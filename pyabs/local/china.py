@@ -21,6 +21,12 @@ freqMap = {"每月": "Monthly"
     , "每季度": "Quarterly"
     , "每半年": "SemiAnnually"}
 
+def mkTag(x):
+    match x:
+        case (tagName,tagValue):
+            return {"tag":tagName,"contents":tagValue}
+        case (tagName):
+            return {"tag":tagName}
 
 def mkBondType(x):
     match x:
@@ -192,6 +198,14 @@ def mkComponent(x):
         case _:
             None
 
+def mkAssumption(x):
+    match x:
+        case {"CPR":cpr}:
+            return mkTag(("PrepaymentCPR",cpr))
+        case {"CDR":cdr}:
+            return mkTag(("DefaultCDR",cdr))
+        case {"回收":(rr,rlag)}:
+            return mkTag(("Recovery",(rr,rlag)))
 
 def mk(x):
     match x:
@@ -295,9 +309,10 @@ class 信贷ABS:
         default_URL = "http://localhost:8081/run_deal2"
         hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         req = json.dumps({"deal": self.json
-                             , "assump": assump
-                             , "bondPricing": mkComponent(pricingInput)}
+                          ,"assump": [ mkAssumption(a) for a in assump ]
+                          ,"bondPricing": mkComponent(pricingInput)}
                          , ensure_ascii=False)
+        self.req = req
         r = requests.post(default_URL
                           , data=req.encode('utf-8')
                           , headers=hdrs)
