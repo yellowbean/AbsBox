@@ -359,17 +359,24 @@ class 信贷ABS:
 
     def show(self,r,x="full"):
         _comps = ['accounts','fees','bonds']
+        agg_acc,agg_fee,agg_bnd = [ pd.concat(r[c].values(),axis=1,keys=r[c].keys()) for c in _comps ]
+
+        agg_acc = pd.concat([agg_acc],keys=["账户"],axis=1)
+        agg_fee = pd.concat([agg_fee],keys=["费用"],axis=1)
+        agg_bnd = pd.concat([agg_bnd],keys=["债券"],axis=1)
+
+        agg_pool = pd.concat([r['pool']['flow']],axis=1,keys=["资产池"])
+        agg_pool = pd.concat([agg_pool],axis=1,keys=["资产池"])
+        _full = agg_fee.merge(agg_bnd,how='outer',on=["日期"]) \
+                   .merge(agg_acc,how='outer',on=["日期"]) \
+                   .merge(agg_pool,how='outer',on=["日期"]).sort_index(axis=1)
+
         match x:
             case "full":
-                agg_acc,agg_fee,agg_bnd = [ pd.concat(r[c].values(),axis=1,keys=r[c].keys()) for c in _comps ]
+                return _full.loc[:,["资产池","费用","账户","债券"]]
+            case "cash":
+                ""
 
-                agg_acc = pd.concat([agg_acc],keys=["账户"],axis=1)
-                agg_fee = pd.concat([agg_fee],keys=["费用"],axis=1)
-                agg_bnd = pd.concat([agg_bnd],keys=["债券"],axis=1)
-
-                agg_pool = pd.concat([r['pool']['flow']],axis=1,keys=["资产池"])
-                agg_pool = pd.concat([agg_pool],axis=1,keys=["资产池"])
-                return agg_fee.merge(agg_bnd,how='outer',on=["日期"]).merge(agg_acc,how='outer',on=["日期"]).merge(agg_pool,how='outer',on=["日期"])
 
 def add_header(x,h):
     new_cols = pd.MultiIndex.from_tuples([(h,y) for y in x.columns])
