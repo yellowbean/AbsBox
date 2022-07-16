@@ -333,10 +333,46 @@ class 信贷ABS:
                 ir = None
                 if x[comp_v[0]]:
                     ir = [_['contents'] for _ in x[comp_v[0]]]
-                output[comp_name][k] = pd.DataFrame(ir, columns=[comp_v[1]])
+                output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("日期")
+        #aggregate fees
+        output['fees'] = { f: v.groupby('日期').agg({"余额": "min", "支付": "sum", "剩余支付": "min"})
+                           for f,v in output['fees'].items()}
+
+        #aggregate accounts
+        output['accounts'] = { f: v.groupby('日期').agg(
+            期初=("余额", max)
+            ,变动额=("变动额", sum)
+            ,期末=("余额", min)) for f,v in output['accounts'].items()}
+
+
         output['pool'] = {}
+        #pool_cols = pd.MultiIndex.from_tuples([("资产池",x) for x in ["日期","未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额"]])
         output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in self.result[0]['pool']['futureCf']]
-                                              , columns=["日期", "未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额"])
+                                              , columns=["日期","未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额"])
+        output['pool']['flow'] = output['pool']['flow'].set_index("日期")
+        output['pool']['flow'].index.rename("日期",inplace=True)
+
+
 
         output['pricing'] = pd.DataFrame.from_dict(self.result[3],orient='index',columns=["估值","票面估值","WAL","久期"])
         return output
+
+    def show(self,r,x="full"):
+        _comps = ['accounts','fees','bonds']
+        match x:
+            case "full":
+                agg_acc,agg_fee,agg_bnd = [ pd.concat(r[c].values(),axis=1,keys=r[c].keys()) for c in _comps ]
+
+                agg_acc = pd.concat([agg_acc],keys=["账户"],axis=1)
+                agg_fee = pd.concat([agg_fee],keys=["费用"],axis=1)
+                agg_bnd = pd.concat([agg_bnd],keys=["债券"],axis=1)
+
+                agg_pool = pd.concat([r['pool']['flow']],axis=1,keys=["资产池"])
+                agg_pool = pd.concat([agg_pool],axis=1,keys=["资产池"])
+                return agg_fee.merge(agg_bnd,how='outer',on=["日期"]).merge(agg_acc,how='outer',on=["日期"]).merge(agg_pool,how='outer',on=["日期"])
+
+def add_header(x,h):
+    new_cols = pd.MultiIndex.from_tuples([(h,y) for y in x.columns])
+    x.columns = new_cols
+    return x
+
