@@ -3,7 +3,7 @@ import functools
 import pandas as pd
 from enum import Enum
 
-from pyabs import *
+from absbox import *
 
 class 频率(Enum):
     每月 = 12

@@ -15,7 +15,7 @@ class API:
         supported_client_versions = echo['version']
         logging.info(f"Connect Successfully with engine version {echo['version']},which support client version {supported_client_versions}")
         if self.version != supported_client_versions:
-            logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['version']} , pls upgrade your api package by: pip -U pyabs")
+            logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['version']} , pls upgrade your api package by: pip -U absbox")
             return
 
 
