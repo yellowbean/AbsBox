@@ -1,13 +1,9 @@
 from dataclasses import dataclass
-from datetime import datetime
 import functools
-import requests
 import pandas as pd
 from enum import Enum
 
 from pyabs import *
-import json
-
 
 class 频率(Enum):
     每月 = 12
@@ -98,14 +94,11 @@ def mkBondRate(x):
 def mkFeeCapType(x):
     match x:
         case {"应计费用百分比": pct}:
-            return {
-                "tag": "DuePct",
-                "contents": pct
-            }
+            return {"tag": "DuePct",
+                    "contents": pct}
         case {"应计费用上限": amt}:
-            return {
-                "tag": "DueCapAmt",
-                "contents": amt}
+            return {"tag": "DueCapAmt",
+                    "contents": amt}
 
 
 def mkWaterfall(x):
@@ -301,24 +294,17 @@ class 信贷ABS:
             fo['feeStart'] = _r['dates']['closing-date']
         return _r  # ,ensure_ascii=False)
 
-    def debug_run(self, assump):
-        return json.dumps({"deal": self.json, "assump": assump}
-                          , ensure_ascii=False)
+    def read_assump(self, assump):
+        if assump:
+            return [ mkAssumption(a) for a in assump ]
+        return None
 
-    def run(self, assump, pricingInput=None, read=True):
-        default_URL = "http://localhost:8081/run_deal2"
-        hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        req = json.dumps({"deal": self.json
-                          ,"assump": [ mkAssumption(a) for a in assump ]
-                          ,"bondPricing": mkComponent(pricingInput)}
-                         , ensure_ascii=False)
-        self.req = req
-        r = requests.post(default_URL
-                          , data=req.encode('utf-8')
-                          , headers=hdrs)
-        self.result = json.loads(r.text)
+    def read_pricing(self, pricing):
+        if pricing:
+            return mkComponent(pricing)
+        return None
 
-    def read(self):
+    def read(self, resp):
         read_paths = {'bonds':
                           ('bndStmt', ["日期", "余额", "利息", "本金", "执行利率", "本息合计", "备注"], "债券")
             , 'fees':
@@ -329,7 +315,7 @@ class 信贷ABS:
         output = {}
         for comp_name, comp_v in read_paths.items():
             output[comp_name] = {}
-            for k, x in self.result[0][comp_name].items():
+            for k, x in resp[0][comp_name].items():
                 ir = None
                 if x[comp_v[0]]:
                     ir = [_['contents'] for _ in x[comp_v[0]]]
@@ -347,39 +333,30 @@ class 信贷ABS:
 
         output['pool'] = {}
         #pool_cols = pd.MultiIndex.from_tuples([("资产池",x) for x in ["日期","未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额"]])
-        output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in self.result[0]['pool']['futureCf']]
+        output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
                                               , columns=["日期","未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额"])
         output['pool']['flow'] = output['pool']['flow'].set_index("日期")
         output['pool']['flow'].index.rename("日期",inplace=True)
 
-
-
-        output['pricing'] = pd.DataFrame.from_dict(self.result[3],orient='index',columns=["估值","票面估值","WAL","久期"])
+        output['pricing'] = pd.DataFrame.from_dict(resp[3],orient='index',columns=["估值","票面估值","WAL","久期"])
         return output
 
-    def show(self,r,x="full"):
-        _comps = ['accounts','fees','bonds']
-        agg_acc,agg_fee,agg_bnd = [ pd.concat(r[c].values(),axis=1,keys=r[c].keys()) for c in _comps ]
+def show(r,x="full"):
+    _comps = ['accounts','fees','bonds']
+    agg_acc,agg_fee,agg_bnd = [ pd.concat(r[c].values(),axis=1,keys=r[c].keys()) for c in _comps ]
 
-        agg_acc = pd.concat([agg_acc],keys=["账户"],axis=1)
-        agg_fee = pd.concat([agg_fee],keys=["费用"],axis=1)
-        agg_bnd = pd.concat([agg_bnd],keys=["债券"],axis=1)
+    agg_acc = pd.concat([agg_acc],keys=["账户"],axis=1)
+    agg_fee = pd.concat([agg_fee],keys=["费用"],axis=1)
+    agg_bnd = pd.concat([agg_bnd],keys=["债券"],axis=1)
 
-        agg_pool = pd.concat([r['pool']['flow']],axis=1,keys=["资产池"])
-        agg_pool = pd.concat([agg_pool],axis=1,keys=["资产池"])
-        _full = agg_fee.merge(agg_bnd,how='outer',on=["日期"]) \
-                   .merge(agg_acc,how='outer',on=["日期"]) \
-                   .merge(agg_pool,how='outer',on=["日期"]).sort_index(axis=1)
+    agg_pool = pd.concat([r['pool']['flow']],axis=1,keys=["资产池"])
+    agg_pool = pd.concat([agg_pool],axis=1,keys=["资产池"])
+    _full = agg_fee.merge(agg_bnd,how='outer',on=["日期"]) \
+               .merge(agg_acc,how='outer',on=["日期"]) \
+               .merge(agg_pool,how='outer',on=["日期"]).sort_index(axis=1)
 
-        match x:
-            case "full":
-                return _full.loc[:,["资产池","费用","账户","债券"]]
-            case "cash":
-                ""
-
-
-def add_header(x,h):
-    new_cols = pd.MultiIndex.from_tuples([(h,y) for y in x.columns])
-    x.columns = new_cols
-    return x
-
+    match x:
+        case "full":
+            return _full.loc[:,["资产池","费用","账户","债券"]]
+        case "cash":
+            ""
