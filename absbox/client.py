@@ -1,4 +1,5 @@
 import json,datetime,logging
+from json.decoder import JSONDecodeError
 import requests
 from dataclasses import dataclass
 
@@ -18,6 +19,14 @@ class API:
             logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['version']} , pls upgrade your api package by: pip -U absbox")
             return
 
+    def build_req(self
+                  ,deal
+                  ,assumptions
+                  ,pricing):
+        return json.dumps({"deal": deal.json
+                       ,"assump": deal.read_assump(assumptions)
+                       ,"bondPricing": deal.read_pricing(pricing)}
+                   , ensure_ascii=False)
 
     def run(self,
             deal,
@@ -31,15 +40,17 @@ class API:
             url = f"{self.url}/run_deal2"
 
         hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        req = json.dumps({"deal": deal.json
-                         ,"assump": deal.read_assump(assumptions)
-                         ,"bondPricing": deal.read_pricing(pricing)}
-                     , ensure_ascii=False)
+        req = self.build_req(deal,assumptions,pricing)
         r = requests.post(url
                           , data=req.encode('utf-8')
                           , headers=hdrs
                           , verify=False)
-        result = json.loads(r.text)
+        try:
+            result = json.loads(r.text)
+        except JSONDecodeError as e:
+            return e
+
+
         if read:
             return deal.read(result)
         else:

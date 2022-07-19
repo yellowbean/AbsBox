@@ -1,10 +1,11 @@
-from distutils.core import setup
+#from distutils.core import setup
 from distutils import util
 from pathlib import Path
+from setuptools import setup
 
 this_directory = Path(__file__).parent
-long_description = (this_directory / "README.md").read_text()
-
+long_description = open("README.md",'r').read()
+print(long_description)
 if __name__ == "__main__":
     local = util.convert_path('absbox/local')
     setup(
@@ -14,16 +15,16 @@ if __name__ == "__main__":
             'absbox.local':local
         },
         packages = ['absbox','absbox.local'],
-        version = '0.1.1.1',
+        version = '0.1.1.3',
         license='Apache',
         description = 'an analytical library for cashflow modeling on ABS/MBS products',
-        long_description = long_description,
         long_description_content_type='text/markdown',
+        long_description = long_description,
         author = 'xiaoyu,zhang',
         author_email = 'always.zhang@gmail.com',
         url = 'https://github.com/yellowbean/PyABS',
         download_url = 'https://github.com/yellowbean/PyABS/archive/refs/tags/pre-release.tar.gz',
-        keywords = ['MBS', 'ABS', 'Modelling','Structured Finance','Cashflow'],
+        keywords = ['MBS', 'ABS', 'Modelling','StructuredFinance','Cashflow'],
         install_requires=[
             'requests',
             'pandas',

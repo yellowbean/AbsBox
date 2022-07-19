@@ -24,6 +24,12 @@ def mkTag(x):
         case (tagName):
             return {"tag":tagName}
 
+class BondType(Enum):
+    固定摊还="固定摊还"
+    过手摊还="过手摊还"
+    锁定摊还="锁定摊还"
+    期间收益="期间收益"
+
 def mkBondType(x):
     match x:
         case {"固定摊还": schedule}:
@@ -37,11 +43,8 @@ def mkBondType(x):
         case {"锁定摊还": _after}:
             return {"tag": "Lockout"
                 , "contents": _after}
-        case {"期间收益": _yield}:
-            return {"tag": "InterestByYield"
-                , "contents": _yield}
-        case _:
-            return {}
+        case {"权益": _ }:
+            return {"tag": "Equity"}
 
 
 def mkAccType(x):
@@ -87,8 +90,6 @@ def mkBondRate(x):
         case {"期间收益": _yield}:
             return {"tag": "InterestByYield"
                 , "contents": _yield}
-        case _:
-            return {}
 
 
 def mkFeeCapType(x):
@@ -131,8 +132,6 @@ def mkWaterfall(x):
         case ["储备账户转移", source, target]:
             return {"tag": "TransferReserve"
                 , "contents": [keep, source, target]}
-        case _:
-            return {}
 
 
 def mkAsset(x):
@@ -157,9 +156,6 @@ def mkAsset(x):
                     currentBalance,
                     currentRate,
                     remainTerms]
-
-        case _:
-            return {}
 
 
 def mkCollection(xs):
@@ -240,9 +236,6 @@ def mk(x):
             return mkCollection(instruction)
         case ["清仓回购", calls]:
             return mkCall(calls)
-        case _:
-            print("Failed to match x")
-            return {}
 
 
 @dataclass
@@ -267,7 +260,7 @@ class 信贷ABS:
 
     @property
     def json(self):
-        closing, cutoff, first_pay = self.日期
+        cutoff, closing, first_pay = self.日期
         """
         get the json formatted string
         """
@@ -357,6 +350,6 @@ def show(r,x="full"):
 
     match x:
         case "full":
-            return _full.loc[:,["资产池","费用","账户","债券"]]
+            return _full.loc[:,["资产池","费用","账户","债券"]].sort_index()
         case "cash":
             ""
