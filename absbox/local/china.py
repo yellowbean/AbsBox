@@ -55,8 +55,12 @@ def mkAccType(x):
         case {"目标储备金额": [base, rate]}:
             return {"tag": "PctReserve"
                 , "contents": [{"tag": baseMap[base]}, rate]}
-        case _:
-            return {}
+        case {"较高":[a,b]}:
+            return {"tag": "Max"
+                    ,"contents": [mkAccType(a),mkAccType(b)]}
+        case {"较低":[a,b]}:
+            return {"tag": "Min"
+                    ,"contents": [mkAccType(a),mkAccType(b)]}
 
 
 def mkFeeType(x):
@@ -83,7 +87,7 @@ def mkBondRate(x):
                     , freqMap[resetInterval]
                     , None
                     , None]}
-        case {"固定": [_rate]}:
+        case {"固定": _rate}:
             return {"tag": "Fix"
                 , "contents": _rate}
 
@@ -195,6 +199,10 @@ def mkAssumption(x):
             return mkTag(("DefaultCDR",cdr))
         case {"回收":(rr,rlag)}:
             return mkTag(("Recovery",(rr,rlag)))
+        case {"利率":[idx, rate]} if isinstance(rate,float):
+            return mkTag(("InterestRateConstant",[idx,rate]))
+        case {"利率":[idx, *rateCurve]}:
+            return mkTag(("InterestRateCurve",[idx,*rateCurve]))
 
 def mk(x):
     match x:
@@ -274,7 +282,8 @@ class 信贷ABS:
                 , "asOfDate": cutoff},
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
-            "waterfall": {"base": [mkWaterfall(w) for w in self.分配规则['违约前']]},
+            "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.分配规则['违约前']]
+                          ,"EndOfPoolCollection":[mkWaterfall(w) for w in self.分配规则['回款后']]},
             "fees": functools.reduce(lambda result, current: result | current
                                      , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]),
             "accounts": functools.reduce(lambda result, current: result | current
@@ -303,8 +312,7 @@ class 信贷ABS:
             , 'fees':
                           ('feeStmt', ["日期", "余额", "支付", "剩余支付", "备注"], "费用")
             , 'accounts':
-                          ('accStmt', ["日期", "余额", "变动额", "备注"], "账户")
-                      }
+                          ('accStmt', ["日期", "余额", "变动额", "备注"], "账户")}
         output = {}
         for comp_name, comp_v in read_paths.items():
             output[comp_name] = {}
@@ -318,11 +326,9 @@ class 信贷ABS:
                            for f,v in output['fees'].items()}
 
         #aggregate accounts
-        output['accounts'] = { f: v.groupby('日期').agg(
-            期初=("余额", max)
-            ,变动额=("变动额", sum)
-            ,期末=("余额", min)) for f,v in output['accounts'].items()}
-
+        output['agg_accounts'] = { f: v.groupby('日期').agg(
+            变动额=("变动额", sum)
+        ) for f,v in output['accounts'].items()}
 
         output['pool'] = {}
         #pool_cols = pd.MultiIndex.from_tuples([("资产池",x) for x in ["日期","未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额"]])
@@ -335,7 +341,7 @@ class 信贷ABS:
         return output
 
 def show(r,x="full"):
-    _comps = ['accounts','fees','bonds']
+    _comps = ['agg_accounts','fees','bonds']
     agg_acc,agg_fee,agg_bnd = [ pd.concat(r[c].values(),axis=1,keys=r[c].keys()) for c in _comps ]
 
     agg_acc = pd.concat([agg_acc],keys=["账户"],axis=1)

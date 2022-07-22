@@ -50,7 +50,6 @@ class API:
         except JSONDecodeError as e:
             return e
 
-
         if read:
             return deal.read(result)
         else:
