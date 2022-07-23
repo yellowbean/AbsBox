@@ -76,6 +76,14 @@ def mkFeeType(x):
         case _:
             return {}
 
+def mkRateReset(x):
+    match x:
+        case {"重置期间":interval,"起始": sdate}:
+            return mkTag(("ByInterval",[freqMap[interval],sdate]))
+        case {"重置期间":interval}:
+            return mkTag(("ByInterval",[freqMap[interval],None]))
+        case {"重置月份":monthOfYear}:
+            return mkTag(("MonthOfYear",monthOfYear))
 
 def mkBondRate(x):
     indexMapping = {"LPR5Y": "LPR5Y", "LIBOR1M": "LIBOR1M"}
@@ -84,7 +92,7 @@ def mkBondRate(x):
             return {"tag": "Floater"
                 , "contents": [indexMapping[_index]
                     , Spread
-                    , freqMap[resetInterval]
+                    , mkRateReset(resetInterval)
                     , None
                     , None]}
         case {"固定": _rate}:
@@ -333,7 +341,7 @@ class 信贷ABS:
         output['pool'] = {}
         #pool_cols = pd.MultiIndex.from_tuples([("资产池",x) for x in ["日期","未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额"]])
         output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
-                                              , columns=["日期","未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额"])
+                                              , columns=["日期","未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额","损失"])
         output['pool']['flow'] = output['pool']['flow'].set_index("日期")
         output['pool']['flow'].index.rename("日期",inplace=True)
 
