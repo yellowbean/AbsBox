@@ -199,6 +199,30 @@ def mkComponent(x):
         case _:
             None
 
+def mkLiq(x):
+    match x :
+        case {"正常余额折价":cf,"违约余额折价":df}:
+            return mkTag(("BalanceFactor",[cf,df]))
+        case {"贴现计价":df, "违约余额回收率":r}:
+            return mkTag(("PV",[df,r]))
+
+def mkCallOptions(x):
+    match x :
+        case {"资产池余额":bal}:
+            return mkTag(("PoolBalance",bal))
+        case {"债券余额":bal}:
+            return mkTag(("PoolBalance",bal))
+        case {"资产池余额剩余比率":factor}:
+            return mkTag(("PoolFactor",factor))
+        case {"债券余额剩余比率":factor}:
+            return mkTag(("PoolFactor",factor))
+        case {"指定日之后":d}:
+            return mkTag(("AfterDate",d))
+        case {"任意满足":xs}:
+            return mkTag(("Or",xs))
+        case {"全部满足":xs}:
+            return mkTag(("And",xs))
+
 def mkAssumption(x):
     match x:
         case {"CPR":cpr}:
@@ -211,6 +235,13 @@ def mkAssumption(x):
             return mkTag(("InterestRateConstant",[idx,rate]))
         case {"利率":[idx, *rateCurve]}:
             return mkTag(("InterestRateCurve",[idx,*rateCurve]))
+        case {"清仓": [opts,liq,accName]}:
+            return mkTag(("CallWhen",
+                     [[ mkCallOptions(co) for co in opts]
+                      ,mkLiq(liq)
+                      ,accName]
+                     ))
+
 
 def mk(x):
     match x:
