@@ -1,6 +1,8 @@
 import json,datetime,logging
 from json.decoder import JSONDecodeError
 import requests
+from requests.exceptions import ConnectionError
+import orjson
 from dataclasses import dataclass
 
 @dataclass
@@ -10,7 +12,13 @@ class API:
     version:str = "0.0.1"
 
     def __post_init__(self):
-        _r = requests.get(f"{self.url}/version",verify=False).text
+        try:
+            _r = requests.get(f"{self.url}/version",verify=False).text
+        except (ConnectionRefusedError, ConnectionError):
+            print(f"Error: Can't not connect to API server {self.url}")
+            self.url = None
+            return
+
         echo = json.loads(_r)
         self.server_info = echo
         supported_client_versions = echo['version']
@@ -41,10 +49,18 @@ class API:
 
         hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         req = self.build_req(deal,assumptions,pricing)
-        r = requests.post(url
-                          , data=req.encode('utf-8')
-                          , headers=hdrs
-                          , verify=False)
+        try:
+            r = requests.post(url
+                              , data=req.encode('utf-8')
+                              , headers=hdrs
+                              , verify=False)
+        except (ConnectionRefusedError, ConnectionError):
+            return None
+
+        if r.status_code != 200:
+            print("Error in response")
+            return r.text
+
         try:
             result = json.loads(r.text)
         except JSONDecodeError as e:
@@ -55,6 +71,13 @@ class API:
         else:
             return result
 
+def save(deal,p:str):
+    def save_to(b):
+        with open(p,'wb') as _f:
+            _f.write(b)
 
+    match deal:
+        case _:
+            save_to(orjson.dumps(deal.json))
 
 
