@@ -1,9 +1,11 @@
-import json,datetime,logging
+import json,datetime,logging,pickle
 from json.decoder import JSONDecodeError
 import requests
 from requests.exceptions import ConnectionError
 import orjson
 from dataclasses import dataclass
+#from dataclasses_json import dataclass_json
+
 
 @dataclass
 class API:
@@ -78,6 +80,6 @@ def save(deal,p:str):
 
     match deal:
         case _:
-            save_to(orjson.dumps(deal.json))
+            save_to(pickle.dumps(deal))
 
 

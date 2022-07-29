@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-import functools
+import functools,pickle
 import orjson
 import pandas as pd
 from enum import Enum
@@ -305,12 +305,18 @@ class 信贷ABS:
     归集规则: tuple
     清仓回购: tuple
 
-    @property
-    def __dict__(self):
-        """
-        get a python dictionary
-        """
-        return asdict(self)
+    #@property
+    #def __dict__(self):
+    #    """
+    #    get a python dictionary
+    #    """
+    #    return asdict(self)
+
+    @classmethod
+    def load(cls,p):
+        with open(p,'rb') as _f:
+            c = _f.read()
+        return pickle.loads(c)
 
     @property
     def json(self):
