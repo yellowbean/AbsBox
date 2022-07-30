@@ -15,7 +15,6 @@ class 频率(Enum):
 
 
 freqMap = {"每月": "Monthly"
-    , "每年": "Annually"
     , "每季度": "Quarterly"
     , "每半年": "SemiAnnually"
     , "每年": "Annually"}
@@ -337,7 +336,7 @@ class 信贷ABS:
             "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.分配规则['违约前']]
                 , "EndOfPoolCollection": [mkWaterfall(w) for w in self.分配规则['回款后']]},
             "fees": functools.reduce(lambda result, current: result | current
-                                     , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]),
+                                     , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]) if self.费用 else {},
             "accounts": functools.reduce(lambda result, current: result | current
                                          , [mk(["账户", accName, accO]) for (accName, accO) in self.账户]),
             "collects": mkCollection(self.归集规则),
@@ -388,7 +387,9 @@ class 信贷ABS:
         output['pool']['flow'] = output['pool']['flow'].set_index("日期")
         output['pool']['flow'].index.rename("日期", inplace=True)
 
-        output['pricing'] = pd.DataFrame.from_dict(resp[3], orient='index', columns=["估值", "票面估值", "WAL", "久期"])
+        output['pricing'] = pd.DataFrame.from_dict(resp[3]
+                                                   , orient='index'
+                                                   , columns=["估值", "票面估值", "WAL", "久期"]) if resp[3] else None
         return output
 
 
@@ -402,20 +403,22 @@ class 信贷ABS:
 
 def show(r, x="full"):
     _comps = ['agg_accounts', 'fees', 'bonds']
-    agg_acc, agg_fee, agg_bnd = [pd.concat(r[c].values(), axis=1, keys=r[c].keys()) for c in _comps]
 
-    agg_acc = pd.concat([agg_acc], keys=["账户"], axis=1)
-    agg_fee = pd.concat([agg_fee], keys=["费用"], axis=1)
-    agg_bnd = pd.concat([agg_bnd], keys=["债券"], axis=1)
+    dfs = { c:pd.concat(r[c].values(), axis=1, keys=r[c].keys())
+                             for c in _comps if r[c] }
+
+    dfs2 = {}
+    _m = {"agg_accounts":"账户","fees":"费用","bonds":"债券"}
+    for k,v in dfs.items():
+        dfs2[_m[k]] = pd.concat([v],keys=[_m[k]],axis=1)
 
     agg_pool = pd.concat([r['pool']['flow']], axis=1, keys=["资产池"])
     agg_pool = pd.concat([agg_pool], axis=1, keys=["资产池"])
-    _full = agg_fee.merge(agg_bnd, how='outer', on=["日期"]) \
-        .merge(agg_acc, how='outer', on=["日期"]) \
-        .merge(agg_pool, how='outer', on=["日期"]).sort_index(axis=1)
+
+    _full = functools.reduce(lambda acc,x: acc.merge(x,how='outer',on=["日期"]),[agg_pool]+list(dfs2.values()))
 
     match x:
         case "full":
-            return _full.loc[:, ["资产池", "费用", "账户", "债券"]].sort_index()
+            return _full.loc[:, ["资产池"]+list(dfs2.keys())].sort_index()
         case "cash":
             ""

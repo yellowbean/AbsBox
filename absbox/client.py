@@ -50,6 +50,12 @@ class API:
             url = f"{self.url}/run_deal2"
 
         hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+
+        if isinstance(deal, str):
+            with open( deal ,'rb') as _f:
+                c = _f.read()
+                deal = pickle.loads(c)
+
         req = self.build_req(deal,assumptions,pricing)
         try:
             r = requests.post(url
