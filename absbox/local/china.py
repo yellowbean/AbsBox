@@ -377,9 +377,19 @@ class 信贷ABS:
                           for f, v in output['fees'].items()}
 
         # aggregate accounts
-        output['agg_accounts'] = {f: v.groupby('日期').agg(
-            变动额=("变动额", sum)
-        ) for f, v in output['accounts'].items()}
+        agg_acc = {}
+        for k,v in output['accounts'].items():
+            acc_by_date = v.groupby("日期")
+            acc_txn_amt = acc_by_date.agg(变动额=("变动额", sum))
+            ending_bal_column = acc_by_date.last()['余额'].rename("期末余额")
+            begin_bal_column = ending_bal_column.shift(1).rename("期初余额")
+            agg_acc[k] = acc_txn_amt.join([begin_bal_column,ending_bal_column])
+
+            fst_idx = agg_acc[k].index[0]
+            agg_acc[k].at[fst_idx,'期初余额'] = round(agg_acc[k].at[fst_idx,'期末余额'] -  agg_acc[k].at[fst_idx,'变动额'],2)
+            agg_acc[k] = agg_acc[k][['期初余额',"变动额",'期末余额']]
+
+        output['agg_accounts'] = agg_acc
 
         output['pool'] = {}
         output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
