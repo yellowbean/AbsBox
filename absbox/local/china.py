@@ -160,7 +160,7 @@ def mkAsset(x):
     match x:
         case ["按揭贷款"
             , {"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm
-                  , "频率": freq, "类型": _type}
+                  , "频率": freq, "类型": _type, "放款日": startDate}
             , {"当前余额": currentBalance
                   , "当前利率": currentRate
                   , "剩余期限": remainTerms}
@@ -172,7 +172,7 @@ def mkAsset(x):
                      },
                      "originTerm": originTerm,
                      "period": freqMap[freq],
-                     "startDate": "2019-01-05",
+                     "startDate": startDate,
                      "prinType": _typeMapping[_type]},
                     currentBalance,
                     currentRate,

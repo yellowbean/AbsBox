@@ -66,8 +66,8 @@ class API:
             return None
 
         if r.status_code != 200:
-            print("Error in response")
-            return r.text
+            print("Error in response:",r.text)
+            return None
 
         try:
             result = json.loads(r.text)
