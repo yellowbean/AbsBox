@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-import functools,pickle
-import orjson
+import functools,pickle,collections
 import pandas as pd
 from enum import Enum
 
@@ -154,6 +153,13 @@ def mkWaterfall(x):
             return {"tag": "TransferReserve"
                 , "contents": [keep, source, target]}
 
+def mkAssetRate(x):
+    match x:
+        case ["固定",r]:
+            return {"tag": "Fix", "contents": r}
+        case ["浮动",r,{"基准":idx,"利差":spd,"重置频率":p}]:
+            return {"tag": "Floater", "contents": [idx,spd,r,freqMap[p],None]}
+            # Floater Index Spread Rate Period (Maybe Floor) 
 
 def mkAsset(x):
     _typeMapping = {"等额本息": "Level", "等额本金": "Even"}
@@ -166,10 +172,8 @@ def mkAsset(x):
                   , "剩余期限": remainTerms}
               ]:
             return [{"originBalance": originBalance,
-                     "originRate": {
-                         "tag": "Fix",
-                         "contents": originRate
-                     },
+                     #"originRate": { "tag": "Fix", "contents": originRate },
+                     "originRate": mkAssetRate(originRate),
                      "originTerm": originTerm,
                      "period": freqMap[freq],
                      "startDate": startDate,
@@ -366,12 +370,14 @@ class 信贷ABS:
                           ('accStmt', ["日期", "余额", "变动额", "备注"], "账户")}
         output = {}
         for comp_name, comp_v in read_paths.items():
+            #output[comp_name] = collections.OrderedDict()
             output[comp_name] = {}
             for k, x in resp[0][comp_name].items():
                 ir = None
                 if x[comp_v[0]]:
                     ir = [_['contents'] for _ in x[comp_v[0]]]
                 output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("日期")
+            output[comp_name] = collections.OrderedDict(sorted(output[comp_name].items()))
         # aggregate fees
         output['fees'] = {f: v.groupby('日期').agg({"余额": "min", "支付": "sum", "剩余支付": "min"})
                           for f, v in output['fees'].items()}
@@ -393,7 +399,7 @@ class 信贷ABS:
 
         output['pool'] = {}
         output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
-                                              , columns=["日期", "未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失"])
+                                              , columns=["日期", "未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失", "利率"])
         output['pool']['flow'] = output['pool']['flow'].set_index("日期")
         output['pool']['flow'].index.rename("日期", inplace=True)
 
@@ -431,4 +437,4 @@ def show(r, x="full"):
         case "full":
             return _full.loc[:, ["资产池"]+list(dfs2.keys())].sort_index()
         case "cash":
-            ""
+            return None # ""

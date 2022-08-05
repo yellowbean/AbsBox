@@ -1,6 +1,11 @@
 # AbsBox 
 a structured finance cashflow engine wrapper
 
+## installation
+
+    pip install absbox
+
+
 ## Goals
 * Provide building blocks to create cashflow models for ABS/MBS
 * Adapt to multiple asset class
