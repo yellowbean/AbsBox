@@ -106,7 +106,6 @@ def mkBondRate(x):
         case {"固定": _rate}:
             return {"tag": "Fix"
                 , "contents": _rate}
-
         case {"期间收益": _yield}:
             return {"tag": "InterestByYield"
                 , "contents": _yield}
@@ -120,16 +119,19 @@ def mkFeeCapType(x):
         case {"应计费用上限": amt}:
             return {"tag": "DueCapAmt",
                     "contents": amt}
-
+def mkFormula(x):
+    match x:
+        case "A+B+C-D":
+            return mkTag(("ABCD"))
 
 def mkWaterfall(x):
     match x:
         case ["账户转移", source, target]:
             return {"tag": "Transfer"
                 , "contents": [source, target, ""]}
-        case ["公式转移", source, target, formula]:
+        case ["按公式账户转移", source, target, formula]:
             return {"tag": "TransferBy"
-                , "contents": [source, target, formula]}
+                , "contents": [source, target, mkFormula(formula)]}
         case ["支付费用", source, target]:
             return {"tag": "PayFee"
                 , "contents": [source, target]}
@@ -337,7 +339,7 @@ class 信贷ABS:
                 , "asOfDate": cutoff},
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
-            "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.分配规则['违约前']]
+            "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.分配规则['未违约']]
                 , "EndOfPoolCollection": [mkWaterfall(w) for w in self.分配规则['回款后']]},
             "fees": functools.reduce(lambda result, current: result | current
                                      , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]) if self.费用 else {},
@@ -362,12 +364,9 @@ class 信贷ABS:
         return None
 
     def read(self, resp):
-        read_paths = {'bonds':
-                          ('bndStmt', ["日期", "余额", "利息", "本金", "执行利率", "本息合计", "备注"], "债券")
-            , 'fees':
-                          ('feeStmt', ["日期", "余额", "支付", "剩余支付", "备注"], "费用")
-            , 'accounts':
-                          ('accStmt', ["日期", "余额", "变动额", "备注"], "账户")}
+        read_paths = {'bonds': ('bndStmt', ["日期", "余额", "利息", "本金", "执行利率", "本息合计", "备注"], "债券")
+                    , 'fees': ('feeStmt', ["日期", "余额", "支付", "剩余支付", "备注"], "费用")
+                    , 'accounts': ('accStmt', ["日期", "余额", "变动额", "备注"], "账户")}
         output = {}
         for comp_name, comp_v in read_paths.items():
             #output[comp_name] = collections.OrderedDict()
@@ -390,7 +389,6 @@ class 信贷ABS:
             ending_bal_column = acc_by_date.last()['余额'].rename("期末余额")
             begin_bal_column = ending_bal_column.shift(1).rename("期初余额")
             agg_acc[k] = acc_txn_amt.join([begin_bal_column,ending_bal_column])
-
             fst_idx = agg_acc[k].index[0]
             agg_acc[k].at[fst_idx,'期初余额'] = round(agg_acc[k].at[fst_idx,'期末余额'] -  agg_acc[k].at[fst_idx,'变动额'],2)
             agg_acc[k] = agg_acc[k][['期初余额',"变动额",'期末余额']]
