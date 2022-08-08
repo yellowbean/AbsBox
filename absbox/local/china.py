@@ -151,7 +151,7 @@ def mkWaterfall(x):
         case ["支付收益", source, target]:
             return {"tag": "PayResidual"
                 , "contents": [source, target]}
-        case ["储备账户转移", source, target]:
+        case ["储备账户转移", source, target, keep]:
             return {"tag": "TransferReserve"
                 , "contents": [keep, source, target]}
 
@@ -164,14 +164,16 @@ def mkAssetRate(x):
             # Floater Index Spread Rate Period (Maybe Floor) 
 
 def mkAsset(x):
-    _typeMapping = {"等额本息": "Level", "等额本金": "Even"}
+    _typeMapping = {"等额本息" :"Level", "等额本金": "Even"}
+    _statusMapping = {"正常":mkTag(("Current")),"违约": mkTag(("Defaulted",None))}
     match x:
         case ["按揭贷款"
-            , {"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm
-                  , "频率": freq, "类型": _type, "放款日": startDate}
-            , {"当前余额": currentBalance
-                  , "当前利率": currentRate
-                  , "剩余期限": remainTerms}
+            ,{"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm
+                  ,"频率": freq, "类型": _type, "放款日": startDate}
+            ,{"当前余额": currentBalance
+             ,"当前利率": currentRate
+             ,"剩余期限": remainTerms
+             ,"状态": status}
               ]:
             return [{"originBalance": originBalance,
                      #"originRate": { "tag": "Fix", "contents": originRate },
@@ -182,7 +184,9 @@ def mkAsset(x):
                      "prinType": _typeMapping[_type]},
                     currentBalance,
                     currentRate,
-                    remainTerms]
+                    remainTerms,
+                    _statusMapping[status]
+                    ]
 
 
 def mkCollection(xs):
@@ -310,12 +314,6 @@ class 信贷ABS:
     归集规则: tuple
     清仓回购: tuple
 
-    #@property
-    #def __dict__(self):
-    #    """
-    #    get a python dictionary
-    #    """
-    #    return asdict(self)
 
     @classmethod
     def load(cls,p):
