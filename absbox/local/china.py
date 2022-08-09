@@ -258,17 +258,28 @@ def mkAssumption(x):
                               , accName]
                           ))
 
+def mkAccTxn(xs):
+    "AccTxn T.Day Balance Amount Comment"
+    if xs is None:
+        return None
+    else:
+        return [ mkTag(("AccTxn",x)) for x in xs]
 
 def mk(x):
     match x:
         case ["资产", assets]:
             return {"assets": [mkAsset(a) for a in assets]}
-        case ["账户", accName, {"余额": bal, "类型": accType}]:
-            return {accName: {"accBalance": bal, "accName": accName, "accType": mkAccType(accType), "accInterest": None,
-                              "accStmt": None}}
-        case ["账户", accName, {"余额": bal}]:
-            return {
-                accName: {"accBalance": bal, "accName": accName, "accType": None, "accInterest": None, "accStmt": None}}
+        case ["账户", accName, attrs]:
+            match attrs:
+                case {"余额": bal, "类型": accType}:
+                    return {accName: {"accBalance": bal, "accName": accName
+                                      , "accType": mkAccType(accType)
+                                      , "accInterest": None
+                                      , "accStmt": mkAccTxn(attrs.get("记录",None))}}
+                case {"余额": bal}:
+                    return { accName: {"accBalance": bal, "accName": accName
+                                      , "accType": None, "accInterest": None
+                                      , "accStmt": mkAccTxn(attrs.get("记录",None))}}
         case ["费用", feeName, {"类型": feeType}]:
             return {feeName: {"feeName": feeName, "feeType": mkFeeType(feeType), "feeStart": None, "feeDue": 0,
                               "feeArrears": 0, "feeLastPaidDay": None}}
@@ -306,7 +317,7 @@ class 信贷ABS:
     名称: str
     日期: tuple  # 起息日: datetime 封包日: datetime 首次兑付日 : datetime
     兑付频率: 频率
-    资产池: tuple
+    资产池: dict
     账户: tuple
     债券: tuple
     费用: tuple
@@ -333,7 +344,7 @@ class 信贷ABS:
                 "cutoff-date": cutoff,
                 "first-pay-date": first_pay},
             "name": self.名称,
-            "pool": {"assets": [mkAsset(x) for x in self.资产池]
+            "pool": {"assets": [mkAsset(x) for x in self.资产池['清单']]
                 , "asOfDate": cutoff},
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
