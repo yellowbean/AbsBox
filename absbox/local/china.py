@@ -124,6 +124,15 @@ def mkFormula(x):
         case "A+B+C-D":
             return mkTag(("ABCD"))
 
+def mkLiqMethod(x):
+    match x:
+        case ["正常|违约",a,b]:
+            return mkTag(("BalanceFactor",[a,b]))
+        case ["正常|拖欠|违约",a,b,c]:
+            return mkTag(("BalanceFactor2",[a,b,c]))
+        case ["贴现|违约",a,b]:
+            return mkTag(("PV",[a,b]))
+
 def mkWaterfall(x):
     match x:
         case ["账户转移", source, target]:
@@ -133,27 +142,28 @@ def mkWaterfall(x):
             return {"tag": "TransferBy"
                 , "contents": [source, target, mkFormula(formula)]}
         case ["支付费用", source, target]:
-            return {"tag": "PayFee"
-                , "contents": [source, target]}
+            return mkTag(("PayFee",[source, target])
+        case ["支付费用收益", source, target, limit]:
+            return mkTag(("PayFeeResidual",[limit, source, target])
+        case ["支付费用收益", source, target]:
+            return mkTag(("PayFeeResidual",[None, source, target])
         case ["支付费用限额", source, target, _limit]:
             limit = mkFeeCapType(_limit)
-            return {"tag": "PayFeeBy"
-                , "contents": [limit, source, target]}
+            return mkTag(("PayFeeBy",[limit, source, target]))
         case ["支付利息", source, target]:
-            return {"tag": "PayInt"
-                , "contents": [source, target]}
+            return mkTag(("PayInt",[source, target]))
         case ["支付本金", source, target]:
-            return {"tag": "PayPrin"
-                , "contents": [source, target]}
+            return mkTag(("PayPrin",[source, target]))
         case ["支付期间收益", source, target]:
-            return {"tag": "PayTillYield"
-                , "contents": [source, target]}
+            return mkTag(("PayTillYield",[source, target]))
+        case ["支付收益", source, target, limit]:
+            return mkTag(("PayResidual",[limit, source, target]))
         case ["支付收益", source, target]:
-            return {"tag": "PayResidual"
-                , "contents": [source, target]}
+            return mkTag(("PayResidual",[None, source, target]))
         case ["储备账户转移", source, target, keep]:
-            return {"tag": "TransferReserve"
-                , "contents": [keep, source, target]}
+            return mkTag(("TransferReserve",[keep, source, target]))
+        case ["出售资产", liq, target]:
+            return mkTag(("LiquidatePool",[mkLiqMethod(liq), target]))
 
 def mkAssetRate(x):
     match x:
@@ -176,7 +186,6 @@ def mkAsset(x):
              ,"状态": status}
               ]:
             return [{"originBalance": originBalance,
-                     #"originRate": { "tag": "Fix", "contents": originRate },
                      "originRate": mkAssetRate(originRate),
                      "originTerm": originTerm,
                      "period": freqMap[freq],
@@ -241,7 +250,9 @@ def mkCallOptions(x):
 
 def mkAssumption(x):
     match x:
-        case {"CPR": cpr}:
+        case {"CPR": cpr} if isinstance(cpr,list):
+            return mkTag(("PrepaymentCPRCurve", cpr))
+        case {"CPR": cpr} :
             return mkTag(("PrepaymentCPR", cpr))
         case {"CDR": cdr}:
             return mkTag(("DefaultCDR", cdr))
@@ -349,7 +360,8 @@ class 信贷ABS:
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
             "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.分配规则['未违约']]
-                , "EndOfPoolCollection": [mkWaterfall(w) for w in self.分配规则['回款后']]},
+                        , "EndOfPoolCollection": [mkWaterfall(w) for w in self.分配规则['回款后']]
+                        , "CleanUp":[mkWaterfall(w) for w in self.分配规则['清仓回购']]},
             "fees": functools.reduce(lambda result, current: result | current
                                      , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]) if self.费用 else {},
             "accounts": functools.reduce(lambda result, current: result | current
