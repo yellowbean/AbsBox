@@ -6,6 +6,12 @@ import orjson
 from dataclasses import dataclass
 #from dataclasses_json import dataclass_json
 
+def mkTag(x):
+    match x:
+        case (tagName, tagValue):
+            return {"tag": tagName, "contents": tagValue}
+        case (tagName):
+            return {"tag": tagName }
 
 @dataclass
 class API:
@@ -33,6 +39,14 @@ class API:
                   ,deal
                   ,assumptions
                   ,pricing):
+        if any(isinstance(i, list) for i in assumptions):
+        #if isinstance(assumptions,list):
+            return json.dumps({"_deal": deal.json
+                       ,"_assump": mkTag(("Multiple"
+                                          ,[ deal.read_assump(a) for a in assumptions ]))
+                       ,"_bondPricing": deal.read_pricing(pricing)}
+                   , ensure_ascii=False)
+
         return json.dumps({"deal": deal.json
                        ,"assump": deal.read_assump(assumptions)
                        ,"bondPricing": deal.read_pricing(pricing)}
@@ -44,10 +58,15 @@ class API:
             pricing=None,
             custom_endpoint=None,
             read=True):
+        multi_run_flag = any(isinstance(i, list) for i in assumptions)
         if custom_endpoint:
             url = f"{self.url}/{custom_endpoint}"
         else:
-            url = f"{self.url}/run_deal2"
+            if multi_run_flag:
+                url = f"{self.url}/run_deal"
+            else:
+                url = f"{self.url}/run_deal2"
+                
 
         hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
@@ -56,6 +75,7 @@ class API:
                 c = _f.read()
                 deal = pickle.loads(c)
 
+        print(multi_run_flag)
         req = self.build_req(deal,assumptions,pricing)
         try:
             r = requests.post(url
@@ -75,9 +95,12 @@ class API:
             return e
 
         if read:
+            if multi_run_flag:
+                return [ deal.read(_r) for _r in result ]
             return deal.read(result)
         else:
             return result
+
 
 def save(deal,p:str):
     def save_to(b):

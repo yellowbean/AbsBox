@@ -142,11 +142,11 @@ def mkWaterfall(x):
             return {"tag": "TransferBy"
                 , "contents": [source, target, mkFormula(formula)]}
         case ["支付费用", source, target]:
-            return mkTag(("PayFee",[source, target])
+            return mkTag(("PayFee",[source, target]))
         case ["支付费用收益", source, target, limit]:
-            return mkTag(("PayFeeResidual",[limit, source, target])
+            return mkTag(("PayFeeResidual",[limit, source, target]))
         case ["支付费用收益", source, target]:
-            return mkTag(("PayFeeResidual",[None, source, target])
+            return mkTag(("PayFeeResidual",[None, source, target]))
         case ["支付费用限额", source, target, _limit]:
             limit = mkFeeCapType(_limit)
             return mkTag(("PayFeeBy",[limit, source, target]))
