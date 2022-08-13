@@ -262,12 +262,8 @@ def mkAssumption(x):
             return mkTag(("InterestRateConstant", [idx, rate]))
         case {"利率": [idx, *rateCurve]}:
             return mkTag(("InterestRateCurve", [idx, *rateCurve]))
-        case {"清仓": [opts, liq, accName]}:
-            return mkTag(("CallWhen",
-                          [[mkCallOptions(co) for co in opts]
-                              , mkLiq(liq)
-                              , accName]
-                          ))
+        case {"清仓": opts}:
+            return mkTag(("CallWhen",[mkCallOptions(co) for co in opts]))
 
 def mkAccTxn(xs):
     "AccTxn T.Day Balance Amount Comment"

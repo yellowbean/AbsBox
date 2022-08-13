@@ -2,7 +2,6 @@ import json,datetime,logging,pickle
 from json.decoder import JSONDecodeError
 import requests
 from requests.exceptions import ConnectionError
-import orjson
 from dataclasses import dataclass
 #from dataclasses_json import dataclass_json
 
@@ -57,7 +56,8 @@ class API:
             assumptions=None,
             pricing=None,
             custom_endpoint=None,
-            read=True):
+            read=True,
+            timing=False):
         multi_run_flag = any(isinstance(i, list) for i in assumptions)
         if custom_endpoint:
             url = f"{self.url}/{custom_endpoint}"
@@ -66,22 +66,23 @@ class API:
                 url = f"{self.url}/run_deal"
             else:
                 url = f"{self.url}/run_deal2"
-                
 
         hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
         if isinstance(deal, str):
-            with open( deal ,'rb') as _f:
+            with open(deal,'rb') as _f:
                 c = _f.read()
                 deal = pickle.loads(c)
 
-        print(multi_run_flag)
+
         req = self.build_req(deal,assumptions,pricing)
         try:
+            print("sending req",datetime.datetime.now())
             r = requests.post(url
                               , data=req.encode('utf-8')
                               , headers=hdrs
                               , verify=False)
+            print("done req",datetime.datetime.now())
         except (ConnectionRefusedError, ConnectionError):
             return None
 
@@ -94,10 +95,16 @@ class API:
         except JSONDecodeError as e:
             return e
 
+        t_reading_s = datetime.datetime.now()
+        print(t_reading_s)
         if read:
             if multi_run_flag:
-                return [ deal.read(_r) for _r in result ]
-            return deal.read(result)
+                __r = [ deal.read(_r) for _r in result ]
+            else:
+                __r = deal.read(result)
+            t_reading_e = datetime.datetime.now()
+            print(t_reading_e)
+            return __r
         else:
             return result
 
