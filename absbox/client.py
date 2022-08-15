@@ -51,6 +51,67 @@ class API:
                        ,"bondPricing": deal.read_pricing(pricing)}
                    , ensure_ascii=False)
 
+    def validate(self, _r):
+        error = []
+        warning = []
+        _r = json.loads(_r)
+        _d = _r['deal']
+        valid_acc = set(_d['accounts'].keys())
+        valid_bnd = set(_d['bonds'].keys())
+        valid_fee = set(_d['fees'].keys())
+        _w = _d['waterfall']
+        for wn,wa in _w.items():
+            for idx,action in enumerate(wa):
+                #print(action)
+                match action['tag']:
+                    case 'PayFeeBy':
+                        if (not set(action['contents'][1]).issubset(valid_acc)) \
+                            or (not set(action['contents'][2]).issubset(valid_fee)):
+                            error.append(f"{wn},{idx}")
+                    case 'PayFee':
+                        if (not set(action['contents'][0]).issubset(valid_acc)) \
+                            or (not set(action['contents'][1]).issubset(valid_fee)):
+                            error.append(f"{wn},{idx}")     
+                    case 'PayInt':
+                        if (action['contents'][0] not in valid_acc) \
+                            or (not set(action['contents'][1]).issubset(valid_bnd)):
+                            error.append(f"{wn},{idx}")  
+                    case 'PayPrin':
+                        if (action['contents'][0] not in valid_acc) \
+                            or (not set(action['contents'][1]).issubset(valid_bnd)):
+                            error.append(f"{wn},{idx}")  
+                    case 'PayResidual':
+                        if (action['contents'][1] not in valid_acc) \
+                            or (action['contents'][2] not in valid_bnd):
+                            error.append(f"{wn},{idx}")  
+                    case 'Transfer':
+                        if (action['contents'][0] not in valid_acc) \
+                            or (action['contents'][1] not in valid_acc):
+                            error.append(f"{wn},{idx}")
+                    case 'TransferBy':
+                        if (action['contents'][0] not in valid_acc) \
+                            or (action['contents'][1] not in valid_acc):
+                            error.append(f"{wn},{idx}")
+                    case 'PayTillYield':
+                        if (action['contents'][0] not in valid_acc) \
+                            or (action['contents'][1] not in valid_bnd):
+                            error.append(f"{wn},{idx}")
+                    case 'PayFeeResidual':
+                        if (action['contents'][1] not in valid_acc) \
+                            or (action['contents'][2] not in valid_fee):
+                            error.append(f"{wn},{idx}")        
+        _d = _r['deal']['dates']
+        if _d['closing-date'] >= _d['first-pay-date']:
+            error.append(f"dates,first pay date/next pay date should be after closing date")
+        if _d['cutoff-date'] >= _d['first-pay-date']:
+            error.append(f"dates,first pay date/next pay date should be after cutoff date")
+
+        if len(error)>0:
+            return False,error,warning
+        else:
+            return True,error,warning
+
+
     def run(self,
             deal,
             assumptions=None,
@@ -76,6 +137,12 @@ class API:
 
 
         req = self.build_req(deal,assumptions,pricing)
+
+        #validate deal
+        deal_validate,err,warn = self.validate(req)
+        if not deal_validate:
+            return deal_validate,err,warn
+
         try:
             print("sending req",datetime.datetime.now())
             r = requests.post(url

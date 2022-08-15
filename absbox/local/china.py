@@ -18,7 +18,9 @@ freqMap = {"每月": "Monthly"
     , "每半年": "SemiAnnually"
     , "每年": "Annually"}
 
-baseMap = {"资产池余额": "CurrentPoolBalance", "资产池当期利息": "PoolCollectionInt"}
+baseMap = {"资产池余额": "CurrentPoolBalance"
+           ,"资产池初始余额":"OriginalPoolBalance"
+           ,"资产池当期利息": "PoolCollectionInt"}
 
 
 def mkTag(x):
@@ -45,22 +47,20 @@ def mkBondType(x):
                     "tag": "AmountCurve",
                     "contents": schedule}}
         case {"过手摊还": None}:
-            return {"tag": "Sequential"}
+            return mkTag(("Sequential"))
         case {"锁定摊还": _after}:
-            return {"tag": "Lockout"
-                , "contents": _after}
+            return mkTag(("Lockout",_after))
         case {"权益": _}:
-            return {"tag": "Equity"}
+            return mkTag(("Equity"))
+
 
 
 def mkAccType(x):
-    baseMap = {"资产池余额": "CurrentPoolBalance"}
     match x:
         case {"固定储备金额": amt}:
             return {"tag": "FixReserve", "contents": amt}
         case {"目标储备金额": [base, rate]}:
-            return {"tag": "PctReserve"
-                , "contents": [{"tag": baseMap[base]}, rate]}
+            return mkTag(("PctReserve",[mkTag(baseMap[base]), rate]))
         case {"较高": [a, b]}:
             return {"tag": "Max"
                 , "contents": [mkAccType(a), mkAccType(b)]}
@@ -104,21 +104,26 @@ def mkBondRate(x):
                     , None
                     , None]}
         case {"固定": _rate}:
-            return {"tag": "Fix"
-                , "contents": _rate}
+            return mkTag(("Fix",_rate))
         case {"期间收益": _yield}:
-            return {"tag": "InterestByYield"
-                , "contents": _yield}
+            return mkTag(("InterestByYield",_yield))
 
 
 def mkFeeCapType(x):
     match x:
         case {"应计费用百分比": pct}:
-            return {"tag": "DuePct",
-                    "contents": pct}
+            return mkTag(("DuePct",pct))
         case {"应计费用上限": amt}:
-            return {"tag": "DueCapAmt",
-                    "contents": amt}
+            return mkTag(("DueCapAmt",amt))
+
+def mkAccountCapType(x):
+    match x:
+        case {"余额百分比": pct}:
+            return mkTag(("DuePct",pct))
+        case {"金额上限": amt}:
+            return mkTag(("DueCapAmt",amt))
+
+    
 def mkFormula(x):
     match x:
         case "A+B+C-D":
@@ -136,14 +141,13 @@ def mkLiqMethod(x):
 def mkWaterfall(x):
     match x:
         case ["账户转移", source, target]:
-            return {"tag": "Transfer"
-                , "contents": [source, target, ""]}
+            return mkTag(("Transfer",[source, target, ""]))
         case ["按公式账户转移", source, target, formula]:
-            return {"tag": "TransferBy"
-                , "contents": [source, target, mkFormula(formula)]}
+            return mkTag(("TransferBy",[source, target, mkFormula(formula)]))
         case ["支付费用", source, target]:
             return mkTag(("PayFee",[source, target]))
-        case ["支付费用收益", source, target, limit]:
+        case ["支付费用收益", source, target, _limit]:
+            limit = mkAccountCapType(_limit)
             return mkTag(("PayFeeResidual",[limit, source, target]))
         case ["支付费用收益", source, target]:
             return mkTag(("PayFeeResidual",[None, source, target]))
@@ -160,8 +164,9 @@ def mkWaterfall(x):
             return mkTag(("PayResidual",[limit, source, target]))
         case ["支付收益", source, target]:
             return mkTag(("PayResidual",[None, source, target]))
-        case ["储备账户转移", source, target, keep]:
-            return mkTag(("TransferReserve",[keep, source, target]))
+        case ["储备账户转移", source, target, satisfy]:
+            _map = {"源储备":"Source","目标储备":"Target"}
+            return mkTag(("TransferReserve",[_map[satisfy], source, target, None]))
         case ["出售资产", liq, target]:
             return mkTag(("LiquidatePool",[mkLiqMethod(liq), target]))
 
@@ -197,6 +202,17 @@ def mkAsset(x):
                     _statusMapping[status]
                     ]
 
+def readIssuance(pool):
+    if '发行' not in pool.keys():
+        return None
+    issuanceField = {
+        "资产池规模":"IssuanceBalance"
+    }
+    r = {} 
+    for k,v in pool['发行'].items():
+        r[issuanceField[k]] = v
+
+    return r
 
 def mkCollection(xs):
     sourceMapping = {"利息回款": "CollectedInterest", "本金回款": "CollectedPrincipal"
@@ -352,7 +368,8 @@ class 信贷ABS:
                 "first-pay-date": first_pay},
             "name": self.名称,
             "pool": {"assets": [mkAsset(x) for x in self.资产池['清单']]
-                , "asOfDate": cutoff},
+                , "asOfDate": cutoff
+                , "issuance": readIssuance(self.资产池)},
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
             "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.分配规则['未违约']]
@@ -370,6 +387,7 @@ class 信贷ABS:
             fo['feeStart'] = _r['dates']['closing-date']
         return _r  # ,ensure_ascii=False)
 
+   
     def read_assump(self, assump):
         if assump:
             return [mkAssumption(a) for a in assump]
@@ -406,6 +424,9 @@ class 信贷ABS:
             ending_bal_column = acc_by_date.last()['余额'].rename("期末余额")
             begin_bal_column = ending_bal_column.shift(1).rename("期初余额")
             agg_acc[k] = acc_txn_amt.join([begin_bal_column,ending_bal_column])
+            if agg_acc[k].empty:
+                agg_acc[k].columns = ['期初余额',"变动额",'期末余额']
+                continue
             fst_idx = agg_acc[k].index[0]
             agg_acc[k].at[fst_idx,'期初余额'] = round(agg_acc[k].at[fst_idx,'期末余额'] -  agg_acc[k].at[fst_idx,'变动额'],2)
             agg_acc[k] = agg_acc[k][['期初余额',"变动额",'期末余额']]
