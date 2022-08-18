@@ -5,7 +5,6 @@ from setuptools import setup
 
 this_directory = Path(__file__).parent
 long_description = open("README.md",'r').read()
-print(long_description)
 if __name__ == "__main__":
     local = util.convert_path('absbox/local')
     setup(

@@ -41,11 +41,7 @@ class BondType(Enum):
 def mkBondType(x):
     match x:
         case {"固定摊还": schedule}:
-            return {
-                "tag": "PAC",
-                "contents": {
-                    "tag": "AmountCurve",
-                    "contents": schedule}}
+            return mkTag(("PAC" ,mkTag(("AmountCurve", schedule))))
         case {"过手摊还": None}:
             return mkTag(("Sequential"))
         case {"锁定摊还": _after}:
@@ -54,29 +50,24 @@ def mkBondType(x):
             return mkTag(("Equity"))
 
 
-
 def mkAccType(x):
     match x:
         case {"固定储备金额": amt}:
-            return {"tag": "FixReserve", "contents": amt}
+            return mkTag(("FixReserve",amt))
         case {"目标储备金额": [base, rate]}:
             return mkTag(("PctReserve",[mkTag(baseMap[base]), rate]))
         case {"较高": [a, b]}:
-            return {"tag": "Max"
-                , "contents": [mkAccType(a), mkAccType(b)]}
+            return mkTag(("Max",[mkAccType(a), mkAccType(b)]))
         case {"较低": [a, b]}:
-            return {"tag": "Min"
-                , "contents": [mkAccType(a), mkAccType(b)]}
+            return mkTag(("Min",[mkAccType(a), mkAccType(b)]))
 
 
 def mkFeeType(x):
     match x:
         case {"年化费率": [base, rate]}:
-            return {"tag": "AnnualRateFee"
-                , "contents": [{"tag": baseMap[base]}, rate]}
+            return mkTag(("AnnualRateFee",[{"tag": baseMap[base]}, rate]))
         case {"百分比费率": [base, rate]}:
-            return {"tag": "PctFee"
-                , "contents": [{"tag": baseMap[base]}, rate]}
+            return mkTag(("PctFee",[{"tag": baseMap[base]}, rate]))
         case {"固定费用": amt}:
             return mkTag(("FixFee", amt))
         case {"周期费用": [p, amt]}:
@@ -173,10 +164,9 @@ def mkWaterfall(x):
 def mkAssetRate(x):
     match x:
         case ["固定",r]:
-            return {"tag": "Fix", "contents": r}
+            return mkTag(("Fix",r))
         case ["浮动",r,{"基准":idx,"利差":spd,"重置频率":p}]:
-            return {"tag": "Floater", "contents": [idx,spd,r,freqMap[p],None]}
-            # Floater Index Spread Rate Period (Maybe Floor) 
+            return mkTag(("Floater",[idx,spd,r,freqMap[p],None]))
 
 def mkAsset(x):
     _typeMapping = {"等额本息" :"Level", "等额本金": "Even"}
@@ -190,7 +180,7 @@ def mkAsset(x):
              ,"剩余期限": remainTerms
              ,"状态": status}
               ]:
-            return [{"originBalance": originBalance,
+            return mkTag(("Mortgage",[{"originBalance": originBalance,
                      "originRate": mkAssetRate(originRate),
                      "originTerm": originTerm,
                      "period": freqMap[freq],
@@ -200,7 +190,7 @@ def mkAsset(x):
                     currentRate,
                     remainTerms,
                     _statusMapping[status]
-                    ]
+                    ]))
 
 def readIssuance(pool):
     if '发行' not in pool.keys():
@@ -369,7 +359,7 @@ class 信贷ABS:
             "name": self.名称,
             "pool": {"assets": [mkAsset(x) for x in self.资产池['清单']]
                 , "asOfDate": cutoff
-                , "issuance": readIssuance(self.资产池)},
+                , "issuanceStat": readIssuance(self.资产池)},
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
             "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.分配规则['未违约']]
@@ -387,6 +377,11 @@ class 信贷ABS:
             fo['feeStart'] = _r['dates']['closing-date']
         return _r  # ,ensure_ascii=False)
 
+    def _get_bond(self, bn):
+        for _bn,_bo in self.债券:
+            if _bn == bn:
+                return _bo
+        return None
    
     def read_assump(self, assump):
         if assump:
@@ -398,7 +393,7 @@ class 信贷ABS:
             return mkComponent(pricing)
         return None
 
-    def read(self, resp):
+    def read(self, resp, position=None):
         read_paths = {'bonds': ('bndStmt', ["日期", "余额", "利息", "本金", "执行利率", "本息合计", "备注"], "债券")
                     , 'fees': ('feeStmt', ["日期", "余额", "支付", "剩余支付", "备注"], "费用")
                     , 'accounts': ('accStmt', ["日期", "余额", "变动额", "备注"], "账户")}
@@ -442,6 +437,16 @@ class 信贷ABS:
         output['pricing'] = pd.DataFrame.from_dict(resp[3]
                                                    , orient='index'
                                                    , columns=["估值", "票面估值", "WAL", "久期"]) if resp[3] else None
+        if position:
+            output['position'] = {}
+            for k,v in position.items():
+                if k in output['bonds']:
+                    b = self._get_bond(k)
+                    factor = v / b["初始余额"] / 100
+                    if factor > 1.0:
+                        raise  RuntimeError("持仓系数大于1.0")
+                    output['position'][k] = output['bonds'][k][['本金','利息','本息合计']].apply(lambda x:x*factor).round(4)
+
         return output
 
 

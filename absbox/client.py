@@ -118,6 +118,7 @@ class API:
             pricing=None,
             custom_endpoint=None,
             read=True,
+            position=None,
             timing=False):
         multi_run_flag = any(isinstance(i, list) for i in assumptions)
         if custom_endpoint:
@@ -163,14 +164,12 @@ class API:
             return e
 
         t_reading_s = datetime.datetime.now()
-        print(t_reading_s)
         if read:
             if multi_run_flag:
-                __r = [ deal.read(_r) for _r in result ]
+                __r = [ deal.read(_r,position=position) for _r in result ]
             else:
-                __r = deal.read(result)
+                __r = deal.read(result,position=position)
             t_reading_e = datetime.datetime.now()
-            print(t_reading_e)
             return __r
         else:
             return result

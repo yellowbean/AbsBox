@@ -130,3 +130,10 @@ dmypy.json
 
 *.ipynb
 pyabs/*.ipynb
+.idea/aws.xml
+.idea/git_toolbox_prj.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/PyABS.iml
+.idea/vcs.xml
+.idea/workspace.xml
