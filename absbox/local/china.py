@@ -334,7 +334,7 @@ class 信贷ABS:
     账户: tuple
     债券: tuple
     费用: tuple
-    分配规则: tuple
+    分配规则: dict
     归集规则: tuple
     清仓回购: tuple
 
@@ -362,9 +362,9 @@ class 信贷ABS:
                 , "issuanceStat": readIssuance(self.资产池)},
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
-            "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.分配规则['未违约']]
-                        , "EndOfPoolCollection": [mkWaterfall(w) for w in self.分配规则['回款后']]
-                        , "CleanUp":[mkWaterfall(w) for w in self.分配规则['清仓回购']]},
+            "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.分配规则.get('未违约',[])]
+                        , "EndOfPoolCollection": [mkWaterfall(w) for w in self.分配规则.get('回款后',[])]
+                        , "CleanUp":[mkWaterfall(w) for w in self.分配规则.get('清仓回购',[])},
             "fees": functools.reduce(lambda result, current: result | current
                                      , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]) if self.费用 else {},
             "accounts": functools.reduce(lambda result, current: result | current
