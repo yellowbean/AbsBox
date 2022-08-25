@@ -37,7 +37,7 @@ class API:
     def build_req(self
                   ,deal
                   ,assumptions
-                  ,pricing):
+                  ,pricing=None):
         if any(isinstance(i, list) for i in assumptions):
         #if isinstance(assumptions,list):
             return json.dumps({"_deal": deal.json
@@ -55,7 +55,8 @@ class API:
         error = []
         warning = []
         _r = json.loads(_r)
-        _d = _r['deal']
+        _deal_key = 'deal' if 'deal' in _r else '_deal'
+        _d = _r[_deal_key] 
         valid_acc = set(_d['accounts'].keys())
         valid_bnd = set(_d['bonds'].keys())
         valid_fee = set(_d['fees'].keys())
@@ -100,7 +101,7 @@ class API:
                         if (action['contents'][1] not in valid_acc) \
                             or (action['contents'][2] not in valid_fee):
                             error.append(f"{wn},{idx}")        
-        _d = _r['deal']['dates']
+        _d = _r[_deal_key]['dates']
         if _d['closing-date'] >= _d['first-pay-date']:
             error.append(f"dates,first pay date/next pay date should be after closing date")
         if _d['cutoff-date'] >= _d['first-pay-date']:
@@ -120,7 +121,11 @@ class API:
             read=True,
             position=None,
             timing=False):
-        multi_run_flag = any(isinstance(i, list) for i in assumptions)
+        if assumptions:
+            multi_run_flag = any(isinstance(i, list) for i in assumptions)
+        else:
+            multi_run_flag = False 
+            
         if custom_endpoint:
             url = f"{self.url}/{custom_endpoint}"
         else:

@@ -1,10 +1,11 @@
-#from distutils.core import setup
 from distutils import util
 from pathlib import Path
 from setuptools import setup
 
 this_directory = Path(__file__).parent
-long_description = open("README.md",'r').read()
+with open("README.md",'r') as f:
+    long_description = f.read()
+
 if __name__ == "__main__":
     local = util.convert_path('absbox/local')
     setup(
@@ -14,7 +15,7 @@ if __name__ == "__main__":
             'absbox.local':local
         },
         packages = ['absbox','absbox.local'],
-        version = '0.1.1.6',
+        version = '0.1.1.9',
         license='Apache',
         description = 'an analytical library for cashflow modeling on ABS/MBS products',
         long_description_content_type='text/markdown',

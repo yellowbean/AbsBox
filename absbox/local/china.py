@@ -192,6 +192,12 @@ def mkAsset(x):
                     _statusMapping[status]
                     ]))
 
+def mkCf(x):
+    if len(x)==0:
+        return None
+    else:
+        return [ mkTag(("MortgageFlow",_x+([0.0]*5))) for _x in x]
+
 def readIssuance(pool):
     if '发行' not in pool.keys():
         return None
@@ -357,14 +363,16 @@ class 信贷ABS:
                 "cutoff-date": cutoff,
                 "first-pay-date": first_pay},
             "name": self.名称,
-            "pool": {"assets": [mkAsset(x) for x in self.资产池['清单']]
+            "pool": {"assets": [mkAsset(x) for x in self.资产池.get('清单',[])]
                 , "asOfDate": cutoff
-                , "issuanceStat": readIssuance(self.资产池)},
+                , "issuanceStat": readIssuance(self.资产池)
+                , "futureCf":mkCf(self.资产池.get('归集表',[]))
+                },
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
             "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.分配规则.get('未违约',[])]
                         , "EndOfPoolCollection": [mkWaterfall(w) for w in self.分配规则.get('回款后',[])]
-                        , "CleanUp":[mkWaterfall(w) for w in self.分配规则.get('清仓回购',[])},
+                        , "CleanUp":[mkWaterfall(w) for w in self.分配规则.get('清仓回购',[])]},
             "fees": functools.reduce(lambda result, current: result | current
                                      , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]) if self.费用 else {},
             "accounts": functools.reduce(lambda result, current: result | current
@@ -479,3 +487,28 @@ def show(r, x="full"):
             return _full.loc[:, ["资产池"]+list(dfs2.keys())].sort_index()
         case "cash":
             return None # ""
+
+
+import matplotlib.pyplot as plt
+from matplotlib import font_manager
+
+fontP = font_manager.FontProperties()
+fontP.set_family('Source Han Sans')
+fontP.set_size(14)
+
+def plot_bond(rs, bnd, flow='本息合计'):
+    plt.figure(figsize=(12,8))
+    _alpha =  0.8
+    for idx,s in enumerate(rs):
+        plt.step(s['bonds'][bnd].index,s['bonds'][bnd][[flow]], alpha=_alpha, linewidth=5, label=f"场景-{idx}")
+
+    plt.legend(loc='upper left', prop=fontP)
+    plt.title(f'{len(rs)} 种场景下 债券:{bnd} - {flow}', fontproperties=fontP)
+
+    plt.grid(True)
+    plt.axis('tight')
+    plt.xticks(rotation=30)
+
+    current_values = plt.gca().get_yticks()
+    plt.gca().set_yticklabels(['{:.0f}(w)'.format(x/10000) for x in current_values])
+    return plt
