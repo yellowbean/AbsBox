@@ -492,9 +492,18 @@ def show(r, x="full"):
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
 
-fontP = font_manager.FontProperties()
-fontP.set_family('Source Han Sans')
-fontP.set_size(14)
+def init_plot_fonts():
+    define_list = ['Source Han Serif CN','Microsoft Yahei','STXihei']
+    support_list = font_manager.findSystemFonts(fontpaths=None, fontext='ttf')
+    font_p = font_manager.FontProperties()
+    for sl in support_list:
+        f = font_manager.get_font(sl)
+        if f.family_name in set(define_list):
+            font_p.set_family(f.family_name)
+            font_p.set_size(14)
+            return font_p
+
+font_p = init_plot_fonts()
 
 def plot_bond(rs, bnd, flow='本息合计'):
     plt.figure(figsize=(12,8))
@@ -502,8 +511,8 @@ def plot_bond(rs, bnd, flow='本息合计'):
     for idx,s in enumerate(rs):
         plt.step(s['bonds'][bnd].index,s['bonds'][bnd][[flow]], alpha=_alpha, linewidth=5, label=f"场景-{idx}")
 
-    plt.legend(loc='upper left', prop=fontP)
-    plt.title(f'{len(rs)} 种场景下 债券:{bnd} - {flow}', fontproperties=fontP)
+    plt.legend(loc='upper left', prop=font_p)
+    plt.title(f'{len(rs)} 种场景下 债券:{bnd} - {flow}', fontproperties=font_p)
 
     plt.grid(True)
     plt.axis('tight')
