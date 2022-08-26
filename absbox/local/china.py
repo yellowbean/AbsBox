@@ -449,7 +449,7 @@ class 信贷ABS:
 
         output['pricing'] = pd.DataFrame.from_dict(resp[3]
                                                    , orient='index'
-                                                   , columns=["估值", "票面估值", "WAL", "久期"]) if resp[3] else None
+                                                   , columns=["估值", "票面估值", "WAL", "久期", "应计利息"]) if resp[3] else None
         if position:
             output['position'] = {}
             for k,v in position.items():

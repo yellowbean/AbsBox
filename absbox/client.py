@@ -6,6 +6,11 @@ from requests.exceptions import ConnectionError
 from dataclasses import dataclass
 #from dataclasses_json import dataclass_json
 
+#logging.captureWarnings(True)
+import urllib3
+urllib3.disable_warnings()
+
+
 def mkTag(x):
     match x:
         case (tagName, tagValue):
