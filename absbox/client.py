@@ -1,3 +1,4 @@
+import logging
 import json,datetime,logging,pickle
 from json.decoder import JSONDecodeError
 import requests
@@ -37,7 +38,8 @@ class API:
     def build_req(self
                   ,deal
                   ,assumptions
-                  ,pricing=None):
+                  ,pricing=None
+                  ,read=None):
         if any(isinstance(i, list) for i in assumptions):
         #if isinstance(assumptions,list):
             return json.dumps({"_deal": deal.json
@@ -150,12 +152,12 @@ class API:
             return deal_validate,err,warn
 
         try:
-            print("sending req",datetime.datetime.now())
+            logging.info("sending req",datetime.datetime.now())
             r = requests.post(url
                               , data=req.encode('utf-8')
                               , headers=hdrs
                               , verify=False)
-            print("done req",datetime.datetime.now())
+            logging.info("done req",datetime.datetime.now())
         except (ConnectionRefusedError, ConnectionError):
             return None
 

@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 import functools,pickle,collections
 import pandas as pd
@@ -18,7 +19,7 @@ freqMap = {"每月": "Monthly"
     , "每半年": "SemiAnnually"
     , "每年": "Annually"}
 
-baseMap = {"资产池余额": "CurrentPoolBalance"
+baseMap = {"资产池余额": "FutureCurrentPoolBalance"
            ,"资产池初始余额":"OriginalPoolBalance"
            ,"资产池当期利息": "PoolCollectionInt"}
 
@@ -55,7 +56,7 @@ def mkAccType(x):
         case {"固定储备金额": amt}:
             return mkTag(("FixReserve",amt))
         case {"目标储备金额": [base, rate]}:
-            return mkTag(("PctReserve",[mkTag(baseMap[base]), rate]))
+            return mkTag(("PctReserve",[mkTag((baseMap[base],"1970-01-01")), rate]))
         case {"较高": [a, b]}:
             return mkTag(("Max",[mkAccType(a), mkAccType(b)]))
         case {"较低": [a, b]}:
@@ -65,9 +66,13 @@ def mkAccType(x):
 def mkFeeType(x):
     match x:
         case {"年化费率": [base, rate]}:
-            return mkTag(("AnnualRateFee",[{"tag": baseMap[base]}, rate]))
+            return mkTag(("AnnualRateFee"
+                        ,[ mkTag((baseMap[base],'1970-01-01')) 
+                           , rate]))
         case {"百分比费率": [base, rate]}:
-            return mkTag(("PctFee",[{"tag": baseMap[base]}, rate]))
+            return mkTag(("PctFee"
+                        ,[mkTag(baseMap[base])
+                          , rate]))
         case {"固定费用": amt}:
             return mkTag(("FixFee", amt))
         case {"周期费用": [p, amt]}:
@@ -496,16 +501,21 @@ def init_plot_fonts():
     define_list = ['Source Han Serif CN','Microsoft Yahei','STXihei']
     support_list = font_manager.findSystemFonts(fontpaths=None, fontext='ttf')
     font_p = font_manager.FontProperties()
-    for sl in support_list:
-        f = font_manager.get_font(sl)
-        if f.family_name in set(define_list):
-            font_p.set_family(f.family_name)
-            font_p.set_size(14)
-            return font_p
+    try:
+        for sl in support_list:
+            f = font_manager.get_font(sl)
+            if f.family_name in set(define_list):
+                font_p.set_family(f.family_name)
+                font_p.set_size(14)
+                return font_p
+    except RuntimeError as e:
+        logging.error("中文字体载入失败")
+        return None
 
 font_p = init_plot_fonts()
 
 def plot_bond(rs, bnd, flow='本息合计'):
+    """Plot bonds across scenarios"""
     plt.figure(figsize=(12,8))
     _alpha =  0.8
     for idx,s in enumerate(rs):
@@ -513,6 +523,26 @@ def plot_bond(rs, bnd, flow='本息合计'):
 
     plt.legend(loc='upper left', prop=font_p)
     plt.title(f'{len(rs)} 种场景下 债券:{bnd} - {flow}', fontproperties=font_p)
+
+    plt.grid(True)
+    plt.axis('tight')
+    plt.xticks(rotation=30)
+
+    current_values = plt.gca().get_yticks()
+    plt.gca().set_yticklabels(['{:.0f}(w)'.format(x/10000) for x in current_values])
+    return plt
+
+def plot_bonds(r, bnds:list, flow='本息合计'):
+    "Plot bond flows with in a single run"
+    plt.figure(figsize=(12,8))
+    _alpha =  0.8
+    for b in bnds:
+        b_flow = r['bonds'][b]
+        plt.step(b_flow.index,b_flow[[flow]], alpha=_alpha, linewidth=5, label=f"债券-{b}")
+
+    plt.legend(loc='upper left', prop=font_p)
+    bnd_title = ','.join(bnds)
+    plt.title(f'债券:{bnd_title} - {flow}', fontproperties=font_p)
 
     plt.grid(True)
     plt.axis('tight')
