@@ -102,7 +102,7 @@ class API:
                             error.append(f"{wn},{idx}")
                     case 'PayTillYield':
                         if (action['contents'][0] not in valid_acc) \
-                            or (action['contents'][1] not in valid_bnd):
+                            or (not set(action['contents'][1]).issubset(valid_bnd)):
                             error.append(f"{wn},{idx}")
                     case 'PayFeeResidual':
                         if (action['contents'][1] not in valid_acc) \
@@ -186,6 +186,44 @@ class API:
         else:
             return result
 
+##    def run_pool(self,
+##                 pool,
+##                 assumptions=None,
+##                 agg = None,
+##                 read=True):
+####data RunPoolReq = RunPoolReq {
+####  pool :: P.Pool P.Mortgage
+####  ,poolAggRule :: P.AggregationRule
+####  ,poolAssump :: Maybe [AP.AssumptionBuilder]
+####}
+##        url = f"{self.url}/run_pool"
+##        hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+##        
+##        req = self.build_pool_req(pool, assumptions, agg)
+##
+##        try:
+##            logging.info("sending req",datetime.datetime.now())
+##            r = requests.post(url
+##                              , data=req.encode('utf-8')
+##                              , headers=hdrs
+##                              , verify=False)
+##            logging.info("done req",datetime.datetime.now())
+##        except (ConnectionRefusedError, ConnectionError):
+##            return None
+##
+##        if r.status_code != 200:
+##            print("Error in response:",r.text)
+##            return None
+##
+##        try:
+##            result = json.loads(r.text)
+##        except JSONDecodeError as e:
+##            return pd.DataFrame.loads(result)     
+##
+##        if read:
+##            return None
+##        else:
+##            return result       
 
 def save(deal,p:str):
     def save_to(b):

@@ -13,7 +13,6 @@ a structured finance cashflow engine wrapper
     * Consumer Credit
 * Features
   * Sensitivity Analysis
-  * Yield Table
   * Bond Cashflow Forecast, Pricing
 
 ## Documentation

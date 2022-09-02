@@ -1,7 +1,9 @@
-import logging
+import logging,os,re
+import requests, shutil
 from dataclasses import dataclass
 import functools,pickle,collections
 import pandas as pd
+from urllib.request import unquote
 from enum import Enum
 
 from absbox import *
@@ -356,6 +358,21 @@ class 信贷ABS:
             c = _f.read()
         return pickle.loads(c)
 
+    @classmethod
+    def pull(cls,_id,p,url=None,pw=None):
+        def get_filename_from_cd(cd):
+            if not cd:
+                return None
+            fname = re.findall("filename\*=utf-8''(.+)", cd)
+            if len(fname) == 0:
+                return None
+            return unquote(fname[0])
+        with requests.get(f"{url}/china/deal/{_id}",stream=True,verify=False) as r:
+            filename = get_filename_from_cd(r.headers.get('content-disposition'))
+            with open(os.path.join(p,filename),'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+
+
     @property
     def json(self):
         cutoff, closing, first_pay = self.日期
@@ -463,13 +480,6 @@ class 信贷ABS:
         return output
 
 
-#    def load(self, path_to_file:str):
-#        with open(path_to_file,'b') as of:
-#            orjson.load(of, self.json)
-#
-#    def save(self, path_to_file:str):
-#        with open(path_to_file,'w') as of:
-#            orjson.dump(of, self.json)
 
 def show(r, x="full"):
     _comps = ['agg_accounts', 'fees', 'bonds']
