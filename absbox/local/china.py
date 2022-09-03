@@ -365,12 +365,17 @@ class 信贷ABS:
                 return None
             fname = re.findall("filename\*=utf-8''(.+)", cd)
             if len(fname) == 0:
-                return None
+                fname1 = re.findall("filename=\"(.+)\"", cd)
+                return fname1[0]
             return unquote(fname[0])
         with requests.get(f"{url}/china/deal/{_id}",stream=True,verify=False) as r:
             filename = get_filename_from_cd(r.headers.get('content-disposition'))
+            if filename is None:
+                logging.error("Can't not find the Deal Name")
+                return None
             with open(os.path.join(p,filename),'wb') as f:
                 shutil.copyfileobj(r.raw, f)
+            logging.info(f"Download {p} {filename} done ")
 
 
     @property
