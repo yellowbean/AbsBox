@@ -45,6 +45,13 @@ class API:
                   ,assumptions
                   ,pricing=None
                   ,read=None):
+
+        if assumptions is None:
+            return json.dumps({"deal": deal.json
+                       ,"assump": None
+                       ,"bondPricing": deal.read_pricing(pricing) if (pricing is not None) else None}
+                   , ensure_ascii=False)
+
         if any(isinstance(i, list) for i in assumptions):
         #if isinstance(assumptions,list):
             return json.dumps({"_deal": deal.json

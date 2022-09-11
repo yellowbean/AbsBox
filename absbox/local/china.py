@@ -1,7 +1,7 @@
-import logging,os,re
+import logging, os, re
 import requests, shutil
 from dataclasses import dataclass
-import functools,pickle,collections
+import functools, pickle, collections
 import pandas as pd
 from urllib.request import unquote
 from enum import Enum
@@ -21,9 +21,14 @@ freqMap = {"每月": "Monthly"
     , "每半年": "SemiAnnually"
     , "每年": "Annually"}
 
-baseMap = {"资产池余额": "FutureCurrentPoolBalance"
-           ,"资产池初始余额":"OriginalPoolBalance"
-           ,"资产池当期利息": "PoolCollectionInt"}
+baseMap = {"资产池余额": "CurrentPoolBalance"
+           , "资产池初始余额": "OriginalPoolBalance"
+           , "资产池当期利息":"PoolCollectionInt"
+           , "当期已付债券利息":"LastBondIntPaid"
+           , "当期已付费用" :"LastFeePaid"
+           , "当期未付债券利息" :"CurrentDueBondInt"
+           , "当期未付费用": "CurrentDueFee"
+           }
 
 
 def mkTag(x):
@@ -44,11 +49,11 @@ class BondType(Enum):
 def mkBondType(x):
     match x:
         case {"固定摊还": schedule}:
-            return mkTag(("PAC" ,mkTag(("AmountCurve", schedule))))
+            return mkTag(("PAC", mkTag(("AmountCurve", schedule))))
         case {"过手摊还": None}:
             return mkTag(("Sequential"))
         case {"锁定摊还": _after}:
-            return mkTag(("Lockout",_after))
+            return mkTag(("Lockout", _after))
         case {"权益": _}:
             return mkTag(("Equity"))
 
@@ -56,13 +61,20 @@ def mkBondType(x):
 def mkAccType(x):
     match x:
         case {"固定储备金额": amt}:
-            return mkTag(("FixReserve",amt))
+            return mkTag(("FixReserve", amt))
         case {"目标储备金额": [base, rate]}:
-            return mkTag(("PctReserve",[mkTag((baseMap[base],"1970-01-01")), rate]))
+            match base:
+                case ["合计",*q]:
+                    return mkTag(("PctReserve"
+                                 , [mkTag(("Sum"
+                                           ,[mkTag((baseMap[_b], _ts)) for (_b, _ts) in q]))
+                                   , rate ]))
+                case _ :
+                    return mkTag(("PctReserve", [mkTag((baseMap[base])), rate]))
         case {"较高": [a, b]}:
-            return mkTag(("Max",[mkAccType(a), mkAccType(b)]))
+            return mkTag(("Max", [mkAccType(a), mkAccType(b)]))
         case {"较低": [a, b]}:
-            return mkTag(("Min",[mkAccType(a), mkAccType(b)]))
+            return mkTag(("Min", [mkAccType(a), mkAccType(b)]))
 
 
 def mkFeeType(x):
@@ -156,6 +168,8 @@ def mkWaterfall(x):
             return mkTag(("PayInt",[source, target]))
         case ["支付本金", source, target]:
             return mkTag(("PayPrin",[source, target]))
+        case ["支付剩余本金", source, target]:
+            return mkTag(("PayPrinResidual",[source, target]))
         case ["支付期间收益", source, target]:
             return mkTag(("PayTillYield",[source, target]))
         case ["支付收益", source, target, limit]:
@@ -283,6 +297,8 @@ def mkAssumption(x):
             return mkTag(("InterestRateCurve", [idx, *rateCurve]))
         case {"清仓": opts}:
             return mkTag(("CallWhen",[mkCallOptions(co) for co in opts]))
+        case {"停止": d}:
+            return mkTag(("StopRunBy",d))
 
 def mkAccTxn(xs):
     "AccTxn T.Day Balance Amount Comment"
@@ -393,13 +409,13 @@ class 信贷ABS:
             "pool": {"assets": [mkAsset(x) for x in self.资产池.get('清单',[])]
                 , "asOfDate": cutoff
                 , "issuanceStat": readIssuance(self.资产池)
-                , "futureCf":mkCf(self.资产池.get('归集表',[]))
+                , "futureCf":mkCf(self.资产池.get('归集表', []))
                 },
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
             "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.分配规则.get('未违约',[])]
-                        , "EndOfPoolCollection": [mkWaterfall(w) for w in self.分配规则.get('回款后',[])]
-                        , "CleanUp":[mkWaterfall(w) for w in self.分配规则.get('清仓回购',[])]},
+                        , "EndOfPoolCollection": [mkWaterfall(w) for w in self.分配规则.get('回款后' ,[])]
+                        , "CleanUp":[ mkWaterfall(w) for w in self.分配规则.get('清仓回购' ,[])]},
             "fees": functools.reduce(lambda result, current: result | current
                                      , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]) if self.费用 else {},
             "accounts": functools.reduce(lambda result, current: result | current
@@ -455,11 +471,11 @@ class 信贷ABS:
             begin_bal_column = ending_bal_column.shift(1).rename("期初余额")
             agg_acc[k] = acc_txn_amt.join([begin_bal_column,ending_bal_column])
             if agg_acc[k].empty:
-                agg_acc[k].columns = ['期初余额',"变动额",'期末余额']
+                agg_acc[k].columns = ['期初余额', "变动额", '期末余额']
                 continue
             fst_idx = agg_acc[k].index[0]
-            agg_acc[k].at[fst_idx,'期初余额'] = round(agg_acc[k].at[fst_idx,'期末余额'] -  agg_acc[k].at[fst_idx,'变动额'],2)
-            agg_acc[k] = agg_acc[k][['期初余额',"变动额",'期末余额']]
+            agg_acc[k].at[fst_idx, '期初余额'] = round(agg_acc[k].at[fst_idx, '期末余额'] - agg_acc[k].at[fst_idx, '变动额'], 2)
+            agg_acc[k] = agg_acc[k][['期初余额', "变动额", '期末余额']]
 
         output['agg_accounts'] = agg_acc
 
