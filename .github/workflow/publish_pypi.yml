@@ -24,4 +24,5 @@ jobs:
         if: startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1.5.1
         with:
+          user: always.zhang
           password: ${{ secrets.PYPI }}
