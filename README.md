@@ -17,9 +17,9 @@ a structured finance cashflow engine wrapper
     * Copr Loans
     * Consumer Credit
 * Features
-  * Sensitivity Analysis
+  * Sensitivity Analysis on different scenarios
   * Bond Cashflow Forecast, Pricing
 
 ## Documentation
-* English -> WIP
-* Chinese -> https://absbox.readthedocs.io/en/latest/index.html
+* English -> https://absbox-doc.readthedocs.io
+* Chinese -> https://absbox.readthedocs.io

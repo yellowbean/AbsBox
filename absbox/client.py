@@ -5,18 +5,12 @@ import requests
 from requests.exceptions import ConnectionError
 from dataclasses import dataclass
 #from dataclasses_json import dataclass_json
+from local.util import mkTag
 
 #logging.captureWarnings(True)
 import urllib3
 urllib3.disable_warnings()
 
-
-def mkTag(x):
-    match x:
-        case (tagName, tagValue):
-            return {"tag": tagName, "contents": tagValue}
-        case (tagName):
-            return {"tag": tagName }
 
 @dataclass
 class API:
@@ -28,7 +22,7 @@ class API:
         try:
             _r = requests.get(f"{self.url}/version",verify=False).text
         except (ConnectionRefusedError, ConnectionError):
-            print(f"Error: Can't not connect to API server {self.url}")
+            logging.error(f"Error: Can't not connect to API server {self.url}")
             self.url = None
             return
 
@@ -70,7 +64,7 @@ class API:
         warning = []
         _r = json.loads(_r)
         _deal_key = 'deal' if 'deal' in _r else '_deal'
-        _d = _r[_deal_key] 
+        _d = _r[_deal_key]
         valid_acc = set(_d['accounts'].keys())
         valid_bnd = set(_d['bonds'].keys())
         valid_fee = set(_d['fees'].keys())
@@ -121,7 +115,12 @@ class API:
         if _d['cutoff-date'] >= _d['first-pay-date']:
             error.append(f"dates,first pay date/next pay date should be after cutoff date")
 
+        if warning:
+            logging.warning(f"Warning in modelling:{warning}")
+
         if len(error)>0:
+            if error:
+                logging.error(f"Error in modelling:{error}")
             return False,error,warning
         else:
             return True,error,warning
@@ -192,45 +191,6 @@ class API:
             return __r
         else:
             return result
-
-##    def run_pool(self,
-##                 pool,
-##                 assumptions=None,
-##                 agg = None,
-##                 read=True):
-####data RunPoolReq = RunPoolReq {
-####  pool :: P.Pool P.Mortgage
-####  ,poolAggRule :: P.AggregationRule
-####  ,poolAssump :: Maybe [AP.AssumptionBuilder]
-####}
-##        url = f"{self.url}/run_pool"
-##        hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-##        
-##        req = self.build_pool_req(pool, assumptions, agg)
-##
-##        try:
-##            logging.info("sending req",datetime.datetime.now())
-##            r = requests.post(url
-##                              , data=req.encode('utf-8')
-##                              , headers=hdrs
-##                              , verify=False)
-##            logging.info("done req",datetime.datetime.now())
-##        except (ConnectionRefusedError, ConnectionError):
-##            return None
-##
-##        if r.status_code != 200:
-##            print("Error in response:",r.text)
-##            return None
-##
-##        try:
-##            result = json.loads(r.text)
-##        except JSONDecodeError as e:
-##            return pd.DataFrame.loads(result)     
-##
-##        if read:
-##            return None
-##        else:
-##            return result       
 
 def save(deal,p:str):
     def save_to(b):

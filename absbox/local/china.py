@@ -7,6 +7,7 @@ from urllib.request import unquote
 from enum import Enum
 
 from absbox import *
+from util import mkTag
 
 
 class 频率(Enum):
@@ -29,22 +30,6 @@ baseMap = {"资产池余额": "CurrentPoolBalance"
            , "当期未付债券利息" :"CurrentDueBondInt"
            , "当期未付费用": "CurrentDueFee"
            }
-
-
-def mkTag(x):
-    match x:
-        case (tagName, tagValue):
-            return {"tag": tagName, "contents": tagValue}
-        case (tagName):
-            return {"tag": tagName}
-
-
-class BondType(Enum):
-    固定摊还 = "固定摊还"
-    过手摊还 = "过手摊还"
-    锁定摊还 = "锁定摊还"
-    期间收益 = "期间收益"
-
 
 def mkBondType(x):
     match x:
