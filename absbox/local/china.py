@@ -7,7 +7,7 @@ from urllib.request import unquote
 from enum import Enum
 
 from absbox import *
-from util import mkTag
+from absbox.local.util import mkTag
 
 
 class 频率(Enum):
@@ -175,8 +175,8 @@ def mkAssetRate(x):
             return mkTag(("Floater",[idx,spd,r,freqMap[p],None]))
 
 def mkAsset(x):
-    _typeMapping = {"等额本息" :"Level", "等额本金": "Even"}
-    _statusMapping = {"正常":mkTag(("Current")),"违约": mkTag(("Defaulted",None))}
+    _typeMapping = {"等额本息": "Level", "等额本金": "Even"}
+    _statusMapping = {"正常": mkTag(("Current")), "违约": mkTag(("Defaulted",None))}
     match x:
         case ["按揭贷款"
             ,{"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm

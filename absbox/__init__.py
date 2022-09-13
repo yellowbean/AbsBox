@@ -5,5 +5,6 @@ if (sys.version_info.major >= 3 and sys.version_info.minor < 10):
 
 from absbox.client import API,save
 from absbox.local.china import 信贷ABS
+from absbox.local.generic import Generic
 
 
