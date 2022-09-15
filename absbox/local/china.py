@@ -133,7 +133,7 @@ def mkLiqMethod(x):
         case ["贴现|违约",a,b]:
             return mkTag(("PV",[a,b]))
 
-def mkWaterfall(x):
+def mkAction(x):
     match x:
         case ["账户转移", source, target]:
             return mkTag(("Transfer",[source, target, ""]))
@@ -166,6 +166,43 @@ def mkWaterfall(x):
             return mkTag(("TransferReserve",[_map[satisfy], source, target, None]))
         case ["出售资产", liq, target]:
             return mkTag(("LiquidatePool",[mkLiqMethod(liq), target]))
+
+def mkDs(x):
+    "Making Deal Stats"
+    match x:
+        case ("债券余额",*bnds):
+            return mkTag(("CurrentBondBalanceOf",bnds))
+
+
+def mkPre(p):
+    dealStatusMap = {"摊还":"Current"
+                     ,"加速清偿":"Accelerated"
+                     ,"循环":"Revolving"}
+    match p:
+        case [ds,">",amt]:
+            return mkTag(("IfGT",[mkDs(ds),amt]))
+        case [ds,"<",amt]:
+            return mkTag(("IfLT",[mkDs(ds),amt]))
+        case [ds,">=",amt]:
+            return mkTag(("IfGET",[mkDs(ds),amt]))
+        case [ds,"<=",amt]:
+            return mkTag(("IfLET",[mkDs(ds),amt]))
+        case [ds,"=",0]:
+            return mkTag(("IfZero",mkDs(ds)))
+        case ["状态",_ds]:
+            return mkTag(("IfDealStatus",dealStatusMap[_ds]))
+        case ["同时",_p1,_p2]:
+            return mkTag(("And",mkPre(_p1),mkPre(_p2)))
+        case ["任一",_p1,_p2]:
+            return mkTag(("Or",mkPre(_p1),mkPre(_p2)))
+
+def mkWaterfall(x):
+    match x:
+        case (pre,_action):
+            action = mkAction(_action)
+            return [mkPre(pre),action]
+        case _:
+            return [None,mkAction(x)]
 
 def mkAssetRate(x):
     match x:
@@ -485,6 +522,11 @@ class 信贷ABS:
 
         return output
 
+def loadAsset(fp, reader, astType):
+    ''' load assets '''
+    with open(fp, 'r') as f:
+        reader = csv.DictReader(f)
+        return [ r for  r in reader ]
 
 
 def show(r, x="full"):

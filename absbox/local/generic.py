@@ -113,7 +113,7 @@ def mkBondRate(x):
                     , None]}
         case {"Fix": _rate}:
             return mkTag(("Fix",_rate))
-        case {"IntrimYield": _yield}:
+        case {"InterimYield": _yield}:
             return mkTag(("InterestByYield",_yield))
 
 

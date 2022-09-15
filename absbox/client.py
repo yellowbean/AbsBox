@@ -70,6 +70,7 @@ class API:
         for wn,wa in _w.items():
             for idx,action in enumerate(wa):
                 #print(action)
+                action = action[1]
                 match action['tag']:
                     case 'PayFeeBy':
                         if (not set(action['contents'][1]).issubset(valid_acc)) \
