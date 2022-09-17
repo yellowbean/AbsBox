@@ -5,6 +5,7 @@ from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass
 from absbox.local.util import mkTag
+import pandas as pd
 
 #logging.captureWarnings(True)
 urllib3.disable_warnings()
@@ -133,6 +134,10 @@ class API:
             read=True,
             position=None,
             timing=False):
+
+        if isinstance(assumptions,str):
+            assumptions = pickle.load(assumptions)
+
         if assumptions:
             multi_run_flag = any(isinstance(i, list) for i in assumptions)
         else:
@@ -172,13 +177,12 @@ class API:
             return None
 
         if r.status_code != 200:
-            print("Error in response:",r.text)
-            return None
+            raise RuntimeError(r.text)
 
         try:
             result = json.loads(r.text)
         except JSONDecodeError as e:
-            return e
+            raise RuntimeError(e)
 
         t_reading_s = datetime.datetime.now()
         if read:
@@ -194,10 +198,15 @@ class API:
 def save(deal,p:str):
     def save_to(b):
         with open(p,'wb') as _f:
-            _f.write(b)
+            pickle.dump(b,_f)
 
     match deal:
         case _:
-            save_to(pickle.dumps(deal))
+            save_to(deal)
 
-
+def init_jupyter():
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', None)
+    pd.set_option('display.max_colwidth', None)
+    pd.options.display.float_format = '{:,}'.format
