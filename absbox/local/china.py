@@ -1,4 +1,4 @@
-import logging, os, re
+import logging, os, re, itertools
 import requests, shutil
 from dataclasses import dataclass
 import functools, pickle, collections
@@ -167,11 +167,44 @@ def mkAction(x):
         case ["出售资产", liq, target]:
             return mkTag(("LiquidatePool",[mkLiqMethod(liq), target]))
 
+#data DealStats =
+#              | CurrentPoolDefaultedBalance
+#              | PoolCollectionInt  -- a redirect map to `CurrentPoolCollectionInt T.Day`
+#              | FutureOriginalPoolBalance
+#              | CurrentDueBondInt [String]
+#              | CurrentDueFee [String]
+#              | LastBondIntPaid [String]
+#              | LastFeePaid [String]
+
+
 def mkDs(x):
     "Making Deal Stats"
     match x:
+        case ("债券余额",):
+            return mkTag("CurrentBondBalance")
+        case ("资产池余额",):
+            return mkTag("CurrentPoolBalance")
+        case ("初始债券余额",):
+            return mkTag("OriginalBondBalance")
+        case ("初始资产池余额",):
+            return mkTag("OriginalPoolBalance")
+        case ("债券系数",):
+            return mkTag("BondFactor")
+        case ("资产池系数",):
+            return mkTag("PoolFactor")
+        case ("所有账户余额",):
+            return mkTag("AllAccBalance")
+        case ("系数",ds,f):
+            return mkTag(("Factor",[mkDs(ds),f]))
         case ("债券余额",*bnds):
             return mkTag(("CurrentBondBalanceOf",bnds))
+        case ("Min",ds1,ds2):
+            return mkTag(("Min",[mkDs(ds1),mkDs(ds2)]))
+        case ("Max",ds1,ds2):
+            return mkTag(("Max",[mkDs(ds1),mkDs(ds2)]))
+        case ("合计",*ds):
+            return mkTag(("Sum",[mkDs(_ds) for _ds in ds]))
+            
 
 
 def mkPre(p):
@@ -191,18 +224,33 @@ def mkPre(p):
             return mkTag(("IfZero",mkDs(ds)))
         case ["状态",_ds]:
             return mkTag(("IfDealStatus",dealStatusMap[_ds]))
-        case ["同时",_p1,_p2]:
+        case ["同时满足",_p1,_p2]:
             return mkTag(("And",mkPre(_p1),mkPre(_p2)))
-        case ["任一",_p1,_p2]:
+        case ["任一满足",_p1,_p2]:
             return mkTag(("Or",mkPre(_p1),mkPre(_p2)))
+
+def isPre(x):
+    return mkPre(x) is not None
 
 def mkWaterfall(x):
     match x:
-        case (pre,_action):
+        case (pre,_action): 
             action = mkAction(_action)
             return [mkPre(pre),action]
         case _:
             return [None,mkAction(x)]
+
+def mkWaterfall2(x):
+    match x:
+        case (pre, *_action) if isPre(pre) and len(x)>2: # pre with multiple actions
+            _pre = mkPre(pre)
+            return [[ _pre, mkAction(a) ] for a in _action ]
+        case (pre, _action) if isPre(pre) and len(x)==2: # pre with multiple actions
+            _pre = mkPre(pre)
+            return [[ _pre, mkAction(_action) ]]
+        case _:
+            return [[ None,mkAction(x) ]]
+
 
 def mkAssetRate(x):
     match x:
@@ -254,8 +302,10 @@ def readIssuance(pool):
     return r
 
 def mkCollection(xs):
-    sourceMapping = {"利息回款": "CollectedInterest", "本金回款": "CollectedPrincipal"
-        , "早偿回款": "CollectedPrepayment", "回收回款": "CollectedRecoveries"}
+    sourceMapping = {"利息回款": "CollectedInterest"
+                    , "本金回款": "CollectedPrincipal"
+                    , "早偿回款": "CollectedPrepayment"
+                    , "回收回款": "CollectedRecoveries"}
     return [[sourceMapping[x], acc] for (x, acc) in xs]
 
 
@@ -419,6 +469,9 @@ class 信贷ABS:
     @property
     def json(self):
         cutoff, closing, first_pay = self.日期
+        dists,collects,cleans = [ self.分配规则.get(wn,[]) for wn in ['未违约','回款后','清仓回购'] ]
+        distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
+        distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
         """
         get the json formatted string
         """
@@ -435,9 +488,9 @@ class 信贷ABS:
                 },
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
-            "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.分配规则.get('未违约',[])]
-                        , "EndOfPoolCollection": [mkWaterfall(w) for w in self.分配规则.get('回款后' ,[])]
-                        , "CleanUp":[ mkWaterfall(w) for w in self.分配规则.get('清仓回购' ,[])]},
+            "waterfall": {"DistributionDay": list(distsflt)
+                        , "EndOfPoolCollection": list(collectsflt)
+                        , "CleanUp": list(cleanflt)},
             "fees": functools.reduce(lambda result, current: result | current
                                      , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]) if self.费用 else {},
             "accounts": functools.reduce(lambda result, current: result | current
