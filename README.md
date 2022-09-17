@@ -2,7 +2,6 @@
 a structured finance cashflow engine wrapper
 
 [![PyPI version](https://badge.fury.io/py/absbox.svg)](https://badge.fury.io/py/absbox)
-
 [![PyPI download](https://img.shields.io/pypi/dm/absbox)](https://img.shields.io/pypi/dm/absbox)
 
 

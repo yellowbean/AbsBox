@@ -94,9 +94,9 @@ def mkFeeType(x):
 def mkRateReset(x):
     match x:
         case {"resetInterval": interval, "start": sdate}:
-            return mkTag(("ByInterval", [freqMap[interval], sdate]))
+            return mkTag(("ByInterval", [interval, sdate]))
         case {"resetInterval": interval}:
-            return mkTag(("ByInterval", [freqMap[interval], None]))
+            return mkTag(("ByInterval", [interval, None]))
         case {"resetMonth": monthOfYear}:
             return mkTag(("MonthOfYear", monthOfYear))
 
@@ -145,8 +145,6 @@ def mkWaterfall(x):
     match x:
         case ["Transfer", source, target]:
             return mkTag(("Transfer",[source, target, ""]))
-        case ["TransferBy", source, target, formula]:
-            return mkTag(("TransferBy",[source, target, mkFormula(formula)]))
         case ["PayFee", source, target]:
             return mkTag(("PayFee",[source, target]))
         case ["PayFeeResidual", source, target, _limit]:
@@ -217,8 +215,8 @@ def mk(x):
             return mkWaterfall(instruction)
         case ["collection", collection]:
             return mkCollection(collection)
-        case ["call", calls]:
-            return mkCall(calls)
+        #case ["call", calls]:
+        #    return mkCall(calls)
 
 def mkAssumption(x):
     match x:
