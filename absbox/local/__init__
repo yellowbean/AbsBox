@@ -1,2 +1,2 @@
-from china import *
-from generic import *
+from local.china import *
+from local.generic import *
