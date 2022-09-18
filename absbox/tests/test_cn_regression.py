@@ -1,8 +1,5 @@
 import pandas as pd
 import os,pickle,sys
-
-sys.path.append("../..")
-
 from absbox import API
 from absbox.local.china import show
 import csv,logging
@@ -36,7 +33,7 @@ def regression_on(server_address, input_cases):
     return report
 
 def test_regression():
-    #cn_regression = regression_on("https://deal-bench.xyz/api", os.path.join("benchmark","china","regression.csv"))
-    cn_regression = regression_on("http://localhost:8081", os.path.join("tests","benchmark","china","regression.csv"))
+    cn_regression = regression_on("https://deal-bench.xyz/api", os.path.join("absbox","tests","benchmark","china","regression.csv"))
+    #cn_regression = regression_on("http://localhost:8081", os.path.join("tests","benchmark","china","regression.csv"))
     print(cn_regression)
     assert cn_regression == []
