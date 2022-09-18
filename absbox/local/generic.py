@@ -306,7 +306,7 @@ class Generic:
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['bond', bn, bo]) for (bn, bo) in self.bonds]),
             "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.waterfall.get('Normal',[])]
-                        , "EndOfPoolCollection": [mkWaterfall(w) for w in self.waterfall.get('CollectionEnd' ,[])]
+                        , "EndOfPoolCollection": [mkWaterfall(w) for w in self.waterfall.get('CollectionEnd', [])]
                         , "CleanUp":[ mkWaterfall(w) for w in self.waterfall.get('CleanUp' ,[])]},
             "fees": functools.reduce(lambda result, current: result | current
                                      , [mk(["fee", feeName, feeO]) for (feeName, feeO) in self.fees]) if self.fees else {},
@@ -386,5 +386,3 @@ class Generic:
                                                    , columns=["估值", "票面估值", "WAL", "久期", "应计利息"]) if resp[3] else None
 
         return output
-
-

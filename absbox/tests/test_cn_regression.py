@@ -1,11 +1,10 @@
 import pandas as pd
-import os,requests,re,pickle,sys
+import os,pickle,sys
 
 sys.path.append("../..")
 
-from absbox import API,save
-from absbox.local.china import 信贷ABS,show
-import numpy as np
+from absbox import API
+from absbox.local.china import show
 import csv,logging
 
 def bench_against(api, deal_p, assump_p, bench_cf_p):
