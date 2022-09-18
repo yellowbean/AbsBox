@@ -1,2 +1,3 @@
-deal,assumption,show_cf
-test01.obj,empty_assumption.obj,test01_cf.obj
+deal,assumption,show_cf,comment
+test01.obj,empty_assumption.obj,test01_cf.obj,"固定费用;等额本金"
+test02.obj,empty_assumption.obj,test02_cf.obj,"固定费用;等额本息"
