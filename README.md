@@ -1,6 +1,7 @@
 # AbsBox 
 a structured finance cashflow engine wrapper
 
+[![Python version](https://img.shields.io/pypi/pyversions/absbox)](https://img.shields.io/pypi/pyversions/absbox)
 [![PyPI version](https://badge.fury.io/py/absbox.svg)](https://badge.fury.io/py/absbox)
 [![PyPI download](https://img.shields.io/pypi/dm/absbox)](https://img.shields.io/pypi/dm/absbox)
 

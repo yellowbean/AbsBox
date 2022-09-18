@@ -15,8 +15,7 @@ def bench_against(api, deal_p, assump_p, bench_cf_p):
     cmp_df = bench_cf.compare(test_cf)
     if len(cmp_df.dropna()) == 0:
         return (True, None, None, None)
-    else:
-        return (False,deal_p,assump_p,bench_cf_p)
+    return (False,deal_p,assump_p,bench_cf_p)
 
 
 def regression_on(server_address, input_cases):
@@ -35,5 +34,4 @@ def regression_on(server_address, input_cases):
 def test_regression():
     cn_regression = regression_on("https://deal-bench.xyz/api", os.path.join("absbox","tests","benchmark","china","regression.csv"))
     #cn_regression = regression_on("http://localhost:8081", os.path.join("tests","benchmark","china","regression.csv"))
-    print(cn_regression)
     assert cn_regression == []
