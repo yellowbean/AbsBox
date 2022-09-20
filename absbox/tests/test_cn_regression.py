@@ -27,11 +27,12 @@ def regression_on(server_address, input_cases):
         for r in reader:
             d,a,f = [ os.path.join(case_folder,_) for _ in (r['deal'],r['assumption'],r['show_cf']) ]
             _r = bench_against(testAPI,d,a,f)
+            assert _r[0] == True
             if _r[0]==False:
                 report.append(_r)
     return report
 
 def test_regression():
     cn_regression = regression_on("https://deal-bench.xyz/api", os.path.join("absbox","tests","benchmark","china","regression.csv"))
-    #cn_regression = regression_on("http://localhost:8081", os.path.join("tests","benchmark","china","regression.csv"))
+    #cn_regression = regression_on("http://localhost:8081", os.path.join("absbox","tests","benchmark","china","regression.csv"))
     assert cn_regression == []

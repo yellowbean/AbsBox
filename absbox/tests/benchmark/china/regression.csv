@@ -1,3 +1,4 @@
 deal,assumption,show_cf,comment
 test01.obj,empty_assumption.obj,test01_cf.obj,"固定费用;等额本金"
 test02.obj,empty_assumption.obj,test02_cf.obj,"固定费用;等额本息"
+test03.obj,empty_assumption.obj,test03_cf.obj,"固定费用;等额本息;年化比例费用"

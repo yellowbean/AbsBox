@@ -23,6 +23,8 @@ freqMap = {"每月": "Monthly"
     , "每年": "Annually"}
 
 baseMap = {"资产池余额": "CurrentPoolBalance"
+           , "资产池期末余额": "CurrentPoolBalance"
+           , "资产池期初余额": "CurrentPoolBegBalance"
            , "资产池初始余额": "OriginalPoolBalance"
            , "资产池当期利息":"PoolCollectionInt"
            , "当期已付债券利息":"LastBondIntPaid"
