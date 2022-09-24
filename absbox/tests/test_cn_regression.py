@@ -8,14 +8,18 @@ def bench_against(api, deal_p, assump_p, bench_cf_p):
     bench_cf = pd.read_pickle(bench_cf_p)
     with open(deal_p,'rb') as _d:
         deal_obj = pickle.load(_d)
+    print(f"Testing deal {deal_obj.名称}")
     with open(assump_p,'rb') as _d:
         assump_obj = pickle.load(_d)
     
     test_cf = show(api.run(deal_obj ,assumptions=assump_obj,read=True))
-    cmp_df = bench_cf.compare(test_cf)
-    if len(cmp_df.dropna()) == 0:
-        return (True, None, None, None)
-    return (False,deal_p,assump_p,bench_cf_p)
+    try:
+        cmp_df = bench_cf.compare(test_cf)
+        if len(cmp_df.dropna()) == 0:
+            return (True, None, None, None)
+    except ValueError as e:
+        print(f"Failed to validate case: {deal_obj.名称}")
+        return (False,deal_p,assump_p,bench_cf_p)
 
 
 def regression_on(server_address, input_cases):
@@ -27,7 +31,6 @@ def regression_on(server_address, input_cases):
         for r in reader:
             d,a,f = [ os.path.join(case_folder,_) for _ in (r['deal'],r['assumption'],r['show_cf']) ]
             _r = bench_against(testAPI,d,a,f)
-            assert _r[0] == True
             if _r[0]==False:
                 report.append(_r)
     return report
