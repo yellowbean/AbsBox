@@ -110,9 +110,9 @@ class API:
                             or (action['contents'][2] not in valid_fee):
                             error.append(f"{wn},{idx}")        
         _d = _r[_deal_key]['dates']
-        if _d['closing-date'] >= _d['first-pay-date']:
+        if _d['ClosingDate'] >= _d['FirstPayDate']:
             error.append(f"dates,first pay date/next pay date should be after closing date")
-        if _d['cutoff-date'] >= _d['first-pay-date']:
+        if _d['CutoffDate'] >= _d['FirstPayDate']:
             error.append(f"dates,first pay date/next pay date should be after cutoff date")
 
         if warning:

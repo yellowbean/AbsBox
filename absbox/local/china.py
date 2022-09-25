@@ -315,12 +315,14 @@ def mkCollection(xs):
 
 def mkDate(x):
     match x:
-        case {"起息日": d}:
-            return {"closing-date": d}
-        case {"首次兑付日": d}:
-            return {"first-pay-date": d}
-        case {"封包日": d}:
-            return {"cutoff-date": d}
+        case (a,b,c):
+            return [a,b,c]
+        case {"封包日":a, "起息日": b,"首次兑付日":c}:
+            return [a,b,c]
+        case {"收款期末日":a,"计息期末日": b,"下次兑付日":c}:
+            return [a,b,c]
+        case _:
+            raise RuntimeError(f"对于产品发行建模格式为：{'封包日':a, '起息日': b,'首次兑付日':c} ;对于存量产品格式为 {'收款期末日':a,'计息期末日': b,'下次兑付日':c} ")
 
 
 def mkComponent(x):
@@ -472,7 +474,7 @@ class 信贷ABS:
 
     @property
     def json(self):
-        cutoff, closing, first_pay = self.日期
+        cutoff, closing, first_pay = mkDate(self.日期)
         dists,collects,cleans = [ self.分配规则.get(wn,[]) for wn in ['未违约','回款后','清仓回购'] ]
         distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
         distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
@@ -481,9 +483,9 @@ class 信贷ABS:
         """
         _r = {
             "dates": {
-                "closing-date": closing,
-                "cutoff-date": cutoff,
-                "first-pay-date": first_pay},
+                "ClosingDate": closing,
+                "CutoffDate": cutoff,
+                "FirstPayDate": first_pay},
             "name": self.名称,
             "pool": {"assets": [mkAsset(x) for x in self.资产池.get('清单',[])]
                 , "asOfDate": cutoff
@@ -504,7 +506,7 @@ class 信贷ABS:
             "payPeriod": freqMap[self.兑付频率],
         }
         for fn, fo in _r['fees'].items():
-            fo['feeStart'] = _r['dates']['closing-date']
+            fo['feeStart'] = _r['dates']['ClosingDate']
         return _r  # ,ensure_ascii=False)
 
     def _get_bond(self, bn):
