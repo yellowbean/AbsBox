@@ -1,6 +1,6 @@
 import logging, os, re, itertools
 import requests, shutil
-from dataclasses import dataclass
+from dataclasses import dataclass,field
 import functools, pickle, collections
 import pandas as pd
 from urllib.request import unquote
@@ -385,6 +385,16 @@ def mkAccTxn(xs):
     else:
         return [ mkTag(("AccTxn",x)) for x in xs]
 
+# \"overrides\":[[{\"tag\":\"RunWaterfall\",\"contents\":[\"2022-01-01\",\"base\"]},{\"tag\":\"PoolCollection\",\"contents\":[\"0202-11-01\",\"collection\"]}]]}
+def mkOverrides(m):
+    r = []
+    mapping = {"分配日":"RunWaterfall","回款日":"PoolCollection"}
+    for k,v in m.items():
+        match (k,v):
+            case("日期",ds):
+                r.append([mkTag((mapping[_x[0]],[_x[1],""])) for _x in ds ])
+    return r
+
 def mk(x):
     match x:
         case ["资产", assets]:
@@ -443,7 +453,8 @@ class 信贷ABS:
     费用: tuple
     分配规则: dict
     归集规则: tuple
-    清仓回购: tuple
+    清仓回购: tuple 
+    自定义: dict = field(default_factory=dict)
 
 
     @classmethod
@@ -507,6 +518,10 @@ class 信贷ABS:
         }
         for fn, fo in _r['fees'].items():
             fo['feeStart'] = _r['dates']['ClosingDate']
+
+        if hasattr(self,"自定义"):
+            _r["overrides"] = mkOverrides(self.自定义)
+            
         return _r  # ,ensure_ascii=False)
 
     def _get_bond(self, bn):
