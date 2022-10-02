@@ -34,6 +34,32 @@ baseMap = {"资产池余额": "CurrentPoolBalance"
            , "当期未付债券利息" :"CurrentDueBondInt"
            , "当期未付费用": "CurrentDueFee"
            }
+#data DatePattern = MonthEnd
+#                 | QuarterEnd
+#                 | YearEnd 
+#                 | MonthFirst
+#                 | QuarterFirst
+#                 | YearFirst
+#                 | MonthDayOfYear Int Int  -- T.MonthOfYear T.DayOfMonth
+#                 | DayOfMonth Int -- T.DayOfMonth 
+#                 | DayOfWeek Int -- T.DayOfWee
+
+datePattern = {"月末":"MonthEnd"
+              ,"季度末":"QuarterEnd"
+              ,"年末":"YearEnd"
+              ,"月初":"MonthFirst"
+              ,"季度初":"QuarterFirst"
+              ,"年初":"YearFIrst"
+              ,"每年":"MonthDayOfYear"
+              ,"每月":"DayOfMonth"
+              ,"每周":"DayOfWeek"}
+
+def mkDateVector(x):
+    match x:
+        case dp if isinstance(dp,str):
+            return mkTag(datePattern[dp])
+        case [dp, *p] if (dp in datePattern.keys()):
+            return mkTag((datePattern[dp],p))
 
 def mkBondType(x):
     match x:
@@ -64,6 +90,13 @@ def mkAccType(x):
             return mkTag(("Max", [mkAccType(a), mkAccType(b)]))
         case {"较低": [a, b]}:
             return mkTag(("Min", [mkAccType(a), mkAccType(b)]))
+
+def mkAccInt(x):
+    match x:
+        case {"周期": _dp,"利率":br , "最近结息日":lsd}:
+            return [br,lsd,mkDateVector(_dp)]
+        case _:
+            return None
 
 
 def mkFeeType(x):
@@ -404,11 +437,12 @@ def mk(x):
                 case {"余额": bal, "类型": accType}:
                     return {accName: {"accBalance": bal, "accName": accName
                                       , "accType": mkAccType(accType)
-                                      , "accInterest": None
+                                      , "accInterest": mkAccInt(attrs.get("计息",None))
                                       , "accStmt": mkAccTxn(attrs.get("记录",None))}}
                 case {"余额": bal}:
                     return { accName: {"accBalance": bal, "accName": accName
-                                      , "accType": None, "accInterest": None
+                                      , "accType": None
+                                      , "accInterest": mkAccInt(attrs.get("计息",None))
                                       , "accStmt": mkAccTxn(attrs.get("记录",None))}}
         case ["费用", feeName, {"类型": feeType}]:
             return {feeName: {"feeName": feeName, "feeType": mkFeeType(feeType), "feeStart": None, "feeDue": 0,

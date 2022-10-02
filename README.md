@@ -14,7 +14,7 @@ a structured finance cashflow engine wrapper
 * Provide building blocks to create cashflow models for ABS/MBS
 * Adapt to multiple asset class
     * Residential Mortgage / Auto Loans
-    * Copr Loans
+    * Corp Loans
     * Consumer Credit
 * Features
   * Sensitivity Analysis on different scenarios
