@@ -44,6 +44,7 @@ baseMap = {"资产池余额": "CurrentPoolBalance"
 #                 | DayOfMonth Int -- T.DayOfMonth 
 #                 | DayOfWeek Int -- T.DayOfWee
 
+
 datePattern = {"月末":"MonthEnd"
               ,"季度末":"QuarterEnd"
               ,"年末":"YearEnd"
@@ -520,6 +521,7 @@ class 信贷ABS:
     @property
     def json(self):
         cutoff, closing, first_pay = mkDate(self.日期)
+        stated = self.日期.get("法定到期日",None)
         dists,collects,cleans = [ self.分配规则.get(wn,[]) for wn in ['未违约','回款后','清仓回购'] ]
         distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
         distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
@@ -550,8 +552,12 @@ class 信贷ABS:
             "collectPeriod": freqMap[self.兑付频率],
             "payPeriod": freqMap[self.兑付频率],
         }
+        
         for fn, fo in _r['fees'].items():
             fo['feeStart'] = _r['dates']['ClosingDate']
+
+        if stated:
+            _r['dates']['StatedMaturityDate'] = stated
 
         if hasattr(self,"自定义"):
             _r["overrides"] = mkOverrides(self.自定义)
