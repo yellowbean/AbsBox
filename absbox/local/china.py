@@ -7,7 +7,7 @@ from urllib.request import unquote
 from enum import Enum
 
 from absbox import *
-from absbox.local.util import mkTag
+from absbox.local.util import mkTag,DC,mkTs
 
 
 class 频率(Enum):
@@ -61,6 +61,8 @@ def mkDateVector(x):
             return mkTag(datePattern[dp])
         case [dp, *p] if (dp in datePattern.keys()):
             return mkTag((datePattern[dp],p))
+        case _ :
+            raise RuntimeError(f"not match found: {x}")
 
 def mkBondType(x):
     match x:
@@ -72,7 +74,6 @@ def mkBondType(x):
             return mkTag(("Lockout", _after))
         case {"权益": _}:
             return mkTag(("Equity"))
-
 
 def mkAccType(x):
     match x:
@@ -129,15 +130,21 @@ def mkRateReset(x):
 def mkBondRate(x):
     indexMapping = {"LPR5Y": "LPR5Y", "LIBOR1M": "LIBOR1M"}
     match x:
-        case {"浮动": [_index, Spread, resetInterval]}:
+        case {"浮动": [_index, Spread, resetInterval],"日历":dc}:
             return {"tag": "Floater"
                 , "contents": [indexMapping[_index]
                     , Spread
                     , mkRateReset(resetInterval)
+                    , dc
                     , None
                     , None]}
+        case {"浮动": [_index, Spread, resetInterval]}:
+            x['日历']=DC.DC_ACT_365F.value
+            return mkBondRate(x)
+        case {"固定": _rate, "日历":dc}:
+            return mkTag(("Fix",[_rate,dc]))
         case {"固定": _rate}:
-            return mkTag(("Fix",_rate))
+            return mkTag(("Fix",[_rate,DC.DC_ACT_365F.value]))
         case {"期间收益": _yield}:
             return mkTag(("InterestByYield",_yield))
 
@@ -177,6 +184,8 @@ def mkAction(x):
             return mkTag(("Transfer",[source, target, ""]))
         case ["按公式账户转移", source, target, formula]:
             return mkTag(("TransferBy",[source, target, mkFormula(formula)]))
+        case ["计提费用", *feeNames]:
+            return mkTag(("CalcFee",feeNames))
         case ["支付费用", source, target]:
             return mkTag(("PayFee",[source, target]))
         case ["支付费用收益", source, target, _limit]:
@@ -347,16 +356,34 @@ def mkCollection(xs):
     return [[sourceMapping[x], acc] for (x, acc) in xs]
 
 
+#"{\"tag\":\"PatternInterval\",
+#  \"contents\":
+#    {\"ClosingDate\": [\"2022-01-01\",{\"tag\":\"MonthFirst\"},\"2030-01-01\"]
+#    ,\"CutoffDate\":[\"2022-01-01\",{\"tag\":\"MonthFirst\"},\"2030-01-01\"]
+#    ,\"FirstPayDate\":[\"2022-02-25\",{\"tag\":\"DayOfMonth\",\"contents\":25},\"2030-01-01\"]}}"
+def mkDatePattern(x):
+    match x:
+        case ["每月",_d]:
+            return mkTag((datePattern["每月"],_d))
+        case ["每年",_m,_d]:
+            return mkTag((datePattern["每年"],[_m,_d]))
+        case _:
+            return mkTag((datePattern[x]))
+
 def mkDate(x):
     match x:
-        case (a,b,c):
-            return [a,b,c]
-        case {"封包日":a, "起息日": b,"首次兑付日":c}:
-            return [a,b,c]
-        case {"收款期末日":a,"计息期末日": b,"下次兑付日":c}:
-            return [a,b,c]
+        case {"封包日":a, "起息日":b,"首次兑付日":c,"法定到期日":d,"收款频率":pf,"付款频率":bf}:
+            return mkTag(("PatternInterval"
+                   ,{"ClosingDate":[b,mkDatePattern(pf),d] ,"CutoffDate":[a,mkDatePattern(pf),d] 
+                      ,"FirstPayDate":[c,mkDatePattern(bf),d]}))
+        case {"回款日":cdays, "分配日":ddays,"封包日":cutoffDate,"起息日":closingDate}:
+            return mkTag(("CustomDates"
+                          ,[cutoffDate
+                            ,[ mkTag(("PoolCollection",[cd,""])) for cd in cdays]
+                            ,closingDate
+                            ,[ mkTag(("RunWaterfall",[dd,""])) for dd in ddays]]))
         case _:
-            raise RuntimeError(f"对于产品发行建模格式为：{'封包日':a, '起息日': b,'首次兑付日':c} ;对于存量产品格式为 {'收款期末日':a,'计息期末日': b,'下次兑付日':c} ")
+            raise RuntimeError(f"对于产品发行建模格式为：{'封包日':a, '起息日': b,'首次兑付日':c,'法定到期日':e,'收款频率':f,'付款频率':g} ")
 
 
 def mkComponent(x):
@@ -392,6 +419,7 @@ def mkCallOptions(x):
         case {"全部满足": xs}:
             return mkTag(("And", xs))
 
+#"{\"tag\":\"PrepaymentFactors\",\"contents\":{\"tag\":\"FactorCurveClosed\",\"contents\":[[\"2022-01-01\",{\"numerator\":33,\"denominator\":25}]]}}"
 
 def mkAssumption(x):
     match x:
@@ -399,6 +427,9 @@ def mkAssumption(x):
             return mkTag(("PrepaymentCPRCurve", cpr))
         case {"CPR": cpr} :
             return mkTag(("PrepaymentCPR", cpr))
+        case {"CPR调整": [*cprAdj,eDate]} :
+            return mkTag(("PrepaymentFactors"
+                         , mkTs("FactorCurveClosed",[cprAdj,eDate])))
         case {"CDR": cdr}:
             return mkTag(("DefaultCDR", cdr))
         case {"回收": (rr, rlag)}:
@@ -421,13 +452,26 @@ def mkAccTxn(xs):
 
 # \"overrides\":[[{\"tag\":\"RunWaterfall\",\"contents\":[\"2022-01-01\",\"base\"]},{\"tag\":\"PoolCollection\",\"contents\":[\"0202-11-01\",\"collection\"]}]]}
 def mkOverrides(m):
-    r = []
-    mapping = {"分配日":"RunWaterfall","回款日":"PoolCollection"}
-    for k,v in m.items():
-        match (k,v):
-            case("日期",ds):
-                r.append([mkTag((mapping[_x[0]],[_x[1],""])) for _x in ds ])
-    return r
+    return None
+#data WhenTrigger = EndCollection
+#                 | EndCollectionWF
+#                 | BeginDistributionWF
+#                 | EndDistributionWF
+class 时间点(Enum):
+    回收后 = "BeginDistributionWF"
+    回收动作完成后 = "EndCollectionWF"
+    分配前 = "BeginDistributionWF"
+    分配后 = "EndDistributionWF"
+
+# [
+#  [[\"BeginDistributionWF\",{\"tag\":\"AfterDate\",\"contents\":\"2022-03-01\"}]
+#    ,{\"tag\":\"DealStatusTo\",\"contents\":{\"tag\":\"Revolving\"}}]
+#   ]"
+def mkTrigger(m):
+    match m :
+        case _:
+            return None
+#
 
 def mk(x):
     match x:
@@ -476,12 +520,17 @@ def mk(x):
         case ["清仓回购", calls]:
             return mkCall(calls)
 
+def readStatus(s):
+    if "," in s:
+        return s.split(",")[1]
+    else:
+        return mkTag("Amortizing")
+
 
 @dataclass
 class 信贷ABS:
     名称: str
-    日期: tuple  # 起息日: datetime 封包日: datetime 首次兑付日 : datetime
-    兑付频率: 频率
+    日期: dict
     资产池: dict
     账户: tuple
     债券: tuple
@@ -489,6 +538,7 @@ class 信贷ABS:
     分配规则: dict
     归集规则: tuple
     清仓回购: tuple 
+    触发事件: dict
     自定义: dict = field(default_factory=dict)
 
 
@@ -520,47 +570,45 @@ class 信贷ABS:
 
     @property
     def json(self):
-        cutoff, closing, first_pay = mkDate(self.日期)
-        stated = self.日期.get("法定到期日",None)
+        #cutoff, closing, first_pay = mkDate(self.日期)
+        stated = False # self.日期.get("法定到期日",None) if len(self.日期)==4  # if isinstance(self.日期,dict) else self.日期[3]
         dists,collects,cleans = [ self.分配规则.get(wn,[]) for wn in ['未违约','回款后','清仓回购'] ]
         distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
         distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
+        status = readStatus(self.名称)
+        parsedDates = mkDate(self.日期)
         """
         get the json formatted string
         """
         _r = {
-            "dates": {
-                "ClosingDate": closing,
-                "CutoffDate": cutoff,
-                "FirstPayDate": first_pay},
+            "dates": parsedDates,
             "name": self.名称,
-            "pool": {"assets": [mkAsset(x) for x in self.资产池.get('清单',[])]
-                , "asOfDate": cutoff
+            "status":status,
+            "pool":{"assets": [mkAsset(x) for x in self.资产池.get('清单',[])]
+                , "asOfDate": self.日期['封包日']
                 , "issuanceStat": readIssuance(self.资产池)
                 , "futureCf":mkCf(self.资产池.get('归集表', []))
                 },
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
-            "waterfall": {"DistributionDay": list(distsflt)
+            "waterfall": {f"DistributionDay {status['tag']}":list(distsflt)
                         , "EndOfPoolCollection": list(collectsflt)
                         , "CleanUp": list(cleanflt)},
             "fees": functools.reduce(lambda result, current: result | current
                                      , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]) if self.费用 else {},
             "accounts": functools.reduce(lambda result, current: result | current
                                          , [mk(["账户", accName, accO]) for (accName, accO) in self.账户]),
-            "collects": mkCollection(self.归集规则),
-            "collectPeriod": freqMap[self.兑付频率],
-            "payPeriod": freqMap[self.兑付频率],
+            "collects": mkCollection(self.归集规则)
         }
         
         for fn, fo in _r['fees'].items():
-            fo['feeStart'] = _r['dates']['ClosingDate']
-
-        if stated:
-            _r['dates']['StatedMaturityDate'] = stated
+            fo['feeStart'] = self.日期["起息日"]
 
         if hasattr(self,"自定义"):
             _r["overrides"] = mkOverrides(self.自定义)
+        
+        if hasattr(self,"触发事件"):
+            _r["triggers"] = mkTrigger(self.触发事件)
             
         return _r  # ,ensure_ascii=False)
 
@@ -623,7 +671,7 @@ class 信贷ABS:
 
         output['pricing'] = pd.DataFrame.from_dict(resp[3]
                                                    , orient='index'
-                                                   , columns=["估值", "票面估值", "WAL", "久期", "应计利息"]) if resp[3] else None
+                                                   , columns=["估值", "票面估值", "WAL", "久期", "应计利息"]).sort_index() if resp[3] else None
         if position:
             output['position'] = {}
             for k,v in position.items():
