@@ -389,7 +389,7 @@ def mkDate(x):
 def mkComponent(x):
     match x:
         case {"贴现日": pricingDay, "贴现曲线": xs}:
-            return [pricingDay, {"tag": "FloatCurve", "contents": xs}]
+            return [pricingDay, {"tag": "PricingCurve", "contents": xs}]
         case _:
             None
 
