@@ -114,7 +114,7 @@ def mkFeeType(x):
         case {"固定费用": amt}:
             return mkTag(("FixFee", amt))
         case {"周期费用": [p, amt]}:
-            return mkTag(("RecurFee", [freqMap[p], amt]))
+            return mkTag(("RecurFee", [mkDatePattern(p), amt]))
 
 
 def mkRateReset(x):
@@ -163,6 +163,15 @@ def mkAccountCapType(x):
         case {"金额上限": amt}:
             return mkTag(("DueCapAmt",amt))
 
+def mkTransferLimit(x):
+    match x:
+        case {"余额百分比": pct}:
+            return mkTag(("DuePct",pct))
+        case {"金额上限": amt}:
+            return mkTag(("DueCapAmt",amt))
+
+       
+
     
 def mkFormula(x):
     match x:
@@ -181,9 +190,9 @@ def mkLiqMethod(x):
 def mkAction(x):
     match x:
         case ["账户转移", source, target]:
-            return mkTag(("Transfer",[source, target, ""]))
-        case ["按公式账户转移", source, target, formula]:
-            return mkTag(("TransferBy",[source, target, mkFormula(formula)]))
+            return mkTag(("Transfer",[source, target]))
+        case ["按公式账户转移", _limit, source, target]:
+            return mkTag(("TransferBy",[mkTransferLimit(_limit), source, target]))
         case ["计提费用", *feeNames]:
             return mkTag(("CalcFee",feeNames))
         case ["支付费用", source, target]:
