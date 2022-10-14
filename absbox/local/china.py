@@ -107,10 +107,14 @@ def mkFeeType(x):
             return mkTag(("AnnualRateFee"
                         ,[ mkTag((baseMap[base],'1970-01-01')) 
                            , rate]))
-        case {"百分比费率": [base, rate]}:
-            return mkTag(("PctFee"
-                        ,[mkTag(baseMap[base])
-                          , rate]))
+        case {"百分比费率": [*desc, rate]}:
+            match desc:
+                case ["资产池回款","利息"]:
+                    return mkTag(("PctFee"
+                                 , [mkTag(("PoolCollectionIncome", "CollectedInterest"))
+                                   , rate]))
+                case _:
+                    raise RuntimeError(f"Failed to match on 百分比费率：{desc,rate}")
         case {"固定费用": amt}:
             return mkTag(("FixFee", amt))
         case {"周期费用": [p, amt]}:
@@ -498,8 +502,9 @@ def mk(x):
                                       , "accType": None
                                       , "accInterest": mkAccInt(attrs.get("计息",None))
                                       , "accStmt": mkAccTxn(attrs.get("记录",None))}}
-        case ["费用", feeName, {"类型": feeType}]:
-            return {feeName: {"feeName": feeName, "feeType": mkFeeType(feeType), "feeStart": None, "feeDue": 0,
+        case ["费用", feeName, {"类型": feeType ,**fi}]:
+            return {feeName: {"feeName": feeName, "feeType": mkFeeType(feeType), "feeStart":fi.get("起算",None)
+                             ,"feeDueDate":fi.get("计算日",None) , "feeDue": 0,
                               "feeArrears": 0, "feeLastPaidDay": None}}
         case ["债券", bndName, {"当前余额": bndBalance
             , "当前利率": bndRate
@@ -611,7 +616,8 @@ class 信贷ABS:
         }
         
         for fn, fo in _r['fees'].items():
-            fo['feeStart'] = self.日期["起息日"]
+            if fo['feeStart'] is None :
+                fo['feeStart'] = self.日期["起息日"]
 
         if hasattr(self,"自定义"):
             _r["overrides"] = mkOverrides(self.自定义)
