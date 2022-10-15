@@ -16,8 +16,6 @@ def mkTag(x):
 def mkTs(n,vs):
     return mkTag((n,vs))
     
-
-
 def unify(xs,ns):
     index_name = xs[0].index.name
     dfs = []
@@ -28,6 +26,17 @@ def unify(xs,ns):
                                                 ,on=[index_name])
                         ,dfs)
     return r.sort_index()
+
+def bondView(r,flow=None):
+    bnds = r['bonds']
+    bndNames = list(bnds.keys())
+    bndVals = list(bnds.values())
+    if flow is None:
+        return unify(bndVals,bndNames)
+    else:
+        newBnds = [ _b[flow] for _b in bndVals] 
+        return unify(newBnds,bndNames)
+
 
 class DC(Enum):  # TODO need to check with HS code
     DC_30E_360 = "DC_30E_360"
