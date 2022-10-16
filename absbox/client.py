@@ -98,8 +98,8 @@ class API:
                             or (action['contents'][1] not in valid_acc):
                             error.append(f"{wn},{idx}")
                     case 'TransferBy':
-                        if (action['contents'][0] not in valid_acc) \
-                            or (action['contents'][1] not in valid_acc):
+                        if (action['contents'][1] not in valid_acc) \
+                            or (action['contents'][2] not in valid_acc):
                             error.append(f"{wn},{idx}")
                     case 'PayTillYield':
                         if (action['contents'][0] not in valid_acc) \

@@ -173,6 +173,10 @@ def mkTransferLimit(x):
             return mkTag(("DuePct",pct))
         case {"金额上限": amt}:
             return mkTag(("DueCapAmt",amt))
+        case {"公式": "ABCD" }:
+            return mkTag(("Formula","ABCD"))
+        case {"公式": formula}:
+            return mkTag(("DS",mkDs(formula)))
 
        
 
@@ -199,6 +203,8 @@ def mkAction(x):
             return mkTag(("TransferBy",[mkTransferLimit(_limit), source, target]))
         case ["计提费用", *feeNames]:
             return mkTag(("CalcFee",feeNames))
+        case ["计提利息", *bndNames]:
+            return mkTag(("CalcBondInt",bndNames))
         case ["支付费用", source, target]:
             return mkTag(("PayFee",[source, target]))
         case ["支付费用收益", source, target, _limit]:
@@ -254,16 +260,26 @@ def mkDs(x):
             return mkTag("PoolFactor")
         case ("所有账户余额",):
             return mkTag("AllAccBalance")
+        case ("账户余额",*ans):
+            return mkTag(("AccBalance",ans))
         case ("系数",ds,f):
             return mkTag(("Factor",[mkDs(ds),f]))
         case ("债券余额",*bnds):
             return mkTag(("CurrentBondBalanceOf",bnds))
+        case ("债券待付利息",*bnds):
+            return mkTag(("CurrentDueBondInt",bnds))
+        case ("待付费用",*fns):
+            return mkTag(("CurrentDueFee",fns))
         case ("Min",ds1,ds2):
             return mkTag(("Min",[mkDs(ds1),mkDs(ds2)]))
         case ("Max",ds1,ds2):
             return mkTag(("Max",[mkDs(ds1),mkDs(ds2)]))
         case ("合计",*ds):
             return mkTag(("Sum",[mkDs(_ds) for _ds in ds]))
+        case ("差额",*ds):
+            return mkTag(("Substract",[mkDs(_ds) for _ds in ds]))
+        case ("常数",n):
+            return mkTag(("Constant",n))
             
 
 
