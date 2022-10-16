@@ -45,11 +45,11 @@ class API:
                        ,"bondPricing": deal.read_pricing(pricing) if (pricing is not None) else None}
                    , ensure_ascii=False)
 
-        if any(isinstance(i, list) for i in assumptions):
+        if isinstance(assumptions, dict):
         #if isinstance(assumptions,list):
             return json.dumps({"_deal": deal.json
                        ,"_assump": mkTag(("Multiple"
-                                          ,[ deal.read_assump(a) for a in assumptions ]))
+                                          ,{ scenarioName:deal.read_assump(a) for (scenarioName,a) in assumptions.items()}))
                        ,"_bondPricing": deal.read_pricing(pricing)}
                    , ensure_ascii=False)
 
@@ -139,7 +139,7 @@ class API:
             assumptions = pickle.load(assumptions)
 
         if assumptions:
-            multi_run_flag = any(isinstance(i, list) for i in assumptions)
+            multi_run_flag = isinstance(assumptions, dict)
         else:
             multi_run_flag = False 
             
@@ -188,7 +188,7 @@ class API:
         t_reading_s = datetime.datetime.now()
         if read:
             if multi_run_flag:
-                __r = [ deal.read(_r,position=position) for _r in result ]
+                __r = { n:deal.read(_r,position=position) for (n,_r) in result.items()}
             else:
                 __r = deal.read(result,position=position)
             t_reading_e = datetime.datetime.now()

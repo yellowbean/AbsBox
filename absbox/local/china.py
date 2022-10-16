@@ -178,13 +178,6 @@ def mkTransferLimit(x):
         case {"公式": formula}:
             return mkTag(("DS",mkDs(formula)))
 
-       
-
-    
-def mkFormula(x):
-    match x:
-        case "A+B+C-D":
-            return mkTag(("ABCD"))
 
 def mkLiqMethod(x):
     match x:
