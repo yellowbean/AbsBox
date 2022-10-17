@@ -37,6 +37,43 @@ def bondView(r,flow=None):
         newBnds = [ _b[flow] for _b in bndVals] 
         return unify(newBnds,bndNames)
 
+def accView(r,flow=None):
+    accs = r['accounts']
+    accNames = list(accs.keys())
+    accVals = list(accs.values())
+    if flow is None:
+        return unify(accVals, accNames)
+    else:
+        newAccs = [ _a[flow] for _a in accVals]
+        return unify(newAccs,accNames)
+
+def peekAtDates(x,ds):
+    x_consol = x.groupby(["日期"]).last()
+
+    if x_consol.index.get_indexer(ds,method='pad').min()==-1:
+        raise RuntimeError("<查看日期>早于当前DataFrame")
+
+    keep_idx = [ x_consol.index.asof(d) for d in ds ]
+    y = x_consol.loc[keep_idx]
+    y.reset_index("日期")
+    y["日期"] = ds
+    return y.set_index("日期")
+
+def balanceSheetView(r,ds=None):
+    bv = bondView(r, flow="余额")
+    av = accView(r, flow="余额")
+    pv = r['pool']['flow'][["未偿余额"]]
+    
+    #validation
+    #bv.index
+
+    try:
+        pvCol,avCol,bvCol = [ peekAtDates(_, ds)  for _ in [pv,av,bv] ]
+    except RuntimeError as e:
+        print(f"Error: 其他错误=>{e}")
+    
+    return unify([pvCol,avCol,bvCol],["资产-资产池","资产-账户","负债"])
+
 
 class DC(Enum):  # TODO need to check with HS code
     DC_30E_360 = "DC_30E_360"
