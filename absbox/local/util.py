@@ -66,6 +66,8 @@ def balanceSheetView(r,ds=None):
     
     #validation
     #bv.index
+    if ds is None:
+        ds = list(bv.index)
 
     try:
         pvCol,avCol,bvCol = [ peekAtDates(_, ds)  for _ in [pv,av,bv] ]
