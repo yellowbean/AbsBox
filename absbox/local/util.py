@@ -69,10 +69,24 @@ def balanceSheetView(r,ds=None):
 
     try:
         pvCol,avCol,bvCol = [ peekAtDates(_, ds)  for _ in [pv,av,bv] ]
+
+        for k,_ in [("资产池",pvCol),("账户",avCol), ("债券",bvCol)]:
+            _[f'{k}-合计'] = _.sum(axis=1)
+
+        asset_cols = (len(pvCol.columns)+len(avCol.columns))*["资产"]
+        liability_cols = len(bvCol.columns)*["负债"]
+        header = asset_cols + liability_cols
+
+        bs = pd.concat([pvCol,avCol,bvCol],axis=1)
+        bs.columns = pd.MultiIndex.from_arrays([header,list(bs.columns)])
+        bs["资产","合计"] = bs["资产","资产池-合计"]+bs["资产","账户-合计"]
+        bs["负债","合计"] = bs["负债","债券-合计"]
+
+
     except RuntimeError as e:
         print(f"Error: 其他错误=>{e}")
     
-    return unify([pvCol,avCol,bvCol],["资产-资产池","资产-账户","负债"])
+    return bs # unify([pvCol,avCol,bvCol],["资产-资产池","资产-账户","负债"])
 
 
 class DC(Enum):  # TODO need to check with HS code
