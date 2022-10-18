@@ -67,7 +67,7 @@ def mkDateVector(x):
 def mkBondType(x):
     match x:
         case {"固定摊还": schedule}:
-            return mkTag(("PAC", mkTag(("AmountCurve", schedule))))
+            return mkTag(("PAC", mkTag(("BalanceCurve", schedule))))
         case {"过手摊还": None}:
             return mkTag(("Sequential"))
         case {"锁定摊还": _after}:
