@@ -4,8 +4,6 @@ from absbox import API
 from absbox.local.china import show,信贷ABS
 import requests
 import json
-import jsondiff as jd
-from jsondiff import diff
 import logging
 
 from absbox.tests.benchmark.china import *
