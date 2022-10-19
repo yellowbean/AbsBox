@@ -536,6 +536,7 @@ def mk(x):
                             , "bndType": mkBondType(bndType)
                             , "bndDuePrin": 0
                             , "bndDueInt": 0
+                            , "bndDueIntDate": None
                          }}
         case ["分配规则", instruction]:
             return mkWaterfall(instruction)
