@@ -106,9 +106,11 @@ def balanceSheetView(r,ds=None,equity=None):
         bs.columns = pd.MultiIndex.from_arrays([header,list(bs.columns)])
         bs["资产","合计"] = bs["资产","资产池-合计"]+bs["资产","账户-合计"]
         bs["负债","合计"] = bs["负债","债券-合计"]
-
-        bs["权益","累计分配"] = equityFlow["权益",f"合计分配{equity}"].cumsum()
-        bs["权益","合计"] = bs["资产","合计"] - bs["负债","合计"] + bs["权益","累计分配"]
+        if equity:
+            bs["权益","累计分配"] = equityFlow["权益",f"合计分配{equity}"].cumsum()
+            bs["权益","合计"] = bs["资产","合计"] - bs["负债","合计"] + bs["权益","累计分配"]
+        else:
+            bs["权益","合计"] = bs["资产","合计"] - bs["负债","合计"] 
 
     # build PnL
         pool_index = r['pool']['flow'].index
