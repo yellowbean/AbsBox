@@ -685,7 +685,7 @@ class 信贷ABS:
                     }
         output = {}
         for comp_name, comp_v in read_paths.items():
-            if not comp_name in resp[0]:
+            if (not comp_name in resp[0]) or (resp[0][comp_name] is None):
                 continue
             output[comp_name] = {}
             for k, x in resp[0][comp_name].items():
