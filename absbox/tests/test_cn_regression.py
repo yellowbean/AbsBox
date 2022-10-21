@@ -52,8 +52,8 @@ def test_resp():
     input_req_folder = os.path.join(china_folder,"out")
     input_scen_folder = os.path.join(china_folder,"scenario")
     input_resp_folder = os.path.join(china_folder,"resp")
-    #test_server = "https://deal-bench.xyz/api/run_deal2" 
-    test_server = "http://localhost:8081/run_deal2" 
+    test_server = "https://deal-bench.xyz/api/run_deal2" 
+    #test_server = "http://localhost:8081/run_deal2" 
     pair = [("test01.json","empty.json","test01.out.json")
             ,("test02.json","empty.json","test02.out.json")
             ,("test03.json","empty.json","test03.out.json")
