@@ -52,4 +52,5 @@ test01 = 信贷ABS(
       ,["回收回款","账户01"])
     ,None
     ,None
+    ,None
 )

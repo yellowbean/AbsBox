@@ -68,6 +68,7 @@ JY_RMBS_01 = 信贷ABS(
       ,["回收回款","本金分账户"])
     ,None
     ,None
+    ,None
 )
 
 

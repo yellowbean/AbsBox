@@ -98,4 +98,5 @@ BYD_AUTO_2021_2 = 信贷ABS(
       ,["回收回款","本金分账户"])
     ,None
     ,None
+    ,None
 )

@@ -4,6 +4,7 @@ from absbox import API
 from absbox.local.china import show,信贷ABS
 import requests
 import json
+from json.decoder import JSONDecodeError
 import logging
 
 from absbox.tests.benchmark.china import *
@@ -29,26 +30,30 @@ def test_translate():
             ,(t12.JY_RMBS_2019_11,"test12.json")
             ,(t13.test01,"test13.json")
             ]
-    result = []
     for d,o in pair:
         benchfile =  os.path.join(case_out,o)
         if not os.path.exists(benchfile):
             print(f"Skipping:{benchfile}")
             with open(benchfile,'w',encoding='utf8') as newbench:
-                json.dump(d.json,newbench)
+                print("Writing new bench out case")
+                print(f"Size {len(d.json)}")
+                json.dump(d.json,newbench,indent=2)
             logging.info(f"Create new case for {o}")
             continue
         with open(benchfile ,'r') as ofile:
-            benchmark_out = json.load(ofile)
-            assert d.json == benchmark_out, f"testing on {o}"
+            try:
+                benchmark_out = json.load(ofile)
+                assert d.json == benchmark_out, f"testing fail on {o}"
+            except JSONDecodeError as e:
+                print(f"Error parsing json format:{benchfile}")
 
 
 def test_resp():
     input_req_folder = os.path.join(china_folder,"out")
     input_scen_folder = os.path.join(china_folder,"scenario")
     input_resp_folder = os.path.join(china_folder,"resp")
-    test_server = "https://deal-bench.xyz/api/run_deal2" 
-    #test_server = "http://localhost:8081/run_deal2" 
+    #test_server = "https://deal-bench.xyz/api/run_deal2" 
+    test_server = "http://localhost:8081/run_deal2" 
     pair = [("test01.json","empty.json","test01.out.json")
             ,("test02.json","empty.json","test02.out.json")
             ,("test03.json","empty.json","test03.out.json")
@@ -68,7 +73,9 @@ def test_resp():
         print(dinput,sinput,eoutput)
         with open(os.path.join(input_req_folder,dinput),'r') as dq:  # deal request
             with open(os.path.join(input_scen_folder,sinput),'r') as sq: # scenario request 
-                req = {"deal":json.load(dq),"assump":json.load(sq),"bondPricing":None}
+                req = {"deal":json.load(dq)
+                        ,"assump":json.load(sq)
+                        ,"bondPricing":None}
                 hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
                 tresp = requests.post(test_server
                                  , data=json.dumps(req).encode('utf-8')
@@ -81,12 +88,10 @@ def test_resp():
                 local_bench_file = os.path.join(input_resp_folder,eoutput)
                 if not os.path.exists(local_bench_file):
                     with open(local_bench_file,'w') as wof: # write output file
-                        json.dump(s_result,wof)
+                        json.dump(s_result,wof,indent=2)
                     continue
                 with open(local_bench_file,'r') as eout: # expected output 
                     local_result = json.load(eout)
-                    #_diff = diff(s_result, local_result)
-                    #print(_diff)
                     assert s_result == local_result , f"Server Test Failed {dinput} {sinput} {eoutput} "
 
 

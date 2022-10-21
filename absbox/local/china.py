@@ -225,6 +225,12 @@ def mkAction(x):
             return mkTag(("TransferReserve",[_map[satisfy], source, target, None]))
         case ["出售资产", liq, target]:
             return mkTag(("LiquidatePool",[mkLiqMethod(liq), target]))
+        case ["流动性支持",source, target, limit]:
+            return mkTag(("LiqSupport",[ mkTag(("DS",mkDs(limit))), source, target]))
+        case ["流动性支持",source, target]:
+            return mkTag(("LiqSupport",[None, source, target]))
+        case ["流动性支持偿还",source, target]:
+            return mkTag(("LiqRepay",[None, source, target]))
 
 #data DealStats =
 #              | CurrentPoolDefaultedBalance
@@ -273,6 +279,8 @@ def mkDs(x):
             return mkTag(("Substract",[mkDs(_ds) for _ds in ds]))
         case ("常数",n):
             return mkTag(("Constant",n))
+        case ("储备账户缺口",*accs):
+            return mkTag(("ReserveAccGap",accs))
             
 
 
@@ -407,6 +415,12 @@ def mkDate(x):
         case _:
             raise RuntimeError(f"对于产品发行建模格式为：{'封包日':a, '起息日': b,'首次兑付日':c,'法定到期日':e,'收款频率':f,'付款频率':g} ")
 
+def mkLiqProviderType(x):
+    match x:
+        case {"总额度": amt}:
+            return mkTag(("FixSupport"))
+        case {"日期":dp,"限额":amt}:
+            return mkTag(("ReplenishSupport",[mkDatePattern(dp),amt]))
 
 def mkComponent(x):
     match x:
@@ -563,6 +577,7 @@ class 信贷ABS:
     分配规则: dict
     归集规则: tuple
     清仓回购: tuple 
+    流动性支持:dict
     触发事件: dict
     自定义: dict = field(default_factory=dict)
 
@@ -635,6 +650,14 @@ class 信贷ABS:
         
         if hasattr(self,"触发事件"):
             _r["triggers"] = mkTrigger(self.触发事件)
+        
+        if hasattr(self,"流动性支持") and self.流动性支持 is not None:
+            _providers = {}
+            for (_k,_p) in self.流动性支持.items():
+                _pm = {"liqName":_k,"liqType":mkLiqProviderType(_p["类型"])
+                        , "liqBalance":_p["额度"],"liqCredit":_p.get("已提供",0),"liqStart":self.日期["起息日"]}
+                _providers[_k]=(_pm)
+            _r["liqProvider"] = _providers
             
         return _r  # ,ensure_ascii=False)
 
@@ -657,10 +680,13 @@ class 信贷ABS:
     def read(self, resp, position=None):
         read_paths = {'bonds': ('bndStmt', ["日期", "余额", "利息", "本金", "执行利率", "本息合计", "备注"], "债券")
                     , 'fees': ('feeStmt', ["日期", "余额", "支付", "剩余支付", "备注"], "费用")
-                    , 'accounts': ('accStmt', ["日期", "余额", "变动额", "备注"], "账户")}
+                    , 'accounts': ('accStmt', ["日期", "余额", "变动额", "备注"], "账户")
+                    , 'liqProvider': ('liqStmt', ["日期", "限额", "变动额", "已提供","备注"], "流动性支持")
+                    }
         output = {}
         for comp_name, comp_v in read_paths.items():
-            #output[comp_name] = collections.OrderedDict()
+            if not comp_name in resp[0]:
+                continue
             output[comp_name] = {}
             for k, x in resp[0][comp_name].items():
                 ir = None
@@ -671,6 +697,11 @@ class 信贷ABS:
         # aggregate fees
         output['fees'] = {f: v.groupby('日期').agg({"余额": "min", "支付": "sum", "剩余支付": "min"})
                           for f, v in output['fees'].items()}
+
+        # aggregate liquidation provider 
+        #if 'liqProvider' in output:
+        #    output['liqProvider'] = {l:v.   
+        #                             for l,v in output['liqProvider'].items() }
 
         # aggregate accounts
         agg_acc = {}
