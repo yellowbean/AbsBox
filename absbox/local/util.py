@@ -10,9 +10,6 @@ def mkTag(x):
         case (tagName):
             return {"tag": tagName}
 
-#"{\"tag\":\"PrepaymentFactors\"
-#  ,\"contents\":{\"tag\":\"FactorCurveClosed\"
-#                ,\"contents\":[[\"2022-01-01\",{\"numerator\":33,\"denominator\":25}]]}}"
 
 def mkTs(n,vs):
     return mkTag((n,vs))
@@ -162,6 +159,20 @@ def balanceSheetView(r,ds=None,equity=None):
 def PnLView(r,ds=None):
     pv = r['pool']['flow'][["利息"]]
     ev = feeView(r, flow='支付')
+
+
+def consolStmtByDate(s):
+    return s.groupby("日期").last()
+
+def aggStmtByDate(s):
+    return s.groupby("日期").sum()
+
+def query(d,p):
+    if len(p)==1:
+        return d[p[0]]
+    else:
+        return query(d[p[0]],p[1:])
+
 
 class DC(Enum):  # TODO need to check with HS code
     DC_30E_360 = "DC_30E_360"

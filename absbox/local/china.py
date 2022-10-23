@@ -3,11 +3,14 @@ import requests, shutil
 from dataclasses import dataclass,field
 import functools, pickle, collections
 import pandas as pd
+import numpy as np
 from urllib.request import unquote
 from enum import Enum
+from functools import reduce 
+import matplotlib.pyplot as plt
 
 from absbox import *
-from absbox.local.util import mkTag,DC,mkTs
+from absbox.local.util import mkTag,DC,mkTs,query,consolStmtByDate,aggStmtByDate
 
 
 class 频率(Enum):
@@ -770,6 +773,14 @@ def show(r, x="full"):
         case "cash":
             return None # ""
 
+def flow_by_scenario(rs, flowpath,annotation=True):
+    "pull flows frommultiple scenario"
+    scenario_names = rs.keys()
+    if annotation:
+        dflows = [query(rs,[s]+flowpath).rename(f"{s}({flowpath[-1]})") for s in scenario_names]
+    else:
+        dflows = [query(rs,[s]+flowpath).rename(s) for s in scenario_names]
+    return pd.concat(dflows,axis=1)
 
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
@@ -828,3 +839,31 @@ def plot_bonds(r, bnds:list, flow='本息合计'):
     current_values = plt.gca().get_yticks()
     plt.gca().set_yticklabels(['{:.0f}(w)'.format(x/10000) for x in current_values])
     return plt
+
+def plot_by_scenario(rs, flowtype, flowpath):
+    "Plot with multiple scenario"
+    plt.figure(figsize=(12,8))
+    scenario_names = rs.keys()
+    dflows = [query(rs,[s]+flowpath) for s in scenario_names]
+    _alpha =  0.8
+
+    x_labels = reduce(lambda acc,x:acc.union(x) ,[ _.index for _ in dflows ]).unique()
+    x = np.arange(len(x_labels))
+    width = 1 
+    step_length = width / (len(scenario_names)+1)
+
+    for (idx,(scen,dflow)) in enumerate(zip(scenario_names,dflows)):
+        if flowtype=="balance":
+            cb = consolStmtByDate(dflow)
+            plt.step(cb.index, cb, alpha=_alpha, linewidth=5, label=f"{scen}")
+        elif flowtype=="amount":
+            cb = aggStmtByDate(dflow)
+            _bar = plt.bar(x+idx*step_length,cb,width=step_length,label=scen)
+        else:
+            plt.plot(dflow.index,dflow, alpha=_alpha, linewidth=5, label=f"{scen}")
+
+    plt.legend(scenario_names,loc='upper right', prop=font_p)
+    plt.grid(True)
+    plt.axis('tight')
+    plt.xticks(ticks=x,labels=x_labels,rotation=30)
+

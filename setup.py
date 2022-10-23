@@ -15,7 +15,7 @@ if __name__ == "__main__":
             'absbox.local':local
         },
         packages = ['absbox','absbox.local'],
-        version = '0.1.2.8',
+        version = '0.1.2.10',
         license='Apache',
         description = 'an analytical library for cashflow modeling on ABS/MBS products',
         long_description_content_type='text/markdown',
