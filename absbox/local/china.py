@@ -773,14 +773,22 @@ def show(r, x="full"):
         case "cash":
             return None # ""
 
-def flow_by_scenario(rs, flowpath,annotation=True):
-    "pull flows frommultiple scenario"
+def flow_by_scenario(rs, flowpath,annotation=True,aggFunc=None,rnd=2):
+    "pull flows from multiple scenario"
     scenario_names = rs.keys()
-    if annotation:
-        dflows = [query(rs,[s]+flowpath).rename(f"{s}({flowpath[-1]})") for s in scenario_names]
+    dflow = None
+    aggFM = {"max":pd.Series.max,"sum":pd.Series.sum,"min":pd.Series.min}
+    
+    if aggFunc is None:
+        dflows = [query(rs,[s]+flowpath) for s in scenario_names]
     else:
-        dflows = [query(rs,[s]+flowpath).rename(s) for s in scenario_names]
-    return pd.concat(dflows,axis=1)
+        dflows = [query(rs,[s]+flowpath).groupby("日期").aggregate(aggFM.get(aggFunc,aggFunc)) for s in scenario_names]
+        
+    if annotation:
+        dflows = [f.rename(f"{s}({flowpath[-1]})") for (s,f) in zip(scenario_names,dflows)]
+     
+    return pd.concat(dflows,axis=1).round(rnd)
+
 
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
