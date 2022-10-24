@@ -786,8 +786,10 @@ def flow_by_scenario(rs, flowpath,annotation=True,aggFunc=None,rnd=2):
         
     if annotation:
         dflows = [f.rename(f"{s}({flowpath[-1]})") for (s,f) in zip(scenario_names,dflows)]
-     
-    return pd.concat(dflows,axis=1).round(rnd)
+    try: 
+        return pd.concat(dflows,axis=1).round(rnd)
+    except ValueError as e:
+        return f"需要传入 aggFunc 函数对重复数据进行 Min/Max/Sum 处理"
 
 
 import matplotlib.pyplot as plt
