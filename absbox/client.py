@@ -211,3 +211,38 @@ def init_jupyter():
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', None)
     pd.options.display.float_format = '{:,}'.format
+
+def comp_engines(engine1,engine2, d, a=None):
+    
+    r1 = engine1.run(d,assumptions=a,read=True)
+    r2 = engine2.run(d,assumptions=a,read=True)
+
+    #pool check
+    if not r1['pool']['flow'] == r2['pool']['flow']:
+        return r1['pool']['flow'].compare(r2['pool']['flow']) 
+
+    #expense check  
+    if not r1['fees'] == r2['fees']:
+        for fn,f in r1['fees'].items():
+            if f.equals(r2['fees'][fn]):
+                continue
+            else:
+                return f.compare(r2['fees'][fn])
+
+    #bond check
+    if not r1['bonds'] == r2['bonds']:
+        for fn,f in r1['bonds'].items():
+            if f.equals(r2['bonds'][fn]):
+                continue
+            else:
+                return f.compare(r2['bonds'][fn])
+
+
+    #account check
+    if not r1['accounts'] == r2['accounts']:
+        for fn,f in r1['accounts'].items():
+            if f.equals(r2['accounts'][fn]):
+                continue
+            else:
+                return f.compare(r2['accounts'][fn])
+

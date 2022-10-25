@@ -68,64 +68,57 @@ def peekAtDates(x,ds):
     y["日期"] = ds
     return y.set_index("日期")
 
-def balanceSheetView(r,ds=None,equity=None):
+
+def balanceSheetView(r, ds=None, equity=None, rnd=2):
     bv = bondView(r, flow="余额")
     av = accView(r, flow="余额")
     pv = r['pool']['flow'][["未偿余额"]]
-    
-
     if equity:
-        equityFlow = bondView(r,flow="本息合计")[equity]
-        equityFlow.columns = pd.MultiIndex.from_arrays([["权益"]*len(equity),list(equityFlow.columns)])
-        equityFlow["权益",f"合计分配{equity}"] = equityFlow.sum(axis=1)
-    #validation
-    #bv.index
+        equityFlow = bondView(r, flow="本息合计")[equity]
+        equityFlow.columns = pd.MultiIndex.from_arrays([["权益"]*len(equity), list(equityFlow.columns)])
+        equityFlow["权益", f"合计分配{equity}"] = equityFlow.sum(axis=1)
     if ds is None:
         ds = list(bv.index)
 
     if equity:
-        bv.drop(columns=equity,inplace=True)
+        bv.drop(columns=equity, inplace=True)
 
     try:
-        pvCol,avCol,bvCol = [ peekAtDates(_, ds)  for _ in [pv,av,bv] ]
+        pvCol, avCol, bvCol = [ peekAtDates(_, ds) for _ in [pv, av, bv] ]
         # need to add cutoff amount for equity tranche
-
-        for k,_ in [("资产池",pvCol),("账户",avCol), ("债券",bvCol)]:
-            #if equity and (k=='资产池'):
-            #    _["权益分配"] = equityFlow["权益","合计分配"]
+        for k, _ in [("资产池", pvCol), ("账户", avCol), ("债券", bvCol)]:
             _[f'{k}-合计'] = _.sum(axis=1)
 
         asset_cols = (len(pvCol.columns)+len(avCol.columns))*["资产"]
         liability_cols = len(bvCol.columns)*["负债"]
         header = asset_cols + liability_cols
 
-        bs = pd.concat([pvCol,avCol,bvCol],axis=1)
-        bs.columns = pd.MultiIndex.from_arrays([header,list(bs.columns)])
-        bs["资产","合计"] = bs["资产","资产池-合计"]+bs["资产","账户-合计"]
-        bs["负债","合计"] = bs["负债","债券-合计"]
+        bs = pd.concat([pvCol, avCol, bvCol], axis=1)
+        bs.columns = pd.MultiIndex.from_arrays([header, list(bs.columns)])
+        bs["资产", "合计"] = bs["资产", "资产池-合计"]+bs["资产", "账户-合计"]
+        bs["负债", "合计"] = bs["负债", "债券-合计"]
         if equity:
-            bs["权益","累计分配"] = equityFlow["权益",f"合计分配{equity}"].cumsum()
-            bs["权益","合计"] = bs["资产","合计"] - bs["负债","合计"] + bs["权益","累计分配"]
+            bs["权益", "累计分配"] = equityFlow["权益", f"合计分配{equity}"].cumsum()
+            bs["权益", "合计"] = bs["资产", "合计"] - bs["负债", "合计"] + bs["权益", "累计分配"]
         else:
-            bs["权益","合计"] = bs["资产","合计"] - bs["负债","合计"] 
+            bs["权益", "合计"] = bs["资产", "合计"] - bs["负债", "合计"] 
 
     # build PnL
         pool_index = r['pool']['flow'].index
         agg_flag = bs.index.get_indexer(list(pool_index),method='ffill')
         pool_cpy = r['pool']['flow'].copy(deep=True)
-        #print(agg_flag)
-        pool_cpy['flag'] = agg_flag 
-        pool_cpy = pool_cpy.groupby("flag",sort=False).aggregate(np.sum)
-        #print(pool_cpy.index)
-        #print(f"len of pool:{len(pool_cpy.index)}")
-        #print(f"len of bs:{len(bs.index)}")
-        new_index_length = min(len(pool_cpy.index),len(bs.index))
-        pool_cpy.index = bs.index[:len(pool_cpy.index)]
+        pool_cpy['flag'] = agg_flag
+        pool_cpy = pool_cpy.groupby("flag", sort=False).aggregate(np.sum)
+        new_index_length = min(len(pool_cpy.index), len(bs.index))
+        #pool_cpy.index = bs.index[:len(pool_cpy.index)]
+        print(pool_cpy)
+        print(bs)
+        pool_cpy.index = bs.index[:new_index_length]
 
-        poolIntflow =  pool_cpy['利息']
+        poolIntflow = pool_cpy['利息']
         poolPrinflow = pool_cpy['本金']
-        poolPpyflow =  pool_cpy['早偿金额']
-        poolRecflow =  pool_cpy['回收金额']
+        poolPpyflow = pool_cpy['早偿金额']
+        poolRecflow = pool_cpy['回收金额']
 
         feeFlow = feeView(r,flow="支付")
         feeFlow["合计"] = feeFlow.sum(axis=1)
@@ -154,7 +147,7 @@ def balanceSheetView(r,ds=None,equity=None):
     except RuntimeError as e:              
         print(f"Error: 其他错误=>{e}")      
     
-    return bs # unify([pvCol,avCol,bvCol],["资产-资产池","资产-账户","负债"])
+    return bs.round(rnd) # unify([pvCol,avCol,bvCol],["资产-资产池","资产-账户","负债"])
 
 def PnLView(r,ds=None):
     pv = r['pool']['flow'][["利息"]]

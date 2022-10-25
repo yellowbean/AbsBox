@@ -6,6 +6,7 @@ import requests
 import json
 from json.decoder import JSONDecodeError
 import logging
+from jsondiff import diff
 
 from absbox.tests.benchmark.china import *
 
@@ -21,21 +22,21 @@ with open(config_file,'r') as cfh:
 
 
 def test_translate():
-    case_out = os.path.join(china_folder,"out")
-    pair = [(t1.test01,"test01.json")
-            ,(t2.test02,"test02.json")
-            ,(t3.test03,"test03.json")
-            ,(t4.JY_RMBS_01,"test04.json")
-            ,(t5.gy,"test05.json")
-            ,(t6.JY_RMBS_2017_5,"test06.json")
-            ,(t7.BYD_AUTO_2021_2,"test07.json")
-            ,(t8.JSD_AUTO_2022_3,"test08.json")
-            ,(t9.test09,"test09.json")
-            ,(t10.test01,"test10.json")
-            ,(t11.test01,"test11.json")
-            ,(t12.JY_RMBS_2019_11,"test12.json")
-            ,(t13.test01,"test13.json")
-            ,(t14.test01,"test14.json")
+    case_out = os.path.join(china_folder, "out")
+    pair = [(t1.test01, "test01.json")
+            ,(t2.test02, "test02.json")
+            ,(t3.test03, "test03.json")
+            ,(t4.JY_RMBS_01, "test04.json")
+            ,(t5.gy, "test05.json")
+            ,(t6.JY_RMBS_2017_5, "test06.json")
+            ,(t7.BYD_AUTO_2021_2, "test07.json")
+            ,(t8.JSD_AUTO_2022_3, "test08.json")
+            ,(t9.test09, "test09.json")
+            ,(t10.test01, "test10.json")
+            ,(t11.test01, "test11.json")
+            ,(t12.JY_RMBS_2019_11, "test12.json")
+            ,(t13.test01, "test13.json")
+            ,(t14.test01, "test14.json")
             ]
     for d,o in pair:
         benchfile =  os.path.join(case_out,o)
@@ -50,7 +51,8 @@ def test_translate():
         with open(benchfile ,'r') as ofile:
             try:
                 benchmark_out = json.load(ofile)
-                assert d.json == benchmark_out, f"testing fail on {o}"
+                assert d.json == benchmark_out, \
+                    f"testing fail on {o},{diff(d.json,benchmark_out)}"
             except JSONDecodeError as e:
                 print(f"Error parsing json format:{benchfile}")
 
@@ -100,7 +102,16 @@ def test_resp():
                     continue
                 with open(local_bench_file,'r') as eout: # expected output 
                     local_result = json.load(eout)
-                    assert s_result == local_result , f"Server Test Failed {dinput} {sinput} {eoutput} "
+                    assert local_result[1]==s_result[1], \
+                        "Pool Flow Is not matching"
+                    if not local_result[0]['waterfall']==s_result[0]['waterfall']:
+                        assert False,f"diff in waterfall: {diff(local_result[0]['waterfall'],s_result[0]['waterfall'])}"
+
+                    for i in ['status','dates','pool','fees','bonds','accounts']:
+                        assert local_result[0][i]==s_result[0][i], \
+                        f"Deal {i} is not matching"
+                    assert s_result == local_result , \
+                           f"Server Test Failed {dinput} {sinput} {eoutput} "
 
 
 

@@ -95,6 +95,8 @@ def mkAccType(x):
             return mkTag(("Max", [mkAccType(a), mkAccType(b)]))
         case {"较低": [a, b]}:
             return mkTag(("Min", [mkAccType(a), mkAccType(b)]))
+        case {"分段": [p,a,b]}:
+            return mkTag(("Either", [mkPre(p) ,mkAccType(a), mkAccType(b)]))
 
 def mkAccInt(x):
     match x:
@@ -224,8 +226,8 @@ def mkAction(x):
         case ["支付收益", source, target]:
             return mkTag(("PayResidual",[None, source, target]))
         case ["储备账户转移", source, target, satisfy]:
-            _map = {"源储备":"Source","目标储备":"Target"}
-            return mkTag(("TransferReserve",[_map[satisfy], source, target, None]))
+            _map = {"源储备":"Source", "目标储备": "Target"}
+            return mkTag(("TransferReserve",[_map[satisfy], source, target]))
         case ["出售资产", liq, target]:
             return mkTag(("LiquidatePool",[mkLiqMethod(liq), target]))
         case ["流动性支持",source, target, limit]:
@@ -422,8 +424,94 @@ def mkLiqProviderType(x):
     match x:
         case {"总额度": amt}:
             return mkTag(("FixSupport"))
-        case {"日期":dp,"限额":amt}:
-            return mkTag(("ReplenishSupport",[mkDatePattern(dp),amt]))
+        case {"日期":dp, "限额":amt}:
+            return mkTag(("ReplenishSupport", [mkDatePattern(dp),amt]))
+        case {}:
+            return mkTag(("UnLimit"))
+
+def mkLiqProvider(n, x):
+    match x:
+        case {"类型":"无限制","起始日":_sd, **p}: 
+            return {"liqName": n, "liqType": mkLiqProviderType({})
+                   , "liqBalance": None
+                   , "liqCredit": p.get("已提供", 0)
+                   , "liqStart": _sd}
+        case {"类型": _sp, "额度": _ab, "起始日":_sd, **p}: 
+            return {"liqName": n, "liqType": mkLiqProviderType(_sp)
+                   , "liqBalance": _ab
+                   , "liqCredit": p.get("已提供", 0)
+                   , "liqStart": _sd}
+        case _:
+            raise RuntimeError(f"无法匹配流动性支持类型：{n,x}")
+
+
+def mkComponent(x):
+    match x:
+        case {"贴现日": pricingDay, "贴现曲线": xs}:
+            return [pricingDay, {"tag": "PricingCurve", "contents": xs}]
+        case _:
+            None
+
+
+def mkLiq(x):
+    match x:
+        case {"正常余额折价": cf, "违约余额折价": df}:
+            return mkTag(("BalanceFactor", [cf, df]))
+        case {"贴现计价": df, "违约余额回收率": r}:
+            return mkTag(("PV", [df, r]))
+
+
+def mkCallOptions(x):
+    match x:
+        case {"资产池余额": bal}:
+            return mkTag(("PoolBalance", bal))
+        case {"债券余额": bal}:
+            return mkTag(("PoolBalance", bal))
+        case {"资产池余额剩余比率": factor}:
+            return mkTag(("PoolFactor", factor))
+        case {"债券余额剩余比率": factor}:
+            return mkTag(("PoolFactor", factor))
+        case {"指定日之后": d}:
+            return mkTag(("AfterDate", d))
+        case {"任意满足": xs}:
+            return mkTag(("Or", xs))
+        case {"全部满足": xs}:
+            return mkTag(("And", xs))
+
+#"{\"tag\":\"PrepaymentFactors\",\"contents\":{\"tag\":\"FactorCurveClosed\",\"contents\":[[\"2022-01-01\",{\"numerator\":33,\"denominator\":25}]]}}"
+
+def mkAssumption(x):
+    match x:
+        case {"CPR": cpr} if isinstance(cpr,list):
+            return mkTag(("PrepaymentCPRCurve", cpr))
+        case {"CPR": cpr} :
+            return mkTag(("PrepaymentCPR", cpr))
+        case {"CPR调整": [*cprAdj,eDate]} :
+            return mkTag(("PrepaymentFactors" , mkTs("FactorCurveClosed",[cprAdj,eDate])))
+        case {"CDR": cdr}:
+            return mkTag(("DefaultCDR", cdr))
+        case {"CDR调整": [*cdrAdj,eDate]} :
+            return mkTag(("DefaultFactors" , mkTs("FactorCurveClosed",[cdrAdj,eDate])))
+        case {"回收": (rr, rlag)}:
+            return mkTag(("Recovery", (rr, rlag)))
+        case {"利率": [idx, rate]} if isinstance(rate, float):
+            return mkTag(("InterestRateConstant", [idx, rate]))
+        case {"利率": [idx, *rateCurve]}:
+            return mkTag(("InterestRateCurve", [idx, *rateCurve]))
+        case {"清仓": opts}:
+            return mkTag(("CallWhen",[mkCallOptions(co) for co in opts]))
+        case {"停止": d}:
+            return mkTag(("StopRunBy",d))
+
+def mkAccTxn(xs):
+    "AccTxn T.Day Balance Amount Comment"
+    if xs is None:
+        return None
+    else:
+        return [ mkTag(("AccTxn",x)) for x in xs]
+
+# \"overrides\":[[{\"tag\":\"RunWaterfall\",\"contents\":[\"2022-01-01\",\"base\"]},{\"tag\":\"PoolCollection\",\"contents\":[\"0202-11-01\",\"collection\"]}]]}
+
 
 def mkComponent(x):
     match x:
@@ -648,20 +736,17 @@ class 信贷ABS:
             if fo['feeStart'] is None :
                 fo['feeStart'] = self.日期["起息日"]
 
-        if hasattr(self,"自定义"):
+        if hasattr(self, "自定义"):
             _r["overrides"] = mkOverrides(self.自定义)
         
-        if hasattr(self,"触发事件"):
+        if hasattr(self, "触发事件"):
             _r["triggers"] = mkTrigger(self.触发事件)
         
-        if hasattr(self,"流动性支持") and self.流动性支持 is not None:
+        if hasattr(self, "流动性支持") and self.流动性支持 is not None:
             _providers = {}
-            for (_k,_p) in self.流动性支持.items():
-                _pm = {"liqName":_k,"liqType":mkLiqProviderType(_p["类型"])
-                        , "liqBalance":_p["额度"],"liqCredit":_p.get("已提供",0),"liqStart":self.日期["起息日"]}
-                _providers[_k]=(_pm)
+            for (_k, _p) in self.流动性支持.items():
+                _providers[_k] = mkLiqProvider(_k, ( _p | {"起始日": self.日期["起息日"]}))
             _r["liqProvider"] = _providers
-            
         return _r  # ,ensure_ascii=False)
 
     def _get_bond(self, bn):
