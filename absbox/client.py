@@ -89,6 +89,10 @@ class API:
                         if (action['contents'][0] not in valid_acc) \
                             or (not set(action['contents'][1]).issubset(valid_bnd)):
                             error.append(f"{wn},{idx}")  
+                    case 'PayPrinBy':
+                        if (action['contents'][1] not in valid_acc) \
+                            or (not set(action['contents'][2]).issubset(valid_bnd)):
+                            error.append(f"{wn},{idx}")  
                     case 'PayResidual':
                         if (action['contents'][1] not in valid_acc) \
                             or (action['contents'][2] not in valid_bnd):

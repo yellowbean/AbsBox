@@ -37,6 +37,7 @@ def test_translate():
             ,(t12.JY_RMBS_2019_11, "test12.json")
             ,(t13.test01, "test13.json")
             ,(t14.test01, "test14.json")
+            ,(t15.test01, "test15.json")
             ]
     for d,o in pair:
         benchfile =  os.path.join(case_out,o)
@@ -77,6 +78,7 @@ def test_resp():
             ,("test12.json","empty.json","test12.out.json")
             ,("test13.json","empty.json","test13.out.json")
             ,("test14.json","empty.json","test14.out.json")
+            ,("test15.json","empty.json","test15.out.json")
             ]
     for dinput,sinput,eoutput in pair:
         print("Comparing")

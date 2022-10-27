@@ -3,6 +3,7 @@ import functools
 from enum import Enum
 import numpy as np
 
+
 def mkTag(x):
     match x:
         case (tagName, tagValue):
@@ -11,18 +12,18 @@ def mkTag(x):
             return {"tag": tagName}
 
 
-def mkTs(n,vs):
-    return mkTag((n,vs))
-    
-def unify(xs,ns):
+def mkTs(n, vs):
+    return mkTag((n, vs))
+
+def unify(xs, ns):
     index_name = xs[0].index.name
     dfs = []
-    for x,n in zip(xs,ns):
-        dfs.append(pd.concat([x],keys=[n],axis=1))
-    r = functools.reduce(lambda acc,x: acc.merge(x
-                                                ,how='outer'
-                                                ,on=[index_name])
-                        ,dfs)
+    for x, n in zip(xs, ns):
+        dfs.append(pd.concat([x], keys=[n], axis=1))
+    r = functools.reduce(lambda acc, x: acc.merge(x
+                                                , how='outer'
+                                                , on=[index_name])
+                        , dfs)
     return r.sort_index()
 
 def bondView(r,flow=None):

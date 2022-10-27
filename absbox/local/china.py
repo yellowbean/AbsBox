@@ -91,6 +91,10 @@ def mkAccType(x):
                                    , rate ]))
                 case _ :
                     return mkTag(("PctReserve", [mkTag((baseMap[base])), rate]))
+        case {"目标储备金额": {"公式":ds,"系数":rate}}:
+            return mkTag(("PctReserve",[mkDs(ds), rate]))
+        case {"目标储备金额": {"公式":ds}}:
+            return mkTag(("PctReserve",[mkDs(ds), 1.0]))
         case {"较高": [a, b]}:
             return mkTag(("Max", [mkAccType(a), mkAccType(b)]))
         case {"较低": [a, b]}:
@@ -98,10 +102,11 @@ def mkAccType(x):
         case {"分段": [p,a,b]}:
             return mkTag(("Either", [mkPre(p) ,mkAccType(a), mkAccType(b)]))
 
+
 def mkAccInt(x):
     match x:
-        case {"周期": _dp,"利率":br , "最近结息日":lsd}:
-            return [br,lsd,mkDateVector(_dp)]
+        case {"周期": _dp, "利率": br, "最近结息日": lsd}:
+            return [br, lsd, mkDateVector(_dp)]
         case _:
             return None
 
@@ -110,14 +115,16 @@ def mkFeeType(x):
     match x:
         case {"年化费率": [base, rate]}:
             return mkTag(("AnnualRateFee"
-                        ,[ mkTag((baseMap[base],'1970-01-01')) 
+                        , [ mkTag((baseMap[base],'1970-01-01')) 
                            , rate]))
         case {"百分比费率": [*desc, rate]}:
             match desc:
                 case ["资产池回款","利息"]:
-                    return mkTag(("PctFee"
-                                 , [mkTag(("PoolCollectionIncome", "CollectedInterest"))
-                                   , rate]))
+                    return mkTag(("PctFee", [mkTag(("PoolCollectionIncome", "CollectedInterest")), rate]))
+                case ["已付利息合计", *bns]:
+                    return mkTag(("PctFee", [mkTag(("LastBondIntPaid",bns)), rate]))
+                case ["已付本金合计", *bns]:
+                    return mkTag(("PctFee", [mkTag(("LastBondPrinPaid",bns)), rate]))
                 case _:
                     raise RuntimeError(f"Failed to match on 百分比费率：{desc,rate}")
         case {"固定费用": amt}:
@@ -164,6 +171,11 @@ def mkFeeCapType(x):
             return mkTag(("DuePct",pct))
         case {"应计费用上限": amt}:
             return mkTag(("DueCapAmt",amt))
+
+def mkPDA(x):
+    match x:
+        case {"公式": ds}:
+            return mkTag(("DS",mkDs(ds)))
 
 def mkAccountCapType(x):
     match x:
@@ -215,6 +227,9 @@ def mkAction(x):
             return mkTag(("PayFeeBy",[limit, source, target]))
         case ["支付利息", source, target]:
             return mkTag(("PayInt",[source, target]))
+        case ["支付本金", source, target, _limit]:
+            pda = mkPDA(_limit)
+            return mkTag(("PayPrinBy",[pda, source, target]))
         case ["支付本金", source, target]:
             return mkTag(("PayPrin",[source, target]))
         case ["支付剩余本金", source, target]:
@@ -236,6 +251,8 @@ def mkAction(x):
             return mkTag(("LiqSupport",[None, source, target]))
         case ["流动性支持偿还",source, target]:
             return mkTag(("LiqRepay",[None, source, target]))
+        case ["流动性支持报酬",source, target]:
+            return mkTag(("LiqYield",[None, source, target]))
 
 #data DealStats =
 #              | CurrentPoolDefaultedBalance
@@ -286,6 +303,8 @@ def mkDs(x):
             return mkTag(("Constant",n))
         case ("储备账户缺口",*accs):
             return mkTag(("ReserveAccGap",accs))
+        case ("自定义",n):
+            return mkTag(("UseCustomData",n))
             
 
 
@@ -599,7 +618,15 @@ def mkTrigger(m):
     match m :
         case _:
             return None
-#
+
+def mkCustom(x):
+    match x:
+        case {"常量":n}:
+            return mkTag(("CustomConstant",n))
+        case {"余额曲线":ts}:
+            return mkTag(("CustomCurve",mkTs("BalanceCurve",ts)))
+        case {"公式":ds}:
+            return mkTag(("CustomDS",mkDs(ds)))
 
 def mk(x):
     match x:
@@ -618,7 +645,7 @@ def mk(x):
                                       , "accInterest": mkAccInt(attrs.get("计息",None))
                                       , "accStmt": mkAccTxn(attrs.get("记录",None))}}
         case ["费用", feeName, {"类型": feeType ,**fi}]:
-            return {feeName: {"feeName": feeName, "feeType": mkFeeType(feeType), "feeStart":fi.get("起算",None)
+            return {feeName: {"feeName": feeName, "feeType": mkFeeType(feeType), "feeStart":fi.get("起算日",None)
                              ,"feeDueDate":fi.get("计算日",None) , "feeDue": 0,
                               "feeArrears": 0, "feeLastPaidDay": None}}
         case ["债券", bndName, {"当前余额": bndBalance
@@ -669,8 +696,8 @@ class 信贷ABS:
     归集规则: tuple
     清仓回购: tuple 
     流动性支持:dict
-    触发事件: dict
-    自定义: dict = field(default_factory=dict)
+    自定义: dict 
+    触发事件: dict = field(default_factory=dict)
 
 
     @classmethod
@@ -736,8 +763,10 @@ class 信贷ABS:
             if fo['feeStart'] is None :
                 fo['feeStart'] = self.日期["起息日"]
 
-        if hasattr(self, "自定义"):
-            _r["overrides"] = mkOverrides(self.自定义)
+        if hasattr(self, "自定义") and self.自定义 is not None:
+            _r["custom"] = {}
+            for n,ci in self.自定义.items():
+                _r["custom"][n] = mkCustom(ci)
         
         if hasattr(self, "触发事件"):
             _r["triggers"] = mkTrigger(self.触发事件)
