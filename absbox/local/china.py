@@ -430,6 +430,10 @@ def mkDate(x):
             return mkTag(("PatternInterval"
                    ,{"ClosingDate":[b,mkDatePattern(pf),d] ,"CutoffDate":[a,mkDatePattern(pf),d] 
                       ,"FirstPayDate":[c,mkDatePattern(bf),d]}))
+        case {"回收期期初日":a, "起息日":b,"下次兑付日":c,"法定到期日":d,"收款频率":pf,"付款频率":bf}:
+            return mkTag(("PatternInterval"
+                   ,{"ClosingDate":[b,mkDatePattern(pf),d] ,"CutoffDate":[a,mkDatePattern(pf),d] 
+                      ,"FirstPayDate":[c,mkDatePattern(bf),d]}))
         case {"回款日":cdays, "分配日":ddays,"封包日":cutoffDate,"起息日":closingDate}:
             return mkTag(("CustomDates"
                           ,[cutoffDate
