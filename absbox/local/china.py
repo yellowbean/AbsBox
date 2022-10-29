@@ -37,15 +37,6 @@ baseMap = {"资产池余额": "CurrentPoolBalance"
            , "当期未付债券利息" :"CurrentDueBondInt"
            , "当期未付费用": "CurrentDueFee"
            }
-#data DatePattern = MonthEnd
-#                 | QuarterEnd
-#                 | YearEnd 
-#                 | MonthFirst
-#                 | QuarterFirst
-#                 | YearFirst
-#                 | MonthDayOfYear Int Int  -- T.MonthOfYear T.DayOfMonth
-#                 | DayOfMonth Int -- T.DayOfMonth 
-#                 | DayOfWeek Int -- T.DayOfWee
 
 
 datePattern = {"月末":"MonthEnd"
@@ -323,6 +314,14 @@ def mkPre(p):
             return mkTag(("IfLET",[mkDs(ds),amt]))
         case [ds,"=",0]:
             return mkTag(("IfZero",mkDs(ds)))
+        case [">",_d]:
+            return mkTag(("IfAfterDate",_d))
+        case ["<",_d]:
+            return mkTag(("IfBeforeDate",_d))
+        case [">=",_d]:
+            return mkTag(("IfAfterOnDate",_d))
+        case ["<=",_d]:
+            return mkTag(("IfBeforeOnDate",_d))
         case ["状态",_ds]:
             return mkTag(("IfDealStatus",dealStatusMap[_ds]))
         case ["同时满足",_p1,_p2]:
