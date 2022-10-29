@@ -13,4 +13,5 @@ import absbox.tests.benchmark.china.test12 as t12
 import absbox.tests.benchmark.china.test13 as t13
 import absbox.tests.benchmark.china.test14 as t14
 import absbox.tests.benchmark.china.test15 as t15
+import absbox.tests.benchmark.china.test16 as t16
 
