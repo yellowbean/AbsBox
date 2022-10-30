@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 import functools
 from absbox.local.util import mkTag
+from absbox.local.component import *
 import pandas as pd
 import collections
-
 
 
 def mkCollection(xs):
@@ -277,7 +277,7 @@ def mkComponent(x):
 @dataclass
 class Generic:
     name: str
-    dates: tuple  # 起息日: datetime 封包日: datetime 首次兑付日 : datetime
+    dates: dict
     frequency: dict
     pool: dict
     accounts: tuple
@@ -292,12 +292,8 @@ class Generic:
         """
         get the json formatted string
         """
-        cutoff, closing, first_pay = self.dates
         _r = {
-            "dates": {
-                "closing-date": closing,
-                "cutoff-date": cutoff,
-                "first-pay-date": first_pay},
+            "dates": mkDate(self.dates),
             "name": self.name,
             "pool": {"assets": [mkAsset(x) for x in self.pool.get('breakdown', [])]
                      , "asOfDate": cutoff

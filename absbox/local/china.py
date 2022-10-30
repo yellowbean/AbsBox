@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from absbox import *
 from absbox.local.util import mkTag,DC,mkTs,query,consolStmtByDate,aggStmtByDate
 
+from absbox.local.component import *
 
 class 频率(Enum):
     每月 = 12
@@ -38,16 +39,6 @@ baseMap = {"资产池余额": "CurrentPoolBalance"
            , "当期未付费用": "CurrentDueFee"
            }
 
-
-datePattern = {"月末":"MonthEnd"
-              ,"季度末":"QuarterEnd"
-              ,"年末":"YearEnd"
-              ,"月初":"MonthFirst"
-              ,"季度初":"QuarterFirst"
-              ,"年初":"YearFIrst"
-              ,"每年":"MonthDayOfYear"
-              ,"每月":"DayOfMonth"
-              ,"每周":"DayOfWeek"}
 
 def mkDateVector(x):
     match x:
@@ -414,33 +405,8 @@ def mkCollection(xs):
 #    {\"ClosingDate\": [\"2022-01-01\",{\"tag\":\"MonthFirst\"},\"2030-01-01\"]
 #    ,\"CutoffDate\":[\"2022-01-01\",{\"tag\":\"MonthFirst\"},\"2030-01-01\"]
 #    ,\"FirstPayDate\":[\"2022-02-25\",{\"tag\":\"DayOfMonth\",\"contents\":25},\"2030-01-01\"]}}"
-def mkDatePattern(x):
-    match x:
-        case ["每月",_d]:
-            return mkTag((datePattern["每月"],_d))
-        case ["每年",_m,_d]:
-            return mkTag((datePattern["每年"],[_m,_d]))
-        case _:
-            return mkTag((datePattern[x]))
 
-def mkDate(x):
-    match x:
-        case {"封包日":a, "起息日":b,"首次兑付日":c,"法定到期日":d,"收款频率":pf,"付款频率":bf}:
-            return mkTag(("PatternInterval"
-                   ,{"ClosingDate":[b,mkDatePattern(pf),d] ,"CutoffDate":[a,mkDatePattern(pf),d] 
-                      ,"FirstPayDate":[c,mkDatePattern(bf),d]}))
-        case {"回收期期初日":a, "起息日":b,"下次兑付日":c,"法定到期日":d,"收款频率":pf,"付款频率":bf}:
-            return mkTag(("PatternInterval"
-                   ,{"ClosingDate":[b,mkDatePattern(pf),d] ,"CutoffDate":[a,mkDatePattern(pf),d] 
-                      ,"FirstPayDate":[c,mkDatePattern(bf),d]}))
-        case {"回款日":cdays, "分配日":ddays,"封包日":cutoffDate,"起息日":closingDate}:
-            return mkTag(("CustomDates"
-                          ,[cutoffDate
-                            ,[ mkTag(("PoolCollection",[cd,""])) for cd in cdays]
-                            ,closingDate
-                            ,[ mkTag(("RunWaterfall",[dd,""])) for dd in ddays]]))
-        case _:
-            raise RuntimeError(f"对于产品发行建模格式为：{'封包日':a, '起息日': b,'首次兑付日':c,'法定到期日':e,'收款频率':f,'付款频率':g} ")
+
 
 def mkLiqProviderType(x):
     match x:
