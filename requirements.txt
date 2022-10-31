@@ -4,3 +4,4 @@ numpy==1.23.1
 matplotlib==3.5.2
 pytest==7.1.2
 jsondiff
+deepdiff
