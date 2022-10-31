@@ -4,9 +4,11 @@ from absbox import API
 from absbox.local.china import show,信贷ABS
 import requests
 import json
+import pprint as pp
 from json.decoder import JSONDecodeError
-import logging
+
 from jsondiff import diff
+from deepdiff import DeepDiff
 
 from absbox.tests.benchmark.china import *
 
@@ -53,8 +55,10 @@ def test_translate():
         with open(benchfile ,'r') as ofile:
             try:
                 benchmark_out = json.load(ofile)
-                assert d.json == benchmark_out, \
-                    f"testing fail on {o},{diff(d.json,benchmark_out)}"
+                if d.json != benchmark_out:
+                    diff_result = DeepDiff(d.json,benchmark_out)
+                    pp.pprint(diff_result,indent=2)
+                    assert d.json == benchmark_out, f"testing fail on {o}"
             except JSONDecodeError as e:
                 print(f"Error parsing json format:{benchfile}")
 
@@ -111,11 +115,18 @@ def test_resp():
                     if not local_result[0]['waterfall']==s_result[0]['waterfall']:
                         assert False,f"diff in waterfall: {diff(local_result[0]['waterfall'],s_result[0]['waterfall'])}"
 
+                    
+                    if local_result[0]['bonds']!=s_result[0]['bonds']:
+                        print("Bonds are not matching")
+                        for bn,bv in local_result[0]['bonds'].items():
+                            if s_result[0]['bonds'][bn]!=bv:
+                                print(f"Bond {bn} is not matching")
+                                print(DeepDiff(s_result[0]['bonds'][bn], bv))
+
                     for i in ['status','dates','pool','fees','bonds','accounts']:
                         assert local_result[0][i]==s_result[0][i], \
                         f"Deal {i} is not matching"
                     assert s_result == local_result , \
                            f"Server Test Failed {dinput} {sinput} {eoutput} "
-
 
 

@@ -177,16 +177,17 @@ def mk(x):
         case ["assets", assets]:
             return {"assets": [mkAsset(a) for a in assets]}
         case ["account", accName, attrs]:
-            match attrs:
-                case {"balance": bal, "type": accType}:
-                    return {accName: {"accBalance": bal, "accName": accName
-                                      , "accType": mkAccType(accType)
-                                      , "accInterest": None
-                                      , "accStmt": mkAccTxn(attrs.get("txn",None))}}
-                case {"balance": bal}:
-                    return { accName: {"accBalance": bal, "accName": accName
-                                      , "accType": None, "accInterest": None
-                                      , "accStmt": mkAccTxn(attrs.get("txn",None))}}
+            return mkAcc(accName, attrs)
+            #match attrs:
+            #    case {"balance": bal, "type": accType}:
+            #        return {accName: {"accBalance": bal, "accName": accName
+            #                          , "accType": mkAccType(accType)
+            #                          , "accInterest": None
+            #                          , "accStmt": mkAccTxn(attrs.get("txn",None))}}
+            #    case {"balance": bal}:
+            #        return { accName: {"accBalance": bal, "accName": accName
+            #                          , "accType": None, "accInterest": None
+            #                          , "accStmt": mkAccTxn(attrs.get("txn",None))}}
         case ["fee", feeName, {"type": feeType}]:
             return {feeName: {"feeName": feeName, "feeType": mkFeeType(feeType), "feeStart": None, "feeDue": 0,
                               "feeArrears": 0, "feeLastPaidDay": None}}
@@ -289,6 +290,9 @@ class Generic:
 
     @property
     def json(self):
+        dists,collects,cleans = [ self.waterfall.get(wn,[]) for wn in ['Normal','PoolCollection','CleanUp']]
+        distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
+        distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
         """
         get the json formatted string
         """
@@ -301,9 +305,9 @@ class Generic:
                      , "futureCf":mkCf(self.pool.get('cashflow', [])) },
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['bond', bn, bo]) for (bn, bo) in self.bonds]),
-            "waterfall": {"DistributionDay": [mkWaterfall(w) for w in self.waterfall.get('Normal',[])]
-                        , "EndOfPoolCollection": [mkWaterfall(w) for w in self.waterfall.get('CollectionEnd', [])]
-                        , "CleanUp":[ mkWaterfall(w) for w in self.waterfall.get('CleanUp' ,[])]},
+            "waterfall": {f"DistributionDay {status['tag']}": list(collectsflt)
+                        , "EndOfPoolCollection": list(collectsflt)
+                        , "CleanUp":list(cleanflt)},
             "fees": functools.reduce(lambda result, current: result | current
                                      , [mk(["fee", feeName, feeO]) for (feeName, feeO) in self.fees]) if self.fees else {},
             "accounts": functools.reduce(lambda result, current: result | current
