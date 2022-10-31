@@ -25,23 +25,7 @@ with open(config_file,'r') as cfh:
 
 def test_translate():
     case_out = os.path.join(china_folder, "out")
-    pair = [(t1.test01, "test01.json")
-            ,(t2.test02, "test02.json")
-            ,(t3.test03, "test03.json")
-            ,(t4.JY_RMBS_01, "test04.json")
-            ,(t5.gy, "test05.json")
-            ,(t6.JY_RMBS_2017_5, "test06.json")
-            ,(t7.BYD_AUTO_2021_2, "test07.json")
-            ,(t8.JSD_AUTO_2022_3, "test08.json")
-            ,(t9.test09, "test09.json")
-            ,(t10.test01, "test10.json")
-            ,(t11.test01, "test11.json")
-            ,(t12.JY_RMBS_2019_11, "test12.json")
-            ,(t13.test01, "test13.json")
-            ,(t14.test01, "test14.json")
-            ,(t15.test01, "test15.json")
-            ,(t16.test01, "test16.json")
-            ]
+    pair = translate_pair
     for d,o in pair:
         benchfile =  os.path.join(case_out,o)
         if not os.path.exists(benchfile):

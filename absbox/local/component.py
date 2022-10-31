@@ -60,62 +60,42 @@ def mkDatePattern(x):
 
 def mkDate(x):
     match x:
-        case {"封包日":a, "起息日":b,"首次兑付日":c,"法定到期日":d,"收款频率":pf,"付款频率":bf}:
+        case {"封包日":a, "起息日":b,"首次兑付日":c,"法定到期日":d,"收款频率":pf,"付款频率":bf} | \
+             {"cutoff":a,"closing":b,"firstPay":c,"stated":d,"poolFreq":pf,"payFreq":bf}:
             return mkTag(("PatternInterval"
                           ,{"ClosingDate":[b,mkDatePattern(pf),d] ,"CutoffDate":[a,mkDatePattern(pf),d] 
                            ,"FirstPayDate":[c,mkDatePattern(bf),d]}))
-        case {"回收期期初日":a, "起息日":b,"下次兑付日":c,"法定到期日":d,"收款频率":pf,"付款频率":bf}:
+        case {"回收期期初日":a, "起息日":b,"下次兑付日":c,"法定到期日":d,"收款频率":pf,"付款频率":bf} | \
+             {"cutoff":a,"closing":b,"nextPay":c,"stated":d,"poolFreq":pf,"payFreq":bf}:
             return mkDate({"封包日":a, "起息日":b,"首次兑付日":c,"法定到期日":d,"收款频率":pf,"付款频率":bf})
-        case {"回款日":cdays, "分配日":ddays,"封包日":cutoffDate,"起息日":closingDate}:
+        case {"回款日":cdays, "分配日":ddays,"封包日":cutoffDate,"起息日":closingDate} | \
+            {"poolCollection":cdays,"distirbution":ddays,"cutoff":cutoffDate,"closing":closingDate} :
             return mkTag(("CustomDates"
                           ,[cutoffDate
                             ,[ mkTag(("PoolCollection",[cd,""])) for cd in cdays]
                             ,closingDate
                             ,[ mkTag(("RunWaterfall",[dd,""])) for dd in ddays]]))
-        case {"cutoff":a,"closing":b,"nextPay":c,"stated":d,"poolFreq":pf,"payFreq":bf}:
-            return mkTag(("PatternInterval"
-                          ,{"ClosingDate":[b,mkDatePattern(pf),d] ,"CutoffDate":[a,mkDatePattern(pf),d] 
-                           ,"FirstPayDate":[c,mkDatePattern(bf),d]}))
-        case {"cutoff":a,"closing":b,"firstPay":c,"stated":d,"poolFreq":pf,"payFreq":bf}:
-            return mkDate({"cutoff":a,"closing":b,"nextPay":c,"stated":d,"poolFreq":pf,"payFreq":bf})
         case _:
             raise RuntimeError(f"对于产品发行建模格式为：{'封包日':a, '起息日': b,'首次兑付日':c,'法定到期日':e,'收款频率':f,'付款频率':g} ")
 
 def mkFeeType(x):
     match x:
-        case {"年化费率": [base, rate]}:
+        case {"年化费率": [base, rate]} | {"annualPctFee": [base, rate]}:
             return mkTag(("AnnualRateFee"
                         , [ mkTag((baseMap[base],'1970-01-01')) , rate]))
-        case {"百分比费率": [*desc, rate]}:
+        case {"百分比费率": [*desc, rate]} | {"pctFee": [*desc, rate]}:
             match desc:
-                case ["资产池回款","利息"]:
+                case ["资产池回款","利息"] | ["poolCollection","interest"]:
                     return mkTag(("PctFee", [mkTag(("PoolCollectionIncome", "CollectedInterest")), rate]))
-                case ["已付利息合计", *bns]:
+                case ["已付利息合计", *bns] | ["paidInterest", *bns]:
                     return mkTag(("PctFee", [mkTag(("LastBondIntPaid",bns)), rate]))
-                case ["已付本金合计", *bns]:
+                case ["已付本金合计", *bns] | ["paidPrincipal", *bns]:
                     return mkTag(("PctFee", [mkTag(("LastBondPrinPaid",bns)), rate]))
                 case _:
                     raise RuntimeError(f"Failed to match on 百分比费率：{desc,rate}")
-        case {"固定费用": amt}:
+        case {"固定费用": amt} | {"fixFee": amt}:
             return mkTag(("FixFee", amt))
-        case {"周期费用": [p, amt]}:
-            return mkTag(("RecurFee", [mkDatePattern(p), amt]))
-        case {"annualPctFee": [base, rate]}:
-            return mkTag(("AnnualRateFee"
-                        , [ mkTag((baseMap[base],'1970-01-01')) , rate]))
-        case {"pctFee": [*desc, rate]}:
-            match desc:
-                case ["poolCollection","interest"]:
-                    return mkTag(("PctFee", [mkTag(("PoolCollectionIncome", "CollectedInterest")), rate]))
-                case ["paidInterest", *bns]:
-                    return mkTag(("PctFee", [mkTag(("LastBondIntPaid",bns)), rate]))
-                case ["paidPrincipal", *bns]:
-                    return mkTag(("PctFee", [mkTag(("LastBondPrinPaid",bns)), rate]))
-                case _:
-                    raise RuntimeError(f"Failed to match on pct fee：{desc,rate}")
-        case {"fixFee": amt}:
-            return mkTag(("FixFee", amt))
-        case {"recurFee": [p, amt]}:
+        case {"周期费用": [p, amt]} | {"recurFee": [p, amt]}:
             return mkTag(("RecurFee", [mkDatePattern(p), amt]))
         case _ :
             raise RuntimeError(f"Failed to match on fee type:{x}")
