@@ -63,7 +63,7 @@ def test_resp():
             ,("test08.json","empty.json","test08.out.json")
             ,("test09.json","empty.json","test09.out.json")
             ,("test10.json","empty.json","test10.out.json")
-            ,("test11.json","empty.json","test11.out.json")
+            ,("test11.json","rates.json","test11.out.json")
             ,("test12.json","empty.json","test12.out.json")
             ,("test13.json","empty.json","test13.out.json")
             ,("test14.json","empty.json","test14.out.json")
@@ -84,6 +84,7 @@ def test_resp():
                                  , headers=hdrs
                                 , verify=False)
                 if tresp.status_code != 200:
+                    print(f"Failed to finish req:{json.dumps(req).encode('utf-8')}")
                     print(tresp.text)
 
                 s_result = json.loads(tresp.text)

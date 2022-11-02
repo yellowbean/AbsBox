@@ -39774,13 +39774,16 @@
           ],
           "tag": "Min"
         },
-        "accInterest": [
-          0.04,
-          "2079-12-31",
-          {
-            "tag": "QuarterEnd"
-          }
-        ],
+        "accInterest": {
+          "contents": [
+            0.04,
+            "2079-12-31",
+            {
+              "tag": "QuarterEnd"
+            }
+          ],
+          "tag": "BankAccount"
+        },
         "accBalance": 879340619.14
       },
       "\u6301\u7eed\u8d2d\u4e70\u51c6\u5907\u91d1\u8d26\u6237": {

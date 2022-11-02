@@ -193,13 +193,33 @@
       "accBalance": 100,
       "accName": "\u8d26\u623701",
       "accType": null,
-      "accInterest": [
-        0.03,
-        "2021-06-15",
-        {
-          "tag": "MonthEnd"
-        }
-      ],
+      "accInterest": {
+        "tag": "BankAccount",
+        "contents": [
+          0.03,
+          "2021-06-15",
+          {
+            "tag": "MonthEnd"
+          }
+        ]
+      },
+      "accStmt": null
+    },
+    "\u8d26\u623702": {
+      "accBalance": 2000,
+      "accName": "\u8d26\u623702",
+      "accType": null,
+      "accInterest": {
+        "tag": "InvestmentAccount",
+        "contents": [
+          "LPR5Y",
+          0.01,
+          "2021-06-15",
+          {
+            "tag": "MonthEnd"
+          }
+        ]
+      },
       "accStmt": null
     }
   },

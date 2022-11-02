@@ -935,13 +935,16 @@
           }
         ]
       },
-      "accInterest": [
-        0.04,
-        "2022-09-30",
-        {
-          "tag": "QuarterEnd"
-        }
-      ],
+      "accInterest": {
+        "tag": "BankAccount",
+        "contents": [
+          0.04,
+          "2022-09-30",
+          {
+            "tag": "QuarterEnd"
+          }
+        ]
+      },
       "accStmt": null
     },
     "\u7ecf\u8425\u8d26\u6237": {

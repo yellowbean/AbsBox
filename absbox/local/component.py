@@ -209,12 +209,12 @@ def mkPre(p):
 
 def mkAccInt(x):
     match x:
-        case {"周期": _dp, "利率": br, "最近结息日": lsd} \
-            | {"period": _dp, "rate": br, "lastSettleDate": lsd}:
-            return mkTag(("BankAccount",[br, lsd, mkDateVector(_dp)]))
         case {"周期": _dp, "利率":idx, "利差":spd, "最近结息日": lsd} \
             | {"period": _dp,  "index":idx, "spread":spd, "lastSettleDate": lsd}:
             return mkTag(("InvestmentAccount",[idx, spd, lsd, mkDateVector(_dp)]))
+        case {"周期": _dp, "利率": br, "最近结息日": lsd} \
+            | {"period": _dp, "rate": br, "lastSettleDate": lsd}:
+            return mkTag(("BankAccount",[br, lsd, mkDateVector(_dp)]))
         case None:
             return None
         case _:

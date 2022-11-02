@@ -1,0 +1,4 @@
+[
+    {"tag": "InterestRateCurve", "contents": ["LPR5Y", [["2020-10-01", 0.05]]]}
+    ,{"tag": "InterestRateCurve", "contents": ["LPR1Y", [["2020-10-01", 0.04]]]}
+]
