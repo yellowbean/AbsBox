@@ -40,14 +40,14 @@ def unify(xs, ns):
     return r.sort_index()
 
 def backFillBal(x,ds):
-    b = pd.DataFrame({"日期":ds})
-    b.set_index("日期",inplace=True)
-    base = pd.concat([b,x],axis=1).sort_index()
+    b = pd.DataFrame({"日期": ds})
+    b.set_index("日期", inplace=True)
+    base = pd.concat([b, x], axis=1).sort_index()
     paidOffDate = base[base['余额']==0].index[0]
     base['flag'] = (base.index >= paidOffDate)
-    base.loc[base['flag']==True,"余额"]=0
-    base.loc[base['flag']==False,"余额"]= (base["余额"] + base["本金"]).shift(-1).fillna(method='bfill')
-    return base.drop(["flag"],axis=1)
+    base.loc[base['flag']==True, "余额"] = 0
+    base.loc[base['flag']==False, "余额"] = (base["余额"] + base["本金"]).shift(-1).fillna(method='bfill')
+    return base.drop(["flag"], axis=1)
 
 
 def bondView(r,flow=None, flowName=True,flowDates=None):
@@ -128,7 +128,9 @@ def peekAtDates(x,ds):
 def balanceSheetView(r, ds=None, equity=None, rnd=2):
     bv = bondView(r, flow=["余额"],flowDates=ds,flowName=False)
     av = accView(r, flow=["余额"],flowName=False)
-    pv = r['pool']['flow'][["未偿余额"]]
+
+    r['pool']["flow"]["不良"] = r['pool']['flow']["违约金额"].cumsum() - r['pool']['flow']["回收金额"].cumsum()
+    pv = r['pool']['flow'][["未偿余额","不良"]]
     if equity:
         equityFlow = bondView(r, flow=["本息合计"],flowDates=ds,flowName=False)[equity]
         equityFlow.columns = pd.MultiIndex.from_arrays([["权益"]*len(equity), list(equityFlow.columns)])
@@ -145,7 +147,6 @@ def balanceSheetView(r, ds=None, equity=None, rnd=2):
         for k, _ in [("资产池", pvCol), ("账户", avCol), ("债券", bv)]:
             _[f'{k}-合计'] = _.sum(axis=1)
         
-        print(bv)
 
         asset_cols = (len(pvCol.columns)+len(avCol.columns))*["资产"]
         liability_cols = len(bv.columns)*["负债"]
