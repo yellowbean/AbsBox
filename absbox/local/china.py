@@ -82,14 +82,6 @@ def mkCollection(xs):
     return [[sourceMapping[x], acc] for (x, acc) in xs]
 
 
-#"{\"tag\":\"PatternInterval\",
-#  \"contents\":
-#    {\"ClosingDate\": [\"2022-01-01\",{\"tag\":\"MonthFirst\"},\"2030-01-01\"]
-#    ,\"CutoffDate\":[\"2022-01-01\",{\"tag\":\"MonthFirst\"},\"2030-01-01\"]
-#    ,\"FirstPayDate\":[\"2022-02-25\",{\"tag\":\"DayOfMonth\",\"contents\":25},\"2030-01-01\"]}}"
-
-
-
 def mkLiqProviderType(x):
     match x:
         case {"总额度": amt}:
@@ -148,7 +140,6 @@ def mkCallOptions(x):
         case {"全部满足": xs}:
             return mkTag(("And", xs))
 
-#"{\"tag\":\"PrepaymentFactors\",\"contents\":{\"tag\":\"FactorCurveClosed\",\"contents\":[[\"2022-01-01\",{\"numerator\":33,\"denominator\":25}]]}}"
 
 def mkAssumption(x):
     match x:
@@ -180,8 +171,6 @@ def mkAccTxn(xs):
     else:
         return [ mkTag(("AccTxn",x)) for x in xs]
 
-# \"overrides\":[[{\"tag\":\"RunWaterfall\",\"contents\":[\"2022-01-01\",\"base\"]},{\"tag\":\"PoolCollection\",\"contents\":[\"0202-11-01\",\"collection\"]}]]}
-
 
 def mkComponent(x):
     match x:
@@ -204,11 +193,11 @@ def mkCallOptions(x):
         case {"资产池余额": bal}:
             return mkTag(("PoolBalance", bal))
         case {"债券余额": bal}:
-            return mkTag(("PoolBalance", bal))
+            return mkTag(("BondBalance", bal))
         case {"资产池余额剩余比率": factor}:
             return mkTag(("PoolFactor", factor))
         case {"债券余额剩余比率": factor}:
-            return mkTag(("PoolFactor", factor))
+            return mkTag(("BondFactor", factor))
         case {"指定日之后": d}:
             return mkTag(("AfterDate", d))
         case {"任意满足": xs}:
@@ -216,11 +205,10 @@ def mkCallOptions(x):
         case {"全部满足": xs}:
             return mkTag(("And", xs))
 
-#"{\"tag\":\"PrepaymentFactors\",\"contents\":{\"tag\":\"FactorCurveClosed\",\"contents\":[[\"2022-01-01\",{\"numerator\":33,\"denominator\":25}]]}}"
 
 def mkAssumption(x):
     match x:
-        case {"CPR": cpr} if isinstance(cpr,list):
+        case {"CPR": cpr} if isinstance(cpr, list):
             return mkTag(("PrepaymentCPRCurve", cpr))
         case {"CPR": cpr} :
             return mkTag(("PrepaymentCPR", cpr))

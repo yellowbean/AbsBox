@@ -1,5 +1,6 @@
 import pandas as pd 
 import functools
+import itertools
 from enum import Enum
 import numpy as np
 
@@ -15,6 +16,18 @@ def mkTag(x):
 def mkTs(n, vs):
     return mkTag((n, vs))
 
+
+def backFillBal(x,ds):
+    b = pd.DataFrame({"日期":ds})
+    b.set_index("日期",inplace=True)
+    base = pd.concat([b,x],axis=1).sort_index()
+    paidOffDate = base[base['余额']==0].index[0]
+    base['flag'] = (base.index >= paidOffDate)
+    base.loc[base['flag']==True,"余额"]=0
+    base.loc[base['flag']==False,"余额"]= (base["余额"] + base["本金"]).shift(-1).fillna(method='bfill')
+    return base
+
+
 def unify(xs, ns):
     index_name = xs[0].index.name
     dfs = []
@@ -26,25 +39,64 @@ def unify(xs, ns):
                         , dfs)
     return r.sort_index()
 
-def bondView(r,flow=None):
-    bnds = r['bonds']
-    bndNames = list(bnds.keys())
-    bndVals = list(bnds.values())
-    if flow is None:
-        return unify(bndVals,bndNames)
-    else:
-        newBnds = [ _b[flow] for _b in bndVals] 
-        return unify(newBnds,bndNames)
+def backFillBal(x,ds):
+    b = pd.DataFrame({"日期":ds})
+    b.set_index("日期",inplace=True)
+    base = pd.concat([b,x],axis=1).sort_index()
+    paidOffDate = base[base['余额']==0].index[0]
+    base['flag'] = (base.index >= paidOffDate)
+    base.loc[base['flag']==True,"余额"]=0
+    base.loc[base['flag']==False,"余额"]= (base["余额"] + base["本金"]).shift(-1).fillna(method='bfill')
+    return base.drop(["flag"],axis=1)
 
-def accView(r,flow=None):
-    accs = r['accounts']
-    accNames = list(accs.keys())
-    accVals = list(accs.values())
-    if flow is None:
-        return unify(accVals, accNames)
+
+def bondView(r,flow=None, flowName=True):
+    result = []
+    default_bnd_col_size = 6
+    bnd_names = r['bonds'].keys()
+
+    b_dates = [ set(r['bonds'][bn].index.tolist()) for bn in bnd_names ]
+    all_b_dates = set()
+    for bd in b_dates:
+        all_b_dates = all_b_dates | bd
+    all_b_dates_s = list(all_b_dates)
+    all_b_dates_s.sort()
+
+    for (bn, bnd) in r['bonds'].items():
+        if flow :
+            result.append(backFillBal(bnd,all_b_dates_s)[flow])
+        else:
+            result.append(backFillBal(bnd,all_b_dates_s))
+    x = pd.concat(result,axis=1)
+    bnd_cols_count = len(flow) if flow else default_bnd_col_size
+    headers = [ bnd_cols_count*[bn] for bn in bnd_names]
+    if flowName:
+        x.columns = [ list(itertools.chain.from_iterable(headers)) ,x.columns]
     else:
-        newAccs = [ _a[flow] for _a in accVals]
-        return unify(newAccs,accNames)
+        x.columns = list(itertools.chain.from_iterable(headers)) 
+    return x.sort_index()
+
+
+def accView(r, flow=None, flowName=True):
+    result = []
+    default_acc_col_size = 3
+    acc_names = r['accounts'].keys()
+    for (an, acc) in r['accounts'].items():
+        if flow :
+            result.append(acc.groupby("日期").last()[flow])
+        else:
+            result.append(acc.groupby("日期").last())
+        
+    x = pd.concat(result,axis=1)
+    
+    account_cols_count = len(flow) if flow else default_acc_col_size
+    headers = [ account_cols_count*[an] for an in acc_names]
+    if flowName:
+        x.columns = [ list(itertools.chain.from_iterable(headers)) ,x.columns]
+    else:
+        x.columns = list(itertools.chain.from_iterable(headers)) 
+    
+    return x.sort_index()
 
 def feeView(r,flow=None):
     fees = r['fees']
@@ -63,7 +115,7 @@ def peekAtDates(x,ds):
     if x_consol.index.get_indexer(ds,method='pad').min()==-1:
         raise RuntimeError(f"<查看日期:{ds}>早于当前DataFrame")
 
-    keep_idx = [ x_consol.index.asof(d) for d in ds ]
+    keep_idx = [x_consol.index.asof(d) for d in ds]
     y = x_consol.loc[keep_idx]
     y.reset_index("日期")
     y["日期"] = ds
@@ -72,7 +124,7 @@ def peekAtDates(x,ds):
 
 def balanceSheetView(r, ds=None, equity=None, rnd=2):
     bv = bondView(r, flow="余额")
-    av = accView(r, flow="余额")
+    av = accView(r, flow=["余额"],flowName=False)
     pv = r['pool']['flow'][["未偿余额"]]
     if equity:
         equityFlow = bondView(r, flow="本息合计")[equity]
@@ -105,45 +157,45 @@ def balanceSheetView(r, ds=None, equity=None, rnd=2):
             bs["权益", "合计"] = bs["资产", "合计"] - bs["负债", "合计"] 
 
     # build PnL
-        pool_index = r['pool']['flow'].index
-        agg_flag = bs.index.get_indexer(list(pool_index),method='ffill')
-        pool_cpy = r['pool']['flow'].copy(deep=True)
-        pool_cpy['flag'] = agg_flag
-        pool_cpy = pool_cpy.groupby("flag", sort=False).aggregate(np.sum)
-        new_index_length = min(len(pool_cpy.index), len(bs.index))
-        #pool_cpy.index = bs.index[:len(pool_cpy.index)]
-        print(pool_cpy)
-        print(bs)
-        pool_cpy.index = bs.index[:new_index_length]
+     #   pool_index = r['pool']['flow'].index
+     #   agg_flag = bs.index.get_indexer(list(pool_index),method='ffill')
+     #   pool_cpy = r['pool']['flow'].copy(deep=True)
+     #   pool_cpy['flag'] = agg_flag
+     #   pool_cpy = pool_cpy.groupby("flag", sort=False).aggregate(np.sum)
+     #   new_index_length = min(len(pool_cpy.index), len(bs.index))
+     #   #pool_cpy.index = bs.index[:len(pool_cpy.index)]
+     #   print(pool_cpy)
+     #   print(bs)
+     #   pool_cpy.index = bs.index[:new_index_length]
 
-        poolIntflow = pool_cpy['利息']
-        poolPrinflow = pool_cpy['本金']
-        poolPpyflow = pool_cpy['早偿金额']
-        poolRecflow = pool_cpy['回收金额']
+     #   poolIntflow = pool_cpy['利息']
+     #   poolPrinflow = pool_cpy['本金']
+     #   poolPpyflow = pool_cpy['早偿金额']
+     #   poolRecflow = pool_cpy['回收金额']
 
-        feeFlow = feeView(r,flow="支付")
-        feeFlow["合计"] = feeFlow.sum(axis=1)
-        agg_flag = bs.index.get_indexer(list(feeFlow.index),method='bfill')
-        feeFlow['flag'] = agg_flag
-        feeFlow.groupby("flag").aggregate(np.sum)
-        feeFlow.index = bs.index
-        
-        liability_p_v = bondView(r,flow="本金")
-        liability_p_v['合计'] = liability_p_v.sum(axis=1)
-        liability_i_v = bondView(r,flow="利息")
-        liability_i_v['合计'] = liability_i_v.sum(axis=1)
+     #   feeFlow = feeView(r,flow="支付")
+     #   feeFlow["合计"] = feeFlow.sum(axis=1)
+     #   agg_flag = bs.index.get_indexer(list(feeFlow.index),method='bfill')
+     #   feeFlow['flag'] = agg_flag
+     #   feeFlow.groupby("flag").aggregate(np.sum)
+     #   feeFlow.index = bs.index
+     #   
+     #   liability_p_v = bondView(r,flow="本金")
+     #   liability_p_v['合计'] = liability_p_v.sum(axis=1)
+     #   liability_i_v = bondView(r,flow="利息")
+     #   liability_i_v['合计'] = liability_i_v.sum(axis=1)
 
-        bs["收入","本金"] = poolPrinflow
-        bs["收入","利息"] = poolIntflow
-        bs["收入","早偿"] = poolPpyflow
-        bs["收入","回收"] = poolRecflow
+     #   bs["收入","本金"] = poolPrinflow
+     #   bs["收入","利息"] = poolIntflow
+     #   bs["收入","早偿"] = poolPpyflow
+     #   bs["收入","回收"] = poolRecflow
 
-        bs["支出","负债-本金"] = liability_p_v['合计']
-        bs["支出","负债-利息"] = liability_i_v['合计']
-        bs["支出","负债-费用"] = feeFlow['合计']
-        
-        bs["利润","合计"] = bs["收入","本金"] + bs["收入","利息"] + bs["收入","早偿"] + bs["收入","回收"]
-        bs["利润","合计"] = bs["利润","合计"] - bs["支出","负债-本金"] - bs["支出","负债-利息"] - bs["支出","负债-费用"]
+     #   bs["支出","负债-本金"] = liability_p_v['合计']
+     #   bs["支出","负债-利息"] = liability_i_v['合计']
+     #   bs["支出","负债-费用"] = feeFlow['合计']
+     #   
+     #   bs["利润","合计"] = bs["收入","本金"] + bs["收入","利息"] + bs["收入","早偿"] + bs["收入","回收"]
+     #   bs["利润","合计"] = bs["利润","合计"] - bs["支出","负债-本金"] - bs["支出","负债-利息"] - bs["支出","负债-费用"]
 
     except RuntimeError as e:              
         print(f"Error: 其他错误=>{e}")      
@@ -151,8 +203,10 @@ def balanceSheetView(r, ds=None, equity=None, rnd=2):
     return bs.round(rnd) # unify([pvCol,avCol,bvCol],["资产-资产池","资产-账户","负债"])
 
 def PnLView(r,ds=None):
-    pv = r['pool']['flow'][["利息"]]
-    ev = feeView(r, flow='支付')
+    accounts = r['accounts']
+    consoleStmts = pd.concat([ acc for acc in accounts ])
+    return consoleStmts
+    
 
 
 def consolStmtByDate(s):
