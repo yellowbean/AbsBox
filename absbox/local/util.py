@@ -50,7 +50,7 @@ def backFillBal(x,ds):
     return base.drop(["flag"],axis=1)
 
 
-def bondView(r,flow=None, flowName=True):
+def bondView(r,flow=None, flowName=True,flowDates=None):
     result = []
     default_bnd_col_size = 6
     bnd_names = r['bonds'].keys()
@@ -61,20 +61,23 @@ def bondView(r,flow=None, flowName=True):
         all_b_dates = all_b_dates | bd
     all_b_dates_s = list(all_b_dates)
     all_b_dates_s.sort()
+    if flowDates is None:
+        flowDates = all_b_dates_s
 
     for (bn, bnd) in r['bonds'].items():
         if flow :
-            result.append(backFillBal(bnd,all_b_dates_s)[flow])
+            result.append(backFillBal(bnd,flowDates)[flow])
         else:
-            result.append(backFillBal(bnd,all_b_dates_s))
+            result.append(backFillBal(bnd,flowDates))
     x = pd.concat(result,axis=1)
     bnd_cols_count = len(flow) if flow else default_bnd_col_size
     headers = [ bnd_cols_count*[bn] for bn in bnd_names]
     if flowName:
+
         x.columns = [ list(itertools.chain.from_iterable(headers)) ,x.columns]
     else:
         x.columns = list(itertools.chain.from_iterable(headers)) 
-    return x.sort_index()
+    return x.sort_index().round(2)
 
 
 def accView(r, flow=None, flowName=True):
@@ -123,11 +126,11 @@ def peekAtDates(x,ds):
 
 
 def balanceSheetView(r, ds=None, equity=None, rnd=2):
-    bv = bondView(r, flow="余额")
+    bv = bondView(r, flow=["余额"],flowDates=ds,flowName=False)
     av = accView(r, flow=["余额"],flowName=False)
     pv = r['pool']['flow'][["未偿余额"]]
     if equity:
-        equityFlow = bondView(r, flow="本息合计")[equity]
+        equityFlow = bondView(r, flow=["本息合计"],flowDates=ds,flowName=False)[equity]
         equityFlow.columns = pd.MultiIndex.from_arrays([["权益"]*len(equity), list(equityFlow.columns)])
         equityFlow["权益", f"合计分配{equity}"] = equityFlow.sum(axis=1)
     if ds is None:
@@ -137,16 +140,18 @@ def balanceSheetView(r, ds=None, equity=None, rnd=2):
         bv.drop(columns=equity, inplace=True)
 
     try:
-        pvCol, avCol, bvCol = [ peekAtDates(_, ds) for _ in [pv, av, bv] ]
+        pvCol, avCol = [ peekAtDates(_, ds) for _ in [pv, av] ]
         # need to add cutoff amount for equity tranche
-        for k, _ in [("资产池", pvCol), ("账户", avCol), ("债券", bvCol)]:
+        for k, _ in [("资产池", pvCol), ("账户", avCol), ("债券", bv)]:
             _[f'{k}-合计'] = _.sum(axis=1)
+        
+        print(bv)
 
         asset_cols = (len(pvCol.columns)+len(avCol.columns))*["资产"]
-        liability_cols = len(bvCol.columns)*["负债"]
+        liability_cols = len(bv.columns)*["负债"]
         header = asset_cols + liability_cols
 
-        bs = pd.concat([pvCol, avCol, bvCol], axis=1)
+        bs = pd.concat([pvCol, avCol, bv], axis=1)
         bs.columns = pd.MultiIndex.from_arrays([header, list(bs.columns)])
         bs["资产", "合计"] = bs["资产", "资产池-合计"]+bs["资产", "账户-合计"]
         bs["负债", "合计"] = bs["负债", "债券-合计"]
