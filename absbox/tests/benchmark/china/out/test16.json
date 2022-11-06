@@ -177,9 +177,7 @@
           ]
         }
       ]
-    ],
-    "EndOfPoolCollection": [],
-    "CleanUp": []
+    ]
   },
   "fees": {},
   "accounts": {
@@ -231,6 +229,5 @@
       "CollectedRecoveries",
       "\u8d26\u623701"
     ]
-  ],
-  "triggers": null
+  ]
 }

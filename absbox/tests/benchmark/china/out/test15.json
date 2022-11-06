@@ -564,6 +564,18 @@
     }
   },
   "waterfall": {
+    "EndOfPoolCollection": [
+      [
+        null,
+        {
+          "tag": "CalcFee",
+          "contents": [
+            "\u589e\u503c\u7a0e",
+            "\u8d37\u6b3e\u670d\u52a1\u8d39\u7528"
+          ]
+        }
+      ]
+    ],
     "DistributionDay Amortizing": [
       [
         null,
@@ -792,20 +804,7 @@
           ]
         }
       ]
-    ],
-    "EndOfPoolCollection": [
-      [
-        null,
-        {
-          "tag": "CalcFee",
-          "contents": [
-            "\u589e\u503c\u7a0e",
-            "\u8d37\u6b3e\u670d\u52a1\u8d39\u7528"
-          ]
-        }
-      ]
-    ],
-    "CleanUp": []
+    ]
   },
   "fees": {
     "\u589e\u503c\u7a0e": {
@@ -1071,7 +1070,6 @@
       "contents": 655396658.24
     }
   },
-  "triggers": null,
   "liqProvider": {
     "\u53d1\u8d77\u4eba": {
       "liqName": "\u53d1\u8d77\u4eba",

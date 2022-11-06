@@ -3,7 +3,7 @@
     "tag": "PatternInterval",
     "contents": {
       "ClosingDate": [
-        "2021-06-15",
+        "2021-05-01",
         {
           "tag": "MonthEnd"
         },
@@ -17,7 +17,7 @@
         "2060-12-01"
       ],
       "FirstPayDate": [
-        "2021-07-26",
+        "2021-06-26",
         {
           "tag": "DayOfMonth",
           "contents": 26
@@ -26,7 +26,7 @@
       ]
     }
   },
-  "name": "TEST09",
+  "name": "\u672a\u6ee1\u8db3\u644a\u8fd8\u76ee\u6807\u7684\u52a0\u901f\u6e05\u507f\u4e8b\u4ef6",
   "status": {
     "tag": "Amortizing"
   },
@@ -36,19 +36,19 @@
         "tag": "Mortgage",
         "contents": [
           {
-            "originBalance": 160,
+            "originBalance": 120,
             "originRate": {
               "tag": "Fix",
-              "contents": 0.045
+              "contents": 0.0485
             },
             "originTerm": 30,
             "period": "Monthly",
-            "startDate": "2021-02-01",
+            "startDate": "2020-06-01",
             "prinType": "Even"
           },
-          160,
+          120,
           0.08,
-          20,
+          10,
           {
             "tag": "Current"
           }
@@ -82,15 +82,19 @@
           "tag": "BalanceCurve",
           "contents": [
             [
-              "2021-08-26",
+              "2021-06-26",
               80
             ],
             [
-              "2021-09-26",
+              "2021-07-26",
               70
             ],
             [
-              "2021-10-26",
+              "2021-09-26",
+              50
+            ],
+            [
+              "2021-11-26",
               0
             ]
           ]
@@ -102,8 +106,8 @@
     },
     "B": {
       "bndName": "B",
-      "bndBalance": 20,
-      "bndRate": 0.0,
+      "bndBalance": 40,
+      "bndRate": 0.08,
       "bndOriginInfo": {
         "originBalance": 100,
         "originDate": "2020-01-03",
@@ -112,12 +116,12 @@
       "bndInterestInfo": {
         "tag": "Fix",
         "contents": [
-          0.0,
+          0.08,
           "DC_ACT_365F"
         ]
       },
       "bndType": {
-        "tag": "Equity"
+        "tag": "Sequential"
       },
       "bndDuePrin": 0,
       "bndDueInt": 0,
@@ -125,21 +129,9 @@
     }
   },
   "waterfall": {
-    "DistributionDay Amortizing": [
-      [
-        null,
-        {
-          "tag": "PayFee",
-          "contents": [
-            [
-              "\u8d26\u623701"
-            ],
-            [
-              "\u4fe1\u6258\u8d39\u7528"
-            ]
-          ]
-        }
-      ],
+    "CleanUp": [],
+    "EndOfPoolCollection": [],
+    "DistributionDay (DealAccelerated Nothing)": [
       [
         null,
         {
@@ -155,7 +147,21 @@
       [
         null,
         {
-          "tag": "PayPrin",
+          "tag": "PayPrinResidual",
+          "contents": [
+            "\u8d26\u623701",
+            [
+              "A1"
+            ]
+          ]
+        }
+      ]
+    ],
+    "DistributionDay Amortizing": [
+      [
+        null,
+        {
+          "tag": "PayInt",
           "contents": [
             "\u8d26\u623701",
             [
@@ -165,17 +171,9 @@
         }
       ],
       [
+        null,
         {
-          "tag": "IfZero",
-          "contents": {
-            "tag": "CurrentBondBalanceOf",
-            "contents": [
-              "A1"
-            ]
-          }
-        },
-        {
-          "tag": "PayPrin",
+          "tag": "PayInt",
           "contents": [
             "\u8d26\u623701",
             [
@@ -185,40 +183,32 @@
         }
       ],
       [
+        null,
         {
-          "tag": "IfZero",
-          "contents": {
-            "tag": "CurrentBondBalanceOf",
-            "contents": [
+          "tag": "PayPrin",
+          "contents": [
+            "\u8d26\u623701",
+            [
               "A1"
             ]
-          }
-        },
+          ]
+        }
+      ],
+      [
+        null,
         {
-          "tag": "PayResidual",
+          "tag": "PayPrin",
           "contents": [
-            null,
             "\u8d26\u623701",
-            "B"
+            [
+              "B"
+            ]
           ]
         }
       ]
     ]
   },
-  "fees": {
-    "\u4fe1\u6258\u8d39\u7528": {
-      "feeName": "\u4fe1\u6258\u8d39\u7528",
-      "feeType": {
-        "tag": "FixFee",
-        "contents": 5
-      },
-      "feeStart": "2021-06-15",
-      "feeDueDate": null,
-      "feeDue": 0,
-      "feeArrears": 0,
-      "feeLastPaidDay": null
-    }
-  },
+  "fees": {},
   "accounts": {
     "\u8d26\u623701": {
       "accBalance": 0,
@@ -245,5 +235,29 @@
       "CollectedRecoveries",
       "\u8d26\u623701"
     ]
-  ]
+  ],
+  "triggers": {
+    "EndDistributionWF": [
+      [
+        {
+          "tag": "ThresholdBal",
+          "contents": [
+            "Above",
+            {
+              "tag": "BondBalanceGap",
+              "contents": "A1"
+            },
+            0
+          ]
+        },
+        {
+          "tag": "DealStatusTo",
+          "contents": {
+            "tag": "DealAccelerated",
+            "contents": null
+          }
+        }
+      ]
+    ]
+  }
 }

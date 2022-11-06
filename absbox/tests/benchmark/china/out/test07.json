@@ -564,111 +564,6 @@
     }
   },
   "waterfall": {
-    "DistributionDay Amortizing": [
-      [
-        null,
-        {
-          "tag": "Transfer",
-          "contents": [
-            "\u6d41\u52a8\u6027\u50a8\u5907",
-            "\u6536\u5165\u5206\u8d26\u6237"
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayFee",
-          "contents": [
-            [
-              "\u6536\u5165\u5206\u8d26\u6237"
-            ],
-            [
-              "\u670d\u52a1\u5546\u8d39\u7528"
-            ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayInt",
-          "contents": [
-            "\u6536\u5165\u5206\u8d26\u6237",
-            [
-              "\u4f18\u5148"
-            ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "TransferReserve",
-          "contents": [
-            "Target",
-            "\u6536\u5165\u5206\u8d26\u6237",
-            "\u6d41\u52a8\u6027\u50a8\u5907"
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "Transfer",
-          "contents": [
-            "\u6536\u5165\u5206\u8d26\u6237",
-            "\u672c\u91d1\u5206\u8d26\u6237"
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayPrin",
-          "contents": [
-            "\u672c\u91d1\u5206\u8d26\u6237",
-            [
-              "\u4f18\u5148"
-            ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayPrin",
-          "contents": [
-            "\u672c\u91d1\u5206\u8d26\u6237",
-            [
-              "\u6b21\u7ea7"
-            ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayResidual",
-          "contents": [
-            null,
-            "\u672c\u91d1\u5206\u8d26\u6237",
-            "\u6b21\u7ea7"
-          ]
-        }
-      ]
-    ],
-    "EndOfPoolCollection": [
-      [
-        null,
-        {
-          "tag": "CalcFee",
-          "contents": [
-            "\u589e\u503c\u7a0e"
-          ]
-        }
-      ]
-    ],
     "CleanUp": [
       [
         null,
@@ -773,6 +668,111 @@
           "contents": [
             null,
             "\u6536\u6b3e\u8d26\u6237",
+            "\u6b21\u7ea7"
+          ]
+        }
+      ]
+    ],
+    "EndOfPoolCollection": [
+      [
+        null,
+        {
+          "tag": "CalcFee",
+          "contents": [
+            "\u589e\u503c\u7a0e"
+          ]
+        }
+      ]
+    ],
+    "DistributionDay Amortizing": [
+      [
+        null,
+        {
+          "tag": "Transfer",
+          "contents": [
+            "\u6d41\u52a8\u6027\u50a8\u5907",
+            "\u6536\u5165\u5206\u8d26\u6237"
+          ]
+        }
+      ],
+      [
+        null,
+        {
+          "tag": "PayFee",
+          "contents": [
+            [
+              "\u6536\u5165\u5206\u8d26\u6237"
+            ],
+            [
+              "\u670d\u52a1\u5546\u8d39\u7528"
+            ]
+          ]
+        }
+      ],
+      [
+        null,
+        {
+          "tag": "PayInt",
+          "contents": [
+            "\u6536\u5165\u5206\u8d26\u6237",
+            [
+              "\u4f18\u5148"
+            ]
+          ]
+        }
+      ],
+      [
+        null,
+        {
+          "tag": "TransferReserve",
+          "contents": [
+            "Target",
+            "\u6536\u5165\u5206\u8d26\u6237",
+            "\u6d41\u52a8\u6027\u50a8\u5907"
+          ]
+        }
+      ],
+      [
+        null,
+        {
+          "tag": "Transfer",
+          "contents": [
+            "\u6536\u5165\u5206\u8d26\u6237",
+            "\u672c\u91d1\u5206\u8d26\u6237"
+          ]
+        }
+      ],
+      [
+        null,
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u672c\u91d1\u5206\u8d26\u6237",
+            [
+              "\u4f18\u5148"
+            ]
+          ]
+        }
+      ],
+      [
+        null,
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u672c\u91d1\u5206\u8d26\u6237",
+            [
+              "\u6b21\u7ea7"
+            ]
+          ]
+        }
+      ],
+      [
+        null,
+        {
+          "tag": "PayResidual",
+          "contents": [
+            null,
+            "\u672c\u91d1\u5206\u8d26\u6237",
             "\u6b21\u7ea7"
           ]
         }
@@ -886,6 +886,5 @@
       "CollectedRecoveries",
       "\u672c\u91d1\u5206\u8d26\u6237"
     ]
-  ],
-  "triggers": null
+  ]
 }

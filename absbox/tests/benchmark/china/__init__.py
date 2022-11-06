@@ -15,6 +15,7 @@ import absbox.tests.benchmark.china.test14 as t14
 import absbox.tests.benchmark.china.test15 as t15
 import absbox.tests.benchmark.china.test16 as t16
 import absbox.tests.benchmark.china.test17 as t17
+import absbox.tests.benchmark.china.test18 as t18
 
 translate_pair = [(t1.test01, "test01.json")
             ,(t2.test02, "test02.json")
@@ -33,4 +34,5 @@ translate_pair = [(t1.test01, "test01.json")
             ,(t15.test01, "test15.json")
             ,(t16.test01, "test16.json")
             ,(t17.test01, "test17.json")
+            ,(t18.test01, "test18.json")
             ]

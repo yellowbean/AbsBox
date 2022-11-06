@@ -145,7 +145,6 @@
     "custom": null,
     "name": "Custom Pay Dates",
     "waterfall": {
-      "CleanUp": [],
       "DistributionDay Amortizing": [
         [
           null,
@@ -208,8 +207,7 @@
             "tag": "PayResidual"
           }
         ]
-      ],
-      "EndOfPoolCollection": []
+      ]
     },
     "liqProvider": null,
     "bonds": {

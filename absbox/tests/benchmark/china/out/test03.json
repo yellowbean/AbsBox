@@ -114,6 +114,50 @@
     }
   },
   "waterfall": {
+    "CleanUp": [
+      [
+        null,
+        {
+          "tag": "LiquidatePool",
+          "contents": [
+            {
+              "tag": "BalanceFactor",
+              "contents": [
+                1.0,
+                0.0
+              ]
+            },
+            "\u8d26\u623701"
+          ]
+        }
+      ],
+      [
+        null,
+        {
+          "tag": "PayFeeResidual",
+          "contents": [
+            {
+              "tag": "DuePct",
+              "contents": 0.7
+            },
+            "\u8d26\u623701",
+            "\u670d\u52a1\u5546\u8d39\u7528"
+          ]
+        }
+      ],
+      [
+        null,
+        {
+          "tag": "PayResidual",
+          "contents": [
+            null,
+            "\u8d26\u623701",
+            "B"
+          ]
+        }
+      ]
+    ],
+    "EndOfPoolCollection": [],
     "DistributionDay Amortizing": [
       [
         null,
@@ -148,50 +192,6 @@
             [
               "B"
             ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayResidual",
-          "contents": [
-            null,
-            "\u8d26\u623701",
-            "B"
-          ]
-        }
-      ]
-    ],
-    "EndOfPoolCollection": [],
-    "CleanUp": [
-      [
-        null,
-        {
-          "tag": "LiquidatePool",
-          "contents": [
-            {
-              "tag": "BalanceFactor",
-              "contents": [
-                1.0,
-                0.0
-              ]
-            },
-            "\u8d26\u623701"
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayFeeResidual",
-          "contents": [
-            {
-              "tag": "DuePct",
-              "contents": 0.7
-            },
-            "\u8d26\u623701",
-            "\u670d\u52a1\u5546\u8d39\u7528"
           ]
         }
       ],
@@ -248,6 +248,5 @@
       "CollectedRecoveries",
       "\u8d26\u623701"
     ]
-  ],
-  "triggers": null
+  ]
 }

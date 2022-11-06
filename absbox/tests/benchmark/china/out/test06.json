@@ -210,6 +210,35 @@
     }
   },
   "waterfall": {
+    "CleanUp": [
+      [
+        null,
+        {
+          "tag": "LiquidatePool",
+          "contents": [
+            {
+              "tag": "BalanceFactor",
+              "contents": [
+                1.0,
+                0.0
+              ]
+            },
+            "\u6536\u5165\u5206\u8d26\u6237"
+          ]
+        }
+      ]
+    ],
+    "EndOfPoolCollection": [
+      [
+        null,
+        {
+          "tag": "CalcFee",
+          "contents": [
+            "\u589e\u503c\u7a0e"
+          ]
+        }
+      ]
+    ],
     "DistributionDay Amortizing": [
       [
         null,
@@ -358,35 +387,6 @@
           ]
         }
       ]
-    ],
-    "EndOfPoolCollection": [
-      [
-        null,
-        {
-          "tag": "CalcFee",
-          "contents": [
-            "\u589e\u503c\u7a0e"
-          ]
-        }
-      ]
-    ],
-    "CleanUp": [
-      [
-        null,
-        {
-          "tag": "LiquidatePool",
-          "contents": [
-            {
-              "tag": "BalanceFactor",
-              "contents": [
-                1.0,
-                0.0
-              ]
-            },
-            "\u6536\u5165\u5206\u8d26\u6237"
-          ]
-        }
-      ]
     ]
   },
   "fees": {
@@ -477,6 +477,5 @@
       "CollectedRecoveries",
       "\u672c\u91d1\u5206\u8d26\u6237"
     ]
-  ],
-  "triggers": null
+  ]
 }

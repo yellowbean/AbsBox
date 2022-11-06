@@ -237,7 +237,6 @@
     "custom": null,
     "name": "TEST09",
     "waterfall": {
-      "CleanUp": [],
       "DistributionDay Amortizing": [
         [
           null,
@@ -316,8 +315,7 @@
             "tag": "PayResidual"
           }
         ]
-      ],
-      "EndOfPoolCollection": []
+      ]
     },
     "liqProvider": null,
     "bonds": {

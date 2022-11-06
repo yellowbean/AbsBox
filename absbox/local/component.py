@@ -1,6 +1,7 @@
-
 from absbox.local.util import mkTag,DC,mkTs,query
 from enum import Enum
+import itertools
+
 datePattern = {"月末":"MonthEnd"
               ,"季度末":"QuarterEnd"
               ,"年末":"YearEnd"
@@ -125,6 +126,12 @@ def mkDs(x):
             return mkTag("OriginalBondBalance")
         case ("初始资产池余额",) | ("originalPoolBalance",):
             return mkTag("OriginalPoolBalance")
+        case ("资产池违约余额",) | ("currentPoolDefaultedBalance",):
+            return mkTag("CurrentPoolDefaultedBalance")
+        case ("资产池累积违约余额",) | ("cumPoolDefaultedBalance",):
+            return mkTag("CumulativePoolDefaultedBalance")
+        case ("资产池累积违约率",) | ("cumPoolDefaultedRate",):
+            return mkTag("CumulativePoolDefaultedRate")
         case ("债券系数",) | ("bondFactor",):
             return mkTag("BondFactor")
         case ("资产池系数",) | ("poolFactor",):
@@ -139,6 +146,8 @@ def mkDs(x):
             return mkTag(("CurrentDueBondInt",bnds))
         case ("债券已付利息",*bnds) | ("lastBondIntPaid",*bnds):
             return mkTag(("LastBondIntPaid",bnds))
+        case ("债券低于目标余额",bn) | ("behindTargetBalance",bn):
+            return mkTag(("BondBalanceGap",bn))
         
         #   , "当期已付债券利息":"LastBondIntPaid"
         #   , "当期已付费用" :"LastFeePaid"
@@ -174,6 +183,15 @@ def isPre(x):
     except RuntimeError as e:
         return False 
 
+#def mkDealStatus(x):
+#    match x:
+#        case "":
+#            return ""
+#        case _ :
+#            raise RuntimeError(f"Failed to match on DealStatus: {x}")
+    
+
+
 def mkPre(p):
     dealStatusMap = {"摊还":"Current"
                      ,"加速清偿":"Accelerated"
@@ -197,10 +215,8 @@ def mkPre(p):
             return mkTag(("IfAfterOnDate",_d))
         case ["<=",_d]:
             return mkTag(("IfBeforeOnDate",_d))
-        case ["状态",_ds] :
-            return mkTag(("IfDealStatus",dealStatusMap[_ds]))
-        case ["status",_ds]: 
-            return mkTag(("IfDealStatus",_ds))
+        case ["状态",_st]:
+            return mkTag(("IfDealStatus",mkStatus(_st)))
         case ["同时满足",_p1,_p2] | ["all",_p1,_p2]:
             return mkTag(("And",mkPre(_p1),mkPre(_p2)))
         case ["任一满足",_p1,_p2] | ["any",_p1,_p2]:
@@ -405,6 +421,8 @@ def mkTransferLimit(x):
             return mkTag(("Formula","ABCD"))
         case {"公式": formula}:
             return mkTag(("DS",mkDs(formula)))
+        case _:
+            raise RuntimeError(f"Failed to match :{x}")
 
 
 
@@ -456,6 +474,8 @@ def mkAction(x):
             return mkTag(("LiqRepay",[None, source, target]))
         case ["流动性支持报酬",source, target]| ["liqRepayResidual",source, target]:
             return mkTag(("LiqYield",[None, source, target]))
+        case _:
+            raise RuntimeError(f"Failed to match :{x}")
 
 
 def mkWaterfall2(x):
@@ -469,3 +489,141 @@ def mkWaterfall2(x):
         case _:
             return [[ None,mkAction(x) ]]
 
+
+def mkStatus(x):
+    match x : 
+        case "摊销":
+            return mkTag(("Amortizing"))
+        case "循环":
+            return mkTag(("Revolving"))
+        case "加速清偿":
+            return mkTag(("DealAccelerated",None))
+        case "违约":
+            return mkTag(("DealDefaulted",None))
+        case "结束":
+            return mkTag(("Ended"))
+        case _:
+            raise RuntimeError(f"Failed to match :{x}")
+
+def mkWhenTrigger(x):
+    match x:
+        case "回收后":
+            return "BeginCollectionWF"
+        case "回收动作后":
+            return "EndCollectionWF"
+        case "分配前":
+            return "BeginDistributionWF"
+        case "分配后":
+            return "EndDistributionWF"
+        case _:
+            raise RuntimeError(f"Failed to match :{x}")
+
+
+def mkThreshold(x):
+    match x:
+        case ">":
+            return "Above"
+        case ">=":
+            return "EqAbove"
+        case "<":
+            return "Below"
+        case "<=":
+            return "EqBelow"
+        case _:
+            raise RuntimeError(f"Failed to match :{x}")
+
+def _rateTypeDs(x):
+    h = x[0]
+    if h in set(["资产池累积违约率","cumPoolDefaultedRate",
+    "债券系数","bondFactor",
+    "资产池系数","poolFactor"]):
+        return True
+    return False
+    
+def mkTrigger(x):
+    match x : 
+        case [ds,cmp,v] if (isinstance(v,float) and _rateTypeDs(ds)):
+            return mkTag(("ThresholdRate",[mkThreshold(cmp),mkDs(ds),v]))
+        case [ds,cmp,ts] if _rateTypeDs(ds):
+            return mkTag(("ThresholdRateCurve",[mkThreshold(cmp),mkDs(ds),ts]))
+        case [ds,cmp,v] if ( isinstance(v,float) or  isinstance(v,int) ):
+            return mkTag(("ThresholdBal",[mkThreshold(cmp),mkDs(ds),v]))
+        case [ds,cmp,ts]:
+            return mkTag(("ThresholdBalCurve",[mkThreshold(cmp),mkDs(ds),ts]))
+        case [">",_d]:
+            return mkTag(("AfterDate",_d))
+        case [">=",_d]:
+            return mkTag(("AfterOnDate",_d))
+        #case ("目标摊还不足",bn):
+        #   return mkTag(("PrinShortfall",bn))
+        #case ["到期日未兑付",bn]:
+        #    return mkTag(("MissMatureDate",bn))
+        case ["所有满足",*trgs]:
+            return mkTag(("AllTrigger",[ mkTrigger(t) for t in trgs ]))
+        case ["任一满足",*trgs]:
+            return mkTag(("AnyTrigger",[ mkTrigger(t) for t in trgs ]))
+        case ["一直",b]:
+            return mkTag(("Always",b))
+        case _:
+            raise RuntimeError(f"Failed to match :{x}")
+
+
+def mkTriggerEffect(x):
+    match x:
+        case ("新状态",s):
+            return mkTag(("DealStatusTo", mkStatus(s)))
+        case ["计提费用",*fn]:
+            return mkTag(("DoAccrueFee", fn))
+        case ["新增事件",trg]:
+            return mkTag(("AddTrigger", mkTrigger(trg)))
+        case ["结果",*efs]:
+            return mkTag(("TriggerEffects",[mkTriggerEffect(e) for e in efs]))
+        case _:
+            raise RuntimeError(f"Failed to match :{x}")
+
+#def mkActionWhen(x):
+#    match x:
+#        case "未违约"|"兑付日":
+#        
+#        case _:
+#            raise RuntimeError(f"Failed to match ActionWhen:{x}")
+
+
+
+def mkWaterfall(r, x):
+    mapping = {
+        "未违约":"Amortizing",
+        "摊销":"Amortizing",
+        "循环":"Revolving",
+        "加速清偿":"DealAccelerated",
+        "违约":"DealDefaulted",
+    }
+    if len(x)==0:
+        return {k:list(v)  for k,v in r.items()}
+    _k,_v = x.popitem()
+    _w_tag = None
+    match _k:
+        case ("兑付日","加速清偿"):
+            _w_tag = f"DistributionDay (DealAccelerated Nothing)"
+        case ("兑付日","违约"):
+            _w_tag = f"DistributionDay (DealDefaulted Nothing)"
+        case ("兑付日",_st):
+            _w_tag = f"DistributionDay {mapping[_st]}"
+            #r[f"DistributionDay {mapping[_st]}"] = \
+            #    itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
+        case "兑付日" | "未违约":
+            _w_tag = f"DistributionDay Amortizing"
+            #r[f"DistributionDay Amortizing"] = \
+            #    itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
+        case "清仓回购":
+            _w_tag = "CleanUp"
+            #r[f"CleanUp"] = \
+            #    itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
+        case "回款日" | "回款后" :
+            _w_tag = f"EndOfPoolCollection"
+            #r[f"EndOfPoolCollection"] = \
+            #    itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
+        case _:
+            raise RuntimeError(f"Failed to match :{x}")
+    r[_w_tag] = itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
+    return mkWaterfall(r, x)

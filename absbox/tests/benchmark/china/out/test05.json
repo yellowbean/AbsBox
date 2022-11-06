@@ -167,6 +167,17 @@
     }
   },
   "waterfall": {
+    "EndOfPoolCollection": [
+      [
+        null,
+        {
+          "tag": "CalcFee",
+          "contents": [
+            "\u589e\u503c\u7a0e"
+          ]
+        }
+      ]
+    ],
     "DistributionDay Amortizing": [
       [
         null,
@@ -296,19 +307,7 @@
           ]
         }
       ]
-    ],
-    "EndOfPoolCollection": [
-      [
-        null,
-        {
-          "tag": "CalcFee",
-          "contents": [
-            "\u589e\u503c\u7a0e"
-          ]
-        }
-      ]
-    ],
-    "CleanUp": []
+    ]
   },
   "fees": {
     "\u589e\u503c\u7a0e": {
@@ -398,6 +397,5 @@
       "CollectedRecoveries",
       "\u672c\u91d1\u5206\u8d26\u6237"
     ]
-  ],
-  "triggers": null
+  ]
 }

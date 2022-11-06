@@ -52,7 +52,6 @@
     "custom": null,
     "name": "\u5206\u6bb5\u76ee\u6807\u50a8\u5907\u91d1\u989d",
     "waterfall": {
-      "CleanUp": [],
       "DistributionDay Amortizing": [
         [
           null,
@@ -122,8 +121,7 @@
             "tag": "PayResidual"
           }
         ]
-      ],
-      "EndOfPoolCollection": []
+      ]
     },
     "liqProvider": null,
     "bonds": {

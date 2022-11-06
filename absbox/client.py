@@ -68,6 +68,10 @@ class API:
         valid_bnd = set(_d['bonds'].keys())
         valid_fee = set(_d['fees'].keys())
         _w = _d['waterfall']
+
+        if _w is None:
+            raise RuntimeError("Waterfall is None")
+
         for wn,wa in _w.items():
             for idx,action in enumerate(wa):
                 #print(action)

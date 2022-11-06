@@ -236,20 +236,11 @@ def mkOverrides(m):
 #                 | EndCollectionWF
 #                 | BeginDistributionWF
 #                 | EndDistributionWF
-class 时间点(Enum):
-    回收后 = "BeginDistributionWF"
-    回收动作完成后 = "EndCollectionWF"
-    分配前 = "BeginDistributionWF"
-    分配后 = "EndDistributionWF"
 
 # [
 #  [[\"BeginDistributionWF\",{\"tag\":\"AfterDate\",\"contents\":\"2022-03-01\"}]
 #    ,{\"tag\":\"DealStatusTo\",\"contents\":{\"tag\":\"Revolving\"}}]
 #   ]"
-def mkTrigger(m):
-    match m :
-        case _:
-            return None
 
 def mkCustom(x):
     match x:
@@ -294,6 +285,11 @@ def readStatus(s):
     else:
         return mkTag("Amortizing")
 
+class 时间点(Enum):
+    回收后 = "BeginCollectionWF"
+    回收动作后 = "EndCollectionWF"
+    分配前 = "BeginDistributionWF"
+    分配后 = "EndDistributionWF"
 
 @dataclass
 class 信贷ABS:
@@ -305,10 +301,11 @@ class 信贷ABS:
     费用: tuple
     分配规则: dict
     归集规则: tuple
-    清仓回购: tuple 
-    流动性支持:dict
-    自定义: dict 
-    触发事件: dict = field(default_factory=dict)
+    清仓回购: tuple = None
+    流动性支持:dict = None
+    自定义: dict = None
+    触发事件: dict = None
+    状态:str = "摊销"
 
 
     @classmethod
@@ -344,15 +341,15 @@ class 信贷ABS:
         dists,collects,cleans = [ self.分配规则.get(wn,[]) for wn in ['未违约','回款后','清仓回购'] ]
         distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
         distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
-        status = readStatus(self.名称)
         parsedDates = mkDate(self.日期)
+        status = mkStatus(self.状态)
         """
         get the json formatted string
         """
         _r = {
             "dates": parsedDates,
             "name": self.名称,
-            "status":status,
+            "status": status,
             "pool":{"assets": [mkAsset(x) for x in self.资产池.get('清单',[])]
                 , "asOfDate": self.日期['封包日']
                 , "issuanceStat": readIssuance(self.资产池)
@@ -360,9 +357,10 @@ class 信贷ABS:
                 },
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
-            "waterfall": {f"DistributionDay {status['tag']}":list(distsflt)
-                        , "EndOfPoolCollection": list(collectsflt)
-                        , "CleanUp": list(cleanflt)},
+            #"waterfall": {f"DistributionDay {status['tag']}":list(distsflt)
+            #            , "EndOfPoolCollection": list(collectsflt)
+            #            , "CleanUp": list(cleanflt)},
+            "waterfall": mkWaterfall({},self.分配规则.copy()),
             "fees": functools.reduce(lambda result, current: result | current
                                      , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]) if self.费用 else {},
             "accounts": functools.reduce(lambda result, current: result | current
@@ -379,8 +377,12 @@ class 信贷ABS:
             for n,ci in self.自定义.items():
                 _r["custom"][n] = mkCustom(ci)
         
-        if hasattr(self, "触发事件"):
-            _r["triggers"] = mkTrigger(self.触发事件)
+        if hasattr(self, "触发事件") and self.触发事件 is  not None:
+            _trigger  = self.触发事件
+            _trr = {mkWhenTrigger(_loc):
+                       [(mkTrigger(_trig),mkTriggerEffect(_effect)) for (_trig,_effect) in _vs ] 
+                       for _loc,_vs in _trigger.items()}
+            _r["triggers"] = _trr
         
         if hasattr(self, "流动性支持") and self.流动性支持 is not None:
             _providers = {}

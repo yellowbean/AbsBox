@@ -237,7 +237,6 @@
     "custom": null,
     "name": "Senior/Junior",
     "waterfall": {
-      "CleanUp": [],
       "DistributionDay Amortizing": [
         [
           null,
@@ -300,8 +299,7 @@
             "tag": "PayResidual"
           }
         ]
-      ],
-      "EndOfPoolCollection": []
+      ]
     },
     "liqProvider": null,
     "bonds": {
