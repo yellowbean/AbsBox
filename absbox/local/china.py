@@ -380,7 +380,7 @@ class 信贷ABS:
         if hasattr(self, "触发事件") and self.触发事件 is  not None:
             _trigger  = self.触发事件
             _trr = {mkWhenTrigger(_loc):
-                       [(mkTrigger(_trig),mkTriggerEffect(_effect)) for (_trig,_effect) in _vs ] 
+                       [[mkTrigger(_trig),mkTriggerEffect(_effect)] for (_trig,_effect) in _vs ] 
                        for _loc,_vs in _trigger.items()}
             _r["triggers"] = _trr
         
