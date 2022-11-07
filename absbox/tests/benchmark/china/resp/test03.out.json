@@ -182,7 +182,7 @@
       "B": {
         "bndName": "B",
         "bndRate": 0,
-        "bndLastIntPay": "2022-01-31",
+        "bndLastIntPay": null,
         "bndOriginInfo": {
           "originRate": {
             "denominator": 100,
@@ -195,7 +195,8 @@
         "bndType": {
           "tag": "Equity"
         },
-        "bndLastPrinPay": "2021-11-26",
+        "bndMaturiyDate": null,
+        "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
             0,
@@ -263,7 +264,7 @@
       "A1": {
         "bndName": "A1",
         "bndRate": 0.07,
-        "bndLastIntPay": "2021-11-26",
+        "bndLastIntPay": null,
         "bndOriginInfo": {
           "originRate": {
             "denominator": 100,
@@ -276,7 +277,8 @@
         "bndType": {
           "tag": "Sequential"
         },
-        "bndLastPrinPay": "2021-11-26",
+        "bndMaturiyDate": null,
+        "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
             0.08,

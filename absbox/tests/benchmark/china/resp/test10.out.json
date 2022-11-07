@@ -214,7 +214,7 @@
       "B": {
         "bndName": "B",
         "bndRate": 0,
-        "bndLastIntPay": "2021-07-26",
+        "bndLastIntPay": null,
         "bndOriginInfo": {
           "originRate": {
             "denominator": 100,
@@ -227,7 +227,8 @@
         "bndType": {
           "tag": "Equity"
         },
-        "bndLastPrinPay": "2021-07-26",
+        "bndMaturiyDate": null,
+        "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
             0,
@@ -289,7 +290,7 @@
       "A1": {
         "bndName": "A1",
         "bndRate": 0.07,
-        "bndLastIntPay": "2021-07-26",
+        "bndLastIntPay": null,
         "bndOriginInfo": {
           "originRate": {
             "denominator": 100,
@@ -302,7 +303,8 @@
         "bndType": {
           "tag": "Sequential"
         },
-        "bndLastPrinPay": "2021-07-26",
+        "bndMaturiyDate": null,
+        "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
             0.08,
@@ -336,7 +338,7 @@
               0.07,
               0,
               [
-                "<PayInt:[\"A1\"],Just 0.75>",
+                "<PayInt:[\"A1\"],Just 1.32>",
                 "<PayPrin:[\"A1\"],Just 96.17>"
               ]
             ],
@@ -345,21 +347,21 @@
           {
             "contents": [
               "2021-07-26",
-              62.68,
-              1.87,
-              33.49,
+              64.58,
+              3.77,
+              31.59,
               0.07,
               35.36,
               [
                 "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just 62.68>"
+                "<PayPrin:[\"A1\"],Just 64.58>"
               ]
             ],
             "tag": "BondTxn"
           }
         ],
-        "bndBalance": 62.68,
-        "bndDuePrin": 62.68
+        "bndBalance": 64.58,
+        "bndDuePrin": 64.58
       }
     },
     "overrides": null,
@@ -577,8 +579,8 @@
           {
             "contents": [
               "2021-07-26",
-              33.49,
-              -1.87,
+              31.59,
+              -3.77,
               "<PayInt:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -587,7 +589,7 @@
             "contents": [
               "2021-07-26",
               0,
-              -33.49,
+              -31.59,
               "<PayPrin:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
