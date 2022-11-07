@@ -554,6 +554,8 @@ def mkTrigger(x):
             return mkTag(("AfterDate",_d))
         case [">=",_d]:
             return mkTag(("AfterOnDate",_d))
+        case ["到期日未兑付",_bn]:
+            return mkTag(("PassMaturityDate",_bn))
         #case ("目标摊还不足",bn):
         #   return mkTag(("PrinShortfall",bn))
         #case ["到期日未兑付",bn]:
