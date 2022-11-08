@@ -70,6 +70,8 @@ def test_resp():
             ,("test15.json","empty.json","test15.out.json")
             ,("test16.json","empty.json","test16.out.json")
             ,("test17.json","empty.json","test17.out.json")
+            ,("test18.json","empty.json","test18.out.json")
+            ,("test19.json","defaults01.json","test19.out.json")
             ]
     for dinput,sinput,eoutput in pair:
         print("Comparing")
