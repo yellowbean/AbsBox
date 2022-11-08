@@ -15,7 +15,7 @@ urllib3.disable_warnings()
 class API:
     url: str
     server_info = {}
-    version:str = "0.0.2"
+    version:str = "0","2","0"
 
     def __post_init__(self):
         try:
@@ -27,9 +27,9 @@ class API:
 
         echo = json.loads(_r)
         self.server_info = echo
-        supported_client_versions = echo['version']
-        logging.info(f"Connect Successfully with engine version {echo['version']},which support client version {supported_client_versions}")
-        if self.version != supported_client_versions:
+        x,y,z = echo['version'].split(".")
+        logging.info(f"Connect Successfully with engine version {echo['version']}")
+        if self.version[1] != y:
             logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['version']} , pls upgrade your api package by: pip -U absbox")
             return
 
