@@ -545,11 +545,11 @@ def mkTrigger(x):
         case [ds,cmp,v] if (isinstance(v,float) and _rateTypeDs(ds)):
             return mkTag(("ThresholdRate",[mkThreshold(cmp),mkDs(ds),v]))
         case [ds,cmp,ts] if _rateTypeDs(ds):
-            return mkTag(("ThresholdRateCurve",[mkThreshold(cmp),mkDs(ds),ts]))
+            return mkTag(("ThresholdRateCurve",[mkThreshold(cmp),mkDs(ds),mkTs("ThresholdCurve",ts)]))
         case [ds,cmp,v] if ( isinstance(v,float) or  isinstance(v,int) ):
             return mkTag(("ThresholdBal",[mkThreshold(cmp),mkDs(ds),v]))
         case [ds,cmp,ts]:
-            return mkTag(("ThresholdBalCurve",[mkThreshold(cmp),mkDs(ds),ts]))
+            return mkTag(("ThresholdBalCurve",[mkThreshold(cmp),mkDs(ds),mkTs("ThresholdCurve",ts)]))
         case [">",_d]:
             return mkTag(("AfterDate",_d))
         case [">=",_d]:
@@ -611,20 +611,12 @@ def mkWaterfall(r, x):
             _w_tag = f"DistributionDay (DealDefaulted Nothing)"
         case ("兑付日",_st):
             _w_tag = f"DistributionDay {mapping[_st]}"
-            #r[f"DistributionDay {mapping[_st]}"] = \
-            #    itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
         case "兑付日" | "未违约":
             _w_tag = f"DistributionDay Amortizing"
-            #r[f"DistributionDay Amortizing"] = \
-            #    itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
         case "清仓回购":
             _w_tag = "CleanUp"
-            #r[f"CleanUp"] = \
-            #    itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
         case "回款日" | "回款后" :
             _w_tag = f"EndOfPoolCollection"
-            #r[f"EndOfPoolCollection"] = \
-            #    itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
         case _:
             raise RuntimeError(f"Failed to match :{x}")
     r[_w_tag] = itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
