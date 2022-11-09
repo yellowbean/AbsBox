@@ -50,7 +50,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
-
+absbox/tests/config.json
 # Translations
 *.mo
 *.pot
@@ -137,10 +137,6 @@ pyabs/*.ipynb
 .idea/PyABS.iml
 .idea/vcs.xml
 .idea/workspace.xml
-untitled
-WeChat02_01.1
-WeChat02-Copy1.1
-WeChat02.1
 .gitignore
-.gitignore
+absbox/tests/config.json
 absbox/tests/config.json
