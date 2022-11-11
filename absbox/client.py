@@ -1,14 +1,17 @@
-import logging, json, datetime, pickle
+import logging, json, datetime, pickle,re
 from json.decoder import JSONDecodeError
 import requests
 from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass
-from absbox.local.util import mkTag
+from absbox.local.util import mkTag,query
 import pandas as pd
 
 #logging.captureWarnings(True)
 urllib3.disable_warnings()
+
+def isDate(x):
+    return re.match(r"\d{4}\-\d{2}\-\d{2}",x)
 
 
 @dataclass
@@ -72,6 +75,7 @@ class API:
         if _w is None:
             raise RuntimeError("Waterfall is None")
 
+        # validatin waterfall
         for wn,wa in _w.items():
             for idx,action in enumerate(wa):
                 #print(action)

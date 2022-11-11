@@ -1,9 +1,15 @@
 import pandas as pd 
 import functools
-import itertools
+import itertools,re
 from enum import Enum
 import numpy as np
 
+
+def query(d,p):
+    if len(p)==1:
+        return d[p[0]]
+    else:
+        return query(d[p[0]],p[1:])
 
 def mkTag(x):
     match x:

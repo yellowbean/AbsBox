@@ -11,18 +11,7 @@ import matplotlib.pyplot as plt
 
 from absbox import *
 from absbox.local.util import mkTag,DC,mkTs,query,consolStmtByDate,aggStmtByDate
-
 from absbox.local.component import *
-
-
-#data DealStats =
-#              | CurrentPoolDefaultedBalance
-#              | PoolCollectionInt  -- a redirect map to `CurrentPoolCollectionInt T.Day`
-#              | FutureOriginalPoolBalance
-#              | CurrentDueBondInt [String]
-#              | CurrentDueFee [String]
-#              | LastBondIntPaid [String]
-#              | LastFeePaid [String]
 
 
 def mkAssetRate(x):
@@ -229,19 +218,6 @@ def mkAssumption(x):
         case {"停止": d}:
             return mkTag(("StopRunBy",d))
 
-# \"overrides\":[[{\"tag\":\"RunWaterfall\",\"contents\":[\"2022-01-01\",\"base\"]},{\"tag\":\"PoolCollection\",\"contents\":[\"0202-11-01\",\"collection\"]}]]}
-def mkOverrides(m):
-    return None
-#data WhenTrigger = EndCollection
-#                 | EndCollectionWF
-#                 | BeginDistributionWF
-#                 | EndDistributionWF
-
-# [
-#  [[\"BeginDistributionWF\",{\"tag\":\"AfterDate\",\"contents\":\"2022-03-01\"}]
-#    ,{\"tag\":\"DealStatusTo\",\"contents\":{\"tag\":\"Revolving\"}}]
-#   ]"
-
 def mkCustom(x):
     match x:
         case {"常量":n}:
@@ -257,17 +233,6 @@ def mk(x):
             return {"assets": [mkAsset(a) for a in assets]}
         case ["账户", accName, attrs]:
             return {accName: mkAcc(accName, attrs)}
-            #match attrs:
-            #    case {"余额": bal, "类型": accType}:
-            #        return {accName: {"accBalance": bal, "accName": accName
-            #                          , "accType": mkAccType(accType)
-            #                          , "accInterest": mkAccInt(attrs.get("计息",None))
-            #                          , "accStmt": mkAccTxn(attrs.get("记录",None))}}
-            #    case {"余额": bal}:
-            #        return { accName: {"accBalance": bal, "accName": accName
-            #                          , "accType": None
-            #                          , "accInterest": mkAccInt(attrs.get("计息",None))
-            #                          , "accStmt": mkAccTxn(attrs.get("记录",None))}}
         case ["费用", feeName, {"类型": feeType ,**fi}]:
             return {feeName: {"feeName": feeName, "feeType": mkFeeType(feeType), "feeStart":fi.get("起算日",None)
                              ,"feeDueDate":fi.get("计算日",None) , "feeDue": 0,
@@ -290,6 +255,9 @@ class 时间点(Enum):
     回收动作后 = "EndCollectionWF"
     分配前 = "BeginDistributionWF"
     分配后 = "EndDistributionWF"
+
+
+
 
 @dataclass
 class 信贷ABS:
@@ -469,7 +437,20 @@ class 信贷ABS:
                         raise  RuntimeError("持仓系数大于1.0")
                     output['position'][k] = output['bonds'][k][['本金','利息','本息合计']].apply(lambda x:x*factor).round(4)
 
+
+        #Get bond defaulted amount 
+        bond_defaults = [ (_x['contents'][0],_x['contents'][1]) for _x in resp[2] if _x['tag'] in set(['BondOutstanding','BondOutstandingInt' ])]
+        _bdefaults = {}
+        for bn,amt in bond_defaults:
+            if bn in _bdefaults:
+                _bdefaults[bn] += amt
+        else:
+            _bdefaults[bn] = amt
+        output['result'] = _bdefaults
+
         return output
+
+SPV = 信贷ABS
 
 def loadAsset(fp, reader, astType):
     ''' load assets '''
