@@ -439,14 +439,15 @@ class 信贷ABS:
 
 
         #Get bond defaulted amount 
-        bond_defaults = [ (_x['contents'][0],_x['contents'][1]) for _x in resp[2] if _x['tag'] in set(['BondOutstanding','BondOutstandingInt' ])]
-        _bdefaults = {}
-        for bn,amt in bond_defaults:
-            if bn in _bdefaults:
-                _bdefaults[bn] += amt
-        else:
-            _bdefaults[bn] = amt
-        output['result'] = _bdefaults
+        bond_defaults = [ (_x['contents'][0],_x['tag'],_x['contents'][1]) for _x in resp[2] if _x['tag'] in set(['BondOutstanding','BondOutstandingInt' ])]
+        _bnds = list(resp[0]['bonds'].keys())
+        _bdefaults = pd.DataFrame(columns=['本金违约','利息违约'],index=_bnds)
+        _dmap = {'BondOutstanding':"本金违约","BondOutstandingInt":"利息违约"}
+        for bn,amt_type,amt in bond_defaults:
+            _bdefaults.loc[bn][_dmap[amt_type]] = amt
+        _bdefaults.fillna(0,inplace=True)
+        _bdefaults['合计'] = _bdefaults['本金违约'] + _bdefaults['利息违约']
+        output['result'] = _bdefaults.sort_index()
 
         return output
 
