@@ -1,6 +1,6 @@
-from absbox.local.china import 信贷ABS
+from absbox.local.china import SPV
 
-gy = 信贷ABS(
+gy = SPV(
     "工元乐居2021年第七期"
     ,{"封包日":"2021-03-01","起息日":"2021-10-15","首次兑付日":"2021-11-26"
      ,"法定到期日":"2060-12-01","收款频率":"月末","付款频率":["每月",26]}      

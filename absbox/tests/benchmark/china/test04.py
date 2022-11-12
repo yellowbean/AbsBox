@@ -1,6 +1,6 @@
-from absbox.local.china import 信贷ABS
+from absbox.local.china import SPV
 
-JY_RMBS_01 = 信贷ABS(
+JY_RMBS_01 = SPV(
     "建元"
     ,{"封包日":"2022-10-02","起息日":"2022-10-02","首次兑付日":"2022-11-02"
       ,"法定到期日":"2060-12-01","收款频率":"月末","付款频率":["每月",2]}     

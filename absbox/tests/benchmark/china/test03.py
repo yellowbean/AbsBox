@@ -1,7 +1,7 @@
-from absbox.local.china import 信贷ABS
+from absbox.local.china import SPV
 
 # 分润模式
-test03 = 信贷ABS(
+test03 = SPV(
     "Split the residual"
     ,{"封包日":"2021-03-01","起息日":"2021-10-15","首次兑付日":"2021-11-26"
       ,"法定到期日":"2060-12-01","收款频率":"月末","付款频率":["每月",26]}       

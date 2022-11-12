@@ -1384,6 +1384,39 @@
       "tag": "MortgageFlow"
     }
   ],
-  null,
+  [
+    {
+      "contents": [
+        "A1",
+        0,
+        100
+      ],
+      "tag": "BondOutstandingInt"
+    },
+    {
+      "contents": [
+        "B",
+        0,
+        20
+      ],
+      "tag": "BondOutstandingInt"
+    },
+    {
+      "contents": [
+        "A1",
+        18.04,
+        100
+      ],
+      "tag": "BondOutstanding"
+    },
+    {
+      "contents": [
+        "B",
+        0,
+        20
+      ],
+      "tag": "BondOutstanding"
+    }
+  ],
   null
 ]

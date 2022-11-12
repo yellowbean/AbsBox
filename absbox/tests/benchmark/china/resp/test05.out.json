@@ -35796,6 +35796,55 @@
       "tag": "MortgageFlow"
     }
   ],
-  null,
+  [
+    {
+      "contents": [
+        "A1",
+        0,
+        3650000000
+      ],
+      "tag": "BondOutstandingInt"
+    },
+    {
+      "contents": [
+        "A2",
+        0,
+        5444000000
+      ],
+      "tag": "BondOutstandingInt"
+    },
+    {
+      "contents": [
+        "\u6b21\u7ea7",
+        13419875.21,
+        900883783.62
+      ],
+      "tag": "BondOutstandingInt"
+    },
+    {
+      "contents": [
+        "A1",
+        0,
+        3650000000
+      ],
+      "tag": "BondOutstanding"
+    },
+    {
+      "contents": [
+        "A2",
+        0,
+        5444000000
+      ],
+      "tag": "BondOutstanding"
+    },
+    {
+      "contents": [
+        "\u6b21\u7ea7",
+        0,
+        900883783.62
+      ],
+      "tag": "BondOutstanding"
+    }
+  ],
   null
 ]

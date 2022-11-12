@@ -1,6 +1,6 @@
-from absbox.local.china import 信贷ABS
+from absbox.local.china import SPV
 
-BYD_AUTO_2021_2 = 信贷ABS(
+BYD_AUTO_2021_2 = SPV(
     "盛世融迪2021年第二期个人汽车抵押贷款"
     ,{"封包日":"2022-07-01","起息日":"2022-07-26","首次兑付日":"2022-08-26"
      ,"法定到期日":"2060-12-01","收款频率":"月初","付款频率":["每月",26]}     

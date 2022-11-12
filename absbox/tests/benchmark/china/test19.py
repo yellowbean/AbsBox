@@ -1,6 +1,6 @@
-from absbox.local.china import 信贷ABS
+from absbox.local.china import SPV
 
-test01 = 信贷ABS(
+test01 = SPV(
      "基于分段违约率的信用事件"
      ,{"封包日":"2021-03-01","起息日":"2021-05-01","首次兑付日":"2021-06-26"
       ,"法定到期日":"2060-12-01","收款频率":"月末","付款频率":["每月",26]}     
