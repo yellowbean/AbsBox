@@ -21,6 +21,16 @@ def mkAssetRate(x):
         case ["浮动",r,{"基准":idx,"利差":spd,"重置频率":p}]:
             return mkTag(("Floater",[idx,spd,r,freqMap[p],None]))
 
+def mkAmortPlan(x):
+    match x:
+        case "等额本息" | "Level" :
+            return mkTag("Level")
+        case "等额本金" | "Even" :
+            return mkTag("Even")
+        case _ :
+            raise RuntimeError(f"Failed to match AmortPlan {x}")
+
+
 def mkAsset(x):
     _typeMapping = {"等额本息": "Level", "等额本金": "Even"}
     _statusMapping = {"正常": mkTag(("Current")), "违约": mkTag(("Defaulted",None))}
@@ -31,18 +41,19 @@ def mkAsset(x):
             ,{"当前余额": currentBalance
              ,"当前利率": currentRate
              ,"剩余期限": remainTerms
-             ,"状态": status}
-              ]:
-            return mkTag(("Mortgage",[{"originBalance": originBalance,
-                     "originRate": mkAssetRate(originRate),
-                     "originTerm": originTerm,
-                     "period": freqMap[freq],
-                     "startDate": startDate,
-                     "prinType": _typeMapping[_type]},
-                    currentBalance,
-                    currentRate,
-                    remainTerms,
-                    _statusMapping[status]
+             ,"状态": status}]:
+            return mkTag(("Mortgage",[
+                                      {"originBalance": originBalance,
+                                      "originRate": mkAssetRate(originRate),
+                                      "originTerm": originTerm,
+                                      "period": freqMap[freq],
+                                      "startDate": startDate,
+                                      "prinType": mkAmortPlan(_type)
+                                      } |mkTag("OriginalInfo"),
+                                     currentBalance,
+                                     currentRate,
+                                     remainTerms,
+                                     _statusMapping[status]
                     ]))
 
 def mkCf(x):

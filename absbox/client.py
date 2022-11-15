@@ -18,7 +18,7 @@ def isDate(x):
 class API:
     url: str
     server_info = {}
-    version:str = "0","2","0"
+    version:str = "0","3","0"
 
     def __post_init__(self):
         try:
@@ -49,15 +49,14 @@ class API:
                    , ensure_ascii=False)
 
         if isinstance(assumptions, dict):
-        #if isinstance(assumptions,list):
-            return json.dumps({"_deal": deal.json
-                       ,"_assump": mkTag(("Multiple"
+            return json.dumps({"deal": deal.json
+                       ,"assump": mkTag(("Multiple"
                                           ,{ scenarioName:deal.read_assump(a) for (scenarioName,a) in assumptions.items()}))
-                       ,"_bondPricing": deal.read_pricing(pricing)}
+                       ,"bondPricing": deal.read_pricing(pricing)}
                    , ensure_ascii=False)
-
-        return json.dumps({"deal": deal.json
-                       ,"assump": deal.read_assump(assumptions)
+        else:
+            return json.dumps({"deal": deal.json
+                       ,"assump": mkTag(("Single",deal.read_assump(assumptions)))
                        ,"bondPricing": deal.read_pricing(pricing)}
                    , ensure_ascii=False)
 
@@ -158,10 +157,7 @@ class API:
         if custom_endpoint:
             url = f"{self.url}/{custom_endpoint}"
         else:
-            if multi_run_flag:
-                url = f"{self.url}/run_deal"
-            else:
-                url = f"{self.url}/run_deal2"
+            url = f"{self.url}/run_deal"
 
         hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
@@ -171,7 +167,7 @@ class API:
                 deal = pickle.loads(c)
 
 
-        req = self.build_req(deal,assumptions,pricing)
+        req = self.build_req(deal, assumptions, pricing)
 
         #validate deal
         deal_validate,err,warn = self.validate(req)
