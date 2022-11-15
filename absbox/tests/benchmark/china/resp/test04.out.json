@@ -39318,7 +39318,10 @@
                 "tag": "Fix"
               },
               "originTerm": 180,
-              "prinType": "Level",
+              "prinType": {
+                "tag": "Level"
+              },
+              "tag": "OriginalInfo",
               "period": "Monthly",
               "startDate": "2020-06-01",
               "originBalance": 18000000000

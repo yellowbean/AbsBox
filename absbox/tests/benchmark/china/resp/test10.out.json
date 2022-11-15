@@ -678,7 +678,10 @@
                 "tag": "Fix"
               },
               "originTerm": 30,
-              "prinType": "Level",
+              "prinType": {
+                "tag": "Level"
+              },
+              "tag": "OriginalInfo",
               "period": "Monthly",
               "startDate": "2021-02-01",
               "originBalance": 120

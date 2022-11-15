@@ -84,7 +84,10 @@
             "originTerm": 30,
             "period": "Monthly",
             "startDate": "2021-02-01",
-            "prinType": "Level"
+            "prinType": {
+              "tag": "Level"
+            },
+            "tag": "OriginalInfo"
           },
           120,
           0.08,

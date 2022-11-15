@@ -79,7 +79,7 @@ def test_resp():
         with open(os.path.join(input_req_folder,dinput),'r') as dq:  # deal request
             with open(os.path.join(input_scen_folder,sinput),'r') as sq: # scenario request 
                 req = {"deal":json.load(dq)
-                        ,"assump":json.load(sq)
+                        ,"assump": {"tag":"Single","contents": json.load(sq)}
                         ,"bondPricing":None}
                 hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
                 tresp = requests.post(test_server

@@ -33445,7 +33445,10 @@
                 "tag": "Fix"
               },
               "originTerm": 218,
-              "prinType": "Level",
+              "prinType": {
+                "tag": "Level"
+              },
+              "tag": "OriginalInfo",
               "period": "Monthly",
               "startDate": "2020-06-01",
               "originBalance": 9961626400
@@ -33467,7 +33470,10 @@
                 "tag": "Fix"
               },
               "originTerm": 218,
-              "prinType": "Even",
+              "prinType": {
+                "tag": "Even"
+              },
+              "tag": "OriginalInfo",
               "period": "Monthly",
               "startDate": "2020-06-01",
               "originBalance": 3309774500

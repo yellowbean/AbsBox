@@ -44,7 +44,10 @@
             "originTerm": 30,
             "period": "Monthly",
             "startDate": "2021-02-01",
-            "prinType": "Even"
+            "prinType": {
+              "tag": "Even"
+            },
+            "tag": "OriginalInfo"
           },
           120,
           0.6,

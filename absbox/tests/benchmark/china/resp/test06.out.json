@@ -24044,7 +24044,10 @@
                 "tag": "Floater"
               },
               "originTerm": 30,
-              "prinType": "Even",
+              "prinType": {
+                "tag": "Even"
+              },
+              "tag": "OriginalInfo",
               "period": "Monthly",
               "startDate": "2020-06-01",
               "originBalance": 120
@@ -24072,7 +24075,10 @@
                 "tag": "Floater"
               },
               "originTerm": 30,
-              "prinType": "Even",
+              "prinType": {
+                "tag": "Even"
+              },
+              "tag": "OriginalInfo",
               "period": "Monthly",
               "startDate": "2020-06-01",
               "originBalance": 0

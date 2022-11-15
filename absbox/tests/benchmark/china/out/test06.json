@@ -50,7 +50,10 @@
             "originTerm": 30,
             "period": "Monthly",
             "startDate": "2020-06-01",
-            "prinType": "Even"
+            "prinType": {
+              "tag": "Even"
+            },
+            "tag": "OriginalInfo"
           },
           2261042196.13,
           0.0444,
@@ -78,7 +81,10 @@
             "originTerm": 30,
             "period": "Monthly",
             "startDate": "2020-06-01",
-            "prinType": "Even"
+            "prinType": {
+              "tag": "Even"
+            },
+            "tag": "OriginalInfo"
           },
           81403764.08,
           0.0444,
