@@ -688,10 +688,11 @@ def mkAsset(x):
 
 
 def identify_deal_type(x):
+    print(f"matching: {x}")
     match x:
-        case {"pool":{"assets":ast}} if ast[0]['tag']=='PersonalLoan':
+        case {"pool":{"assets":[{'tag':'PersonalLoan'},*rest]}}:
             return "LDeal"
-        case {"pool":{"assets":ast}} if ast[0]['tag']=='Mortgage':
+        case {"pool":{"assets":[{'tag':'Mortgage'},*rest]}} :
             return "MDeal"
         case _ :
             return "MDeal"

@@ -1,357 +1,360 @@
 {
-  "dates": {
-    "tag": "PatternInterval",
-    "contents": {
-      "ClosingDate": [
-        "2021-06-15",
-        {
-          "tag": "MonthEnd"
-        },
-        "2060-12-01"
-      ],
-      "CutoffDate": [
-        "2021-06-30",
-        {
-          "tag": "MonthEnd"
-        },
-        "2060-12-01"
-      ],
-      "FirstPayDate": [
-        "2021-07-26",
-        {
-          "tag": "DayOfMonth",
-          "contents": 26
-        },
-        "2060-12-01"
-      ]
-    }
-  },
-  "name": "\u7b2c\u4e09\u65b9\u589e\u4fe1",
-  "status": {
-    "tag": "Amortizing"
-  },
-  "pool": {
-    "assets": [
-      {
-        "tag": "Mortgage",
-        "contents": [
+  "tag": "MDeal",
+  "contents": {
+    "dates": {
+      "tag": "PatternInterval",
+      "contents": {
+        "ClosingDate": [
+          "2021-06-15",
           {
-            "originBalance": 120,
-            "originRate": {
-              "tag": "Fix",
-              "contents": 0.15
-            },
-            "originTerm": 30,
-            "period": "Monthly",
-            "startDate": "2021-05-01",
-            "prinType": {
-              "tag": "Level"
-            },
-            "tag": "OriginalInfo"
+            "tag": "MonthEnd"
           },
-          120,
-          0.45,
-          20,
+          "2060-12-01"
+        ],
+        "CutoffDate": [
+          "2021-06-30",
           {
-            "tag": "Current"
-          }
+            "tag": "MonthEnd"
+          },
+          "2060-12-01"
+        ],
+        "FirstPayDate": [
+          "2021-07-26",
+          {
+            "tag": "DayOfMonth",
+            "contents": 26
+          },
+          "2060-12-01"
         ]
       }
-    ],
-    "asOfDate": "2021-06-30",
-    "issuanceStat": null,
-    "futureCf": null
-  },
-  "bonds": {
-    "A1": {
-      "bndName": "A1",
-      "bndBalance": 100,
-      "bndRate": 0.09,
-      "bndOriginInfo": {
-        "originBalance": 100,
-        "originDate": "2020-01-03",
-        "originRate": 0.08
-      },
-      "bndInterestInfo": {
-        "tag": "Floater",
-        "contents": [
-          "LPR5Y",
-          0.025,
-          {
-            "tag": "ByInterval",
-            "contents": [
-              "Monthly",
-              null
-            ]
-          },
-          "DC_ACT_365F",
-          null,
-          null
-        ]
-      },
-      "bndType": {
-        "tag": "Sequential"
-      },
-      "bndDuePrin": 0,
-      "bndDueInt": 0,
-      "bndDueIntDate": null
     },
-    "B": {
-      "bndName": "B",
-      "bndBalance": 20,
-      "bndRate": 0.0,
-      "bndOriginInfo": {
-        "originBalance": 100,
-        "originDate": "2020-01-03",
-        "originRate": 0.07
-      },
-      "bndInterestInfo": {
-        "tag": "Fix",
-        "contents": [
-          0.0,
-          "DC_ACT_365F"
-        ]
-      },
-      "bndType": {
-        "tag": "Equity"
-      },
-      "bndDuePrin": 0,
-      "bndDueInt": 0,
-      "bndDueIntDate": null
-    }
-  },
-  "waterfall": {
-    "EndOfPoolCollection": [
-      [
-        null,
+    "name": "\u7b2c\u4e09\u65b9\u589e\u4fe1",
+    "status": {
+      "tag": "Amortizing"
+    },
+    "pool": {
+      "assets": [
         {
-          "tag": "CalcFee",
-          "contents": [
-            "\u589e\u503c\u7a0e"
-          ]
-        }
-      ]
-    ],
-    "DistributionDay Amortizing": [
-      [
-        null,
-        {
-          "tag": "CalcBondInt",
-          "contents": [
-            "A1"
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "LiqRepay",
-          "contents": [
-            null,
-            "\u8d26\u623701",
-            "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8"
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "LiqSupport",
+          "tag": "Mortgage",
           "contents": [
             {
-              "tag": "DS",
-              "contents": {
-                "tag": "ReserveAccGap",
-                "contents": [
-                  "\u8d26\u623701"
-                ]
-              }
+              "originBalance": 120,
+              "originRate": {
+                "tag": "Fix",
+                "contents": 0.15
+              },
+              "originTerm": 30,
+              "period": "Monthly",
+              "startDate": "2021-05-01",
+              "prinType": {
+                "tag": "Level"
+              },
+              "tag": "OriginalInfo"
             },
-            "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8",
-            "\u8d26\u623701"
+            120,
+            0.45,
+            20,
+            {
+              "tag": "Current"
+            }
           ]
         }
       ],
-      [
-        null,
-        {
-          "tag": "PayFee",
+      "asOfDate": "2021-06-30",
+      "issuanceStat": null,
+      "futureCf": null
+    },
+    "bonds": {
+      "A1": {
+        "bndName": "A1",
+        "bndBalance": 100,
+        "bndRate": 0.09,
+        "bndOriginInfo": {
+          "originBalance": 100,
+          "originDate": "2020-01-03",
+          "originRate": 0.08
+        },
+        "bndInterestInfo": {
+          "tag": "Floater",
           "contents": [
-            [
-              "\u8d26\u623701"
-            ],
-            [
+            "LPR5Y",
+            0.025,
+            {
+              "tag": "ByInterval",
+              "contents": [
+                "Monthly",
+                null
+              ]
+            },
+            "DC_ACT_365F",
+            null,
+            null
+          ]
+        },
+        "bndType": {
+          "tag": "Sequential"
+        },
+        "bndDuePrin": 0,
+        "bndDueInt": 0,
+        "bndDueIntDate": null
+      },
+      "B": {
+        "bndName": "B",
+        "bndBalance": 20,
+        "bndRate": 0.0,
+        "bndOriginInfo": {
+          "originBalance": 100,
+          "originDate": "2020-01-03",
+          "originRate": 0.07
+        },
+        "bndInterestInfo": {
+          "tag": "Fix",
+          "contents": [
+            0.0,
+            "DC_ACT_365F"
+          ]
+        },
+        "bndType": {
+          "tag": "Equity"
+        },
+        "bndDuePrin": 0,
+        "bndDueInt": 0,
+        "bndDueIntDate": null
+      }
+    },
+    "waterfall": {
+      "EndOfPoolCollection": [
+        [
+          null,
+          {
+            "tag": "CalcFee",
+            "contents": [
               "\u589e\u503c\u7a0e"
             ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayFee",
-          "contents": [
-            [
-              "\u8d26\u623701"
-            ],
-            [
-              "\u627f\u9500\u8d39"
-            ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayInt",
-          "contents": [
-            "\u8d26\u623701",
-            [
-              "A1"
-            ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayPrin",
-          "contents": [
-            "\u8d26\u623702",
-            [
-              "A1"
-            ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayPrin",
-          "contents": [
-            "\u8d26\u623702",
-            [
-              "B"
-            ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayResidual",
-          "contents": [
-            null,
-            "\u8d26\u623702",
-            "B"
-          ]
-        }
-      ]
-    ]
-  },
-  "fees": {
-    "\u589e\u503c\u7a0e": {
-      "feeName": "\u589e\u503c\u7a0e",
-      "feeType": {
-        "tag": "PctFee",
-        "contents": [
-          {
-            "tag": "PoolCollectionIncome",
-            "contents": "CollectedInterest"
-          },
-          0.0326
+          }
         ]
-      },
-      "feeStart": "2021-06-15",
-      "feeDueDate": null,
-      "feeDue": 0,
-      "feeArrears": 0,
-      "feeLastPaidDay": null
-    },
-    "\u627f\u9500\u8d39": {
-      "feeName": "\u627f\u9500\u8d39",
-      "feeType": {
-        "tag": "FixFee",
-        "contents": 8
-      },
-      "feeStart": "2021-06-15",
-      "feeDueDate": null,
-      "feeDue": 0,
-      "feeArrears": 0,
-      "feeLastPaidDay": null
-    }
-  },
-  "accounts": {
-    "\u8d26\u623701": {
-      "accBalance": 0,
-      "accName": "\u8d26\u623701",
-      "accType": {
-        "tag": "PctReserve",
-        "contents": [
+      ],
+      "DistributionDay Amortizing": [
+        [
+          null,
           {
-            "tag": "Sum",
+            "tag": "CalcBondInt",
+            "contents": [
+              "A1"
+            ]
+          }
+        ],
+        [
+          null,
+          {
+            "tag": "LiqRepay",
+            "contents": [
+              null,
+              "\u8d26\u623701",
+              "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8"
+            ]
+          }
+        ],
+        [
+          null,
+          {
+            "tag": "LiqSupport",
             "contents": [
               {
-                "tag": "CurrentDueBondInt",
-                "contents": [
-                  "A1"
-                ]
+                "tag": "DS",
+                "contents": {
+                  "tag": "ReserveAccGap",
+                  "contents": [
+                    "\u8d26\u623701"
+                  ]
+                }
               },
-              {
-                "tag": "CurrentDueFee",
-                "contents": [
-                  "\u589e\u503c\u7a0e"
-                ]
-              }
+              "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8",
+              "\u8d26\u623701"
             ]
-          },
-          1.0
-        ]
-      },
-      "accInterest": null,
-      "accStmt": null
-    },
-    "\u8d26\u623702": {
-      "accBalance": 0,
-      "accName": "\u8d26\u623702",
-      "accType": null,
-      "accInterest": null,
-      "accStmt": null
-    }
-  },
-  "collects": [
-    [
-      "CollectedInterest",
-      "\u8d26\u623701"
-    ],
-    [
-      "CollectedPrincipal",
-      "\u8d26\u623702"
-    ],
-    [
-      "CollectedPrepayment",
-      "\u8d26\u623702"
-    ],
-    [
-      "CollectedRecoveries",
-      "\u8d26\u623702"
-    ]
-  ],
-  "liqProvider": {
-    "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8": {
-      "liqName": "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8",
-      "liqType": {
-        "tag": "ReplenishSupport",
-        "contents": [
+          }
+        ],
+        [
+          null,
           {
-            "tag": "QuarterEnd"
-          },
-          10
+            "tag": "PayFee",
+            "contents": [
+              [
+                "\u8d26\u623701"
+              ],
+              [
+                "\u589e\u503c\u7a0e"
+              ]
+            ]
+          }
+        ],
+        [
+          null,
+          {
+            "tag": "PayFee",
+            "contents": [
+              [
+                "\u8d26\u623701"
+              ],
+              [
+                "\u627f\u9500\u8d39"
+              ]
+            ]
+          }
+        ],
+        [
+          null,
+          {
+            "tag": "PayInt",
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "A1"
+              ]
+            ]
+          }
+        ],
+        [
+          null,
+          {
+            "tag": "PayPrin",
+            "contents": [
+              "\u8d26\u623702",
+              [
+                "A1"
+              ]
+            ]
+          }
+        ],
+        [
+          null,
+          {
+            "tag": "PayPrin",
+            "contents": [
+              "\u8d26\u623702",
+              [
+                "B"
+              ]
+            ]
+          }
+        ],
+        [
+          null,
+          {
+            "tag": "PayResidual",
+            "contents": [
+              null,
+              "\u8d26\u623702",
+              "B"
+            ]
+          }
         ]
+      ]
+    },
+    "fees": {
+      "\u589e\u503c\u7a0e": {
+        "feeName": "\u589e\u503c\u7a0e",
+        "feeType": {
+          "tag": "PctFee",
+          "contents": [
+            {
+              "tag": "PoolCollectionIncome",
+              "contents": "CollectedInterest"
+            },
+            0.0326
+          ]
+        },
+        "feeStart": "2021-06-15",
+        "feeDueDate": null,
+        "feeDue": 0,
+        "feeArrears": 0,
+        "feeLastPaidDay": null
       },
-      "liqBalance": 10,
-      "liqCredit": 0,
-      "liqStart": "2021-06-15"
+      "\u627f\u9500\u8d39": {
+        "feeName": "\u627f\u9500\u8d39",
+        "feeType": {
+          "tag": "FixFee",
+          "contents": 8
+        },
+        "feeStart": "2021-06-15",
+        "feeDueDate": null,
+        "feeDue": 0,
+        "feeArrears": 0,
+        "feeLastPaidDay": null
+      }
+    },
+    "accounts": {
+      "\u8d26\u623701": {
+        "accBalance": 0,
+        "accName": "\u8d26\u623701",
+        "accType": {
+          "tag": "PctReserve",
+          "contents": [
+            {
+              "tag": "Sum",
+              "contents": [
+                {
+                  "tag": "CurrentDueBondInt",
+                  "contents": [
+                    "A1"
+                  ]
+                },
+                {
+                  "tag": "CurrentDueFee",
+                  "contents": [
+                    "\u589e\u503c\u7a0e"
+                  ]
+                }
+              ]
+            },
+            1.0
+          ]
+        },
+        "accInterest": null,
+        "accStmt": null
+      },
+      "\u8d26\u623702": {
+        "accBalance": 0,
+        "accName": "\u8d26\u623702",
+        "accType": null,
+        "accInterest": null,
+        "accStmt": null
+      }
+    },
+    "collects": [
+      [
+        "CollectedInterest",
+        "\u8d26\u623701"
+      ],
+      [
+        "CollectedPrincipal",
+        "\u8d26\u623702"
+      ],
+      [
+        "CollectedPrepayment",
+        "\u8d26\u623702"
+      ],
+      [
+        "CollectedRecoveries",
+        "\u8d26\u623702"
+      ]
+    ],
+    "liqProvider": {
+      "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8": {
+        "liqName": "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8",
+        "liqType": {
+          "tag": "ReplenishSupport",
+          "contents": [
+            {
+              "tag": "QuarterEnd"
+            },
+            10
+          ]
+        },
+        "liqBalance": 10,
+        "liqCredit": 0,
+        "liqStart": "2021-06-15"
+      }
     }
   }
 }

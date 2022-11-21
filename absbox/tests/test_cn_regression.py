@@ -31,8 +31,7 @@ def test_translate():
         if not os.path.exists(benchfile):
             print(f"Skipping:{benchfile}")
             with open(benchfile,'w',encoding='utf8') as newbench:
-                print("Writing new bench out case")
-                print(f"Size {len(d.json)}")
+                print(f"Writing new bench out case -> size {len(d.json)}")
                 json.dump(d.json,newbench,indent=2)
             logging.info(f"Create new case for {o}")
             continue
@@ -72,10 +71,10 @@ def test_resp():
             ,("test17.json","empty.json","test17.out.json")
             ,("test18.json","empty.json","test18.out.json")
             ,("test19.json","defaults01.json","test19.out.json")
+            ,("test20.json","empty.json","test20.out.json")
             ]
     for dinput,sinput,eoutput in pair:
-        print("Comparing")
-        print(dinput,sinput,eoutput)
+        print(f"Comparing:{dinput},{sinput},{eoutput}")
         with open(os.path.join(input_req_folder,dinput),'r') as dq:  # deal request
             with open(os.path.join(input_scen_folder,sinput),'r') as sq: # scenario request 
                 req = {"deal":json.load(dq)

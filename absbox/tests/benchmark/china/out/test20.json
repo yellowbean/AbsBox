@@ -1,25 +1,25 @@
 {
-  "tag": "MDeal",
+  "tag": "LDeal",
   "contents": {
     "dates": {
       "tag": "PatternInterval",
       "contents": {
         "ClosingDate": [
-          "2021-05-01",
+          "2021-06-15",
           {
             "tag": "MonthEnd"
           },
           "2060-12-01"
         ],
         "CutoffDate": [
-          "2021-03-01",
+          "2021-03-31",
           {
             "tag": "MonthEnd"
           },
           "2060-12-01"
         ],
         "FirstPayDate": [
-          "2021-06-26",
+          "2021-07-26",
           {
             "tag": "DayOfMonth",
             "contents": 26
@@ -28,39 +28,39 @@
         ]
       }
     },
-    "name": "\u56fa\u5b9a\u644a\u8fd8",
+    "name": "Loan Level ",
     "status": {
       "tag": "Amortizing"
     },
     "pool": {
       "assets": [
         {
-          "tag": "Mortgage",
+          "tag": "PersonalLoan",
           "contents": [
             {
               "originBalance": 120,
               "originRate": {
                 "tag": "Fix",
-                "contents": 0.0485
+                "contents": 0.045
               },
               "originTerm": 30,
               "period": "Monthly",
-              "startDate": "2020-06-01",
+              "startDate": "2021-02-01",
               "prinType": {
-                "tag": "Even"
+                "tag": "I_P"
               },
-              "tag": "OriginalInfo"
+              "tag": "LoanOriginalInfo"
             },
-            120,
-            0.08,
-            10,
+            120000,
+            0.05,
+            5,
             {
               "tag": "Current"
             }
           ]
         }
       ],
-      "asOfDate": "2021-03-01",
+      "asOfDate": "2021-03-31",
       "issuanceStat": null,
       "futureCf": null
     },
@@ -82,24 +82,7 @@
           ]
         },
         "bndType": {
-          "tag": "PAC",
-          "contents": {
-            "tag": "BalanceCurve",
-            "contents": [
-              [
-                "2021-06-26",
-                80
-              ],
-              [
-                "2021-07-26",
-                70
-              ],
-              [
-                "2021-09-26",
-                0
-              ]
-            ]
-          }
+          "tag": "Sequential"
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
@@ -130,8 +113,21 @@
       }
     },
     "waterfall": {
-      "EndOfPoolCollection": [],
       "DistributionDay Amortizing": [
+        [
+          null,
+          {
+            "tag": "PayFee",
+            "contents": [
+              [
+                "\u8d26\u623701"
+              ],
+              [
+                "\u4fe1\u6258\u8d39\u7528"
+              ]
+            ]
+          }
+        ],
         [
           null,
           {
@@ -181,7 +177,20 @@
         ]
       ]
     },
-    "fees": {},
+    "fees": {
+      "\u4fe1\u6258\u8d39\u7528": {
+        "feeName": "\u4fe1\u6258\u8d39\u7528",
+        "feeType": {
+          "tag": "FixFee",
+          "contents": 10
+        },
+        "feeStart": "2021-06-15",
+        "feeDueDate": null,
+        "feeDue": 0,
+        "feeArrears": 0,
+        "feeLastPaidDay": null
+      }
+    },
     "accounts": {
       "\u8d26\u623701": {
         "accBalance": 0,

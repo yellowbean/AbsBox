@@ -1,0 +1,822 @@
+[
+  {
+    "status": {
+      "tag": "Amortizing"
+    },
+    "dates": {
+      "contents": {
+        "FirstPayDate": [
+          "2021-07-26",
+          {
+            "contents": 26,
+            "tag": "DayOfMonth"
+          },
+          "2060-12-01"
+        ],
+        "CutoffDate": [
+          "2021-03-31",
+          {
+            "tag": "MonthEnd"
+          },
+          "2060-12-01"
+        ],
+        "ClosingDate": [
+          "2021-06-15",
+          {
+            "tag": "MonthEnd"
+          },
+          "2060-12-01"
+        ]
+      },
+      "tag": "PatternInterval"
+    },
+    "fees": {
+      "\u4fe1\u6258\u8d39\u7528": {
+        "feeStmt": [
+          {
+            "contents": [
+              "2021-07-26",
+              0,
+              10,
+              0,
+              "<PayFee:\u4fe1\u6258\u8d39\u7528,0.00>"
+            ],
+            "tag": "ExpTxn"
+          },
+          {
+            "contents": [
+              "2021-08-26",
+              0,
+              0,
+              0,
+              "<PayFee:\u4fe1\u6258\u8d39\u7528,0.00>"
+            ],
+            "tag": "ExpTxn"
+          },
+          {
+            "contents": [
+              "2021-09-26",
+              0,
+              0,
+              0,
+              "<PayFee:\u4fe1\u6258\u8d39\u7528,0.00>"
+            ],
+            "tag": "ExpTxn"
+          }
+        ],
+        "feeStart": "2021-06-15",
+        "feeName": "\u4fe1\u6258\u8d39\u7528",
+        "feeArrears": 0,
+        "feeType": {
+          "contents": 10,
+          "tag": "FixFee"
+        },
+        "feeDueDate": "2021-06-15",
+        "feeLastPaidDay": "2021-09-26",
+        "feeDue": 0
+      }
+    },
+    "collects": [
+      [
+        "CollectedInterest",
+        "\u8d26\u623701"
+      ],
+      [
+        "CollectedPrincipal",
+        "\u8d26\u623701"
+      ],
+      [
+        "CollectedPrepayment",
+        "\u8d26\u623701"
+      ],
+      [
+        "CollectedRecoveries",
+        "\u8d26\u623701"
+      ]
+    ],
+    "custom": null,
+    "name": "Loan Level ",
+    "waterfall": {
+      "DistributionDay Amortizing": [
+        [
+          null,
+          {
+            "contents": [
+              [
+                "\u8d26\u623701"
+              ],
+              [
+                "\u4fe1\u6258\u8d39\u7528"
+              ]
+            ],
+            "tag": "PayFee"
+          }
+        ],
+        [
+          null,
+          {
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "A1"
+              ]
+            ],
+            "tag": "PayInt"
+          }
+        ],
+        [
+          null,
+          {
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "A1"
+              ]
+            ],
+            "tag": "PayPrin"
+          }
+        ],
+        [
+          null,
+          {
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "B"
+              ]
+            ],
+            "tag": "PayPrin"
+          }
+        ],
+        [
+          null,
+          {
+            "contents": [
+              null,
+              "\u8d26\u623701",
+              "B"
+            ],
+            "tag": "PayResidual"
+          }
+        ]
+      ]
+    },
+    "liqProvider": null,
+    "bonds": {
+      "B": {
+        "bndName": "B",
+        "bndRate": 0,
+        "bndLastIntPay": null,
+        "bndOriginInfo": {
+          "originRate": {
+            "denominator": 100,
+            "numerator": 7
+          },
+          "originDate": "2020-01-03",
+          "originBalance": 100
+        },
+        "bndDueInt": 0,
+        "bndType": {
+          "tag": "Equity"
+        },
+        "bndMaturiyDate": null,
+        "bndLastPrinPay": null,
+        "bndInterestInfo": {
+          "contents": [
+            0,
+            "DC_ACT_365F"
+          ],
+          "tag": "Fix"
+        },
+        "bndDueIntDate": null,
+        "bndStmt": [
+          {
+            "contents": [
+              "2021-07-26",
+              0,
+              1402.34,
+              20,
+              0,
+              1422.34,
+              [
+                "<PayPrin:[\"B\"],Just 0.00>",
+                "<PayYield:B>"
+              ]
+            ],
+            "tag": "BondTxn"
+          },
+          {
+            "contents": [
+              "2021-08-26",
+              0,
+              499.92,
+              0,
+              0,
+              499.92,
+              "<PayYield:B>"
+            ],
+            "tag": "BondTxn"
+          },
+          {
+            "contents": [
+              "2021-09-26",
+              0,
+              120516.6,
+              0,
+              0,
+              120516.6,
+              "<PayYield:B>"
+            ],
+            "tag": "BondTxn"
+          }
+        ],
+        "bndBalance": 0,
+        "bndDuePrin": 0
+      },
+      "A1": {
+        "bndName": "A1",
+        "bndRate": 0.07,
+        "bndLastIntPay": null,
+        "bndOriginInfo": {
+          "originRate": {
+            "denominator": 100,
+            "numerator": 7
+          },
+          "originDate": "2020-01-03",
+          "originBalance": 100
+        },
+        "bndDueInt": 0,
+        "bndType": {
+          "tag": "Sequential"
+        },
+        "bndMaturiyDate": null,
+        "bndLastPrinPay": null,
+        "bndInterestInfo": {
+          "contents": [
+            0.08,
+            "DC_ACT_365F"
+          ],
+          "tag": "Fix"
+        },
+        "bndDueIntDate": "2021-07-26",
+        "bndStmt": [
+          {
+            "contents": [
+              "2021-07-26",
+              0,
+              0.78,
+              100,
+              0.07,
+              100.78,
+              [
+                "<PayInt:[\"A1\"],Just 0.00>",
+                "<PayPrin:[\"A1\"],Just 0.00>"
+              ]
+            ],
+            "tag": "BondTxn"
+          }
+        ],
+        "bndBalance": 0,
+        "bndDuePrin": 0
+      }
+    },
+    "overrides": null,
+    "accounts": {
+      "\u8d26\u623701": {
+        "accName": "\u8d26\u623701",
+        "accStmt": [
+          {
+            "contents": [
+              "2021-04-30",
+              516.6,
+              516.6,
+              "<PoolInflow:CollectedInterest>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-04-30",
+              516.6,
+              0,
+              "<PoolInflow:CollectedPrincipal>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-04-30",
+              516.6,
+              0,
+              "<PoolInflow:CollectedPrepayment>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-04-30",
+              516.6,
+              0,
+              "<PoolInflow:CollectedRecoveries>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-05-31",
+              1016.52,
+              499.92,
+              "<PoolInflow:CollectedInterest>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-05-31",
+              1016.52,
+              0,
+              "<PoolInflow:CollectedPrincipal>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-05-31",
+              1016.52,
+              0,
+              "<PoolInflow:CollectedPrepayment>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-05-31",
+              1016.52,
+              0,
+              "<PoolInflow:CollectedRecoveries>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-06-30",
+              1533.12,
+              516.6,
+              "<PoolInflow:CollectedInterest>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-06-30",
+              1533.12,
+              0,
+              "<PoolInflow:CollectedPrincipal>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-06-30",
+              1533.12,
+              0,
+              "<PoolInflow:CollectedPrepayment>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-06-30",
+              1533.12,
+              0,
+              "<PoolInflow:CollectedRecoveries>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-07-26",
+              1523.12,
+              -10,
+              "<SeqPayFee:[\"\\20449\\25176\\36153\\29992\"]>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-07-26",
+              1522.34,
+              -0.78,
+              "<PayInt:[\"A1\"],Nothing>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-07-26",
+              1422.34,
+              -100,
+              "<PayPrin:[\"A1\"],Nothing>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-07-26",
+              1402.34,
+              -20,
+              "<PayPrin:[\"B\"],Nothing>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-07-26",
+              0,
+              -1402.34,
+              "<PayYield:B>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-07-31",
+              499.92,
+              499.92,
+              "<PoolInflow:CollectedInterest>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-07-31",
+              499.92,
+              0,
+              "<PoolInflow:CollectedPrincipal>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-07-31",
+              499.92,
+              0,
+              "<PoolInflow:CollectedPrepayment>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-07-31",
+              499.92,
+              0,
+              "<PoolInflow:CollectedRecoveries>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-08-26",
+              499.92,
+              0,
+              "<SeqPayFee:[\"\\20449\\25176\\36153\\29992\"]>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-08-26",
+              499.92,
+              0,
+              "<PayInt:[\"A1\"],Nothing>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-08-26",
+              499.92,
+              0,
+              "<PayPrin:[\"A1\"],Nothing>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-08-26",
+              499.92,
+              0,
+              "<PayPrin:[\"B\"],Nothing>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-08-26",
+              0,
+              -499.92,
+              "<PayYield:B>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-08-31",
+              516.6,
+              516.6,
+              "<PoolInflow:CollectedInterest>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-08-31",
+              120516.6,
+              120000,
+              "<PoolInflow:CollectedPrincipal>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-08-31",
+              120516.6,
+              0,
+              "<PoolInflow:CollectedPrepayment>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-08-31",
+              120516.6,
+              0,
+              "<PoolInflow:CollectedRecoveries>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-09-26",
+              120516.6,
+              0,
+              "<SeqPayFee:[\"\\20449\\25176\\36153\\29992\"]>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-09-26",
+              120516.6,
+              0,
+              "<PayInt:[\"A1\"],Nothing>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-09-26",
+              120516.6,
+              0,
+              "<PayPrin:[\"A1\"],Nothing>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-09-26",
+              120516.6,
+              0,
+              "<PayPrin:[\"B\"],Nothing>"
+            ],
+            "tag": "AccTxn"
+          },
+          {
+            "contents": [
+              "2021-09-26",
+              0,
+              -120516.6,
+              "<PayYield:B>"
+            ],
+            "tag": "AccTxn"
+          }
+        ],
+        "accType": null,
+        "accInterest": null,
+        "accBalance": 0
+      }
+    },
+    "call": null,
+    "triggers": null,
+    "pool": {
+      "issuanceStat": null,
+      "asOfDate": "2021-03-31",
+      "futureCf": [
+        {
+          "contents": [
+            "2021-04-30",
+            120000,
+            0,
+            516.6,
+            0,
+            0,
+            0,
+            0,
+            0.05
+          ],
+          "tag": "LoanFlow"
+        },
+        {
+          "contents": [
+            "2021-05-31",
+            120000,
+            0,
+            499.92,
+            0,
+            0,
+            0,
+            0,
+            0.05
+          ],
+          "tag": "LoanFlow"
+        },
+        {
+          "contents": [
+            "2021-06-30",
+            120000,
+            0,
+            516.6,
+            0,
+            0,
+            0,
+            0,
+            0.05
+          ],
+          "tag": "LoanFlow"
+        },
+        {
+          "contents": [
+            "2021-07-31",
+            120000,
+            0,
+            499.92,
+            0,
+            0,
+            0,
+            0,
+            0.05
+          ],
+          "tag": "LoanFlow"
+        },
+        {
+          "contents": [
+            "2021-08-31",
+            0,
+            120000,
+            516.6,
+            0,
+            0,
+            0,
+            0,
+            0.05
+          ],
+          "tag": "LoanFlow"
+        }
+      ],
+      "assets": [
+        {
+          "contents": [
+            {
+              "originRate": {
+                "contents": 0.045,
+                "tag": "Fix"
+              },
+              "originTerm": 30,
+              "prinType": {
+                "tag": "I_P"
+              },
+              "tag": "LoanOriginalInfo",
+              "period": "Monthly",
+              "startDate": "2021-02-01",
+              "originBalance": 120
+            },
+            120000,
+            0.05,
+            5,
+            {
+              "tag": "Current"
+            }
+          ],
+          "tag": "PersonalLoan"
+        }
+      ]
+    }
+  },
+  [
+    {
+      "contents": [
+        "2021-04-30",
+        120000,
+        0,
+        516.6,
+        0,
+        0,
+        0,
+        0,
+        0.05
+      ],
+      "tag": "LoanFlow"
+    },
+    {
+      "contents": [
+        "2021-05-31",
+        120000,
+        0,
+        499.92,
+        0,
+        0,
+        0,
+        0,
+        0.05
+      ],
+      "tag": "LoanFlow"
+    },
+    {
+      "contents": [
+        "2021-06-30",
+        120000,
+        0,
+        516.6,
+        0,
+        0,
+        0,
+        0,
+        0.05
+      ],
+      "tag": "LoanFlow"
+    },
+    {
+      "contents": [
+        "2021-07-31",
+        120000,
+        0,
+        499.92,
+        0,
+        0,
+        0,
+        0,
+        0.05
+      ],
+      "tag": "LoanFlow"
+    },
+    {
+      "contents": [
+        "2021-08-31",
+        0,
+        120000,
+        516.6,
+        0,
+        0,
+        0,
+        0,
+        0.05
+      ],
+      "tag": "LoanFlow"
+    }
+  ],
+  [
+    {
+      "contents": [
+        "A1",
+        0,
+        100
+      ],
+      "tag": "BondOutstandingInt"
+    },
+    {
+      "contents": [
+        "B",
+        0,
+        20
+      ],
+      "tag": "BondOutstandingInt"
+    },
+    {
+      "contents": [
+        "A1",
+        0,
+        100
+      ],
+      "tag": "BondOutstanding"
+    },
+    {
+      "contents": [
+        "B",
+        0,
+        20
+      ],
+      "tag": "BondOutstanding"
+    }
+  ],
+  null
+]

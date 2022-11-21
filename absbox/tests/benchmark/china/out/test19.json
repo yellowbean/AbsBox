@@ -1,258 +1,261 @@
 {
-  "dates": {
-    "tag": "PatternInterval",
-    "contents": {
-      "ClosingDate": [
-        "2021-05-01",
-        {
-          "tag": "MonthEnd"
-        },
-        "2060-12-01"
-      ],
-      "CutoffDate": [
-        "2021-03-01",
-        {
-          "tag": "MonthEnd"
-        },
-        "2060-12-01"
-      ],
-      "FirstPayDate": [
-        "2021-06-26",
-        {
-          "tag": "DayOfMonth",
-          "contents": 26
-        },
-        "2060-12-01"
-      ]
-    }
-  },
-  "name": "\u57fa\u4e8e\u5206\u6bb5\u8fdd\u7ea6\u7387\u7684\u4fe1\u7528\u4e8b\u4ef6",
-  "status": {
-    "tag": "Amortizing"
-  },
-  "pool": {
-    "assets": [
-      {
-        "tag": "Mortgage",
-        "contents": [
+  "tag": "MDeal",
+  "contents": {
+    "dates": {
+      "tag": "PatternInterval",
+      "contents": {
+        "ClosingDate": [
+          "2021-05-01",
           {
-            "originBalance": 120,
-            "originRate": {
-              "tag": "Fix",
-              "contents": 0.0485
-            },
-            "originTerm": 30,
-            "period": "Monthly",
-            "startDate": "2020-06-01",
-            "prinType": {
-              "tag": "Even"
-            },
-            "tag": "OriginalInfo"
+            "tag": "MonthEnd"
           },
-          120,
-          0.08,
-          10,
+          "2060-12-01"
+        ],
+        "CutoffDate": [
+          "2021-03-01",
           {
-            "tag": "Current"
-          }
+            "tag": "MonthEnd"
+          },
+          "2060-12-01"
+        ],
+        "FirstPayDate": [
+          "2021-06-26",
+          {
+            "tag": "DayOfMonth",
+            "contents": 26
+          },
+          "2060-12-01"
         ]
       }
-    ],
-    "asOfDate": "2021-03-01",
-    "issuanceStat": {
-      "IssuanceBalance": 120.0
     },
-    "futureCf": null
-  },
-  "bonds": {
-    "A1": {
-      "bndName": "A1",
-      "bndBalance": 100,
-      "bndRate": 0.07,
-      "bndOriginInfo": {
-        "originBalance": 100,
-        "originDate": "2020-01-03",
-        "originRate": 0.07
-      },
-      "bndInterestInfo": {
-        "tag": "Fix",
-        "contents": [
-          0.08,
-          "DC_ACT_365F"
-        ]
-      },
-      "bndType": {
-        "tag": "Sequential"
-      },
-      "bndDuePrin": 0,
-      "bndDueInt": 0,
-      "bndDueIntDate": null
+    "name": "\u57fa\u4e8e\u5206\u6bb5\u8fdd\u7ea6\u7387\u7684\u4fe1\u7528\u4e8b\u4ef6",
+    "status": {
+      "tag": "Amortizing"
     },
-    "B": {
-      "bndName": "B",
-      "bndBalance": 40,
-      "bndRate": 0.08,
-      "bndOriginInfo": {
-        "originBalance": 100,
-        "originDate": "2020-01-03",
-        "originRate": 0.07
-      },
-      "bndInterestInfo": {
-        "tag": "Fix",
-        "contents": [
-          0.08,
-          "DC_ACT_365F"
-        ]
-      },
-      "bndType": {
-        "tag": "Sequential"
-      },
-      "bndDuePrin": 0,
-      "bndDueInt": 0,
-      "bndDueIntDate": null
-    }
-  },
-  "waterfall": {
-    "CleanUp": [],
-    "EndOfPoolCollection": [],
-    "DistributionDay (DealAccelerated Nothing)": [
-      [
-        null,
+    "pool": {
+      "assets": [
         {
-          "tag": "PayInt",
+          "tag": "Mortgage",
           "contents": [
-            "\u8d26\u623701",
-            [
-              "A1"
-            ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayPrinResidual",
-          "contents": [
-            "\u8d26\u623701",
-            [
-              "A1"
-            ]
-          ]
-        }
-      ]
-    ],
-    "DistributionDay Amortizing": [
-      [
-        null,
-        {
-          "tag": "PayInt",
-          "contents": [
-            "\u8d26\u623701",
-            [
-              "A1"
-            ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayInt",
-          "contents": [
-            "\u8d26\u623701",
-            [
-              "B"
-            ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayPrin",
-          "contents": [
-            "\u8d26\u623701",
-            [
-              "A1"
-            ]
-          ]
-        }
-      ],
-      [
-        null,
-        {
-          "tag": "PayPrin",
-          "contents": [
-            "\u8d26\u623701",
-            [
-              "B"
-            ]
-          ]
-        }
-      ]
-    ]
-  },
-  "fees": {},
-  "accounts": {
-    "\u8d26\u623701": {
-      "accBalance": 0,
-      "accName": "\u8d26\u623701",
-      "accType": null,
-      "accInterest": null,
-      "accStmt": null
-    }
-  },
-  "collects": [
-    [
-      "CollectedInterest",
-      "\u8d26\u623701"
-    ],
-    [
-      "CollectedPrincipal",
-      "\u8d26\u623701"
-    ],
-    [
-      "CollectedPrepayment",
-      "\u8d26\u623701"
-    ],
-    [
-      "CollectedRecoveries",
-      "\u8d26\u623701"
-    ]
-  ],
-  "triggers": {
-    "BeginDistributionWF": [
-      [
-        {
-          "tag": "ThresholdRateCurve",
-          "contents": [
-            "Above",
             {
-              "tag": "CumulativePoolDefaultedRate"
+              "originBalance": 120,
+              "originRate": {
+                "tag": "Fix",
+                "contents": 0.0485
+              },
+              "originTerm": 30,
+              "period": "Monthly",
+              "startDate": "2020-06-01",
+              "prinType": {
+                "tag": "Even"
+              },
+              "tag": "OriginalInfo"
             },
+            120,
+            0.08,
+            10,
             {
-              "tag": "ThresholdCurve",
-              "contents": [
-                [
-                  "2021-06-30",
-                  0.02
-                ],
-                [
-                  "2021-08-31",
-                  0.022
-                ]
-              ]
+              "tag": "Current"
             }
           ]
-        },
-        {
-          "tag": "DealStatusTo",
-          "contents": {
-            "tag": "DealAccelerated",
-            "contents": null
-          }
         }
+      ],
+      "asOfDate": "2021-03-01",
+      "issuanceStat": {
+        "IssuanceBalance": 120.0
+      },
+      "futureCf": null
+    },
+    "bonds": {
+      "A1": {
+        "bndName": "A1",
+        "bndBalance": 100,
+        "bndRate": 0.07,
+        "bndOriginInfo": {
+          "originBalance": 100,
+          "originDate": "2020-01-03",
+          "originRate": 0.07
+        },
+        "bndInterestInfo": {
+          "tag": "Fix",
+          "contents": [
+            0.08,
+            "DC_ACT_365F"
+          ]
+        },
+        "bndType": {
+          "tag": "Sequential"
+        },
+        "bndDuePrin": 0,
+        "bndDueInt": 0,
+        "bndDueIntDate": null
+      },
+      "B": {
+        "bndName": "B",
+        "bndBalance": 40,
+        "bndRate": 0.08,
+        "bndOriginInfo": {
+          "originBalance": 100,
+          "originDate": "2020-01-03",
+          "originRate": 0.07
+        },
+        "bndInterestInfo": {
+          "tag": "Fix",
+          "contents": [
+            0.08,
+            "DC_ACT_365F"
+          ]
+        },
+        "bndType": {
+          "tag": "Sequential"
+        },
+        "bndDuePrin": 0,
+        "bndDueInt": 0,
+        "bndDueIntDate": null
+      }
+    },
+    "waterfall": {
+      "CleanUp": [],
+      "EndOfPoolCollection": [],
+      "DistributionDay (DealAccelerated Nothing)": [
+        [
+          null,
+          {
+            "tag": "PayInt",
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "A1"
+              ]
+            ]
+          }
+        ],
+        [
+          null,
+          {
+            "tag": "PayPrinResidual",
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "A1"
+              ]
+            ]
+          }
+        ]
+      ],
+      "DistributionDay Amortizing": [
+        [
+          null,
+          {
+            "tag": "PayInt",
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "A1"
+              ]
+            ]
+          }
+        ],
+        [
+          null,
+          {
+            "tag": "PayInt",
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "B"
+              ]
+            ]
+          }
+        ],
+        [
+          null,
+          {
+            "tag": "PayPrin",
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "A1"
+              ]
+            ]
+          }
+        ],
+        [
+          null,
+          {
+            "tag": "PayPrin",
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "B"
+              ]
+            ]
+          }
+        ]
       ]
-    ]
+    },
+    "fees": {},
+    "accounts": {
+      "\u8d26\u623701": {
+        "accBalance": 0,
+        "accName": "\u8d26\u623701",
+        "accType": null,
+        "accInterest": null,
+        "accStmt": null
+      }
+    },
+    "collects": [
+      [
+        "CollectedInterest",
+        "\u8d26\u623701"
+      ],
+      [
+        "CollectedPrincipal",
+        "\u8d26\u623701"
+      ],
+      [
+        "CollectedPrepayment",
+        "\u8d26\u623701"
+      ],
+      [
+        "CollectedRecoveries",
+        "\u8d26\u623701"
+      ]
+    ],
+    "triggers": {
+      "BeginDistributionWF": [
+        [
+          {
+            "tag": "ThresholdRateCurve",
+            "contents": [
+              "Above",
+              {
+                "tag": "CumulativePoolDefaultedRate"
+              },
+              {
+                "tag": "ThresholdCurve",
+                "contents": [
+                  [
+                    "2021-06-30",
+                    0.02
+                  ],
+                  [
+                    "2021-08-31",
+                    0.022
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "tag": "DealStatusTo",
+            "contents": {
+              "tag": "DealAccelerated",
+              "contents": null
+            }
+          }
+        ]
+      ]
+    }
   }
 }
