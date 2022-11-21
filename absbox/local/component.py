@@ -621,3 +621,77 @@ def mkWaterfall(r, x):
             raise RuntimeError(f"Failed to match :{x}")
     r[_w_tag] = itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
     return mkWaterfall(r, x)
+
+
+def mkAssetRate(x):
+    match x:
+        case ["固定",r]:
+            return mkTag(("Fix",r))
+        case ["浮动",r,{"基准":idx,"利差":spd,"重置频率":p}]:
+            return mkTag(("Floater",[idx,spd,r,freqMap[p],None]))
+
+def mkAmortPlan(x):
+    match x:
+        case "等额本息" | "Level" :
+            return mkTag("Level")
+        case "等额本金" | "Even" :
+            return mkTag("Even")
+        case "先息后本" | "I_P" :
+            return mkTag("I_P")
+        case _ :
+            raise RuntimeError(f"Failed to match AmortPlan {x}")
+
+
+def mkAsset(x):
+    _statusMapping = {"正常": mkTag(("Current")), "违约": mkTag(("Defaulted",None))}
+    match x:
+        case ["按揭贷款"
+            ,{"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm
+                  ,"频率": freq, "类型": _type, "放款日": startDate}
+            ,{"当前余额": currentBalance
+             ,"当前利率": currentRate
+             ,"剩余期限": remainTerms
+             ,"状态": status}]:
+            return mkTag(("Mortgage",[
+                                      {"originBalance": originBalance,
+                                      "originRate": mkAssetRate(originRate),
+                                      "originTerm": originTerm,
+                                      "period": freqMap[freq],
+                                      "startDate": startDate,
+                                      "prinType": mkAmortPlan(_type)
+                                      } |mkTag("OriginalInfo"),
+                                     currentBalance,
+                                     currentRate,
+                                     remainTerms,
+                                     _statusMapping[status]]))
+        case ["贷款"
+            ,{"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm
+                  ,"频率": freq, "类型": _type, "放款日": startDate}
+            ,{"当前余额": currentBalance
+             ,"当前利率": currentRate
+             ,"剩余期限": remainTerms
+             ,"状态": status}]:
+            return mkTag(("PersonalLoan",[
+                                      {"originBalance": originBalance,
+                                      "originRate": mkAssetRate(originRate),
+                                      "originTerm": originTerm,
+                                      "period": freqMap[freq],
+                                      "startDate": startDate,
+                                      "prinType": mkAmortPlan(_type)
+                                      } | mkTag("LoanOriginalInfo"),
+                                     currentBalance,
+                                     currentRate,
+                                     remainTerms,
+                                     _statusMapping[status]]))       
+        case _ :
+            raise RuntimeError(f"Failed to match {x}")
+
+
+def identify_deal_type(x):
+    match x:
+        case {"pool":{"assets":ast}} if ast[0]['tag']=='PersonalLoan':
+            return "LDeal"
+        case {"pool":{"assets":ast}} if ast[0]['tag']=='Mortgage':
+            return "MDeal"
+        case _ :
+            return "MDeal"

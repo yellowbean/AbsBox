@@ -14,48 +14,6 @@ from absbox.local.util import mkTag,DC,mkTs,query,consolStmtByDate,aggStmtByDate
 from absbox.local.component import *
 
 
-def mkAssetRate(x):
-    match x:
-        case ["固定",r]:
-            return mkTag(("Fix",r))
-        case ["浮动",r,{"基准":idx,"利差":spd,"重置频率":p}]:
-            return mkTag(("Floater",[idx,spd,r,freqMap[p],None]))
-
-def mkAmortPlan(x):
-    match x:
-        case "等额本息" | "Level" :
-            return mkTag("Level")
-        case "等额本金" | "Even" :
-            return mkTag("Even")
-        case _ :
-            raise RuntimeError(f"Failed to match AmortPlan {x}")
-
-
-def mkAsset(x):
-    _typeMapping = {"等额本息": "Level", "等额本金": "Even"}
-    _statusMapping = {"正常": mkTag(("Current")), "违约": mkTag(("Defaulted",None))}
-    match x:
-        case ["按揭贷款"
-            ,{"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm
-                  ,"频率": freq, "类型": _type, "放款日": startDate}
-            ,{"当前余额": currentBalance
-             ,"当前利率": currentRate
-             ,"剩余期限": remainTerms
-             ,"状态": status}]:
-            return mkTag(("Mortgage",[
-                                      {"originBalance": originBalance,
-                                      "originRate": mkAssetRate(originRate),
-                                      "originTerm": originTerm,
-                                      "period": freqMap[freq],
-                                      "startDate": startDate,
-                                      "prinType": mkAmortPlan(_type)
-                                      } |mkTag("OriginalInfo"),
-                                     currentBalance,
-                                     currentRate,
-                                     remainTerms,
-                                     _statusMapping[status]
-                    ]))
-
 def mkCf(x):
     if len(x)==0:
         return None
@@ -368,7 +326,10 @@ class 信贷ABS:
             for (_k, _p) in self.流动性支持.items():
                 _providers[_k] = mkLiqProvider(_k, ( _p | {"起始日": self.日期["起息日"]}))
             _r["liqProvider"] = _providers
-        return _r  # ,ensure_ascii=False)
+
+        _dealType = identify_deal_type(_r)
+
+        return mkTag((_dealType,_r))
 
     def _get_bond(self, bn):
         for _bn,_bo in self.债券:
