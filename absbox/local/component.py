@@ -638,6 +638,8 @@ def mkAmortPlan(x):
             return mkTag("Even")
         case "先息后本" | "I_P" :
             return mkTag("I_P")
+        case "等本等费" | "F_P" :
+            return mkTag("F_P")
         case _ :
             raise RuntimeError(f"Failed to match AmortPlan {x}")
 
@@ -688,7 +690,6 @@ def mkAsset(x):
 
 
 def identify_deal_type(x):
-    print(f"matching: {x}")
     match x:
         case {"pool":{"assets":[{'tag':'PersonalLoan'},*rest]}}:
             return "LDeal"
