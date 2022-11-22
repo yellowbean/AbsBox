@@ -19,7 +19,7 @@ def isDate(x):
 class API:
     url: str
     server_info = {}
-    version:str = "0","4","0"
+    version:str = "0","5","0"
 
     def __post_init__(self):
         try:
