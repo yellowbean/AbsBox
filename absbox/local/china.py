@@ -81,9 +81,6 @@ def mkLiq(x):
             return mkTag(("PV", [df, r]))
 
 
-)
-
-
 def mkAssumption(x):
     match x:
         case {"CPR": cpr} if isinstance(cpr,list):

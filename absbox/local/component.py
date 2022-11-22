@@ -714,7 +714,6 @@ def mkCallOptions(x):
             return mkTag(("Or", xs))
         case {"全部满足": xs}:
             return mkTag(("And", xs))
-q
 
 def mkAssumption(x):
     match x:
