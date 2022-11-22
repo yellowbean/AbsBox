@@ -661,7 +661,7 @@ def mkAsset(x):
                                       "period": freqMap[freq],
                                       "startDate": startDate,
                                       "prinType": mkAmortPlan(_type)
-                                      } |mkTag("OriginalInfo"),
+                                      } |mkTag("MortgageOriginalInfo"),
                                      currentBalance,
                                      currentRate,
                                      remainTerms,
@@ -697,3 +697,36 @@ def identify_deal_type(x):
             return "MDeal"
         case _ :
             return "MDeal"
+
+def mkAssumption(x):
+    match x:
+        case {"CPR": cpr} if isinstance(cpr, list):
+            return mkTag(("PrepaymentCPRCurve", cpr))
+        case {"CPR": cpr} :
+            return mkTag(("PrepaymentCPR", cpr))
+        case {"CPR调整": [*cprAdj,eDate]} :
+            return mkTag(("PrepaymentFactors" , mkTs("FactorCurveClosed",[cprAdj,eDate])))
+        case {"CDR": cdr}:
+            return mkTag(("DefaultCDR", cdr))
+        case {"CDR调整": [*cdrAdj,eDate]} :
+            return mkTag(("DefaultFactors" , mkTs("FactorCurveClosed",[cdrAdj,eDate])))
+        case {"回收": (rr, rlag)}:
+            return mkTag(("Recovery", (rr, rlag)))
+        case {"利率": [idx, rate]} if isinstance(rate, float):
+            return mkTag(("InterestRateConstant", [idx, rate]))
+        case {"利率": [idx, *rateCurve]}:
+            return mkTag(("InterestRateCurve", [idx, *rateCurve]))
+        case {"清仓": opts}:
+            return mkTag(("CallWhen",[mkCallOptions(co) for co in opts]))
+        case {"停止": d}:
+            return mkTag(("StopRunBy",d))
+
+def mkPool(x):
+    mapping = {"LDeal":"LPool","MDeal":"MPool"}
+    match x:
+        case {"清单":assets,"封包日":coday}:
+            _pool = {"assets": [mkAsset(a) for a in assets],"asOfDate": coday}
+            _pool_asset_type = identify_deal_type({"pool":_pool})
+            return mkTag((mapping[_pool_asset_type], _pool))
+        case _:
+            raise RuntimeError("mkPool Failed to match {x}")

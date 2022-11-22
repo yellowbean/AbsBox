@@ -5,6 +5,7 @@ from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass
 from absbox.local.util import mkTag,query
+from absbox.local.component import mkPool
 import pandas as pd
 
 #logging.captureWarnings(True)
@@ -59,6 +60,11 @@ class API:
                        ,"assump": mkTag(("Single",deal.read_assump(assumptions)))
                        ,"bondPricing": deal.read_pricing(pricing)}
                    , ensure_ascii=False)
+
+    def build_pool_req(self ,pool ,assumptions=[] ,read=None):
+        return json.dumps({"pool": mkPool(pool)
+                          ,"pAssump": [ mkAssumption(a) for a in assumptions]}
+                          ,ensure_ascii=False)
 
     def validate(self, _r):
         error = []
@@ -199,6 +205,39 @@ class API:
             return __r
         else:
             return result
+
+    def runPool(self, pool, assumptions=[], custom_endpoint=None,read=True):
+        if custom_endpoint:
+            url = f"{self.url}/{custom_endpoint}"
+        else:
+            url = f"{self.url}/run_pool"        
+
+        hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        req = self.build_pool_req(pool, assumptions=assumptions)
+
+        try:
+            logging.info("sending req",datetime.datetime.now())
+            r = requests.post(url, data=req.encode('utf-8'), headers=hdrs, verify=False)
+            logging.info("done req",datetime.datetime.now())
+        except (ConnectionRefusedError, ConnectionError):
+            return None
+
+        if r.status_code != 200:
+            __sending_req = req
+            print(json.loads(__sending_req))
+            raise RuntimeError(r.text)
+        try:
+            result = json.loads(r.text)
+        except JSONDecodeError as e:
+            raise RuntimeError(e)
+
+        if read:
+            result = pd.DataFrame([_['contents'] for _ in result]
+                                                  , columns=["日期", "未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失", "利率"])
+            result = result.set_index("日期")
+            result.index.rename("日期", inplace=True)
+        return result
+
 
 def save(deal,p:str):
     def save_to(b):

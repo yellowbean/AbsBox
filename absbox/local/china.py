@@ -164,29 +164,6 @@ def mkCallOptions(x):
             return mkTag(("And", xs))
 
 
-def mkAssumption(x):
-    match x:
-        case {"CPR": cpr} if isinstance(cpr, list):
-            return mkTag(("PrepaymentCPRCurve", cpr))
-        case {"CPR": cpr} :
-            return mkTag(("PrepaymentCPR", cpr))
-        case {"CPR调整": [*cprAdj,eDate]} :
-            return mkTag(("PrepaymentFactors" , mkTs("FactorCurveClosed",[cprAdj,eDate])))
-        case {"CDR": cdr}:
-            return mkTag(("DefaultCDR", cdr))
-        case {"CDR调整": [*cdrAdj,eDate]} :
-            return mkTag(("DefaultFactors" , mkTs("FactorCurveClosed",[cdrAdj,eDate])))
-        case {"回收": (rr, rlag)}:
-            return mkTag(("Recovery", (rr, rlag)))
-        case {"利率": [idx, rate]} if isinstance(rate, float):
-            return mkTag(("InterestRateConstant", [idx, rate]))
-        case {"利率": [idx, *rateCurve]}:
-            return mkTag(("InterestRateCurve", [idx, *rateCurve]))
-        case {"清仓": opts}:
-            return mkTag(("CallWhen",[mkCallOptions(co) for co in opts]))
-        case {"停止": d}:
-            return mkTag(("StopRunBy",d))
-
 def mkCustom(x):
     match x:
         case {"常量":n}:
@@ -290,8 +267,7 @@ class 信贷ABS:
             "pool":{"assets": [mkAsset(x) for x in self.资产池.get('清单',[])]
                 , "asOfDate": self.日期['封包日']
                 , "issuanceStat": readIssuance(self.资产池)
-                , "futureCf":mkCf(self.资产池.get('归集表', []))
-                },
+                , "futureCf":mkCf(self.资产池.get('归集表', []))},
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
             #"waterfall": {f"DistributionDay {status['tag']}":list(distsflt)
