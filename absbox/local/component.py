@@ -698,6 +698,24 @@ def identify_deal_type(x):
         case _ :
             return "MDeal"
 
+def mkCallOptions(x):
+    match x:
+        case {"资产池余额": bal}:
+            return mkTag(("PoolBalance", bal))
+        case {"债券余额": bal}:
+            return mkTag(("BondBalance", bal))
+        case {"资产池余额剩余比率": factor}:
+            return mkTag(("PoolFactor", factor))
+        case {"债券余额剩余比率": factor}:
+            return mkTag(("BondFactor", factor))
+        case {"指定日之后": d}:
+            return mkTag(("AfterDate", d))
+        case {"任意满足": xs}:
+            return mkTag(("Or", xs))
+        case {"全部满足": xs}:
+            return mkTag(("And", xs))
+q
+
 def mkAssumption(x):
     match x:
         case {"CPR": cpr} if isinstance(cpr, list):
