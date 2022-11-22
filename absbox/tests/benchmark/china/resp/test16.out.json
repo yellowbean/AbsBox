@@ -3366,7 +3366,7 @@
               "prinType": {
                 "tag": "Even"
               },
-              "tag": "OriginalInfo",
+              "tag": "MortgageOriginalInfo",
               "period": "Monthly",
               "startDate": "2021-02-01",
               "originBalance": 120

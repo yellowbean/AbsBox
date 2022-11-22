@@ -49,7 +49,7 @@
               "prinType": {
                 "tag": "Level"
               },
-              "tag": "OriginalInfo"
+              "tag": "MortgageOriginalInfo"
             },
             7596981800,
             0.0495,
@@ -74,7 +74,7 @@
               "prinType": {
                 "tag": "Even"
               },
-              "tag": "OriginalInfo"
+              "tag": "MortgageOriginalInfo"
             },
             2397902000.0,
             0.0495,

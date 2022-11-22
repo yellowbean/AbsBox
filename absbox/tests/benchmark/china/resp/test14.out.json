@@ -61730,7 +61730,7 @@
               "prinType": {
                 "tag": "Level"
               },
-              "tag": "OriginalInfo",
+              "tag": "MortgageOriginalInfo",
               "period": "Monthly",
               "startDate": "2021-05-01",
               "originBalance": 120

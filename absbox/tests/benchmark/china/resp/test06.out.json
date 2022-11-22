@@ -24225,7 +24225,7 @@
               "prinType": {
                 "tag": "Even"
               },
-              "tag": "OriginalInfo",
+              "tag": "MortgageOriginalInfo",
               "period": "Monthly",
               "startDate": "2020-06-01",
               "originBalance": 120
@@ -24256,7 +24256,7 @@
               "prinType": {
                 "tag": "Even"
               },
-              "tag": "OriginalInfo",
+              "tag": "MortgageOriginalInfo",
               "period": "Monthly",
               "startDate": "2020-06-01",
               "originBalance": 0

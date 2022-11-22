@@ -39494,7 +39494,7 @@
               "prinType": {
                 "tag": "Level"
               },
-              "tag": "OriginalInfo",
+              "tag": "MortgageOriginalInfo",
               "period": "Monthly",
               "startDate": "2020-06-01",
               "originBalance": 18000000000
