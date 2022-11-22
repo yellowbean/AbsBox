@@ -5,7 +5,7 @@ from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass
 from absbox.local.util import mkTag,query
-from absbox.local.component import mkPool
+from absbox.local.component import mkPool,mkAssumption
 import pandas as pd
 
 #logging.captureWarnings(True)
