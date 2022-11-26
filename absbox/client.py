@@ -4,22 +4,18 @@ import requests
 from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass
-from absbox.local.util import mkTag,query
+from absbox.local.util import mkTag,query,isDate
 from absbox.local.component import mkPool,mkAssumption
 import pandas as pd
 
-#logging.captureWarnings(True)
 urllib3.disable_warnings()
-
-def isDate(x):
-    return re.match(r"\d{4}\-\d{2}\-\d{2}",x)
-
 
 @dataclass
 class API:
     url: str
     server_info = {}
-    version:str = "0","5","0"
+    version:str = "0","5","1"
+    hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
     def __post_init__(self):
         try:
@@ -37,31 +33,20 @@ class API:
             logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['version']} , pls upgrade your api package by: pip -U absbox")
             return
 
-    def build_req(self
-                  ,deal
-                  ,assumptions
-                  ,pricing=None
-                  ,read=None):
-
-        if assumptions is None:
-            return json.dumps({"deal": deal.json
-                       ,"assump": None
-                       ,"bondPricing": deal.read_pricing(pricing) if (pricing is not None) else None}
-                   , ensure_ascii=False)
-
+    def build_req(self, deal, assumptions, pricing=None, read=None):
+        _assump = None 
         if isinstance(assumptions, dict):
-            return json.dumps({"deal": deal.json
-                       ,"assump": mkTag(("Multiple"
-                                          ,{ scenarioName:deal.read_assump(a) for (scenarioName,a) in assumptions.items()}))
-                       ,"bondPricing": deal.read_pricing(pricing)}
-                   , ensure_ascii=False)
+            _assump = mkTag(("Multiple", { scenarioName:deal.read_assump(a) for (scenarioName,a) in assumptions.items()}))
+        elif isinstance(assumptions, list) :   
+            _assump = mkTag(("Single",deal.read_assump(assumptions)))
         else:
-            return json.dumps({"deal": deal.json
-                       ,"assump": mkTag(("Single",deal.read_assump(assumptions)))
-                       ,"bondPricing": deal.read_pricing(pricing)}
-                   , ensure_ascii=False)
+            _assump = None
+        return json.dumps({"deal": deal.json
+                          ,"assump": _assump
+                          ,"bondPricing": deal.read_pricing(pricing) if (pricing is not None) else None}
+                          , ensure_ascii=False)
 
-    def build_pool_req(self ,pool ,assumptions=[] ,read=None):
+    def build_pool_req(self, pool, assumptions=[], read=None):
         return json.dumps({"pool": mkPool(pool)
                           ,"pAssump": [ mkAssumption(a) for a in assumptions]}
                           ,ensure_ascii=False)
@@ -151,24 +136,24 @@ class API:
         if isinstance(assumptions,str):
             assumptions = pickle.load(assumptions)
 
+        # if run req is a multi-scenario run
         if assumptions:
             multi_run_flag = isinstance(assumptions, dict)
         else:
             multi_run_flag = False 
-            
+        
+        # overwrite any custom_endpoint
         if custom_endpoint:
             url = f"{self.url}/{custom_endpoint}"
         else:
             url = f"{self.url}/run_deal"
-
-        hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
         if isinstance(deal, str):
             with open(deal,'rb') as _f:
                 c = _f.read()
                 deal = pickle.loads(c)
 
-
+        # construst request
         req = self.build_req(deal, assumptions, pricing)
 
         #validate deal
@@ -176,60 +161,21 @@ class API:
         if not deal_validate:
             return deal_validate,err,warn
 
-        try:
-            logging.info("sending req",datetime.datetime.now())
-            r = requests.post(url
-                              , data=req.encode('utf-8')
-                              , headers=hdrs
-                              , verify=False)
-            logging.info("done req",datetime.datetime.now())
-        except (ConnectionRefusedError, ConnectionError):
-            return None
+        result = self._send_req(req)
 
-        if r.status_code != 200:
-            __sending_req = req
-            print(json.loads(__sending_req))
-            raise RuntimeError(r.text)
-        try:
-            result = json.loads(r.text)
-        except JSONDecodeError as e:
-            raise RuntimeError(e)
-
-        t_reading_s = datetime.datetime.now()
         if read:
             if multi_run_flag:
-                __r = { n:deal.read(_r,position=position) for (n,_r) in result.items()}
+                return { n:deal.read(_r,position=position) for (n,_r) in result.items()}
             else:
-                __r = deal.read(result,position=position)
-            t_reading_e = datetime.datetime.now()
-            return __r
+                return deal.read(result,position=position)
         else:
             return result
 
-    def runPool(self, pool, assumptions=[], custom_endpoint=None,read=True):
-        if custom_endpoint:
-            url = f"{self.url}/{custom_endpoint}"
-        else:
-            url = f"{self.url}/run_pool"        
-
-        hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+    def runPool(self, pool, assumptions=[],read=True):
+        url = f"{self.url}/run_pool"        
         req = self.build_pool_req(pool, assumptions=assumptions)
 
-        try:
-            logging.info("sending req",datetime.datetime.now())
-            r = requests.post(url, data=req.encode('utf-8'), headers=hdrs, verify=False)
-            logging.info("done req",datetime.datetime.now())
-        except (ConnectionRefusedError, ConnectionError):
-            return None
-
-        if r.status_code != 200:
-            __sending_req = req
-            print(json.loads(__sending_req))
-            raise RuntimeError(r.text)
-        try:
-            result = json.loads(r.text)
-        except JSONDecodeError as e:
-            raise RuntimeError(e)
+        result = self._send_req(req)
 
         if read:
             result = pd.DataFrame([_['contents'] for _ in result]
@@ -237,6 +183,22 @@ class API:
             result = result.set_index("日期")
             result.index.rename("日期", inplace=True)
         return result
+    
+    def _send_req(self,_req)->dict:
+        try:
+            r = requests.post(url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False)
+        except (ConnectionRefusedError, ConnectionError):
+            return None
+
+        if r.status_code != 200:
+            __sending_req = req
+            print(json.loads(__sending_req))
+            raise RuntimeError(r.text)
+        try:
+            result = json.loads(r.text)
+            return result
+        except JSONDecodeError as e:
+            raise RuntimeError(e)        
 
 
 def save(deal,p:str):

@@ -19,6 +19,9 @@ def mkTag(x):
             return {"tag": tagName}
 
 
+def isDate(x):
+    return re.match(r"\d{4}\-\d{2}\-\d{2}",x)
+
 def mkTs(n, vs):
     return mkTag((n, vs))
 
