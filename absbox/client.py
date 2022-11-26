@@ -190,8 +190,7 @@ class API:
             return None
 
         if r.status_code != 200:
-            __sending_req = req
-            print(json.loads(__sending_req))
+            print(json.loads(_req))
             raise RuntimeError(r.text)
         try:
             result = json.loads(r.text)
