@@ -142,10 +142,9 @@ class API:
             multi_run_flag = False 
         
         # overwrite any custom_endpoint
+        url = f"{self.url}/run_deal"
         if custom_endpoint:
             url = f"{self.url}/{custom_endpoint}"
-        else:
-            url = f"{self.url}/run_deal"
 
         if isinstance(deal, str):
             with open(deal,'rb') as _f:
@@ -160,7 +159,7 @@ class API:
         if not deal_validate:
             return deal_validate,err,warn
 
-        result = self._send_req(req)
+        result = self._send_req(req,url)
 
         if read:
             if multi_run_flag:
@@ -174,7 +173,7 @@ class API:
         url = f"{self.url}/run_pool"        
         req = self.build_pool_req(pool, assumptions=assumptions)
 
-        result = self._send_req(req)
+        result = self._send_req(req,url)
 
         if read:
             result = pd.DataFrame([_['contents'] for _ in result]
@@ -183,9 +182,9 @@ class API:
             result.index.rename("日期", inplace=True)
         return result
     
-    def _send_req(self,_req)->dict:
+    def _send_req(self,_req,_url)->dict:
         try:
-            r = requests.post(self.url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False)
+            r = requests.post(_url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False)
         except (ConnectionRefusedError, ConnectionError):
             return None
 

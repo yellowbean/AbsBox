@@ -12,12 +12,6 @@ datePattern = {"月末":"MonthEnd"
               ,"每月":"DayOfMonth"
               ,"每周":"DayOfWeek"}
 
-class 频率(Enum):
-    每月 = 12
-    每季度 = 4
-    每半年 = 2
-    每年 = 1
-
 
 freqMap = {"每月": "Monthly"
     , "每季度": "Quarterly"
@@ -644,7 +638,7 @@ def mkAssetRate(x):
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkAssetRate")
 
-def mkAmortPlan(x):
+def mkAmortPlan(x)->dict:
     match x:
         case "等额本息" | "Level" :
             return mkTag("Level")
@@ -699,6 +693,25 @@ def mkAsset(x):
                                      currentRate,
                                      remainTerms,
                                      _statusMapping[status]]))       
+        case ["分期"
+            ,{"放款金额": originBalance, "放款费率": originRate, "初始期限": originTerm
+                  ,"频率": freq, "类型": _type, "放款日": startDate}
+            ,{"当前余额": currentBalance
+             ,"剩余期限": remainTerms
+             ,"状态": status}]:
+            return mkTag(("Installment",[
+                                      {"originBalance": originBalance,
+                                      "originRate": mkAssetRate(originRate),
+                                      "originTerm": originTerm,
+                                      "period": freqMap[freq],
+                                      "startDate": startDate,
+                                      "prinType": mkAmortPlan(_type)
+                                      } | mkTag("LoanOriginalInfo"),
+                                     currentBalance,
+                                     remainTerms,
+                                     _statusMapping[status]]))       
+ 
+
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 
@@ -709,6 +722,8 @@ def identify_deal_type(x):
             return "LDeal"
         case {"pool":{"assets":[{'tag':'Mortgage'},*rest]}} :
             return "MDeal"
+        case {"pool":{"assets":[{'tag':'Installment'},*rest]}} :
+            return "IDeal"
         case _ :
             return "MDeal"
 
@@ -758,7 +773,7 @@ def mkAssumption(x) -> dict:
             raise RuntimeError(f"Failed to match {x}:Assumption")
 
 def mkPool(x):
-    mapping = {"LDeal":"LPool","MDeal":"MPool"}
+    mapping = {"LDeal":"LPool","MDeal":"MPool","IDeal":"IPool"}
     match x:
         case {"清单":assets,"封包日":coday}:
             _pool = {"assets": [mkAsset(a) for a in assets],"asOfDate": coday}
