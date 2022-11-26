@@ -185,7 +185,7 @@ class API:
     
     def _send_req(self,_req)->dict:
         try:
-            r = requests.post(url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False)
+            r = requests.post(self.url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False)
         except (ConnectionRefusedError, ConnectionError):
             return None
 
