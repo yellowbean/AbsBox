@@ -154,20 +154,6 @@ def mk(x):
         case ["清仓回购", calls]:
             return mkCall(calls)
 
-def readStatus(s):
-    if "," in s:
-        return s.split(",")[1]
-    else:
-        return mkTag("Amortizing")
-
-class 时间点(Enum):
-    回收后 = "BeginCollectionWF"
-    回收动作后 = "EndCollectionWF"
-    分配前 = "BeginDistributionWF"
-    分配后 = "EndDistributionWF"
-
-
-
 
 @dataclass
 class 信贷ABS:
@@ -184,7 +170,6 @@ class 信贷ABS:
     自定义: dict = None
     触发事件: dict = None
     状态:str = "摊销"
-
 
     @classmethod
     def load(cls,p):

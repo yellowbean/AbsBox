@@ -33,7 +33,7 @@ class API:
             logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['version']} , pls upgrade your api package by: pip -U absbox")
             return
 
-    def build_req(self, deal, assumptions, pricing=None, read=None):
+    def build_req(self, deal, assumptions, pricing=None, read=None) -> str:
         _assump = None 
         if isinstance(assumptions, dict):
             _assump = mkTag(("Multiple", { scenarioName:deal.read_assump(a) for (scenarioName,a) in assumptions.items()}))
@@ -46,12 +46,12 @@ class API:
                           ,"bondPricing": deal.read_pricing(pricing) if (pricing is not None) else None}
                           , ensure_ascii=False)
 
-    def build_pool_req(self, pool, assumptions=[], read=None):
+    def build_pool_req(self, pool, assumptions=[], read=None) -> str:
         return json.dumps({"pool": mkPool(pool)
                           ,"pAssump": [ mkAssumption(a) for a in assumptions]}
                           ,ensure_ascii=False)
 
-    def validate(self, _r):
+    def validate(self, _r) -> list:
         error = []
         warning = []
         _r = json.loads(_r)
@@ -69,7 +69,6 @@ class API:
         # validatin waterfall
         for wn,wa in _w.items():
             for idx,action in enumerate(wa):
-                #print(action)
                 action = action[1]
                 match action['tag']:
                     case 'PayFeeBy':

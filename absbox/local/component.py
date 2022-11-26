@@ -323,6 +323,8 @@ def mkRateReset(x):
             return mkTag(("ByInterval", [freqMap[interval], None]))
         case {"重置月份": monthOfYear}:
             return mkTag(("MonthOfYear", monthOfYear))
+        case _:
+            raise RuntimeError(f"Failed to match:{x}: mkRateReset")
 
       
 
@@ -379,7 +381,7 @@ def mkBnd(bn,x):
                           , "bndDueIntDate": None }}
 
         case _:
-            raise RuntimeError(f"Failed to match bond:{bn},{x}")
+            raise RuntimeError(f"Failed to match bond:{bn},{x}:mkBnd")
 
 def mkLiqMethod(x):
     match x:
@@ -389,7 +391,8 @@ def mkLiqMethod(x):
             return mkTag(("BalanceFactor2",[a,b,c]))
         case ["贴现|违约",a,b]:
             return mkTag(("PV",[a,b]))
-
+        case _ :
+            raise RuntimeError(f"Failed to match {x}:mkLiqMethod")
 
 
 def mkFeeCapType(x):
@@ -398,11 +401,17 @@ def mkFeeCapType(x):
             return mkTag(("DuePct",pct))
         case {"应计费用上限": amt}:
             return mkTag(("DueCapAmt",amt))
+        case _ :
+            raise RuntimeError(f"Failed to match {x}:mkFeeCapType")
+
 
 def mkPDA(x):
     match x:
         case {"公式": ds}:
             return mkTag(("DS",mkDs(ds)))
+        case _ :
+            raise RuntimeError(f"Failed to match {x}:mkPDA")
+
 
 def mkAccountCapType(x):
     match x:
@@ -410,6 +419,9 @@ def mkAccountCapType(x):
             return mkTag(("DuePct",pct))
         case {"金额上限": amt}:
             return mkTag(("DueCapAmt",amt))
+        case _ :
+            raise RuntimeError(f"Failed to match {x}:mkAccountCapType")
+            
 
 def mkTransferLimit(x):
     match x:
@@ -422,7 +434,7 @@ def mkTransferLimit(x):
         case {"公式": formula}:
             return mkTag(("DS",mkDs(formula)))
         case _:
-            raise RuntimeError(f"Failed to match :{x}")
+            raise RuntimeError(f"Failed to match :{x}:mkTransferLimit")
 
 
 
@@ -475,7 +487,7 @@ def mkAction(x):
         case ["流动性支持报酬",source, target]| ["liqRepayResidual",source, target]:
             return mkTag(("LiqYield",[None, source, target]))
         case _:
-            raise RuntimeError(f"Failed to match :{x}")
+            raise RuntimeError(f"Failed to match :{x}:mkAction")
 
 
 def mkWaterfall2(x):
@@ -503,7 +515,7 @@ def mkStatus(x):
         case "结束":
             return mkTag(("Ended"))
         case _:
-            raise RuntimeError(f"Failed to match :{x}")
+            raise RuntimeError(f"Failed to match :{x}:mkStatus")
 
 def mkWhenTrigger(x):
     match x:
@@ -516,7 +528,7 @@ def mkWhenTrigger(x):
         case "分配后":
             return "EndDistributionWF"
         case _:
-            raise RuntimeError(f"Failed to match :{x}")
+            raise RuntimeError(f"Failed to match :{x}:mkWhenTrigger")
 
 
 def mkThreshold(x):
@@ -530,7 +542,7 @@ def mkThreshold(x):
         case "<=":
             return "EqBelow"
         case _:
-            raise RuntimeError(f"Failed to match :{x}")
+            raise RuntimeError(f"Failed to match :{x}:mkThreshold")
 
 def _rateTypeDs(x):
     h = x[0]
@@ -567,7 +579,7 @@ def mkTrigger(x):
         case ["一直",b]:
             return mkTag(("Always",b))
         case _:
-            raise RuntimeError(f"Failed to match :{x}")
+            raise RuntimeError(f"Failed to match :{x}:mkTrigger")
 
 
 def mkTriggerEffect(x):
@@ -581,7 +593,7 @@ def mkTriggerEffect(x):
         case ["结果",*efs]:
             return mkTag(("TriggerEffects",[mkTriggerEffect(e) for e in efs]))
         case _:
-            raise RuntimeError(f"Failed to match :{x}")
+            raise RuntimeError(f"Failed to match :{x}:mkTriggerEffect")
 
 #def mkActionWhen(x):
 #    match x:
@@ -618,7 +630,7 @@ def mkWaterfall(r, x):
         case "回款日" | "回款后" :
             _w_tag = f"EndOfPoolCollection"
         case _:
-            raise RuntimeError(f"Failed to match :{x}")
+            raise RuntimeError(f"Failed to match :{x}:mkWaterfall")
     r[_w_tag] = itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
     return mkWaterfall(r, x)
 
@@ -629,6 +641,8 @@ def mkAssetRate(x):
             return mkTag(("Fix",r))
         case ["浮动",r,{"基准":idx,"利差":spd,"重置频率":p}]:
             return mkTag(("Floater",[idx,spd,r,freqMap[p],None]))
+        case _ :
+            raise RuntimeError(f"Failed to match {x}:mkAssetRate")
 
 def mkAmortPlan(x):
     match x:
@@ -641,7 +655,7 @@ def mkAmortPlan(x):
         case "等本等费" | "F_P" :
             return mkTag("F_P")
         case _ :
-            raise RuntimeError(f"Failed to match AmortPlan {x}")
+            raise RuntimeError(f"Failed to match AmortPlan {x}:mkAmortPlan")
 
 
 def mkAsset(x):
@@ -686,7 +700,7 @@ def mkAsset(x):
                                      remainTerms,
                                      _statusMapping[status]]))       
         case _ :
-            raise RuntimeError(f"Failed to match {x}")
+            raise RuntimeError(f"Failed to match {x}:mkAsset")
 
 
 def identify_deal_type(x):
@@ -714,8 +728,11 @@ def mkCallOptions(x):
             return mkTag(("Or", xs))
         case {"全部满足": xs}:
             return mkTag(("And", xs))
+        case _ :
+            raise RuntimeError(f"Failed to match {x}:mkCallOptions")
+            
 
-def mkAssumption(x):
+def mkAssumption(x) -> dict:
     match x:
         case {"CPR": cpr} if isinstance(cpr, list):
             return mkTag(("PrepaymentCPRCurve", cpr))
@@ -737,6 +754,8 @@ def mkAssumption(x):
             return mkTag(("CallWhen",[mkCallOptions(co) for co in opts]))
         case {"停止": d}:
             return mkTag(("StopRunBy",d))
+        case _ :
+            raise RuntimeError(f"Failed to match {x}:Assumption")
 
 def mkPool(x):
     mapping = {"LDeal":"LPool","MDeal":"MPool"}
@@ -746,4 +765,4 @@ def mkPool(x):
             _pool_asset_type = identify_deal_type({"pool":_pool})
             return mkTag((mapping[_pool_asset_type], _pool))
         case _:
-            raise RuntimeError("mkPool Failed to match {x}")
+            raise RuntimeError(f"Failed to match {x}:mkPool")
