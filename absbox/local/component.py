@@ -750,7 +750,9 @@ def mkCallOptions(x):
 def mkAssumption(x) -> dict:
     match x:
         case {"CPR": cpr} if isinstance(cpr, list):
-            return mkTag(("PrepaymentCPRCurve", cpr))
+            return mkTag(("PrepaymentVec", cpr))
+        case {"CDR": cdr} if isinstance(cdr, list):
+            return mkTag(("DefaultVec", cdr))
         case {"CPR": cpr} :
             return mkTag(("PrepaymentCPR", cpr))
         case {"CPR调整": [*cprAdj,eDate]} :
