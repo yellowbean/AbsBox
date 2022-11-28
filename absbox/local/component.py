@@ -774,6 +774,18 @@ def mkAssumption(x) -> dict:
         case _ :
             raise RuntimeError(f"Failed to match {x}:Assumption")
 
+def mkAssumpList(xs):
+    return [mkAssumption(x) for x in xs]
+
+def mkAssumption2(x) -> dict:
+    match x:
+        case (assetAssumpList,dealAssump):
+            return mkTag(("ByIndex",[[(ids,mkAssumpList(aps)) for ids,aps in assetAssumpList], mkAssumpList(dealAssump)]))
+        case xs if isinstance(xs, list):
+            return mkTag(("PoolLevel", mkAssumpList(xs)))
+        case _:
+            raise RuntimeError(f"Failed to match {x}:mkAssumption2")
+
 def mkPool(x):
     mapping = {"LDeal":"LPool","MDeal":"MPool","IDeal":"IPool"}
     match x:

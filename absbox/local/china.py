@@ -81,29 +81,6 @@ def mkLiq(x):
             return mkTag(("PV", [df, r]))
 
 
-def mkAssumption(x):
-    match x:
-        case {"CPR": cpr} if isinstance(cpr,list):
-            return mkTag(("PrepaymentCPRCurve", cpr))
-        case {"CPR": cpr} :
-            return mkTag(("PrepaymentCPR", cpr))
-        case {"CPR调整": [*cprAdj,eDate]} :
-            return mkTag(("PrepaymentFactors" , mkTs("FactorCurveClosed",[cprAdj,eDate])))
-        case {"CDR": cdr}:
-            return mkTag(("DefaultCDR", cdr))
-        case {"CDR调整": [*cdrAdj,eDate]} :
-            return mkTag(("DefaultFactors" , mkTs("FactorCurveClosed",[cdrAdj,eDate])))
-        case {"回收": (rr, rlag)}:
-            return mkTag(("Recovery", (rr, rlag)))
-        case {"利率": [idx, rate]} if isinstance(rate, float):
-            return mkTag(("InterestRateConstant", [idx, rate]))
-        case {"利率": [idx, *rateCurve]}:
-            return mkTag(("InterestRateCurve", [idx, *rateCurve]))
-        case {"清仓": opts}:
-            return mkTag(("CallWhen",[mkCallOptions(co) for co in opts]))
-        case {"停止": d}:
-            return mkTag(("StopRunBy",d))
-
 def mkAccTxn(xs):
     "AccTxn T.Day Balance Amount Comment"
     if xs is None:

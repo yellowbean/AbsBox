@@ -5,7 +5,7 @@ from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass
 from absbox.local.util import mkTag,query,isDate
-from absbox.local.component import mkPool,mkAssumption
+from absbox.local.component import mkPool,mkAssumption,mkAssumption2
 import pandas as pd
 
 urllib3.disable_warnings()
@@ -36,9 +36,9 @@ class API:
     def build_req(self, deal, assumptions, pricing=None, read=None) -> str:
         _assump = None 
         if isinstance(assumptions, dict):
-            _assump = mkTag(("Multiple", { scenarioName:deal.read_assump(a) for (scenarioName,a) in assumptions.items()}))
-        elif isinstance(assumptions, list) :   
-            _assump = mkTag(("Single",deal.read_assump(assumptions)))
+            _assump = mkTag(("Multiple", { scenarioName:mkAssumption2(a) for (scenarioName,a) in assumptions.items()}))
+        elif isinstance(assumptions, list) or  isinstance(assumptions, tuple):   
+            _assump = mkTag(("Single",mkAssumption2(assumptions)))
         else:
             _assump = None
         return json.dumps({"deal": deal.json
@@ -48,7 +48,7 @@ class API:
 
     def build_pool_req(self, pool, assumptions=[], read=None) -> str:
         return json.dumps({"pool": mkPool(pool)
-                          ,"pAssump": [ mkAssumption(a) for a in assumptions]}
+                          ,"pAssump": mkAssumption2(assumptions)}
                           ,ensure_ascii=False)
 
     def validate(self, _r) -> list:
@@ -180,6 +180,7 @@ class API:
                                                   , columns=["日期", "未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失", "利率"])
             result = result.set_index("日期")
             result.index.rename("日期", inplace=True)
+            result.sort_index(inplace=True)
         return result
     
     def _send_req(self,_req,_url)->dict:
