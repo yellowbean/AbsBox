@@ -779,7 +779,7 @@ def mkAssumpList(xs):
 
 def mkAssumption2(x) -> dict:
     match x:
-        case (assetAssumpList,dealAssump):
+        case (assetAssumpList,dealAssump) if isinstance(x,tuple):
             return mkTag(("ByIndex",[[(ids,mkAssumpList(aps)) for ids,aps in assetAssumpList], mkAssumpList(dealAssump)]))
         case xs if isinstance(xs, list):
             return mkTag(("PoolLevel", mkAssumpList(xs)))
