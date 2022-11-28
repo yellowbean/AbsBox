@@ -3,13 +3,20 @@ import functools
 import itertools,re
 from enum import Enum
 import numpy as np
-
+from functools import reduce
 
 def query(d,p):
     if len(p)==1:
         return d[p[0]]
     else:
-        return query(d[p[0]],p[1:])
+        if p[0] in d:
+            return query(d[p[0]],p[1:])
+        else:
+            return None
+
+def flat(xss) -> list:
+    return reduce(lambda xs, ys: xs + ys, xss)
+
 
 def mkTag(x):
     match x:

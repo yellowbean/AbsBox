@@ -4,7 +4,7 @@ import requests
 from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass
-from absbox.local.util import mkTag,query,isDate
+from absbox.local.util import mkTag,query,isDate,flat
 from absbox.local.component import mkPool,mkAssumption,mkAssumption2
 import pandas as pd
 
@@ -33,7 +33,7 @@ class API:
             logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['version']} , pls upgrade your api package by: pip -U absbox")
             return
 
-    def build_req(self, deal, assumptions, pricing=None, read=None) -> str:
+    def build_req(self, deal, assumptions=None, pricing=None, read=None) -> str:
         _assump = None 
         if isinstance(assumptions, dict):
             _assump = mkTag(("Multiple", { scenarioName:mkAssumption2(a) for (scenarioName,a) in assumptions.items()}))
@@ -51,17 +51,52 @@ class API:
                           ,"pAssump": mkAssumption2(assumptions)}
                           ,ensure_ascii=False)
 
+    def _validate_assump(self,x,e,w):
+        a = x['assump']
+        asset_ids = set(range(len(query(x,['deal','contents','pool','assets']))))
+        match a:
+            case {'tag':'Single',
+                'contents':{'tag':'ByIndex',
+                            'contents':(assumps,_)}}:
+                _ids = set(flat([ assump[0] for assump in assumps ]))
+                if not _ids.issubset(asset_ids):
+                    e.append(f"Not Valid Asset ID:{_ids - asset_ids}")
+                missing_asset_id = asset_ids - _ids
+                if len(missing_asset_id)>0:
+                    w.append(f"Missing Asset to set assumption:{missing_asset_id}")            
+            case {'tag':'Multiple',
+                'contents':scenarioMap}:
+                for k,v in scenarioMap.items():
+                    _ids = set(flat([ _a[0] for _a in v['contents'][0]]))
+                    if not _ids.issubset(asset_ids):
+                        e.append(f"Scenario:{k},Not Valid Asset ID:{_ids - asset_ids}")
+                    missing_asset_id = asset_ids - _ids
+                    if len(missing_asset_id)>0:
+                        w.append(f"Scenario:{k},Missing Asset to set assumption:{missing_asset_id}")
+            case {'tag':'Single','contents':{'tag':'PoolLevel'}}:
+                return [True,e,w]
+            case {'tag':'Multiple','contents':{'tag':'PoolLevel'}}:
+                return [True,e,w]
+            case None:
+                return [True,e,w]
+            case _ :
+                raise RuntimeError(f"Failed to match:{a}")
+        if len(e)>0:
+            return [False,e,w]
+        return [True,e,w]
+
     def validate(self, _r) -> list:
         error = []
         warning = []
         _r = json.loads(_r)
-        _deal_key = 'deal' if 'deal' in _r else '_deal'
-        __d = _r[_deal_key]
+        __d = _r['deal']
         _d = __d['contents']
         valid_acc = set(_d['accounts'].keys())
         valid_bnd = set(_d['bonds'].keys())
         valid_fee = set(_d['fees'].keys())
         _w = _d['waterfall']
+
+        _,error,warning = self._validate_assump(_r,error,warning)
 
         if _w is None:
             raise RuntimeError("Waterfall is None")
