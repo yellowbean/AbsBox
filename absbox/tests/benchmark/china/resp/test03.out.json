@@ -4,31 +4,26 @@
       "tag": "Amortizing"
     },
     "dates": {
-      "contents": {
-        "FirstPayDate": [
+      "contents": [
+        "2021-03-01",
+        "2021-10-15",
+        null,
+        "2060-12-01",
+        [
+          "2021-10-15",
+          {
+            "tag": "MonthEnd"
+          }
+        ],
+        [
           "2021-11-26",
           {
             "contents": 26,
             "tag": "DayOfMonth"
-          },
-          "2060-12-01"
-        ],
-        "CutoffDate": [
-          "2021-03-01",
-          {
-            "tag": "MonthEnd"
-          },
-          "2060-12-01"
-        ],
-        "ClosingDate": [
-          "2021-10-15",
-          {
-            "tag": "MonthEnd"
-          },
-          "2060-12-01"
+          }
         ]
-      },
-      "tag": "PatternInterval"
+      ],
+      "tag": "PreClosingDates"
     },
     "fees": {
       "\u670d\u52a1\u5546\u8d39\u7528": {
@@ -327,7 +322,7 @@
         "accStmt": [
           {
             "contents": [
-              "2021-04-30",
+              "2021-10-15",
               0,
               0,
               "<PoolInflow:CollectedInterest>"
@@ -336,232 +331,16 @@
           },
           {
             "contents": [
-              "2021-04-30",
-              18,
-              18,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-04-30",
-              18,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-04-30",
-              18,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-05-31",
-              18,
-              0,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-05-31",
-              36,
-              18,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-05-31",
-              36,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-05-31",
-              36,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-06-30",
-              36,
-              0,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-06-30",
-              54,
-              18,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-06-30",
-              54,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-06-30",
-              54,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-31",
-              54,
-              0,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-31",
-              72,
-              18,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-31",
-              72,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-31",
-              72,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-31",
-              72,
-              0,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-31",
-              90,
-              18,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-31",
-              90,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-31",
-              90,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-30",
-              90,
-              0,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-30",
-              108,
-              18,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-30",
-              108,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-30",
-              108,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-10-31",
-              108,
-              0,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-10-31",
+              "2021-10-15",
               126,
-              18,
+              126,
               "<PoolInflow:CollectedPrincipal>"
             ],
             "tag": "AccTxn"
           },
           {
             "contents": [
-              "2021-10-31",
+              "2021-10-15",
               126,
               0,
               "<PoolInflow:CollectedPrepayment>"
@@ -570,7 +349,7 @@
           },
           {
             "contents": [
-              "2021-10-31",
+              "2021-10-15",
               126,
               0,
               "<PoolInflow:CollectedRecoveries>"
@@ -870,93 +649,9 @@
       "futureCf": [
         {
           "contents": [
-            "2021-04-30",
-            162,
-            18,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-05-31",
-            144,
-            18,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-06-30",
-            126,
-            18,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-07-31",
-            108,
-            18,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-08-31",
-            90,
-            18,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-09-30",
-            72,
-            18,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-10-31",
+            "2021-10-15",
             54,
-            18,
+            126,
             0,
             0,
             0,
@@ -1047,93 +742,9 @@
   [
     {
       "contents": [
-        "2021-04-30",
-        162,
-        18,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "tag": "MortgageFlow"
-    },
-    {
-      "contents": [
-        "2021-05-31",
-        144,
-        18,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "tag": "MortgageFlow"
-    },
-    {
-      "contents": [
-        "2021-06-30",
-        126,
-        18,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "tag": "MortgageFlow"
-    },
-    {
-      "contents": [
-        "2021-07-31",
-        108,
-        18,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "tag": "MortgageFlow"
-    },
-    {
-      "contents": [
-        "2021-08-31",
-        90,
-        18,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "tag": "MortgageFlow"
-    },
-    {
-      "contents": [
-        "2021-09-30",
-        72,
-        18,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "tag": "MortgageFlow"
-    },
-    {
-      "contents": [
-        "2021-10-31",
+        "2021-10-15",
         54,
-        18,
+        126,
         0,
         0,
         0,

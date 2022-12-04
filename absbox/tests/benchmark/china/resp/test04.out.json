@@ -4,31 +4,26 @@
       "tag": "Amortizing"
     },
     "dates": {
-      "contents": {
-        "FirstPayDate": [
+      "contents": [
+        "2022-10-02",
+        "2022-10-02",
+        null,
+        "2060-12-01",
+        [
+          "2022-10-02",
+          {
+            "tag": "MonthEnd"
+          }
+        ],
+        [
           "2022-11-02",
           {
             "contents": 2,
             "tag": "DayOfMonth"
-          },
-          "2060-12-01"
-        ],
-        "CutoffDate": [
-          "2022-10-02",
-          {
-            "tag": "MonthEnd"
-          },
-          "2060-12-01"
-        ],
-        "ClosingDate": [
-          "2022-10-02",
-          {
-            "tag": "MonthEnd"
-          },
-          "2060-12-01"
+          }
         ]
-      },
-      "tag": "PatternInterval"
+      ],
+      "tag": "PreClosingDates"
     },
     "fees": {
       "\u670d\u52a1\u5546\u8d39\u7528": {

@@ -34,7 +34,6 @@ baseMap = {"资产池余额": "CurrentPoolBalance"
 
 
 
-
 def mkDatePattern(x):
     match x:
         case ["每月",_d]:
@@ -57,12 +56,17 @@ def mkDate(x):
     match x:
         case {"封包日":a, "起息日":b,"首次兑付日":c,"法定到期日":d,"收款频率":pf,"付款频率":bf} | \
              {"cutoff":a,"closing":b,"firstPay":c,"stated":d,"poolFreq":pf,"payFreq":bf}:
-            return mkTag(("PatternInterval"
-                          ,{"ClosingDate":[b,mkDatePattern(pf),d] ,"CutoffDate":[a,mkDatePattern(pf),d] 
-                           ,"FirstPayDate":[c,mkDatePattern(bf),d]}))
-        case {"回收期期初日":a, "起息日":b,"下次兑付日":c,"法定到期日":d,"收款频率":pf,"付款频率":bf} | \
-             {"cutoff":a,"closing":b,"nextPay":c,"stated":d,"poolFreq":pf,"payFreq":bf}:
-            return mkDate({"封包日":a, "起息日":b,"首次兑付日":c,"法定到期日":d,"收款频率":pf,"付款频率":bf})
+            firstCollection = x.get("首次归集日",b)
+            mr = x.get("循环结束日",None)
+            return mkTag(("PreClosingDates",[a,b,mr,d,[firstCollection,mkDatePattern(pf)],[c,mkDatePattern(bf)]]))
+        case {"归集日":(lastCollected,nextCollect),"兑付日":(pp,np),"法定到期日":c,"收款频率":pf,"付款频率":bf} | \
+             {"collect":(lastCollected,nextCollect),"pay":(pp,np),"stated":c,"poolFreq":pf,"payFreq":bf}:
+            mr = x.get("循环结束日",None)
+            return mkTag(("CurrentDates",[[lastCollected,pp],
+                                         mr,
+                                         c,
+                                         [nextCollect,mkDatePattern(pf)],
+                                         [np,mkDatePattern(bf)]]))
         case {"回款日":cdays, "分配日":ddays,"封包日":cutoffDate,"起息日":closingDate} | \
             {"poolCollection":cdays,"distirbution":ddays,"cutoff":cutoffDate,"closing":closingDate} :
             return mkTag(("CustomDates"
@@ -71,7 +75,7 @@ def mkDate(x):
                             ,closingDate
                             ,[ mkTag(("RunWaterfall",[dd,""])) for dd in ddays]]))
         case _:
-            raise RuntimeError(f"对于产品发行建模格式为：{'封包日':a, '起息日': b,'首次兑付日':c,'法定到期日':e,'收款频率':f,'付款频率':g} ")
+            raise RuntimeError(f"Failed to match:{x}")
 
 def mkFeeType(x):
     match x:
@@ -508,6 +512,8 @@ def mkStatus(x):
             return mkTag(("DealDefaulted",None))
         case "结束":
             return mkTag(("Ended"))
+        case "设计":
+            return mkTag(("PreClosing"))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkStatus")
 
@@ -605,6 +611,7 @@ def mkWaterfall(r, x):
         "循环":"Revolving",
         "加速清偿":"DealAccelerated",
         "违约":"DealDefaulted",
+        "未设立":"PreClosing",
     }
     if len(x)==0:
         return {k:list(v)  for k,v in r.items()}
@@ -623,6 +630,8 @@ def mkWaterfall(r, x):
             _w_tag = "CleanUp"
         case "回款日" | "回款后" :
             _w_tag = f"EndOfPoolCollection"
+        case "设立日":
+            _w_tag = f"OnClosingDay"
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkWaterfall")
     r[_w_tag] = itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
@@ -696,9 +705,7 @@ def mkAsset(x):
         case ["分期"
             ,{"放款金额": originBalance, "放款费率": originRate, "初始期限": originTerm
                   ,"频率": freq, "类型": _type, "放款日": startDate}
-            ,{"当前余额": currentBalance
-             ,"剩余期限": remainTerms
-             ,"状态": status}]:
+            ,{"状态": status}]:
             return mkTag(("Installment",[
                                       {"originBalance": originBalance,
                                       "originRate": mkAssetRate(originRate),
@@ -707,8 +714,7 @@ def mkAsset(x):
                                       "startDate": startDate,
                                       "prinType": mkAmortPlan(_type)
                                       } | mkTag("LoanOriginalInfo"),
-                                     currentBalance,
-                                     remainTerms,
+                                     0.0,
                                      _statusMapping[status]]))       
  
 
@@ -783,6 +789,8 @@ def mkAssumption2(x) -> dict:
             return mkTag(("ByIndex",[[(ids,mkAssumpList(aps)) for ids,aps in assetAssumpList], mkAssumpList(dealAssump)]))
         case xs if isinstance(xs, list):
             return mkTag(("PoolLevel", mkAssumpList(xs)))
+        case None:
+            return None
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAssumption2")
 

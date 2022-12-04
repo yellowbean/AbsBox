@@ -183,6 +183,7 @@ class 信贷ABS:
         distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
         parsedDates = mkDate(self.日期)
         status = mkStatus(self.状态)
+        defaultStartDate = self.日期.get("起息日",None) or self.日期['归集日'][0]
         """
         get the json formatted string
         """
@@ -191,7 +192,7 @@ class 信贷ABS:
             "name": self.名称,
             "status": status,
             "pool":{"assets": [mkAsset(x) for x in self.资产池.get('清单',[])]
-                , "asOfDate": self.日期['封包日']
+                , "asOfDate": self.日期.get('封包日',None) or self.日期['归集日'][0]
                 , "issuanceStat": readIssuance(self.资产池)
                 , "futureCf":mkCf(self.资产池.get('归集表', []))},
             "bonds": functools.reduce(lambda result, current: result | current
@@ -209,7 +210,7 @@ class 信贷ABS:
         
         for fn, fo in _r['fees'].items():
             if fo['feeStart'] is None :
-                fo['feeStart'] = self.日期["起息日"]
+                fo['feeStart'] = defaultStartDate
 
         if hasattr(self, "自定义") and self.自定义 is not None:
             _r["custom"] = {}
@@ -226,7 +227,7 @@ class 信贷ABS:
         if hasattr(self, "流动性支持") and self.流动性支持 is not None:
             _providers = {}
             for (_k, _p) in self.流动性支持.items():
-                _providers[_k] = mkLiqProvider(_k, ( _p | {"起始日": self.日期["起息日"]}))
+                _providers[_k] = mkLiqProvider(_k, ( _p | {"起始日": defaultStartDate}))
             _r["liqProvider"] = _providers
 
         _dealType = identify_deal_type(_r)

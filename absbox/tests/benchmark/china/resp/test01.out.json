@@ -4,31 +4,26 @@
       "tag": "Amortizing"
     },
     "dates": {
-      "contents": {
-        "FirstPayDate": [
+      "contents": [
+        "2021-03-31",
+        "2021-06-15",
+        null,
+        "2060-12-01",
+        [
+          "2021-06-15",
+          {
+            "tag": "MonthEnd"
+          }
+        ],
+        [
           "2021-07-26",
           {
             "contents": 26,
             "tag": "DayOfMonth"
-          },
-          "2060-12-01"
-        ],
-        "CutoffDate": [
-          "2021-03-31",
-          {
-            "tag": "MonthEnd"
-          },
-          "2060-12-01"
-        ],
-        "ClosingDate": [
-          "2021-06-15",
-          {
-            "tag": "MonthEnd"
-          },
-          "2060-12-01"
+          }
         ]
-      },
-      "tag": "PatternInterval"
+      ],
+      "tag": "PreClosingDates"
     },
     "fees": {
       "\u4fe1\u6258\u8d39\u7528": {
@@ -923,97 +918,25 @@
         "accStmt": [
           {
             "contents": [
-              "2021-04-30",
-              0.45,
-              0.45,
+              "2021-06-15",
+              1.27,
+              1.27,
               "<PoolInflow:CollectedInterest>"
             ],
             "tag": "AccTxn"
           },
           {
             "contents": [
-              "2021-04-30",
-              6.45,
-              6,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-04-30",
-              6.45,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-04-30",
-              6.45,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-05-31",
-              6.87,
-              0.42,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-05-31",
-              12.87,
-              6,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-05-31",
-              12.87,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-05-31",
-              12.87,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-06-30",
-              13.27,
-              0.4,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-06-30",
+              "2021-06-15",
               19.27,
-              6,
+              18,
               "<PoolInflow:CollectedPrincipal>"
             ],
             "tag": "AccTxn"
           },
           {
             "contents": [
-              "2021-06-30",
+              "2021-06-15",
               19.27,
               0,
               "<PoolInflow:CollectedPrepayment>"
@@ -1022,7 +945,7 @@
           },
           {
             "contents": [
-              "2021-06-30",
+              "2021-06-15",
               19.27,
               0,
               "<PoolInflow:CollectedRecoveries>"
@@ -2465,43 +2388,15 @@
       "futureCf": [
         {
           "contents": [
-            "2021-04-30",
-            114,
-            6,
-            0.45,
-            0,
-            0,
-            0,
-            0,
-            0.045
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-05-31",
-            108,
-            6,
-            0.42,
-            0,
-            0,
-            0,
-            0,
-            0.045
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-06-30",
+            "2021-06-15",
             102,
-            6,
-            0.4,
+            18,
+            1.27,
             0,
             0,
             0,
             0,
-            0.045
+            969.03
           ],
           "tag": "MortgageFlow"
         },
@@ -2776,43 +2671,15 @@
   [
     {
       "contents": [
-        "2021-04-30",
-        114,
-        6,
-        0.45,
-        0,
-        0,
-        0,
-        0,
-        0.045
-      ],
-      "tag": "MortgageFlow"
-    },
-    {
-      "contents": [
-        "2021-05-31",
-        108,
-        6,
-        0.42,
-        0,
-        0,
-        0,
-        0,
-        0.045
-      ],
-      "tag": "MortgageFlow"
-    },
-    {
-      "contents": [
-        "2021-06-30",
+        "2021-06-15",
         102,
-        6,
-        0.4,
+        18,
+        1.27,
         0,
         0,
         0,
         0,
-        0.045
+        969.03
       ],
       "tag": "MortgageFlow"
     },

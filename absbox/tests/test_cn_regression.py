@@ -39,6 +39,7 @@ def test_translate():
             try:
                 benchmark_out = json.load(ofile)
                 if d.json != benchmark_out:
+                    print(f"Failed with benchmark file:{benchfile} ")
                     diff_result = DeepDiff(d.json,benchmark_out)
                     pp.pprint(diff_result,indent=2)
                     assert d.json == benchmark_out, f"testing fail on {o}"
@@ -77,16 +78,12 @@ def test_resp():
         print(f"Comparing:{dinput},{sinput},{eoutput}")
         with open(os.path.join(input_req_folder,dinput),'r') as dq:  # deal request
             with open(os.path.join(input_scen_folder,sinput),'r') as sq: # scenario request 
-                req = {"deal":json.load(dq)
-                        ,"assump": {"tag":"Single","contents": json.load(sq)}
-                        ,"bondPricing":None}
+                print(f"With deal request=> {dinput}, scenario => {sinput}")
+                req = {"deal":json.load(dq) ,"assump": {"tag":"Single","contents": json.load(sq)} ,"bondPricing":None}
                 hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-                tresp = requests.post(test_server
-                                 , data=json.dumps(req).encode('utf-8')
-                                 , headers=hdrs
-                                , verify=False)
+                tresp = requests.post(test_server , data=json.dumps(req).encode('utf-8') , headers=hdrs , verify=False)
                 if tresp.status_code != 200:
-                    print(f"Failed to finish req:{json.dumps(req).encode('utf-8')}")
+                    print(f"Failed to finish req:{req['deal']['contents']['name']}")
                     print(tresp.text)
 
                 s_result = json.loads(tresp.text)

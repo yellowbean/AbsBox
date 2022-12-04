@@ -1,34 +1,29 @@
 [
   {
     "status": {
-      "tag": "Amortizing"
+      "tag": "Ended"
     },
     "dates": {
-      "contents": {
-        "FirstPayDate": [
+      "contents": [
+        "2022-07-01",
+        "2022-07-26",
+        null,
+        "2060-12-01",
+        [
+          "2022-07-26",
+          {
+            "tag": "MonthFirst"
+          }
+        ],
+        [
           "2022-08-26",
           {
             "contents": 26,
             "tag": "DayOfMonth"
-          },
-          "2060-12-01"
-        ],
-        "CutoffDate": [
-          "2022-07-01",
-          {
-            "tag": "MonthFirst"
-          },
-          "2060-12-01"
-        ],
-        "ClosingDate": [
-          "2022-07-26",
-          {
-            "tag": "MonthFirst"
-          },
-          "2060-12-01"
+          }
         ]
-      },
-      "tag": "PatternInterval"
+      ],
+      "tag": "PreClosingDates"
     },
     "fees": {
       "\u670d\u52a1\u5546\u8d39\u7528": {
@@ -4673,7 +4668,7 @@
         },
         "feeDueDate": "2025-04-01",
         "feeLastPaidDay": null,
-        "feeDue": 373023.75
+        "feeDue": 404125.55
       }
     },
     "collects": [
@@ -19007,7 +19002,7 @@
         "accStmt": [
           {
             "contents": [
-              "2022-07-01",
+              "2022-07-26",
               954043.04,
               954043.04,
               "<PoolInflow:CollectedInterest>"
@@ -39958,7 +39953,7 @@
         "accStmt": [
           {
             "contents": [
-              "2022-07-01",
+              "2022-07-26",
               78501963.04,
               78501963.04,
               "<PoolInflow:CollectedPrincipal>"
@@ -39967,7 +39962,7 @@
           },
           {
             "contents": [
-              "2022-07-01",
+              "2022-07-26",
               78501963.04,
               0,
               "<PoolInflow:CollectedPrepayment>"
@@ -39976,7 +39971,7 @@
           },
           {
             "contents": [
-              "2022-07-01",
+              "2022-07-26",
               78501963.04,
               0,
               "<PoolInflow:CollectedRecoveries>"
@@ -57450,7 +57445,7 @@
       "futureCf": [
         {
           "contents": [
-            "2022-07-01",
+            "2022-07-26",
             1234640402,
             78501963.04,
             954043.04,
@@ -57931,7 +57926,7 @@
   [
     {
       "contents": [
-        "2022-07-01",
+        "2022-07-26",
         1234640402,
         78501963.04,
         954043.04,

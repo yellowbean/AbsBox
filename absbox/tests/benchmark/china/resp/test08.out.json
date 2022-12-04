@@ -4,31 +4,26 @@
       "tag": "Amortizing"
     },
     "dates": {
-      "contents": {
-        "FirstPayDate": [
+      "contents": [
+        "2022-06-30",
+        "2022-08-31",
+        null,
+        "2060-12-01",
+        [
+          "2022-08-31",
+          {
+            "tag": "MonthEnd"
+          }
+        ],
+        [
           "2022-10-26",
           {
             "contents": 26,
             "tag": "DayOfMonth"
-          },
-          "2060-12-01"
-        ],
-        "CutoffDate": [
-          "2022-06-30",
-          {
-            "tag": "MonthEnd"
-          },
-          "2060-12-01"
-        ],
-        "ClosingDate": [
-          "2022-08-31",
-          {
-            "tag": "MonthEnd"
-          },
-          "2060-12-01"
+          }
         ]
-      },
-      "tag": "PatternInterval"
+      ],
+      "tag": "PreClosingDates"
     },
     "fees": {
       "\u670d\u52a1\u5546\u8d39\u7528": {
@@ -2953,45 +2948,9 @@
         "accStmt": [
           {
             "contents": [
-              "2022-07-31",
-              6676623.4,
-              6676623.4,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-07-31",
-              198828075.1,
-              192151451.7,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-07-31",
-              198828075.1,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-07-31",
-              198828075.1,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
               "2022-08-31",
-              210396659.93,
-              11568584.83,
+              18245208.23,
+              18245208.23,
               "<PoolInflow:CollectedInterest>"
             ],
             "tag": "AccTxn"
@@ -3000,7 +2959,7 @@
             "contents": [
               "2022-08-31",
               403123288.43,
-              192726628.5,
+              384878080.2,
               "<PoolInflow:CollectedPrincipal>"
             ],
             "tag": "AccTxn"
@@ -9457,24 +9416,10 @@
       "futureCf": [
         {
           "contents": [
-            "2022-07-31",
-            3865848481,
-            192151451.7,
-            6676623.4,
-            0,
-            0,
-            0,
-            0,
-            0
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
             "2022-08-31",
             3673121853,
-            192726628.5,
-            11568584.83,
+            384878080.2,
+            18245208.23,
             0,
             0,
             0,
@@ -10106,24 +10051,10 @@
   [
     {
       "contents": [
-        "2022-07-31",
-        3865848481,
-        192151451.7,
-        6676623.4,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "tag": "MortgageFlow"
-    },
-    {
-      "contents": [
         "2022-08-31",
         3673121853,
-        192726628.5,
-        11568584.83,
+        384878080.2,
+        18245208.23,
         0,
         0,
         0,

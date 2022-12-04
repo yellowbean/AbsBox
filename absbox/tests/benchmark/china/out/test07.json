@@ -2,31 +2,26 @@
   "tag": "MDeal",
   "contents": {
     "dates": {
-      "tag": "PatternInterval",
-      "contents": {
-        "ClosingDate": [
+      "tag": "PreClosingDates",
+      "contents": [
+        "2022-07-01",
+        "2022-07-26",
+        null,
+        "2060-12-01",
+        [
           "2022-07-26",
           {
             "tag": "MonthFirst"
-          },
-          "2060-12-01"
+          }
         ],
-        "CutoffDate": [
-          "2022-07-01",
-          {
-            "tag": "MonthFirst"
-          },
-          "2060-12-01"
-        ],
-        "FirstPayDate": [
+        [
           "2022-08-26",
           {
             "tag": "DayOfMonth",
             "contents": 26
-          },
-          "2060-12-01"
+          }
         ]
-      }
+      ]
     },
     "name": "\u76db\u4e16\u878d\u8fea2021\u5e74\u7b2c\u4e8c\u671f\u4e2a\u4eba\u6c7d\u8f66\u62b5\u62bc\u8d37\u6b3e",
     "status": {
