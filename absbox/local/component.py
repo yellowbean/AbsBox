@@ -213,7 +213,7 @@ def mkPre(p):
             return mkTag(("IfAfterOnDate",_d))
         case ["<=",_d]:
             return mkTag(("IfBeforeOnDate",_d))
-        case ["状态",_st] | ["status", st]:
+        case ["状态",_st] | ["status",_st]:
             return mkTag(("IfDealStatus",mkStatus(_st)))
         case ["同时满足",_p1,_p2] | ["all",_p1,_p2]:
             return mkTag(("And",mkPre(_p1),mkPre(_p2)))
@@ -397,7 +397,7 @@ def mkFeeCapType(x):
     match x:
         case {"应计费用百分比": pct} | {"duePct": pct}:
             return mkTag(("DuePct",pct))
-        case {"应计费用上限": amt} | {"dueCapAmt": pct}:
+        case {"应计费用上限": amt} | {"dueCapAmt": amt}:
             return mkTag(("DueCapAmt",amt))
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkFeeCapType")
@@ -423,7 +423,7 @@ def mkAccountCapType(x):
 
 def mkTransferLimit(x):
     match x:
-        case {"余额百分比": pct} | {"balPct": pctj}:
+        case {"余额百分比": pct} | {"balPct": pct}:
             return mkTag(("DuePct",pct))
         case {"金额上限": amt} | {"balCapAmt": amt}:
             return mkTag(("DueCapAmt",amt))
@@ -565,7 +565,7 @@ def mkTrigger(x):
             return mkTag(("AfterDate",_d))
         case [">=",_d]:
             return mkTag(("AfterOnDate",_d))
-        case ["到期日未兑付",_bn] | ["oustandingAfterMaturity"]:
+        case ["到期日未兑付",_bn] | ["passMaturity",_bn]:
             return mkTag(("PassMaturityDate",_bn))
         #case ("目标摊还不足",bn):
         #   return mkTag(("PrinShortfall",bn))
@@ -575,7 +575,7 @@ def mkTrigger(x):
             return mkTag(("AllTrigger",[ mkTrigger(t) for t in trgs ]))
         case ["任一满足",*trgs] | ["any",*trgs]:
             return mkTag(("AnyTrigger",[ mkTrigger(t) for t in trgs ]))
-        case ["一直",b] | ["always"]:
+        case ["一直",b] | ["always",b]:
             return mkTag(("Always",b))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkTrigger")
@@ -658,15 +658,13 @@ def mkAsset(x):
     _statusMapping = {"正常": mkTag(("Current")), "违约": mkTag(("Defaulted",None))}
     match x:
         case ["按揭贷款"
-            ,{"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm
-                  ,"频率": freq, "类型": _type, "放款日": startDate}
-            ,{"当前余额": currentBalance
-             ,"当前利率": currentRate
-             ,"剩余期限": remainTerms
-             ,"状态": status}] 
-            |["mortgage"
-            ,{"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm
-                  ,"freq": freq, "type": _type, "originDate": startDate}
+              ,{"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm ,"频率": freq, "类型": _type, "放款日": startDate}
+              ,{"当前余额": currentBalance
+                ,"当前利率": currentRate
+                ,"剩余期限": remainTerms
+                ,"状态": status}] | \
+            ["mortgage"
+            ,{"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm ,"freq": freq, "type": _type, "originDate": startDate}
             ,{"currentBalance": currentBalance
              ,"currentRate": currentRate
              ,"remainTerm": remainTerms
@@ -678,7 +676,7 @@ def mkAsset(x):
                                       "period": freqMap[freq],
                                       "startDate": startDate,
                                       "prinType": mkAmortPlan(_type)
-                                      } |mkTag("MortgageOriginalInfo"),
+                                      } | mkTag("MortgageOriginalInfo"),
                                      currentBalance,
                                      currentRate,
                                      remainTerms,
@@ -689,7 +687,7 @@ def mkAsset(x):
             ,{"当前余额": currentBalance
              ,"当前利率": currentRate
              ,"剩余期限": remainTerms
-             ,"状态": status}]:
+             ,"状态": status}] \
             |["loan"
             ,{"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm
                   ,"freq": freq, "type": _type, "originDate": startDate}
@@ -712,8 +710,8 @@ def mkAsset(x):
         case ["分期"
             ,{"放款金额": originBalance, "放款费率": originRate, "初始期限": originTerm
                   ,"频率": freq, "类型": _type, "放款日": startDate}
-            ,{"状态": status}]
-           |["installment"
+            ,{"状态": status}] \
+            |["installment"
             ,{"originBalance": originBalance, "feeRate": originRate, "originTerm": originTerm
                   ,"freq": freq, "type": _type, "originDate": startDate}
             ,{"status": status}]:
@@ -741,14 +739,16 @@ def identify_deal_type(x):
         case {"pool":{"assets":[{'tag':'Installment'},*rest]}} :
             return "IDeal"
         case _ :
-            raise RuntimeError(f"Failed to identify deal type {x}")
+            return "MDeal"
+        #case _ :
+        #    raise RuntimeError(f"Failed to identify deal type {x}")
 
 
 def mkCallOptions(x):
     match x:
         case {"资产池余额": bal} | {"poolBalance": bal}:
             return mkTag(("PoolBalance", bal))
-        case {"债券余额": bal} | {"bondBalance", bal}:
+        case {"债券余额": bal} | {"bondBalance": bal}:
             return mkTag(("BondBalance", bal))
         case {"资产池余额剩余比率": factor} | {"poolFactor": factor}:
             return mkTag(("PoolFactor", factor))
