@@ -614,7 +614,7 @@ def mkWaterfall(r, x):
         case ("兑付日","违约"):
             _w_tag = f"DistributionDay (DealDefaulted Nothing)"
         case ("兑付日",_st) | ("amortizing",_st):
-            _w_tag = f"DistributionDay {mapping.get(_st,st)]}"
+            _w_tag = f"DistributionDay {mapping.get(_st,_st)}"
         case "兑付日" | "未违约" | "amortizing":
             _w_tag = f"DistributionDay Amortizing"
         case "清仓回购" | "cleanUp":
