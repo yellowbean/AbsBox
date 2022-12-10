@@ -413,9 +413,9 @@ def mkPDA(x):
 
 def mkAccountCapType(x):
     match x:
-        case {"余额百分比": pct} | {"balPct"}:
+        case {"余额百分比": pct} | {"balPct": pct}:
             return mkTag(("DuePct",pct))
-        case {"金额上限": amt} | {"balCapAmt"}:
+        case {"金额上限": amt} | {"balCapAmt": amt}:
             return mkTag(("DueCapAmt",amt))
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkAccountCapType")
@@ -423,9 +423,9 @@ def mkAccountCapType(x):
 
 def mkTransferLimit(x):
     match x:
-        case {"余额百分比": pct} | {"balPct"}:
+        case {"余额百分比": pct} | {"balPct": pctj}:
             return mkTag(("DuePct",pct))
-        case {"金额上限": amt} | {"balCapAmt"}:
+        case {"金额上限": amt} | {"balCapAmt": amt}:
             return mkTag(("DueCapAmt",amt))
         case {"公式": "ABCD" }:
             return mkTag(("Formula","ABCD"))
