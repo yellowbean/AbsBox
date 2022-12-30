@@ -16,7 +16,12 @@ datePattern = {"月末":"MonthEnd"
 freqMap = {"每月": "Monthly"
     , "每季度": "Quarterly"
     , "每半年": "SemiAnnually"
-    , "每年": "Annually"}
+    , "每年": "Annually"
+    , "Monthly": "Monthly"
+    , "Quarterly": "Quarterly"
+    , "SemiAnnually": "SemiAnnually"
+    , "Annually": "Annually"
+    }
 
 baseMap = {"资产池余额": "CurrentPoolBalance"
            , "资产池期末余额": "CurrentPoolBalance"
@@ -181,14 +186,6 @@ def isPre(x):
     except RuntimeError as e:
         return False 
 
-#def mkDealStatus(x):
-#    match x:
-#        case "":
-#            return ""
-#        case _ :
-#            raise RuntimeError(f"Failed to match on DealStatus: {x}")
-    
-
 
 def mkPre(p):
     dealStatusMap = {"摊还":"Current"
@@ -283,19 +280,6 @@ def mkAcc(an,x):
             return mkAcc(an, x|{"计息":x.get("计息",None),"interest":x.get("interest",None)
                                 ,"记录":x.get("记录",None),"txn":x.get("txn",None)
                                 ,"类型":x.get("类型",None),"type":x.get("type",None)})
-        #case {"余额":b,"类型":t,"计息":i}|{"balance":b,"type":t,"interest":i}:
-        #    return mkAcc(an, x|{"记录":None,"txn":None})
-        #
-        #case {"余额":b,"类型":t,"记录":tx}|{"balance":b,"type":t,"txn":tx}:
-        #    return mkAcc(an, x|{"计息":None,"interest":None})
-        #
-        #case {"余额":b,"类型":t}|{"balance":b,"type":t}:
-        #    return mkAcc(an, x|{"计息":None,"interest":None, "记录":None,"txn":None})
-
-        #case {"余额":b}|{"balance":b}:
-        #    return mkAcc(an, x|{"计息":None,"interest":None
-        #                        ,"记录":None,"txn":None
-        #                        ,"类型":None,"type":None})
         case _ :
             raise RuntimeError(f"Failed to match account: {an},{x}")
  
@@ -342,7 +326,7 @@ def mkBondRate(x):
                                   ,"dayCount":DC.DC_ACT_365F.value})
         case {"固定": _rate, "日历":dc} | {"fix": _rate, "dayCount":dc}:
             return mkTag(("Fix",[_rate,dc]))
-        case {"固定": _rate} | {"fix": _rate}:
+        case {"固定": _rate} | {"Fixed": _rate}:
             return mkTag(("Fix",[_rate,DC.DC_ACT_365F.value]))
         case {"期间收益": _yield}:
             return mkTag(("InterestByYield",_yield))
@@ -609,9 +593,9 @@ def mkWaterfall(r, x):
     _k,_v = x.popitem()
     _w_tag = None
     match _k:
-        case ("兑付日","加速清偿"):
+        case ("兑付日","加速清偿") | ("amortizing","accelerated"):
             _w_tag = f"DistributionDay (DealAccelerated Nothing)"
-        case ("兑付日","违约"):
+        case ("兑付日","违约") | ("amortizing","defaulted"):
             _w_tag = f"DistributionDay (DealDefaulted Nothing)"
         case ("兑付日",_st) | ("amortizing",_st):
             _w_tag = f"DistributionDay {mapping.get(_st,_st)}"
@@ -631,7 +615,7 @@ def mkWaterfall(r, x):
 
 def mkAssetRate(x):
     match x:
-        case ["固定",r] | ["fixed",r]:
+        case ["固定",r] | ["Fixed",r]:
             return mkTag(("Fix",r))
         case ["浮动",r,{"基准":idx,"利差":spd,"重置频率":p}]:
             return mkTag(("Floater",[idx,spd,r,freqMap[p],None]))
@@ -655,7 +639,11 @@ def mkAmortPlan(x)->dict:
 
 
 def mkAsset(x):
-    _statusMapping = {"正常": mkTag(("Current")), "违约": mkTag(("Defaulted",None))}
+    _statusMapping = {"正常": mkTag(("Current"))
+                    , "违约": mkTag(("Defaulted",None))
+                    , "Current":mkTag(("Current"))
+                    , "Defaulted": mkTag(("Defaulted",None))
+                    }
     match x:
         case ["按揭贷款"
               ,{"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm ,"频率": freq, "类型": _type, "放款日": startDate}
@@ -663,7 +651,7 @@ def mkAsset(x):
                 ,"当前利率": currentRate
                 ,"剩余期限": remainTerms
                 ,"状态": status}] | \
-            ["mortgage"
+            ["Mortgage"
             ,{"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm ,"freq": freq, "type": _type, "originDate": startDate}
             ,{"currentBalance": currentBalance
              ,"currentRate": currentRate
@@ -816,3 +804,63 @@ def mkPool(x):
             return mkTag((mapping[_pool_asset_type], _pool))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkPool")
+
+def mkCustom(x):
+    match x:
+        case {"常量":n} | {"Constant":n}:
+            return mkTag(("CustomConstant",n))
+        case {"余额曲线":ts} | {"BalanceCurve":ts}:
+            return mkTag(("CustomCurve",mkTs("BalanceCurve",ts)))
+        case {"公式":ds} | {"Formula":ds}:
+            return mkTag(("CustomDS",mkDs(ds)))
+
+def mkLiqProvider(n, x):
+    match x:
+        case {"类型":"无限制","起始日":_sd, **p} \
+            | {"type":"Unlimited","start":_sd, **p}: 
+            return {"liqName": n, "liqType": mkLiqProviderType({})
+                   , "liqBalance": None
+                   , "liqCredit": p.get("已提供", 0)
+                   , "liqStart": _sd}
+        case {"类型": _sp, "额度": _ab, "起始日":_sd, **p} \
+            | {"type": _sp, "lineOfCredit": _ab, "start":_sd, **p}: 
+            return {"liqName": n, "liqType": mkLiqProviderType(_sp)
+                   , "liqBalance": _ab
+                   , "liqCredit": p.get("已提供", 0)
+                   , "liqStart": _sd}
+        case _:
+            raise RuntimeError(f"无法匹配流动性支持类型：{n,x}")
+
+def mkCf(x):
+    if len(x)==0:
+        return None
+    else:
+        return [ mkTag(("MortgageFlow",_x+([0.0]*5))) for _x in x]
+
+def mk(x):
+    match x:
+        case ["资产", assets]:
+            return {"assets": [mkAsset(a) for a in assets]}
+        case ["账户", accName, attrs] | ["account", accName, attrs]:
+            return {accName: mkAcc(accName, attrs)}
+        case ["费用", feeName, {"类型": feeType ,**fi}] \
+            | ["fee", feeName, {"type": feeType ,**fi}] :
+            return {feeName: {"feeName": feeName, "feeType": mkFeeType(feeType), "feeStart":fi.get("起算日",None)
+                             ,"feeDueDate":fi.get("计算日",None) , "feeDue": 0,
+                              "feeArrears": 0, "feeLastPaidDay": None}}
+        case ["债券", bndName, bnd] | ["bond", bndName, bnd]:
+            return mkBnd(bndName, bnd)
+        case ["归集规则", collection]:
+            return mkCollection(collection)
+        case ["清仓回购", calls]:
+            return mkCall(calls)
+
+
+def mkComponent(x):
+    match x:
+        case {"贴现日": pricingDay, "贴现曲线": xs}:
+            return [pricingDay, {"tag": "PricingCurve", "contents": xs}]
+        case {"PVDate": pricingDay, "PVCurve": xs}:
+            return [pricingDay, {"tag": "PricingCurve", "contents": xs}]
+        case _:
+            None

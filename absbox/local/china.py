@@ -14,11 +14,6 @@ from absbox.local.util import mkTag,DC,mkTs,query,consolStmtByDate,aggStmtByDate
 from absbox.local.component import *
 
 
-def mkCf(x):
-    if len(x)==0:
-        return None
-    else:
-        return [ mkTag(("MortgageFlow",_x+([0.0]*5))) for _x in x]
 
 def readIssuance(pool):
     if '发行' not in pool.keys():
@@ -29,7 +24,6 @@ def readIssuance(pool):
     r = {} 
     for k,v in pool['发行'].items():
         r[issuanceField[k]] = v
-
     return r
 
 def mkCollection(xs):
@@ -49,28 +43,9 @@ def mkLiqProviderType(x):
         case {}:
             return mkTag(("UnLimit"))
 
-def mkLiqProvider(n, x):
-    match x:
-        case {"类型":"无限制","起始日":_sd, **p}: 
-            return {"liqName": n, "liqType": mkLiqProviderType({})
-                   , "liqBalance": None
-                   , "liqCredit": p.get("已提供", 0)
-                   , "liqStart": _sd}
-        case {"类型": _sp, "额度": _ab, "起始日":_sd, **p}: 
-            return {"liqName": n, "liqType": mkLiqProviderType(_sp)
-                   , "liqBalance": _ab
-                   , "liqCredit": p.get("已提供", 0)
-                   , "liqStart": _sd}
-        case _:
-            raise RuntimeError(f"无法匹配流动性支持类型：{n,x}")
 
 
-def mkComponent(x):
-    match x:
-        case {"贴现日": pricingDay, "贴现曲线": xs}:
-            return [pricingDay, {"tag": "PricingCurve", "contents": xs}]
-        case _:
-            None
+
 
 
 def mkLiq(x):
@@ -105,31 +80,8 @@ def mkLiq(x):
             return mkTag(("PV", [df, r]))
 
 
-def mkCustom(x):
-    match x:
-        case {"常量":n}:
-            return mkTag(("CustomConstant",n))
-        case {"余额曲线":ts}:
-            return mkTag(("CustomCurve",mkTs("BalanceCurve",ts)))
-        case {"公式":ds}:
-            return mkTag(("CustomDS",mkDs(ds)))
 
-def mk(x):
-    match x:
-        case ["资产", assets]:
-            return {"assets": [mkAsset(a) for a in assets]}
-        case ["账户", accName, attrs]:
-            return {accName: mkAcc(accName, attrs)}
-        case ["费用", feeName, {"类型": feeType ,**fi}]:
-            return {feeName: {"feeName": feeName, "feeType": mkFeeType(feeType), "feeStart":fi.get("起算日",None)
-                             ,"feeDueDate":fi.get("计算日",None) , "feeDue": 0,
-                              "feeArrears": 0, "feeLastPaidDay": None}}
-        case ["债券", bndName, bnd]:
-            return mkBnd(bndName, bnd)
-        case ["归集规则", collection]:
-            return mkCollection(collection)
-        case ["清仓回购", calls]:
-            return mkCall(calls)
+
 
 
 @dataclass
@@ -176,7 +128,6 @@ class 信贷ABS:
 
     @property
     def json(self):
-        #cutoff, closing, first_pay = mkDate(self.日期)
         stated = False # self.日期.get("法定到期日",None) if len(self.日期)==4  # if isinstance(self.日期,dict) else self.日期[3]
         dists,collects,cleans = [ self.分配规则.get(wn,[]) for wn in ['未违约','回款后','清仓回购'] ]
         distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
@@ -197,9 +148,6 @@ class 信贷ABS:
                 , "futureCf":mkCf(self.资产池.get('归集表', []))},
             "bonds": functools.reduce(lambda result, current: result | current
                                       , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
-            #"waterfall": {f"DistributionDay {status['tag']}":list(distsflt)
-            #            , "EndOfPoolCollection": list(collectsflt)
-            #            , "CleanUp": list(cleanflt)},
             "waterfall": mkWaterfall({},self.分配规则.copy()),
             "fees": functools.reduce(lambda result, current: result | current
                                      , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]) if self.费用 else {},
@@ -271,10 +219,6 @@ class 信贷ABS:
         output['fees'] = {f: v.groupby('日期').agg({"余额": "min", "支付": "sum", "剩余支付": "min"})
                           for f, v in output['fees'].items()}
 
-        # aggregate liquidation provider 
-        #if 'liqProvider' in output:
-        #    output['liqProvider'] = {l:v.   
-        #                             for l,v in output['liqProvider'].items() }
 
         # aggregate accounts
         agg_acc = {}
