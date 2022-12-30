@@ -44,10 +44,6 @@ def mkLiqProviderType(x):
             return mkTag(("UnLimit"))
 
 
-
-
-
-
 def mkLiq(x):
     match x:
         case {"正常余额折价": cf, "违约余额折价": df}:
@@ -78,9 +74,6 @@ def mkLiq(x):
             return mkTag(("BalanceFactor", [cf, df]))
         case {"贴现计价": df, "违约余额回收率": r}:
             return mkTag(("PV", [df, r]))
-
-
-
 
 
 

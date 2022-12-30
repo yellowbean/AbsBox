@@ -852,8 +852,8 @@ def mk(x):
             return mkBnd(bndName, bnd)
         case ["归集规则", collection]:
             return mkCollection(collection)
-        case ["清仓回购", calls]:
-            return mkCall(calls)
+        #case ["清仓回购", calls]:
+        #    return mkCall(calls)
 
 
 def mkComponent(x):
