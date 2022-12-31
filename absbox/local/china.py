@@ -26,22 +26,10 @@ def readIssuance(pool):
         r[issuanceField[k]] = v
     return r
 
-def mkCollection(xs):
-    sourceMapping = {"利息回款": "CollectedInterest"
-                    , "本金回款": "CollectedPrincipal"
-                    , "早偿回款": "CollectedPrepayment"
-                    , "回收回款": "CollectedRecoveries"}
-    return [[sourceMapping[x], acc] for (x, acc) in xs]
 
 
 
 
-def mkAccTxn(xs):
-    "AccTxn T.Day Balance Amount Comment"
-    if xs is None:
-        return None
-    else:
-        return [ mkTag(("AccTxn",x)) for x in xs]
 
 
 @dataclass

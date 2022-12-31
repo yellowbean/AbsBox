@@ -846,6 +846,26 @@ def mkCf(x):
     else:
         return [ mkTag(("MortgageFlow",_x+([0.0]*5))) for _x in x]
 
+def mkCollection(xs):
+    sourceMapping = {"利息回款": "CollectedInterest"
+                    , "本金回款": "CollectedPrincipal"
+                    , "早偿回款": "CollectedPrepayment"
+                    , "回收回款": "CollectedRecoveries"
+                    ,"CollectedInterest": "CollectedInterest"
+                    , "CollectedPrincipal": "CollectedPrincipal"
+                    , "CollectedPrepayment": "CollectedPrepayment"
+                    , "CollectedRecoveries": "CollectedRecoveries"
+                    }
+    return [[sourceMapping[x], acc] for (x, acc) in xs]
+
+def mkAccTxn(xs):
+    "AccTxn T.Day Balance Amount Comment"
+    if xs is None:
+        return None
+    else:
+        return [ mkTag(("AccTxn",x)) for x in xs]
+
+
 def mk(x):
     match x:
         case ["资产", assets]:
