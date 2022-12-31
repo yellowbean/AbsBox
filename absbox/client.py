@@ -14,7 +14,7 @@ urllib3.disable_warnings()
 class API:
     url: str
     server_info = {}
-    version:str = "0","6","0"
+    version = "0","6","1"
     hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
     def __post_init__(self):
