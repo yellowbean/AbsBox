@@ -37,7 +37,16 @@ baseMap = {"资产池余额": "CurrentPoolBalance"
            , "当期未付费用": "CurrentDueFee"
            }
 
-
+def mkLiq(x):
+    match x:
+        case {"正常余额折价": cf, "违约余额折价": df}:
+            return mkTag(("BalanceFactor", [cf, df]))
+        case {"CurrentFactor": cf, "DefaultFactor": df}:
+            return mkTag(("BalanceFactor", [cf, df]))
+        case {"贴现计价": df, "违约余额回收率": r}:
+            return mkTag(("PV", [df, r]))
+        case {"PV": df, "DefaultRecovery": r}:
+            return mkTag(("PV", [df, r]))
 
 def mkDatePattern(x):
     match x:
@@ -864,3 +873,12 @@ def mkComponent(x):
             return [pricingDay, {"tag": "PricingCurve", "contents": xs}]
         case _:
             None
+
+def mkLiqProviderType(x):
+    match x:
+        case {"总额度": amt} | {"Total": amt}:
+            return mkTag(("FixSupport"))
+        case {"日期":dp, "限额":amt} | {"Reset":dp, "Quota":amt}:
+            return mkTag(("ReplenishSupport", [mkDatePattern(dp),amt]))
+        case {}:
+            return mkTag(("UnLimit"))            

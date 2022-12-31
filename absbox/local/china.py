@@ -34,22 +34,6 @@ def mkCollection(xs):
     return [[sourceMapping[x], acc] for (x, acc) in xs]
 
 
-def mkLiqProviderType(x):
-    match x:
-        case {"总额度": amt}:
-            return mkTag(("FixSupport"))
-        case {"日期":dp, "限额":amt}:
-            return mkTag(("ReplenishSupport", [mkDatePattern(dp),amt]))
-        case {}:
-            return mkTag(("UnLimit"))
-
-
-def mkLiq(x):
-    match x:
-        case {"正常余额折价": cf, "违约余额折价": df}:
-            return mkTag(("BalanceFactor", [cf, df]))
-        case {"贴现计价": df, "违约余额回收率": r}:
-            return mkTag(("PV", [df, r]))
 
 
 def mkAccTxn(xs):
@@ -58,23 +42,6 @@ def mkAccTxn(xs):
         return None
     else:
         return [ mkTag(("AccTxn",x)) for x in xs]
-
-
-def mkComponent(x):
-    match x:
-        case {"贴现日": pricingDay, "贴现曲线": xs}:
-            return [pricingDay, {"tag": "PricingCurve", "contents": xs}]
-        case _:
-            None
-
-
-def mkLiq(x):
-    match x:
-        case {"正常余额折价": cf, "违约余额折价": df}:
-            return mkTag(("BalanceFactor", [cf, df]))
-        case {"贴现计价": df, "违约余额回收率": r}:
-            return mkTag(("PV", [df, r]))
-
 
 
 @dataclass
