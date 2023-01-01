@@ -84,7 +84,6 @@ class Generic:
             return mkComponent(pricing)
         return None
 
-
     def read(self, resp, position=None):
         read_paths = {'bonds': ('bndStmt'
                                , ["date", "balance", "interest", "principal", "rate", "cash", "memo"]
@@ -97,7 +96,6 @@ class Generic:
                                  , "account")}
         output = {}
         for comp_name, comp_v in read_paths.items():
-            #output[comp_name] = collections.OrderedDict()
             output[comp_name] = {}
             for k, x in resp[0][comp_name].items():
                 ir = None
@@ -106,10 +104,7 @@ class Generic:
                 output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("date")
             output[comp_name] = collections.OrderedDict(sorted(output[comp_name].items()))
         # aggregate fees
-        print(output['fees'].items())
-        output['fees'] = {f: v.groupby('date').agg({"balance": "min"
-                                                   , "payment": "sum"
-                                                   , "due": "min"})
+        output['fees'] = {f: v.groupby('date').agg({"balance": "min", "payment": "sum", "due": "min"})
                           for f, v in output['fees'].items()}
 
         # aggregate accounts
@@ -131,12 +126,12 @@ class Generic:
 
         output['pool'] = {}
         output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
-                                              , columns=["date", "未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失", "利率"])
+                                              , columns=["date", "balance", "principal", "interest", "prepayment", "default", "recovery", "loss", "rate"])
         output['pool']['flow'] = output['pool']['flow'].set_index("date")
         output['pool']['flow'].index.rename("date", inplace=True)
 
         output['pricing'] = pd.DataFrame.from_dict(resp[3]
                                                    , orient='index'
-                                                   , columns=["估值", "票面估值", "WAL", "久期", "应计利息"]) if resp[3] else None
+                                                   , columns=["pricing", "face", "WAL", "duration", "accure interest"]) if resp[3] else None
 
         return output
