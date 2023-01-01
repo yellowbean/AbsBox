@@ -15,7 +15,7 @@ class Generic:
     bonds: tuple
     fees: tuple
     waterfall: dict
-    collection: tuple
+    collection: list
     call: tuple = None 
     liqFacility :dict = None
     custom: dict = None 

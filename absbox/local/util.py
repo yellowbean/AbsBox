@@ -29,6 +29,7 @@ def mkTag(x):
 def isDate(x):
     return re.match(r"\d{4}\-\d{2}\-\d{2}",x)
 
+
 def mkTs(n, vs):
     return mkTag((n, vs))
 
@@ -66,7 +67,7 @@ def backFillBal(x,ds):
     return base.drop(["flag"], axis=1)
 
 
-def bondView(r,flow=None, flowName=True,flowDates=None):
+def bondView(r,flow=None, flowName=True,flowDates=None,rnd=2):
     result = []
     default_bnd_col_size = 6
     bnd_names = r['bonds'].keys()
@@ -89,11 +90,10 @@ def bondView(r,flow=None, flowName=True,flowDates=None):
     bnd_cols_count = len(flow) if flow else default_bnd_col_size
     headers = [ bnd_cols_count*[bn] for bn in bnd_names]
     if flowName:
-
         x.columns = [ list(itertools.chain.from_iterable(headers)) ,x.columns]
     else:
         x.columns = list(itertools.chain.from_iterable(headers)) 
-    return x.sort_index().round(2)
+    return x.sort_index().round(rnd)
 
 
 def accView(r, flow=None, flowName=True):
@@ -224,24 +224,19 @@ def balanceSheetView(r, ds=None, equity=None, rnd=2):
     
     return bs.round(rnd) # unify([pvCol,avCol,bvCol],["资产-资产池","资产-账户","负债"])
 
+
 def PnLView(r,ds=None):
     accounts = r['accounts']
     consoleStmts = pd.concat([ acc for acc in accounts ])
     return consoleStmts
-    
 
 
 def consolStmtByDate(s):
     return s.groupby("日期").last()
 
+
 def aggStmtByDate(s):
     return s.groupby("日期").sum()
-
-def query(d,p):
-    if len(p)==1:
-        return d[p[0]]
-    else:
-        return query(d[p[0]],p[1:])
 
 
 class DC(Enum):  # TODO need to check with HS code
