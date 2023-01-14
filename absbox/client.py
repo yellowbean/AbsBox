@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from absbox.local.util import mkTag,query,isDate,flat
 from absbox.local.component import mkPool,mkAssumption,mkAssumption2
 import pandas as pd
+#from pyspecter import S,query
 
 urllib3.disable_warnings()
 
@@ -14,7 +15,7 @@ urllib3.disable_warnings()
 class API:
     url: str
     server_info = {}
-    version = "0","6","1"
+    version = "0","7","0"
     hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
     def __post_init__(self):
@@ -211,10 +212,10 @@ class API:
         result = self._send_req(req,url)
 
         if read:
-            result = pd.DataFrame([_['contents'] for _ in result]
-                                                  , columns=["日期", "未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失", "利率"])
-            result = result.set_index("日期")
-            result.index.rename("日期", inplace=True)
+            flow_header,idx = guess_pool_flow_header(result)
+            result = pd.DataFrame([_['contents'] for _ in result] , columns=flow_header)
+            result = result.set_index(idx)
+            result.index.rename(idx, inplace=True)
             result.sort_index(inplace=True)
         return result
     
@@ -232,6 +233,13 @@ class API:
             return result
         except JSONDecodeError as e:
             raise RuntimeError(e)        
+
+def guess_pool_flow_header(x):
+    match x[0]['tag']:
+        case 'MortgageFlow':
+            return (["日期", "未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失", "利率"],"日期")
+        case 'LeaseFlow':
+            return (["日期", "租金"],"日期")
 
 
 def save(deal,p:str):
