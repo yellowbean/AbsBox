@@ -245,7 +245,7 @@ def guess_pool_flow_header(x,l):
         case ('LeaseFlow','chinese'):
             return (["日期", "租金"],"日期")
         case ('LeaseFlow','english'):
-            return (["日期", "Rental"],"Date")
+            return (["Date", "Rental"],"Date")
         case _:
             raise RuntimeError(f"Failed to match pool header with {x[0]['tag']}{l}")
 
