@@ -722,6 +722,16 @@ def mkAsset(x):
                                       } | mkTag("LoanOriginalInfo"),
                                      0.0,
                                      _statusMapping[status]]))       
+        case ["租赁"
+                ,{"固定租金": periodAmt, "初始期限": originTerm
+                  ,"频率": dp, "起始日": startDate, "剩余期限": remainTerm}] \
+            |["Lease"
+                ,{"fixRental": periodAmt, "originTerm": originTerm
+                  ,"freq": dp, "originDate": startDate, "remainTerm":remainTerm} ]:
+            return mkTag(("RegularLease"
+                            ,[ {"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp)} | mkTag("LeaseInfo")
+                              , periodAmt
+                              , remainTerm]))       
 
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkAsset")
@@ -735,10 +745,10 @@ def identify_deal_type(x):
             return "MDeal"
         case {"pool":{"assets":[{'tag':'Installment'},*rest]}} :
             return "IDeal"
+        case {"pool":{"assets":[{'tag':'Lease'},*rest]}} | {"pool":{"assets":[{'tag':'RegularLease'},*rest]}}:
+            return "RDeal"
         case _ :
-            return "MDeal"
-        #case _ :
-        #    raise RuntimeError(f"Failed to identify deal type {x}")
+            raise RuntimeError(f"Failed to identify deal type {x}")
 
 
 def mkCallOptions(x):
@@ -805,7 +815,7 @@ def mkAssumption2(x) -> dict:
             raise RuntimeError(f"Failed to match {x}:mkAssumption2")
 
 def mkPool(x):
-    mapping = {"LDeal":"LPool","MDeal":"MPool","IDeal":"IPool"}
+    mapping = {"LDeal":"LPool","MDeal":"MPool","IDeal":"IPool","RDeal":"RPool"}
     match x:
         case {"清单":assets,"封包日":d} | {"assets":assets,"cutoffDate":d}:
             _pool = {"assets": [mkAsset(a) for a in assets],"asOfDate": d}

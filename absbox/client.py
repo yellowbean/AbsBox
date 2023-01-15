@@ -3,7 +3,7 @@ from json.decoder import JSONDecodeError
 import requests
 from requests.exceptions import ConnectionError
 import urllib3
-from dataclasses import dataclass
+from dataclasses import dataclass,field
 from absbox.local.util import mkTag,query,isDate,flat
 from absbox.local.component import mkPool,mkAssumption,mkAssumption2
 import pandas as pd
@@ -13,9 +13,11 @@ urllib3.disable_warnings()
 
 @dataclass
 class API:
-    url: str
+    url:str
+    #lang = field(repr=False, default="chinese")
+    lang:str = "chinese"
     server_info = {}
-    version = "0","7","0"
+    version:tuple = "0","7","0"
     hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
     def __post_init__(self):
@@ -212,7 +214,7 @@ class API:
         result = self._send_req(req,url)
 
         if read:
-            flow_header,idx = guess_pool_flow_header(result)
+            flow_header,idx = guess_pool_flow_header(result,self.lang)
             result = pd.DataFrame([_['contents'] for _ in result] , columns=flow_header)
             result = result.set_index(idx)
             result.index.rename(idx, inplace=True)
@@ -234,12 +236,18 @@ class API:
         except JSONDecodeError as e:
             raise RuntimeError(e)        
 
-def guess_pool_flow_header(x):
-    match x[0]['tag']:
-        case 'MortgageFlow':
+def guess_pool_flow_header(x,l):
+    match (x[0]['tag'],l):
+        case ('MortgageFlow','chinese'):
             return (["日期", "未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失", "利率"],"日期")
-        case 'LeaseFlow':
+        case ('MortgageFlow','english'):
+            return (["Date", "Balance", "Principal", "Interest", "Prepayment", "Default", "Recovery", "Loss", "WAC"],"Date")
+        case ('LeaseFlow','chinese'):
             return (["日期", "租金"],"日期")
+        case ('LeaseFlow','english'):
+            return (["日期", "Rental"],"Date")
+        case _:
+            raise RuntimeError(f"Failed to match pool header with {x[0]['tag']}{l}")
 
 
 def save(deal,p:str):
