@@ -723,16 +723,32 @@ def mkAsset(x):
                                      0.0,
                                      _statusMapping[status]]))       
         case ["租赁"
-                ,{"固定租金": periodAmt, "初始期限": originTerm
-                  ,"频率": dp, "起始日": startDate, "剩余期限": remainTerm}] \
+                ,{"固定租金": dailyRate, "初始期限": originTerm
+                  ,"频率": dp, "起始日": startDate}] \
             |["Lease"
-                ,{"fixRental": periodAmt, "originTerm": originTerm
-                  ,"freq": dp, "originDate": startDate, "remainTerm":remainTerm} ]:
+                ,{"fixRental": dailyRate, "originTerm": originTerm
+                  ,"freq": dp, "originDate": startDate}]:
             return mkTag(("RegularLease"
-                            ,[ {"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp)} | mkTag("LeaseInfo")
-                              , periodAmt
-                              , remainTerm]))       
-
+                            ,[ {"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp),"originRental":dailyRate} | mkTag("LeaseInfo")
+                              , 0]))       
+        case ["租赁"
+                ,{"初始租金": dailyRate, "初始期限": originTerm
+                  ,"频率": dp, "起始日": startDate,"计提周期":accDp,"涨幅":rate}] \
+            |["Lease"
+                ,{"fixRental": dailyRate, "originTerm": originTerm
+                  ,"freq": dp, "originDate": startDate,"accure":accDp,"pct":rate}]:
+            
+            _stepUpType = "curve" if isinstance(rate, list) else "constant"
+            if _stepUpType == "constant":
+                return mkTag(("StepUpLease"
+                                ,[ {"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp),"originRental":dailyRate} | mkTag("LeaseInfo")
+                                  ,mkTag(("FlatRate",[mkDatePattern(accDp),rate]))
+                                  , 0]))       
+            else:
+                return mkTag(("StepUpLease"
+                                ,[ {"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp),"originRental":dailyRate} | mkTag("LeaseInfo")
+                                  ,mkTag(("ByRateCurve",[mkDatePattern(accDp),rate]))
+                                  , 0]))       
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 
@@ -743,9 +759,13 @@ def identify_deal_type(x):
             return "LDeal"
         case {"pool":{"assets":[{'tag':'Mortgage'},*rest]}} :
             return "MDeal"
+        case {"pool":{"assets":[],"futureCf":cfs}} if cfs[0]['tag']=='MortgageFlow' :
+            return "MDeal"
         case {"pool":{"assets":[{'tag':'Installment'},*rest]}} :
             return "IDeal"
         case {"pool":{"assets":[{'tag':'Lease'},*rest]}} | {"pool":{"assets":[{'tag':'RegularLease'},*rest]}}:
+            return "RDeal"
+        case {"pool":{"assets":[{'tag':'StepUpLease'},*rest]}}:
             return "RDeal"
         case _ :
             raise RuntimeError(f"Failed to identify deal type {x}")
@@ -797,6 +817,16 @@ def mkAssumption(x) -> dict:
             return mkTag(("CallWhen",[mkCallOptions(co) for co in opts]))
         case {"停止": d} | {"StopAt":d}:
             return mkTag(("StopRunBy",d))
+        case {"租赁截止日": d} | {"LeaseProjectEnd":d}:
+            return mkTag(("LeaseProjectionEnd",d))
+        case {"租赁年涨幅": r} | {"LeaseAnnualIncreaseRate":r} if not isinstance(r, list):
+            return mkTag(("LeaseBaseAnnualRate",r))
+        case {"租赁年涨幅": r} | {"LeaseAnnualIncreaseRate":r}:
+            return mkTag(("LeaseBaseCurve",mkTs("RatioCurve",r)))
+        case {"租赁间隔": n} | {"LeaseGapDays":n}:
+            return mkTag(("LeaseGapDays",n))
+        case {"租赁金额/间隔": (tbl,n)} | {"LeaseGapDaysByAmount":(tbl,n)}:
+            return mkTag(("LeaseGapDaysByAmount",[tbl,n]))
         case _ :
             raise RuntimeError(f"Failed to match {x}:Assumption")
 
