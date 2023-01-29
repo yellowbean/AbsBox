@@ -17,7 +17,7 @@ class API:
     #lang = field(repr=False, default="chinese")
     lang:str = "chinese"
     server_info = {}
-    version:tuple = "0","7","0"
+    version:tuple = "0","8","1"
     hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
     def __post_init__(self):
