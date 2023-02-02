@@ -4,6 +4,7 @@ import itertools,re
 from enum import Enum
 import numpy as np
 from functools import reduce
+from pyxirr import xirr
 
 def query(d,p):
     if len(p)==1:
@@ -60,7 +61,11 @@ def backFillBal(x,ds):
     b = pd.DataFrame({"日期": ds})
     b.set_index("日期", inplace=True)
     base = pd.concat([b, x], axis=1).sort_index()
-    paidOffDate = base[base['余额']==0].index[0]
+    paidOffDate = None
+    if any(base['余额']==0):
+        paidOffDate = base[base['余额']==0].index[0]
+    else:
+        paidOffDate = base.index[-1]
     base['flag'] = (base.index >= paidOffDate)
     base.loc[base['flag']==True, "余额"] = 0
     base.loc[base['flag']==False, "余额"] = (base["余额"] + base["本金"]).shift(-1).fillna(method='bfill')
@@ -145,8 +150,10 @@ def balanceSheetView(r, ds=None, equity=None, rnd=2):
     bv = bondView(r, flow=["余额"],flowDates=ds,flowName=False)
     av = accView(r, flow=["余额"],flowName=False)
 
-    r['pool']["flow"]["不良"] = r['pool']['flow']["违约金额"].cumsum() - r['pool']['flow']["回收金额"].cumsum()
-    pv = r['pool']['flow'][["未偿余额","不良"]]
+    pv = r['pool']['flow'][["未偿余额"]]
+    if "违约金额" in r['pool']['flow'] and "回收金额" in r['pool']['flow']:
+        r['pool']["flow"]["不良"] = r['pool']['flow']["违约金额"].cumsum() - r['pool']['flow']["回收金额"].cumsum()
+        pv = r['pool']['flow'][["未偿余额","不良"]]
     if equity:
         equityFlow = bondView(r, flow=["本息合计"],flowDates=ds,flowName=False)[equity]
         equityFlow.columns = pd.MultiIndex.from_arrays([["权益"]*len(equity), list(equityFlow.columns)])
@@ -178,47 +185,6 @@ def balanceSheetView(r, ds=None, equity=None, rnd=2):
         else:
             bs["权益", "合计"] = bs["资产", "合计"] - bs["负债", "合计"] 
 
-    # build PnL
-     #   pool_index = r['pool']['flow'].index
-     #   agg_flag = bs.index.get_indexer(list(pool_index),method='ffill')
-     #   pool_cpy = r['pool']['flow'].copy(deep=True)
-     #   pool_cpy['flag'] = agg_flag
-     #   pool_cpy = pool_cpy.groupby("flag", sort=False).aggregate(np.sum)
-     #   new_index_length = min(len(pool_cpy.index), len(bs.index))
-     #   #pool_cpy.index = bs.index[:len(pool_cpy.index)]
-     #   print(pool_cpy)
-     #   print(bs)
-     #   pool_cpy.index = bs.index[:new_index_length]
-
-     #   poolIntflow = pool_cpy['利息']
-     #   poolPrinflow = pool_cpy['本金']
-     #   poolPpyflow = pool_cpy['早偿金额']
-     #   poolRecflow = pool_cpy['回收金额']
-
-     #   feeFlow = feeView(r,flow="支付")
-     #   feeFlow["合计"] = feeFlow.sum(axis=1)
-     #   agg_flag = bs.index.get_indexer(list(feeFlow.index),method='bfill')
-     #   feeFlow['flag'] = agg_flag
-     #   feeFlow.groupby("flag").aggregate(np.sum)
-     #   feeFlow.index = bs.index
-     #   
-     #   liability_p_v = bondView(r,flow="本金")
-     #   liability_p_v['合计'] = liability_p_v.sum(axis=1)
-     #   liability_i_v = bondView(r,flow="利息")
-     #   liability_i_v['合计'] = liability_i_v.sum(axis=1)
-
-     #   bs["收入","本金"] = poolPrinflow
-     #   bs["收入","利息"] = poolIntflow
-     #   bs["收入","早偿"] = poolPpyflow
-     #   bs["收入","回收"] = poolRecflow
-
-     #   bs["支出","负债-本金"] = liability_p_v['合计']
-     #   bs["支出","负债-利息"] = liability_i_v['合计']
-     #   bs["支出","负债-费用"] = feeFlow['合计']
-     #   
-     #   bs["利润","合计"] = bs["收入","本金"] + bs["收入","利息"] + bs["收入","早偿"] + bs["收入","回收"]
-     #   bs["利润","合计"] = bs["利润","合计"] - bs["支出","负债-本金"] - bs["支出","负债-利息"] - bs["支出","负债-费用"]
-
     except RuntimeError as e:              
         print(f"Error: 其他错误=>{e}")      
     
@@ -238,6 +204,33 @@ def consolStmtByDate(s):
 def aggStmtByDate(s):
     return s.groupby("日期").sum()
 
+def aggCFby(df, interval, cols):
+    idx = None
+    dummy_col = '_index'
+    df[dummy_col] = df.index
+    _mapping = {"月份":"M","Month":"M","M":"M","month":"M"}
+    if df.index.name == "日期":
+        idx = "日期"
+    else:
+        idx = "date"
+    df[dummy_col]=pd.to_datetime(df[dummy_col]).dt.to_period(_mapping[interval])
+    df.drop(columns=[dummy_col])
+    return df.groupby([dummy_col])[cols].sum().rename_axis(idx)
+
+
+def irr(bflow,init):
+    dates = bflow.index.to_list()
+    amounts = bflow['本息合计'].to_list()
+    if init is not None:
+        dates = [init[0]]+dates
+        amounts = [init[1]]+amounts
+    return xirr(np.array(dates), np.array(amounts))
+
+def update_deal(d,i,c):
+    _d = d.copy()
+    _d.pop(i)
+    _d.insert(i,c)
+    return _d
 
 class DC(Enum):  # TODO need to check with HS code
     DC_30E_360 = "DC_30E_360"

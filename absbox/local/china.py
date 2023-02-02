@@ -26,12 +26,6 @@ def readIssuance(pool):
         r[issuanceField[k]] = v
     return r
 
-
-
-
-
-
-
 @dataclass
 class 信贷ABS:
     名称: str
@@ -186,8 +180,10 @@ class 信贷ABS:
         output['agg_accounts'] = agg_acc
 
         output['pool'] = {}
+
+        _pool_cf_header,_ = guess_pool_flow_header(resp[0]['pool']['futureCf'][0],"chinese")
         output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
-                                              , columns=["日期", "未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失", "利率"])
+                                              , columns=_pool_cf_header)
         output['pool']['flow'] = output['pool']['flow'].set_index("日期")
         output['pool']['flow'].index.rename("日期", inplace=True)
 

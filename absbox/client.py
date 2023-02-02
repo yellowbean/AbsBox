@@ -189,7 +189,7 @@ class API:
                 c = _f.read()
                 deal = pickle.loads(c)
 
-        # construst request
+        # construct request
         req = self.build_req(deal, assumptions, pricing)
 
         #validate deal
@@ -214,7 +214,7 @@ class API:
         result = self._send_req(req,url)
 
         if read:
-            flow_header,idx = guess_pool_flow_header(result,self.lang)
+            flow_header,idx = guess_pool_flow_header(result[0],self.lang)
             result = pd.DataFrame([_['contents'] for _ in result] , columns=flow_header)
             result = result.set_index(idx)
             result.index.rename(idx, inplace=True)
@@ -237,7 +237,7 @@ class API:
             raise RuntimeError(e)        
 
 def guess_pool_flow_header(x,l):
-    match (x[0]['tag'],l):
+    match (x['tag'],l):
         case ('MortgageFlow','chinese'):
             return (["日期", "未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失", "利率"],"日期")
         case ('MortgageFlow','english'):

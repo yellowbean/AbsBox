@@ -822,10 +822,10 @@ def mkAssumption(x) -> dict:
         case {"租赁年涨幅": r} | {"LeaseAnnualIncreaseRate":r} if not isinstance(r, list):
             return mkTag(("LeaseBaseAnnualRate",r))
         case {"租赁年涨幅": r} | {"LeaseAnnualIncreaseRate":r}:
-            return mkTag(("LeaseBaseCurve",mkTs("RatioCurve",r)))
+            return mkTag(("LeaseBaseCurve",mkTs("FloatCurve",r)))
         case {"租赁间隔": n} | {"LeaseGapDays":n}:
             return mkTag(("LeaseGapDays",n))
-        case {"租赁金额/间隔": (tbl,n)} | {"LeaseGapDaysByAmount":(tbl,n)}:
+        case {"租赁间隔表": (tbl,n)} | {"LeaseGapDaysByAmount":(tbl,n)}:
             return mkTag(("LeaseGapDaysByAmount",[tbl,n]))
         case _ :
             raise RuntimeError(f"Failed to match {x}:Assumption")
@@ -891,10 +891,12 @@ def mkCollection(xs):
                     , "本金回款": "CollectedPrincipal"
                     , "早偿回款": "CollectedPrepayment"
                     , "回收回款": "CollectedRecoveries"
+                    , "租金回款": "CollectedRental"
                     ,"CollectedInterest": "CollectedInterest"
                     , "CollectedPrincipal": "CollectedPrincipal"
                     , "CollectedPrepayment": "CollectedPrepayment"
                     , "CollectedRecoveries": "CollectedRecoveries"
+                    , "CollectedRental": "CollectedRental"
                     }
     return [[sourceMapping[x], acc] for (x, acc) in xs]
 
