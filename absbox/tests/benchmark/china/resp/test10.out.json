@@ -315,7 +315,7 @@
       "A1": {
         "bndName": "A1",
         "bndRate": 0.07,
-        "bndLastIntPay": null,
+        "bndLastIntPay": "2022-03-26",
         "bndOriginInfo": {
           "originRate": {
             "denominator": 100,
@@ -363,7 +363,7 @@
               0.07,
               0,
               [
-                "<PayInt:[\"A1\"],Just 1.26>",
+                "<PayInt:[\"A1\"],Just 0.72>",
                 "<PayPrin:[\"A1\"],Just 91.75>"
               ]
             ],
@@ -372,14 +372,14 @@
           {
             "contents": [
               "2021-07-26",
-              86.51,
-              3.6,
-              5.24,
+              84.7,
+              1.79,
+              7.05,
               0.07,
               8.84,
               [
                 "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just 86.51>"
+                "<PayPrin:[\"A1\"],Just 84.70>"
               ]
             ],
             "tag": "BondTxn"
@@ -387,21 +387,21 @@
           {
             "contents": [
               "2022-03-26",
-              61.8,
-              6.23,
-              24.71,
+              57.7,
+              3.94,
+              27,
               0.07,
               30.94,
               [
                 "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just 61.80>"
+                "<PayPrin:[\"A1\"],Just 57.70>"
               ]
             ],
             "tag": "BondTxn"
           }
         ],
-        "bndBalance": 61.8,
-        "bndDuePrin": 61.8
+        "bndBalance": 57.7,
+        "bndDuePrin": 57.7
       }
     },
     "overrides": null,
@@ -619,8 +619,8 @@
           {
             "contents": [
               "2021-07-26",
-              5.24,
-              -3.6,
+              7.05,
+              -1.79,
               "<PayInt:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -629,7 +629,7 @@
             "contents": [
               "2021-07-26",
               0,
-              -5.24,
+              -7.05,
               "<PayPrin:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -700,8 +700,8 @@
           {
             "contents": [
               "2022-03-26",
-              24.71,
-              -6.23,
+              27,
+              -3.94,
               "<PayInt:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -710,7 +710,7 @@
             "contents": [
               "2022-03-26",
               0,
-              -24.71,
+              -27,
               "<PayPrin:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -911,7 +911,7 @@
     {
       "contents": [
         "A1",
-        61.8,
+        57.7,
         100
       ],
       "tag": "BondOutstanding"

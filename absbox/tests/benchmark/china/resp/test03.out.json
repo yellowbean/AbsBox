@@ -259,7 +259,7 @@
       "A1": {
         "bndName": "A1",
         "bndRate": 0.07,
-        "bndLastIntPay": null,
+        "bndLastIntPay": "2021-11-26",
         "bndOriginInfo": {
           "originRate": {
             "denominator": 100,

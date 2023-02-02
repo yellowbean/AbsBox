@@ -132,7 +132,7 @@
       "B": {
         "bndName": "B",
         "bndRate": 0.08,
-        "bndLastIntPay": null,
+        "bndLastIntPay": "2021-09-26",
         "bndOriginInfo": {
           "originRate": {
             "denominator": 100,
@@ -174,14 +174,14 @@
           {
             "contents": [
               "2021-07-26",
-              22.63,
-              0.44,
-              0.82,
+              21.49,
+              0.15,
+              1.96,
               0.08,
-              1.26,
+              2.11,
               [
                 "<PayInt:[\"B\"],Just 0.00>",
-                "<PayPrin:[\"B\"],Just 22.63>"
+                "<PayPrin:[\"B\"],Just 21.49>"
               ]
             ],
             "tag": "BondTxn"
@@ -189,14 +189,14 @@
           {
             "contents": [
               "2021-08-26",
-              12.31,
-              0.58,
-              10.32,
+              9.57,
+              0.14,
+              11.92,
               0.08,
-              10.9,
+              12.06,
               [
                 "<PayInt:[\"B\"],Just 0.00>",
-                "<PayPrin:[\"B\"],Just 12.31>"
+                "<PayPrin:[\"B\"],Just 9.57>"
               ]
             ],
             "tag": "BondTxn"
@@ -204,26 +204,26 @@
           {
             "contents": [
               "2021-09-26",
-              12.31,
-              0.39,
+              9.57,
+              0.06,
               0,
               0.08,
-              0.39,
+              0.06,
               [
                 "<PayInt:[\"B\"],Just 0.00>",
-                "<PayPrin:[\"B\"],Just 12.31>"
+                "<PayPrin:[\"B\"],Just 9.57>"
               ]
             ],
             "tag": "BondTxn"
           }
         ],
-        "bndBalance": 12.31,
-        "bndDuePrin": 12.31
+        "bndBalance": 9.57,
+        "bndDuePrin": 9.57
       },
       "A1": {
         "bndName": "A1",
         "bndRate": 0.07,
-        "bndLastIntPay": null,
+        "bndLastIntPay": "2022-01-26",
         "bndOriginInfo": {
           "originRate": {
             "denominator": 100,
@@ -287,10 +287,10 @@
             "contents": [
               "2021-07-26",
               70,
-              1.31,
+              0.46,
               10,
               0.07,
-              11.31,
+              10.46,
               [
                 "<PayInt:[\"A1\"],Just 0.00>",
                 "<PayPrin:[\"A1\"],Just 0.00>"
@@ -302,10 +302,10 @@
             "contents": [
               "2021-08-26",
               70,
-              1.57,
+              0.41,
               0,
               0.07,
-              1.57,
+              0.41,
               [
                 "<PayInt:[\"A1\"],Just 0.00>",
                 "<PayPrin:[\"A1\"],Just 0.00>"
@@ -316,14 +316,14 @@
           {
             "contents": [
               "2021-09-26",
-              59.96,
-              1.98,
-              10.04,
+              58.06,
+              0.41,
+              11.94,
               0.07,
-              12.02,
+              12.35,
               [
                 "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just 9.96>"
+                "<PayPrin:[\"A1\"],Just 8.06>"
               ]
             ],
             "tag": "BondTxn"
@@ -331,14 +331,14 @@
           {
             "contents": [
               "2021-10-26",
-              49.67,
-              2.04,
-              10.29,
+              46.06,
+              0.33,
+              12,
               0.07,
               12.33,
               [
                 "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just (-0.33)>"
+                "<PayPrin:[\"A1\"],Just (-3.94)>"
               ]
             ],
             "tag": "BondTxn"
@@ -346,14 +346,14 @@
           {
             "contents": [
               "2021-11-26",
-              39.43,
-              1.99,
-              10.24,
+              34.1,
+              0.27,
+              11.96,
               0.07,
               12.23,
               [
                 "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just (-10.57)>"
+                "<PayPrin:[\"A1\"],Just (-15.90)>"
               ]
             ],
             "tag": "BondTxn"
@@ -361,14 +361,14 @@
           {
             "contents": [
               "2021-12-26",
-              29.07,
-              1.8,
-              10.36,
+              22.13,
+              0.19,
+              11.97,
               0.07,
               12.16,
               [
                 "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just (-20.93)>"
+                "<PayPrin:[\"A1\"],Just (-27.87)>"
               ]
             ],
             "tag": "BondTxn"
@@ -376,21 +376,21 @@
           {
             "contents": [
               "2022-01-26",
-              18.5,
-              1.5,
-              10.57,
+              10.19,
+              0.13,
+              11.94,
               0.07,
               12.07,
               [
                 "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just (-31.50)>"
+                "<PayPrin:[\"A1\"],Just (-39.81)>"
               ]
             ],
             "tag": "BondTxn"
           }
         ],
-        "bndBalance": 18.5,
-        "bndDuePrin": -31.5
+        "bndBalance": 10.19,
+        "bndDuePrin": -39.81
       }
     },
     "overrides": null,
@@ -509,8 +509,8 @@
           {
             "contents": [
               "2021-07-26",
-              11.26,
-              -1.31,
+              12.11,
+              -0.46,
               "<PayInt:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -518,8 +518,8 @@
           {
             "contents": [
               "2021-07-26",
-              10.82,
-              -0.44,
+              11.96,
+              -0.15,
               "<PayInt:[\"B\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -527,7 +527,7 @@
           {
             "contents": [
               "2021-07-26",
-              0.82,
+              1.96,
               -10,
               "<PayPrin:[\"A1\"],Nothing>"
             ],
@@ -537,7 +537,7 @@
             "contents": [
               "2021-07-26",
               0,
-              -0.82,
+              -1.96,
               "<PayPrin:[\"B\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -581,8 +581,8 @@
           {
             "contents": [
               "2021-08-26",
-              10.9,
-              -1.57,
+              12.06,
+              -0.41,
               "<PayInt:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -590,8 +590,8 @@
           {
             "contents": [
               "2021-08-26",
-              10.32,
-              -0.58,
+              11.92,
+              -0.14,
               "<PayInt:[\"B\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -599,7 +599,7 @@
           {
             "contents": [
               "2021-08-26",
-              10.32,
+              11.92,
               0,
               "<PayPrin:[\"A1\"],Nothing>"
             ],
@@ -609,7 +609,7 @@
             "contents": [
               "2021-08-26",
               0,
-              -10.32,
+              -11.92,
               "<PayPrin:[\"B\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -653,8 +653,8 @@
           {
             "contents": [
               "2021-09-26",
-              10.43,
-              -1.98,
+              12,
+              -0.41,
               "<PayInt:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -662,8 +662,8 @@
           {
             "contents": [
               "2021-09-26",
-              10.04,
-              -0.39,
+              11.94,
+              -0.06,
               "<PayInt:[\"B\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -672,7 +672,7 @@
             "contents": [
               "2021-09-26",
               0,
-              -10.04,
+              -11.94,
               "<PayPrin:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -725,8 +725,8 @@
           {
             "contents": [
               "2021-10-26",
-              10.29,
-              -2.04,
+              12,
+              -0.33,
               "<PayInt:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -735,7 +735,7 @@
             "contents": [
               "2021-10-26",
               0,
-              -10.29,
+              -12,
               "<PayPrin:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -779,8 +779,8 @@
           {
             "contents": [
               "2021-11-26",
-              10.24,
-              -1.99,
+              11.96,
+              -0.27,
               "<PayInt:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -789,7 +789,7 @@
             "contents": [
               "2021-11-26",
               0,
-              -10.24,
+              -11.96,
               "<PayPrin:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -833,8 +833,8 @@
           {
             "contents": [
               "2021-12-26",
-              10.36,
-              -1.8,
+              11.97,
+              -0.19,
               "<PayInt:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -843,7 +843,7 @@
             "contents": [
               "2021-12-26",
               0,
-              -10.36,
+              -11.97,
               "<PayPrin:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -887,8 +887,8 @@
           {
             "contents": [
               "2022-01-26",
-              10.57,
-              -1.5,
+              11.94,
+              -0.13,
               "<PayInt:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -897,7 +897,7 @@
             "contents": [
               "2022-01-26",
               0,
-              -10.57,
+              -11.94,
               "<PayPrin:[\"A1\"],Nothing>"
             ],
             "tag": "AccTxn"
@@ -1213,7 +1213,7 @@
     {
       "contents": [
         "A1",
-        18.5,
+        10.19,
         100
       ],
       "tag": "BondOutstanding"
@@ -1221,7 +1221,7 @@
     {
       "contents": [
         "B",
-        12.31,
+        9.57,
         40
       ],
       "tag": "BondOutstanding"
