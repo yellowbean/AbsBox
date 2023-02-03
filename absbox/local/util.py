@@ -240,6 +240,11 @@ def npv(flow,**p):
             return _pv("本息合计")
         case (['租金'],"日期"):
             return _pv("租金")
+        case (["Balance", "Principal", "Interest", "Prepayment", "Default", "Recovery", "Loss", "WAC"],"Date"):
+            flow['Cash'] = flow["Principal"]+flow["Interest"]+flow["Prepayment"]+flow["Recovery"]
+            return _pv("Cash")
+        case (['Rental'],"Date"):
+            return _pv("Rental")
         case _:
             raise RuntimeError("Failed to match",cols,idx_name)
 
