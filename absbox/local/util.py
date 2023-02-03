@@ -6,6 +6,8 @@ import numpy as np
 from functools import reduce
 from pyxirr import xirr,xnpv
 
+from absbox.local.base import *
+
 def query(d,p):
     if len(p)==1:
         return d[p[0]]
@@ -205,46 +207,67 @@ def aggStmtByDate(s):
     return s.groupby("日期").sum()
 
 
-def aggCFby(df, interval, cols):
+def aggCFby(_df, interval, cols):
+    df = _df.copy()
     idx = None
     dummy_col = '_index'
     df[dummy_col] = df.index
-    _mapping = {"月份":"M","Month":"M","M":"M","month":"M"}
+    _mapping = {"月份":"M"
+               ,"Month":"M"
+               ,"M":"M"
+               ,"month":"M"}
     if df.index.name == "日期":
         idx = "日期"
     else:
         idx = "date"
     df[dummy_col]=pd.to_datetime(df[dummy_col]).dt.to_period(_mapping[interval])
-    df.drop(columns=[dummy_col])
-    return df.groupby([dummy_col])[cols].sum().rename_axis(idx)
+    return df.groupby([dummy_col])[cols].sum().rename_axis(idx)#.drop(columns=[dummy_col])
 
+def irr(flow,init=None):
+    def extract_cash_col(_cols):
+        if _cols == china_bondflow_fields_s:
+            return flow['本息合计']
+        elif _cols == english_bondflow_fields_s: 
+            return flow['cash']
+        else:
+            raise RuntimeError("Failed to match",_cols)
 
-def irr(bflow,init):
-    dates = bflow.index.to_list()
-    amounts = bflow['本息合计'].to_list()
+    cols = flow.columns.to_list()
+    dates = flow.index.to_list()
+    amounts = extract_cash_col(cols).to_list()
+        
     if init is not None:
-        dates = [init[0]]+dates
-        amounts = [init[1]]+amounts
+        invest_date,invest_amount = init
+        dates = [invest_date]+dates
+        amounts = [invest_amount]+amounts
+    
     return xirr(np.array(dates), np.array(amounts))
 
+def sum_fields_to_field(df,cols,col):
+    df[col] = df[cols].sum(axis=1)
+    return df
 
-def npv(flow,**p):
+def npv(_flow,**p):
+    flow = _flow.copy()
     cols = flow.columns.to_list()
     idx_name = flow.index.name
     init_date,_init_amt = p['init']
     init_amt = _init_amt if _init_amt!=0.00 else 0.0001
-    def _pv(af):
-        return xnpv(p['rate'],[init_date]+flow.index.to_list(),[-1*init_amt]+flow[af].to_list())
+    def _pv(_af):
+        af = flow[_af]
+        return xnpv(p['rate'],[init_date]+flow.index.to_list(),[-1*init_amt]+af.to_list())
     match (cols,idx_name):
-        case (['余额', '利息', '本金', '执行利率', '本息合计', '备注'],"日期"):
-            return _pv("本息合计")
-        case (['租金'],"日期"):
+        case (china_rental_flow,"日期"):
             return _pv("租金")
-        case (["Balance", "Principal", "Interest", "Prepayment", "Default", "Recovery", "Loss", "WAC"],"Date"):
-            flow['Cash'] = flow["Principal"]+flow["Interest"]+flow["Prepayment"]+flow["Recovery"]
-            return _pv("Cash")
-        case (['Rental'],"Date"):
+        case (english_rental_flow,"Date"):
             return _pv("Rental")
+        case (english_mortgage_flow_fields,"Date"):
+            sum_fields_to_field(flow,["Principal","Interest","Prepayment","Recovery"], "Cash")
+            return _pv("Cash")
+        case (china_bondflow_fields,"日期"):
+            return _pv("本息合计")
+        case (english_bondflow_fields,"Date"):
+            return _pv("cash")
         case _:
             raise RuntimeError("Failed to match",cols,idx_name)
 

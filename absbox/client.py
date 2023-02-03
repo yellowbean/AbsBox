@@ -6,6 +6,7 @@ import urllib3
 from dataclasses import dataclass,field
 from absbox.local.util import mkTag,query,isDate,flat
 from absbox.local.component import mkPool,mkAssumption,mkAssumption2
+from absbox.local.base import *
 import pandas as pd
 #from pyspecter import S,query
 
@@ -31,7 +32,7 @@ class API:
         echo = json.loads(_r)
         self.server_info = echo
         x,y,z = echo['version'].split(".")
-        logging.info(f"Connect Successfully with engine version {echo['version']}")
+        logging.info(f"Connect with engine version {echo['version']} successfully")
         if self.version[1] != y:
             logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['version']} , pls upgrade your api package by: pip -U absbox")
             return
@@ -239,13 +240,13 @@ class API:
 def guess_pool_flow_header(x,l):
     match (x['tag'],l):
         case ('MortgageFlow','chinese'):
-            return (["日期", "未偿余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失", "利率"],"日期")
+            return (china_mortgage_flow_fields_d,"日期")
         case ('MortgageFlow','english'):
-            return (["Date", "Balance", "Principal", "Interest", "Prepayment", "Default", "Recovery", "Loss", "WAC"],"Date")
+            return (english_mortgage_flow_fields_d,"Date")
         case ('LeaseFlow','chinese'):
-            return (["日期", "租金"],"日期")
+            return (china_rental_flow_d,"日期")
         case ('LeaseFlow','english'):
-            return (["Date", "Rental"],"Date")
+            return (english_rental_flow_d,"Date")
         case _:
             raise RuntimeError(f"Failed to match pool header with {x[0]['tag']}{l}")
 

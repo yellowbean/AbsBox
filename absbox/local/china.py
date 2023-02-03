@@ -141,7 +141,7 @@ class 信贷ABS:
         return None
 
     def read(self, resp, position=None):
-        read_paths = {'bonds': ('bndStmt', ["日期", "余额", "利息", "本金", "执行利率", "本息合计", "备注"], "债券")
+        read_paths = {'bonds': ('bndStmt', china_bondflow_fields, "债券")
                     , 'fees': ('feeStmt', ["日期", "余额", "支付", "剩余支付", "备注"], "费用")
                     , 'accounts': ('accStmt', ["日期", "余额", "变动额", "备注"], "账户")
                     , 'liqProvider': ('liqStmt', ["日期", "限额", "变动额", "已提供","备注"], "流动性支持")

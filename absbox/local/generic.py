@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import functools
 from absbox.local.util import mkTag
 from absbox.local.component import *
+from absbox.local.base import * 
 import pandas as pd
 import collections
 
@@ -86,7 +87,7 @@ class Generic:
 
     def read(self, resp, position=None):
         read_paths = {'bonds': ('bndStmt'
-                               , ["date", "balance", "interest", "principal", "rate", "cash", "memo"]
+                               , english_bondflow_fields
                                , "bond")
                      , 'fees': ('feeStmt'
                                , ["date", "balance", "payment", "due", "memo"]
@@ -126,7 +127,7 @@ class Generic:
 
         output['pool'] = {}
         output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
-                                              , columns=["date", "balance", "principal", "interest", "prepayment", "default", "recovery", "loss", "rate"])
+                                              , columns=english_mortgage_flow_fields_d)
         output['pool']['flow'] = output['pool']['flow'].set_index("date")
         output['pool']['flow'].index.rename("date", inplace=True)
 
