@@ -4,7 +4,7 @@ import itertools,re
 from enum import Enum
 import numpy as np
 from functools import reduce
-from pyxirr import xirr
+from pyxirr import xirr,xnpv
 
 def query(d,p):
     if len(p)==1:
@@ -204,6 +204,7 @@ def consolStmtByDate(s):
 def aggStmtByDate(s):
     return s.groupby("日期").sum()
 
+
 def aggCFby(df, interval, cols):
     idx = None
     dummy_col = '_index'
@@ -225,6 +226,23 @@ def irr(bflow,init):
         dates = [init[0]]+dates
         amounts = [init[1]]+amounts
     return xirr(np.array(dates), np.array(amounts))
+
+
+def npv(flow,**p):
+    cols = flow.columns.to_list()
+    idx_name = flow.index.name
+    init_date,_init_amt = p['init']
+    init_amt = _init_amt if _init_amt!=0.00 else 0.0001
+    def _pv(af):
+        return xnpv(p['rate'],[init_date]+flow.index.to_list(),[-1*init_amt]+flow[af].to_list())
+    match (cols,idx_name):
+        case (['余额', '利息', '本金', '执行利率', '本息合计', '备注'],"日期"):
+            return _pv("本息合计")
+        case (['租金'],"日期"):
+            return _pv("租金")
+        case _:
+            raise RuntimeError("Failed to match",cols,idx_name)
+
 
 def update_deal(d,i,c):
     _d = d.copy()
