@@ -7,3 +7,4 @@ pyspecter
 pyxirr
 jsondiff
 deepdiff
+pyspecter
