@@ -10,8 +10,10 @@ from functools import reduce
 import matplotlib.pyplot as plt
 
 from absbox import *
-from absbox.local.util import mkTag,DC,mkTs,query,consolStmtByDate,aggStmtByDate
+from absbox.local.util import mkTag,DC,mkTs,consolStmtByDate,aggStmtByDate
 from absbox.local.component import *
+
+from pyspecter import query
 
 
 

@@ -128,8 +128,9 @@ class Generic:
         output['pool'] = {}
         output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
                                               , columns=english_mortgage_flow_fields_d)
-        output['pool']['flow'] = output['pool']['flow'].set_index("date")
-        output['pool']['flow'].index.rename("date", inplace=True)
+        pool_idx = 'Date'
+        output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)
+        output['pool']['flow'].index.rename(pool_idx, inplace=True)
 
         output['pricing'] = pd.DataFrame.from_dict(resp[3]
                                                    , orient='index'

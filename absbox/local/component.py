@@ -1,6 +1,8 @@
-from absbox.local.util import mkTag,DC,mkTs,query
+from absbox.local.util import mkTag,DC,mkTs
 from enum import Enum
 import itertools
+
+from pyspecter import query
 
 datePattern = {"月末":"MonthEnd"
               ,"季度末":"QuarterEnd"
@@ -21,6 +23,10 @@ freqMap = {"每月": "Monthly"
     , "Quarterly": "Quarterly"
     , "SemiAnnually": "SemiAnnually"
     , "Annually": "Annually"
+    , "monthly": "Monthly"
+    , "quarterly": "Quarterly"
+    , "semiAnnually": "SemiAnnually"
+    , "annually": "Annually"
     }
 
 baseMap = {"资产池余额": "CurrentPoolBalance"
@@ -624,7 +630,7 @@ def mkWaterfall(r, x):
 
 def mkAssetRate(x):
     match x:
-        case ["固定",r] | ["Fixed",r]:
+        case ["固定",r] | ["fix",r]:
             return mkTag(("Fix",r))
         case ["浮动",r,{"基准":idx,"利差":spd,"重置频率":p}]:
             return mkTag(("Floater",[idx,spd,r,freqMap[p],None]))
@@ -635,13 +641,13 @@ def mkAssetRate(x):
 
 def mkAmortPlan(x)->dict:
     match x:
-        case "等额本息" | "Level" :
+        case "等额本息" | "Level" | "level":
             return mkTag("Level")
-        case "等额本金" | "Even" :
+        case "等额本金" | "Even" | "even":
             return mkTag("Even")
-        case "先息后本" | "I_P" :
+        case "先息后本" | "I_P" | "i_p" :
             return mkTag("I_P")
-        case "等本等费" | "F_P" :
+        case "等本等费" | "F_P" | "f_p" :
             return mkTag("F_P")
         case _ :
             raise RuntimeError(f"Failed to match AmortPlan {x}:mkAmortPlan")
@@ -650,8 +656,8 @@ def mkAmortPlan(x)->dict:
 def mkAsset(x):
     _statusMapping = {"正常": mkTag(("Current"))
                     , "违约": mkTag(("Defaulted",None))
-                    , "Current":mkTag(("Current"))
-                    , "Defaulted": mkTag(("Defaulted",None))
+                    , "current":mkTag(("Current"))
+                    , "defaulted": mkTag(("Defaulted",None))
                     }
     match x:
         case ["按揭贷款"
@@ -685,7 +691,7 @@ def mkAsset(x):
              ,"当前利率": currentRate
              ,"剩余期限": remainTerms
              ,"状态": status}] \
-            |["loan"
+            |["Loan"
             ,{"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm
                   ,"freq": freq, "type": _type, "originDate": startDate}
             ,{"currentBalance": currentBalance
@@ -729,13 +735,13 @@ def mkAsset(x):
                 ,{"fixRental": dailyRate, "originTerm": originTerm
                   ,"freq": dp, "originDate": startDate}]:
             return mkTag(("RegularLease"
-                            ,[ {"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp),"originRental":dailyRate} | mkTag("LeaseInfo")
-                              , 0]))       
+                            ,[{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp),"originRental":dailyRate} | mkTag("LeaseInfo")
+                              ,0]))       
         case ["租赁"
                 ,{"初始租金": dailyRate, "初始期限": originTerm
                   ,"频率": dp, "起始日": startDate,"计提周期":accDp,"涨幅":rate}] \
             |["Lease"
-                ,{"fixRental": dailyRate, "originTerm": originTerm
+                ,{"initRental": dailyRate, "originTerm": originTerm
                   ,"freq": dp, "originDate": startDate,"accure":accDp,"pct":rate}]:
             
             _stepUpType = "curve" if isinstance(rate, list) else "constant"

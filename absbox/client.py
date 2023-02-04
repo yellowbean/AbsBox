@@ -4,11 +4,11 @@ import requests
 from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass,field
-from absbox.local.util import mkTag,query,isDate,flat
+from absbox.local.util import mkTag,isDate,flat
 from absbox.local.component import mkPool,mkAssumption,mkAssumption2
 from absbox.local.base import *
 import pandas as pd
-#from pyspecter import S,query
+from pyspecter import S,query
 
 urllib3.disable_warnings()
 
@@ -68,8 +68,7 @@ class API:
                 missing_asset_id = asset_ids - _ids
                 if len(missing_asset_id)>0:
                     w.append(f"Missing Asset to set assumption:{missing_asset_id}")            
-            case {'tag':'Multiple',
-                'contents':scenarioMap}:
+            case {'tag':'Multiple', 'contents':scenarioMap}:
                 for k,v in scenarioMap.items():
                     _ids = set(flat([ _a[0] for _a in v['contents'][0]]))
                     if not _ids.issubset(asset_ids):
