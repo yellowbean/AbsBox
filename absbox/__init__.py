@@ -7,5 +7,3 @@ from absbox.client import API,save,init_jupyter,comp_engines,guess_pool_flow_hea
 from absbox.local.base import *
 from absbox.local.china import 信贷ABS,SPV
 from absbox.local.generic import Generic
-
-

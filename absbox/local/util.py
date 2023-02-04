@@ -8,15 +8,6 @@ from pyxirr import xirr,xnpv
 
 from absbox.local.base import *
 
-def query(d,p):
-    if len(p)==1:
-        return d[p[0]]
-    else:
-        if p[0] in d:
-            return query(d[p[0]],p[1:])
-        else:
-            return None
-
 def flat(xss) -> list:
     return reduce(lambda xs, ys: xs + ys, xss)
 
@@ -36,18 +27,6 @@ def isDate(x):
 def mkTs(n, vs):
     return mkTag((n, vs))
 
-
-def backFillBal(x,ds):
-    b = pd.DataFrame({"日期":ds})
-    b.set_index("日期",inplace=True)
-    base = pd.concat([b,x],axis=1).sort_index()
-    paidOffDate = base[base['余额']==0].index[0]
-    base['flag'] = (base.index >= paidOffDate)
-    base.loc[base['flag']==True,"余额"]=0
-    base.loc[base['flag']==False,"余额"]= (base["余额"] + base["本金"]).shift(-1).fillna(method='bfill')
-    return base
-
-
 def unify(xs, ns):
     index_name = xs[0].index.name
     dfs = []
@@ -64,14 +43,20 @@ def backFillBal(x,ds):
     b.set_index("日期", inplace=True)
     base = pd.concat([b, x], axis=1).sort_index()
     paidOffDate = None
+    r = None
     if any(base['余额']==0):
         paidOffDate = base[base['余额']==0].index[0]
+        base['flag'] = (base.index >= paidOffDate)
+        base.loc[base['flag']==True, "余额"] = 0
+        base.loc[base['flag']==False, "余额"] = (base["余额"] + base["本金"]).shift(-1).fillna(method='bfill')
+        r = base.drop(["flag"], axis=1)
     else:
-        paidOffDate = base.index[-1]
-    base['flag'] = (base.index >= paidOffDate)
-    base.loc[base['flag']==True, "余额"] = 0
-    base.loc[base['flag']==False, "余额"] = (base["余额"] + base["本金"]).shift(-1).fillna(method='bfill')
-    return base.drop(["flag"], axis=1)
+        last_index = base.index.to_list()[-1]
+        last_keep_balance = base.at[last_index, "余额"]
+        base["余额"] = (base["余额"] + base["本金"]).shift(-1).fillna(method='bfill')
+        base.at[last_index, "余额"] = last_keep_balance
+        r = base
+    return r 
 
 
 def bondView(r,flow=None, flowName=True,flowDates=None,rnd=2):
@@ -93,6 +78,7 @@ def bondView(r,flow=None, flowName=True,flowDates=None,rnd=2):
             result.append(backFillBal(bnd,flowDates)[flow])
         else:
             result.append(backFillBal(bnd,flowDates))
+    
     x = pd.concat(result,axis=1)
     bnd_cols_count = len(flow) if flow else default_bnd_col_size
     headers = [ bnd_cols_count*[bn] for bn in bnd_names]
