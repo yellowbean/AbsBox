@@ -170,7 +170,7 @@
           "originDate": "2020-01-03",
           "originBalance": 100
         },
-        "bndDueInt": 0,
+        "bndDueInt": -122418.86,
         "bndType": {
           "tag": "Equity"
         },
@@ -195,7 +195,7 @@
               1422.34,
               [
                 "<PayPrin:[\"B\"],Just 0.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just (-1402.34)>"
               ]
             ],
             "tag": "BondTxn"
@@ -208,7 +208,7 @@
               0,
               0,
               499.92,
-              "<PayYield:B>"
+              "<PayYield:B,Just (-1902.26)>"
             ],
             "tag": "BondTxn"
           },
@@ -220,7 +220,7 @@
               0,
               0,
               120516.6,
-              "<PayYield:B>"
+              "<PayYield:B,Just (-122418.86)>"
             ],
             "tag": "BondTxn"
           }
@@ -357,7 +357,7 @@
               "2021-07-26",
               0,
               -1402.34,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -438,7 +438,7 @@
               "2021-08-26",
               0,
               -499.92,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -519,7 +519,7 @@
               "2021-09-26",
               0,
               -120516.6,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           }
@@ -663,7 +663,7 @@
     {
       "contents": [
         "B",
-        0,
+        -122418.86,
         20
       ],
       "tag": "BondOutstandingInt"

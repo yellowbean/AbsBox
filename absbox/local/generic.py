@@ -36,7 +36,7 @@ class Generic:
             "dates": parsedDates,
             "name": self.name,
             "status":mkTag((self.status)),
-            "pool": {"assets": [mkAsset(x) for x in self.pool.get('breakdown', [])]
+            "pool": {"assets": [mkAsset(x) for x in self.pool.get('assets', [])]
                      , "asOfDate": self.dates['cutoff']
                      , "issuanceStat": self.pool.get("issuanceStat")
                      , "futureCf":mkCf(self.pool.get('cashflow', [])) },

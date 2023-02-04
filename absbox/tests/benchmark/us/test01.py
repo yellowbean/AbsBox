@@ -4,13 +4,13 @@ test01 = Generic(
     "TEST01"
     ,{"cutoff":"2021-03-01","closing":"2021-06-15","firstPay":"2021-07-26"
      ,"payFreq":["DayOfMonth",20],"poolFreq":"MonthEnd","stated":"2030-01-01"}
-    ,{'breakdown':[["Mortgage"
-        ,{"originBalance":120,"originRate":["Fixed",0.045],"originTerm":30
+    ,{'assets':[["Mortgage"
+        ,{"originBalance":120,"originRate":["fix",0.045],"originTerm":30
           ,"freq":"Monthly","type":"Level","originDate":"2021-02-01"}
           ,{"currentBalance":120
           ,"currentRate":0.08
           ,"remainTerm":20
-          ,"status":"Current"}]]}
+          ,"status":"current"}]]}
     ,(("acc01",{"balance":0}),)
     ,(("A1",{"balance":100
              ,"rate":0.07

@@ -186,7 +186,7 @@
           "originDate": "2020-01-03",
           "originBalance": 100
         },
-        "bndDueInt": 0,
+        "bndDueInt": -65.74,
         "bndType": {
           "tag": "Equity"
         },
@@ -211,7 +211,7 @@
               49.39,
               [
                 "<PayPrin:[\"B\"],Just 0.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just (-29.39)>"
               ]
             ],
             "tag": "BondTxn"
@@ -224,7 +224,7 @@
               0,
               0,
               18.24,
-              "<PayYield:B>"
+              "<PayYield:B,Just (-47.63)>"
             ],
             "tag": "BondTxn"
           },
@@ -236,7 +236,7 @@
               0,
               0,
               18.11,
-              "<PayYield:B>"
+              "<PayYield:B,Just (-65.74)>"
             ],
             "tag": "BondTxn"
           },
@@ -248,7 +248,7 @@
               0,
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Just (-65.74)>"
             ],
             "tag": "BondTxn"
           }
@@ -376,7 +376,7 @@
               "2021-11-26",
               0,
               -29.39,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -448,7 +448,7 @@
               "2021-12-26",
               0,
               -18.24,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -520,7 +520,7 @@
               "2022-01-26",
               0,
               -18.11,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -547,7 +547,7 @@
               "2022-01-31",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           }
@@ -697,7 +697,7 @@
     {
       "contents": [
         "B",
-        0,
+        -65.74,
         20
       ],
       "tag": "BondOutstandingInt"

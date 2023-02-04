@@ -326,7 +326,7 @@
           "originDate": "2020-01-03",
           "originBalance": 100
         },
-        "bndDueInt": 0,
+        "bndDueInt": -43.41,
         "bndType": {
           "tag": "Equity"
         },
@@ -351,7 +351,7 @@
               5.92,
               [
                 "<PayPrin:[\"B\"],Just 14.08>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -366,7 +366,7 @@
               8.38,
               [
                 "<PayPrin:[\"B\"],Just 5.70>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -381,7 +381,7 @@
               8.31,
               [
                 "<PayPrin:[\"B\"],Just 0.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just (-2.61)>"
               ]
             ],
             "tag": "BondTxn"
@@ -394,7 +394,7 @@
               0,
               0,
               8.27,
-              "<PayYield:B>"
+              "<PayYield:B,Just (-10.88)>"
             ],
             "tag": "BondTxn"
           },
@@ -406,7 +406,7 @@
               0,
               0,
               8.21,
-              "<PayYield:B>"
+              "<PayYield:B,Just (-19.09)>"
             ],
             "tag": "BondTxn"
           },
@@ -418,7 +418,7 @@
               0,
               0,
               8.16,
-              "<PayYield:B>"
+              "<PayYield:B,Just (-27.25)>"
             ],
             "tag": "BondTxn"
           },
@@ -430,7 +430,7 @@
               0,
               0,
               8.11,
-              "<PayYield:B>"
+              "<PayYield:B,Just (-35.36)>"
             ],
             "tag": "BondTxn"
           },
@@ -442,7 +442,7 @@
               0,
               0,
               8.05,
-              "<PayYield:B>"
+              "<PayYield:B,Just (-43.41)>"
             ],
             "tag": "BondTxn"
           }
@@ -1298,7 +1298,7 @@
               "2022-04-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1379,7 +1379,7 @@
               "2022-05-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1460,7 +1460,7 @@
               "2022-06-26",
               0,
               -2.61,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1541,7 +1541,7 @@
               "2022-07-26",
               0,
               -8.27,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1622,7 +1622,7 @@
               "2022-08-26",
               0,
               -8.21,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1703,7 +1703,7 @@
               "2022-09-26",
               0,
               -8.16,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1784,7 +1784,7 @@
               "2022-10-26",
               0,
               -8.11,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1865,7 +1865,7 @@
               "2022-11-26",
               0,
               -8.05,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           }
@@ -2401,7 +2401,7 @@
     {
       "contents": [
         "B",
-        0,
+        -43.41,
         20
       ],
       "tag": "BondOutstandingInt"

@@ -28,6 +28,7 @@ def translate(input_cases,output_folder):
     case_out = output_folder
     pair = input_cases
     for d,o in pair:
+        print(f"Translating>>{d}>>{o}")
         benchfile =  os.path.join(case_out,o)
         if not os.path.exists(benchfile):
             print(f"Skipping:{benchfile}")

@@ -345,7 +345,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -360,7 +360,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -375,7 +375,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -390,7 +390,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -405,7 +405,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -420,7 +420,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -435,7 +435,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -450,7 +450,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -465,7 +465,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -480,7 +480,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -495,7 +495,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -510,7 +510,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -525,7 +525,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -540,7 +540,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -555,7 +555,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -570,7 +570,7 @@
               1.43,
               [
                 "<PayPrin:[\"B\"],Just 18.57>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -585,7 +585,7 @@
               6.07,
               [
                 "<PayPrin:[\"B\"],Just 12.50>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -600,7 +600,7 @@
               6.04,
               [
                 "<PayPrin:[\"B\"],Just 6.46>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -963,7 +963,7 @@
               "2021-07-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1044,7 +1044,7 @@
               "2021-08-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1125,7 +1125,7 @@
               "2021-09-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1206,7 +1206,7 @@
               "2021-10-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1287,7 +1287,7 @@
               "2021-11-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1368,7 +1368,7 @@
               "2021-12-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1449,7 +1449,7 @@
               "2022-01-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1530,7 +1530,7 @@
               "2022-02-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1611,7 +1611,7 @@
               "2022-03-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1692,7 +1692,7 @@
               "2022-04-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1773,7 +1773,7 @@
               "2022-05-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1854,7 +1854,7 @@
               "2022-06-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -1935,7 +1935,7 @@
               "2022-07-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -2016,7 +2016,7 @@
               "2022-08-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -2097,7 +2097,7 @@
               "2022-09-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -2178,7 +2178,7 @@
               "2022-10-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -2259,7 +2259,7 @@
               "2022-11-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -2340,7 +2340,7 @@
               "2022-12-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           }

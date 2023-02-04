@@ -258,7 +258,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -273,7 +273,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -288,7 +288,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -303,7 +303,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B>"
+                "<PayYield:B,Just 0.00>"
               ]
             ],
             "tag": "BondTxn"
@@ -486,7 +486,7 @@
               "2021-04-15",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -531,7 +531,7 @@
               "2021-05-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -648,7 +648,7 @@
               "2021-07-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           },
@@ -729,7 +729,7 @@
               "2022-03-26",
               0,
               0,
-              "<PayYield:B>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "AccTxn"
           }
