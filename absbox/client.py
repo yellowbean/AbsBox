@@ -56,12 +56,18 @@ class API:
                           ,ensure_ascii=False)
 
     def _validate_assump(self,x,e,w):
+        def asset_check(_e,_w):
+
+            return _e,_w
         a = x['assump']
         asset_ids = set(range(len(query(x,['deal','contents','pool','assets']))))
+        #print("matching",a)            
         match a:
-            case {'tag':'Single',
-                'contents':{'tag':'ByIndex',
-                            'contents':(assumps,_)}}:
+            case {'tag':'Single','contents':{'tag':'PoolLevel'}}:
+                return [True,e,w]
+            case {'tag':'Multiple','contents':{'tag':'PoolLevel'}}:
+                return [True,e,w]
+            case {'tag':'Single', 'contents':{'tag':'ByIndex', 'contents':(assumps,_)}}:
                 _ids = set(flat([ assump[0] for assump in assumps ]))
                 if not _ids.issubset(asset_ids):
                     e.append(f"Not Valid Asset ID:{_ids - asset_ids}")
@@ -70,16 +76,14 @@ class API:
                     w.append(f"Missing Asset to set assumption:{missing_asset_id}")            
             case {'tag':'Multiple', 'contents':scenarioMap}:
                 for k,v in scenarioMap.items():
+                    if v['tag']=='PoolLevel':
+                        continue
                     _ids = set(flat([ _a[0] for _a in v['contents'][0]]))
                     if not _ids.issubset(asset_ids):
                         e.append(f"Scenario:{k},Not Valid Asset ID:{_ids - asset_ids}")
                     missing_asset_id = asset_ids - _ids
                     if len(missing_asset_id)>0:
                         w.append(f"Scenario:{k},Missing Asset to set assumption:{missing_asset_id}")
-            case {'tag':'Single','contents':{'tag':'PoolLevel'}}:
-                return [True,e,w]
-            case {'tag':'Multiple','contents':{'tag':'PoolLevel'}}:
-                return [True,e,w]
             case None:
                 return [True,e,w]
             case _ :
