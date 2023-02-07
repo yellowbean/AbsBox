@@ -790,9 +790,9 @@ def mkCallOptions(x):
         case {"指定日之后": d} | {"afterDate": d}:
             return mkTag(("AfterDate", d))
         case {"任意满足": xs} | {"or": xs}:
-            return mkTag(("Or", xs))
+            return mkTag(("Or", [ mkCallOptions(_x) for _x in xs ]))
         case {"全部满足": xs} | {"and": xs}:
-            return mkTag(("And", xs))
+            return mkTag(("And", [ mkCallOptions(_x) for _x in xs ]))
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkCallOptions")
             

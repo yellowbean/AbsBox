@@ -219,7 +219,10 @@ class API:
 
         if read:
             flow_header,idx = guess_pool_flow_header(result[0],self.lang)
-            result = pd.DataFrame([_['contents'] for _ in result] , columns=flow_header)
+            try:
+                result = pd.DataFrame([_['contents'] for _ in result] , columns=flow_header)
+            except ValueError as e:
+                logging.error(f"Failed to match header:{flow_header} with {result[0]['contents']}")
             result = result.set_index(idx)
             result.index.rename(idx, inplace=True)
             result.sort_index(inplace=True)
@@ -246,12 +249,16 @@ def guess_pool_flow_header(x,l):
             return (china_mortgage_flow_fields_d,"日期")
         case ('MortgageFlow','english'):
             return (english_mortgage_flow_fields_d,"Date")
+        case ('LoanFlow','chinese'):
+            return (china_loan_flow_d,"日期")
+        case ('LoanFlow','english'):
+            return (english_loan_flow_d,"Date")
         case ('LeaseFlow','chinese'):
             return (china_rental_flow_d,"日期")
         case ('LeaseFlow','english'):
             return (english_rental_flow_d,"Date")
         case _:
-            raise RuntimeError(f"Failed to match pool header with {x[0]['tag']}{l}")
+            raise RuntimeError(f"Failed to match pool header with {x['tag']}{l}")
 
 
 def save(deal,p:str):
