@@ -28,6 +28,13 @@ if __name__ == "__main__":
         install_requires=[
             'requests',
             'pandas',
+            'pyxirr',
+            'matplotlib',
+            'pyspecter',
+            'numpy',
+            'pystest',
+            'jsondiff',
+            'deepdiff'
         ],
         classifiers=[
             'Development Status :: 3 - Alpha',
