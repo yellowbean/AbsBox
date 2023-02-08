@@ -713,11 +713,11 @@ def mkAsset(x):
         case ["分期"
             ,{"放款金额": originBalance, "放款费率": originRate, "初始期限": originTerm
                   ,"频率": freq, "类型": _type, "放款日": startDate}
-            ,{"状态": status}] \
-            |["installment"
+            ,{"当前余额":currentBalance, "状态": status}] \
+            |["Installment"
             ,{"originBalance": originBalance, "feeRate": originRate, "originTerm": originTerm
                   ,"freq": freq, "type": _type, "originDate": startDate}
-            ,{"status": status}]:
+            ,{"currentBalance":currentBalance,"status": status}]:
             return mkTag(("Installment",[
                                       {"originBalance": originBalance,
                                       "originRate": mkAssetRate(originRate),
@@ -726,7 +726,7 @@ def mkAsset(x):
                                       "startDate": startDate,
                                       "prinType": mkAmortPlan(_type)
                                       } | mkTag("LoanOriginalInfo"),
-                                     0.0,
+                                     currentBalance,
                                      _statusMapping[status]]))       
         case ["租赁"
                 ,{"固定租金": dailyRate, "初始期限": originTerm
