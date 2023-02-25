@@ -5,20 +5,26 @@ a structured finance cashflow engine wrapper
 [![PyPI version](https://badge.fury.io/py/absbox.svg)](https://badge.fury.io/py/absbox)
 [![PyPI download](https://img.shields.io/pypi/dm/absbox)](https://img.shields.io/pypi/dm/absbox)
 
-
 ## installation
 
     pip install absbox
 
 ## Goals
 * Provide building blocks to create cashflow models for ABS/MBS
-* Adapt to multiple asset class
+* Adapt to multiple asset classes
     * Residential Mortgage / Auto Loans
     * Corp Loans
     * Consumer Credit
+    * Lease
 * Features
   * Sensitivity Analysis on different scenarios
   * Bond Cashflow Forecast, Pricing
+  * Tweaking on deal components
+
+## Data flow
+
+![image](https://user-images.githubusercontent.com/1008321/221366747-5e37fc9e-dfaa-44b5-ab00-f5c8a3b26d79.png)
+
 
 ## Documentation
 * English -> https://absbox-doc.readthedocs.io
