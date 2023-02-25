@@ -57,11 +57,9 @@ class API:
 
     def _validate_assump(self,x,e,w):
         def asset_check(_e,_w):
-
             return _e,_w
         a = x['assump']
         asset_ids = set(range(len(query(x,['deal','contents','pool','assets']))))
-        #print("matching",a)            
         match a:
             case {'tag':'Single','contents':{'tag':'PoolLevel'}}:
                 return [True,e,w]

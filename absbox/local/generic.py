@@ -86,15 +86,9 @@ class Generic:
         return None
 
     def read(self, resp, position=None):
-        read_paths = {'bonds': ('bndStmt'
-                               , english_bondflow_fields
-                               , "bond")
-                     , 'fees': ('feeStmt'
-                               , ["date", "balance", "payment", "due", "memo"]
-                                , "fee")
-                     , 'accounts': ('accStmt'
-                                 , ["date", "balance", "change", "memo"]
-                                 , "account")}
+        read_paths = {'bonds': ('bndStmt' , english_bondflow_fields , "bond")
+                     , 'fees': ('feeStmt' , english_fee_flow_fields_d , "fee")
+                     , 'accounts': ('accStmt' , english_acc_flow_fields_d , "account")}
         output = {}
         for comp_name, comp_v in read_paths.items():
             output[comp_name] = {}

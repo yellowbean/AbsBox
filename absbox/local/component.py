@@ -730,31 +730,34 @@ def mkAsset(x):
                                      _statusMapping[status]]))       
         case ["租赁"
                 ,{"固定租金": dailyRate, "初始期限": originTerm
-                  ,"频率": dp, "起始日": startDate}] \
+                  ,"频率": dp, "起始日": startDate,"状态":status,"剩余期限":remainTerms}] \
             |["Lease"
                 ,{"fixRental": dailyRate, "originTerm": originTerm
-                  ,"freq": dp, "originDate": startDate}]:
+                  ,"freq": dp, "originDate": startDate, "status":status,"remainTerm":remainTerms}]:
             return mkTag(("RegularLease"
                             ,[{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp),"originRental":dailyRate} | mkTag("LeaseInfo")
-                              ,0]))       
+                              ,0
+                              ,remainTerms
+                              ,_statusMapping[status]]))       
         case ["租赁"
                 ,{"初始租金": dailyRate, "初始期限": originTerm
-                  ,"频率": dp, "起始日": startDate,"计提周期":accDp,"涨幅":rate}] \
+                  ,"频率": dp, "起始日": startDate,"计提周期":accDp,"涨幅":rate,"状态":status,"剩余期限":remainTerms}] \
             |["Lease"
                 ,{"initRental": dailyRate, "originTerm": originTerm
-                  ,"freq": dp, "originDate": startDate,"accure":accDp,"pct":rate}]:
+                  ,"freq": dp, "originDate": startDate,"accure":accDp,"pct":rate,"status":status,"remainTerm":remainTerms}]:
             
+            dailyRatePlan = None
             _stepUpType = "curve" if isinstance(rate, list) else "constant"
             if _stepUpType == "constant":
-                return mkTag(("StepUpLease"
-                                ,[ {"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp),"originRental":dailyRate} | mkTag("LeaseInfo")
-                                  ,mkTag(("FlatRate",[mkDatePattern(accDp),rate]))
-                                  , 0]))       
+                dailyRatePlan = mkTag(("FlatRate",[mkDatePattern(accDp),rate]))
             else:
-                return mkTag(("StepUpLease"
-                                ,[ {"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp),"originRental":dailyRate} | mkTag("LeaseInfo")
-                                  ,mkTag(("ByRateCurve",[mkDatePattern(accDp),rate]))
-                                  , 0]))       
+                dailyRatePlan = mkTag(("ByRateCurve",[mkDatePattern(accDp),rate]))
+            return mkTag(("StepUpLease"
+                            ,[ {"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp),"originRental":dailyRate} | mkTag("LeaseInfo")
+                              ,dailyRatePlan
+                              ,0
+                              ,remainTerms
+                              ,_statusMapping[status]]))       
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 

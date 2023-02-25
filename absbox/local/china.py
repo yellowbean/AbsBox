@@ -29,7 +29,7 @@ def readIssuance(pool):
     return r
 
 @dataclass
-class 信贷ABS:
+class SPV:
     名称: str
     日期: dict
     资产池: dict
@@ -144,9 +144,9 @@ class 信贷ABS:
 
     def read(self, resp, position=None):
         read_paths = {'bonds': ('bndStmt', china_bondflow_fields, "债券")
-                    , 'fees': ('feeStmt', ["日期", "余额", "支付", "剩余支付", "备注"], "费用")
-                    , 'accounts': ('accStmt', ["日期", "余额", "变动额", "备注"], "账户")
-                    , 'liqProvider': ('liqStmt', ["日期", "限额", "变动额", "已提供","备注"], "流动性支持")
+                    , 'fees': ('feeStmt', china_fee_flow_fields_d, "费用")
+                    , 'accounts': ('accStmt', china_acc_flow_fields_d , "账户")
+                    , 'liqProvider': ('liqStmt', china_liq_flow_fields_d, "流动性支持")
                     }
         output = {}
         for comp_name, comp_v in read_paths.items():
@@ -218,7 +218,6 @@ class 信贷ABS:
 
         return output
 
-SPV = 信贷ABS
 
 def loadAsset(fp, reader, astType):
     ''' load assets '''
@@ -353,3 +352,5 @@ def plot_by_scenario(rs, flowtype, flowpath):
     plt.axis('tight')
     plt.xticks(ticks=x,labels=x_labels,rotation=30)
 
+
+信贷ABS = SPV # Legacy ,to be deleted

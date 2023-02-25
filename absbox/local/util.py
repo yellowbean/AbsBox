@@ -27,6 +27,7 @@ def isDate(x):
 def mkTs(n, vs):
     return mkTag((n, vs))
 
+
 def unify(xs, ns):
     index_name = xs[0].index.name
     dfs = []
@@ -209,6 +210,7 @@ def aggCFby(_df, interval, cols):
     df[dummy_col]=pd.to_datetime(df[dummy_col]).dt.to_period(_mapping[interval])
     return df.groupby([dummy_col])[cols].sum().rename_axis(idx)#.drop(columns=[dummy_col])
 
+
 def irr(flow,init=None):
     def extract_cash_col(_cols):
         if _cols == china_bondflow_fields_s:
@@ -229,9 +231,12 @@ def irr(flow,init=None):
     
     return xirr(np.array(dates), np.array(amounts))
 
-def sum_fields_to_field(df,cols,col):
+
+def sum_fields_to_field(_df,cols,col):
+    df = _df.copy()
     df[col] = df[cols].sum(axis=1)
     return df
+
 
 def npv(_flow,**p):
     flow = _flow.copy()
@@ -259,10 +264,12 @@ def npv(_flow,**p):
 
 
 def update_deal(d,i,c):
+    "A patch function to update a deal data list in immuntable way"
     _d = d.copy()
     _d.pop(i)
     _d.insert(i,c)
     return _d
+
 
 class DC(Enum):  # TODO need to check with HS code
     DC_30E_360 = "DC_30E_360"
@@ -276,3 +283,9 @@ class DC(Enum):  # TODO need to check with HS code
     DC_30_360_ISDA = "DC_30_360_ISDA"
     DC_30_360_German = "DC_30_360_German"
     DC_30_360_US  = "DC_30_360_US"
+
+def str2date(x:str):
+    return datetime.strptime(x, '%Y-%m-%d').date()
+
+def daysBetween(sd,ed):
+    return (ed - sd).days
