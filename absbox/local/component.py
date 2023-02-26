@@ -584,7 +584,7 @@ def mkTriggerEffect(x):
     match x:
         case ("新状态",s) | ("newStatus",s):
             return mkTag(("DealStatusTo", mkStatus(s)))
-        case ["计提费用",*fn] | ["accureFees",*fn]:
+        case ["计提费用",*fn] | ["accrueFees",*fn]:
             return mkTag(("DoAccrueFee", fn))
         case ["新增事件",trg] | ["newTrigger",trg]:
             return mkTag(("AddTrigger", mkTrigger(trg)))
@@ -744,7 +744,8 @@ def mkAsset(x):
                   ,"频率": dp, "起始日": startDate,"计提周期":accDp,"涨幅":rate,"状态":status,"剩余期限":remainTerms}] \
             |["Lease"
                 ,{"initRental": dailyRate, "originTerm": originTerm
-                  ,"freq": dp, "originDate": startDate,"accure":accDp,"pct":rate,"status":status,"remainTerm":remainTerms}]:
+                  ,"freq": dp, "originDate": startDate,"accrue":accDp
+                  ,"pct":rate,"status":status,"remainTerm":remainTerms}]:
             
             dailyRatePlan = None
             _stepUpType = "curve" if isinstance(rate, list) else "constant"
