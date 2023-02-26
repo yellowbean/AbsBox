@@ -7,8 +7,8 @@ english_bondflow_fields_s = ["balance", "interest", "principal", "rate", "cash",
 
 # Pool
 ## mortgage
-china_mortgage_flow_fields = ["余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失金额", "利率"]
-english_mortgage_flow_fields = ["Balance", "Principal", "Interest", "Prepayment", "Default", "Recovery", "Loss", "WAC"]
+china_mortgage_flow_fields = ["余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失金额", "利率", "债务人数量"]
+english_mortgage_flow_fields = ["Balance", "Principal", "Interest", "Prepayment", "Default", "Recovery", "Loss", "WAC","BorrowerNum"]
 china_mortgage_flow_fields_d = ["日期"]+ china_mortgage_flow_fields
 english_mortgage_flow_fields_d = ["Date"] + english_mortgage_flow_fields
 ## Rental
