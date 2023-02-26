@@ -636,6 +636,8 @@ def mkAssetRate(x):
             return mkTag(("Floater",[idx,spd,r,freqMap[p],None]))
         case ["floater",r,{"index":idx,"spread":spd,"reset":p}]:
             return mkTag(("Floater",[idx,spd,r,freqMap[p],None]))
+        case ["Floater",r,{"index":idx,"spread":spd,"reset":p}]:
+            return mkTag(("Floater",[idx,spd,r,freqMap[p],None]))
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkAssetRate")
 
@@ -658,6 +660,8 @@ def mkAsset(x):
                     , "违约": mkTag(("Defaulted",None))
                     , "current":mkTag(("Current"))
                     , "defaulted": mkTag(("Defaulted",None))
+                    , "Current":mkTag(("Current"))
+                    , "Defaulted": mkTag(("Defaulted",None))
                     }
     match x:
         case ["按揭贷款"
@@ -672,6 +676,10 @@ def mkAsset(x):
              ,"currentRate": currentRate
              ,"remainTerm": remainTerms
              ,"status": status}]:
+
+            borrowerNum1 = x[2].get("borrowerNum",None)
+            borrowerNum2 = x[2].get("借款数量",None)
+
             return mkTag(("Mortgage",[
                                       {"originBalance": originBalance,
                                       "originRate": mkAssetRate(originRate),
@@ -683,6 +691,7 @@ def mkAsset(x):
                                      currentBalance,
                                      currentRate,
                                      remainTerms,
+                                     (borrowerNum1 or borrowerNum2),
                                      _statusMapping[status]]))
         case ["贷款"
             ,{"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm
@@ -894,7 +903,7 @@ def mkCf(x):
     if len(x)==0:
         return None
     else:
-        return [ mkTag(("MortgageFlow",_x+([0.0]*5))) for _x in x]
+        return [ mkTag(("MortgageFlow",_x+[0.0]*5+[None])) for _x in x]
 
 def mkCollection(xs):
     sourceMapping = {"利息回款": "CollectedInterest"
