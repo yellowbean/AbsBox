@@ -118,6 +118,8 @@ def mkFeeType(x):
             return mkTag(("RecurFee", [mkDatePattern(p), amt]))
         case {"自定义": fflow} | {"customFee": fflow}:
             return mkTag(("FeeFlow",mkTs("BalanceCurve",fflow)))
+        case {"计数费用": [p,s,amt]} | {"numFee": [p,s,amt]}:
+            return mkTag(("NumFee",[mkDatePattern(p),mkDs(s),amt]))
         case _ :
             raise RuntimeError(f"Failed to match on fee type:{x}")
 
@@ -166,6 +168,8 @@ def mkDs(x):
             return mkTag(("LastBondIntPaid",bnds))
         case ("债券低于目标余额",bn) | ("behindTargetBalance",bn):
             return mkTag(("BondBalanceGap",bn))
+        case ("债务人数量",) | ("borrowerNumber",):
+            return mkTag(("CurrentPoolBorrowerNum"))
         
         #   , "当期已付债券利息":"LastBondIntPaid"
         #   , "当期已付费用" :"LastFeePaid"
@@ -721,11 +725,11 @@ def mkAsset(x):
                                      _statusMapping[status]]))       
         case ["分期"
             ,{"放款金额": originBalance, "放款费率": originRate, "初始期限": originTerm
-                  ,"频率": freq, "类型": _type, "放款日": startDate}
+                  ,"频率": freq, "类型": _type, "放款日": startDate, "剩余期限":remainTerms}
             ,{"当前余额":currentBalance, "状态": status}] \
             |["Installment"
             ,{"originBalance": originBalance, "feeRate": originRate, "originTerm": originTerm
-                  ,"freq": freq, "type": _type, "originDate": startDate}
+                  ,"freq": freq, "type": _type, "originDate": startDate, "remainTerm":remainTerms}
             ,{"currentBalance":currentBalance,"status": status}]:
             return mkTag(("Installment",[
                                       {"originBalance": originBalance,
@@ -736,6 +740,7 @@ def mkAsset(x):
                                       "prinType": mkAmortPlan(_type)
                                       } | mkTag("LoanOriginalInfo"),
                                      currentBalance,
+                                     remainTerms,
                                      _statusMapping[status]]))       
         case ["租赁"
                 ,{"固定租金": dailyRate, "初始期限": originTerm
