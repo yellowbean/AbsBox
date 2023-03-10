@@ -15,10 +15,9 @@ urllib3.disable_warnings()
 @dataclass
 class API:
     url:str
-    #lang = field(repr=False, default="chinese")
     lang:str = "chinese"
     server_info = {}
-    version:tuple = "0","8","1"
+    version:tuple = "0","9","1"
     hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
     def __post_init__(self):

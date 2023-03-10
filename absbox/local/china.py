@@ -139,7 +139,7 @@ class SPV:
 
     def read_pricing(self, pricing):
         if pricing:
-            return mkComponent(pricing)
+            return mkPricingAssump(pricing)
         return None
 
     def read(self, resp, position=None):
@@ -189,9 +189,10 @@ class SPV:
         output['pool']['flow'] = output['pool']['flow'].set_index("日期")
         output['pool']['flow'].index.rename("日期", inplace=True)
 
-        output['pricing'] = pd.DataFrame.from_dict(resp[3]
-                                                   , orient='index'
-                                                   , columns=["估值", "票面估值", "WAL", "久期", "应计利息"]).sort_index() if resp[3] else None
+        #output['pricing'] = pd.DataFrame.from_dict(resp[3]
+        #                                          , orient='index'
+        #                                          , columns=["估值", "票面估值", "WAL", "久期", "应计利息"]).sort_index() if resp[3] else None
+        output['pricing'] = readPricingResult(resp[3], 'cn')
         if position:
             output['position'] = {}
             for k,v in position.items():

@@ -2,7 +2,8 @@ from absbox.local.util import mkTag,DC,mkTs
 from enum import Enum
 import itertools
 
-from pyspecter import query
+import pandas as pd
+from pyspecter import query,S
 
 datePattern = {"月末":"MonthEnd"
               ,"季度末":"QuarterEnd"
@@ -951,14 +952,18 @@ def mk(x):
         #    return mkCall(calls)
 
 
-def mkComponent(x):
+def mkPricingAssump(x):
     match x:
-        case {"贴现日": pricingDay, "贴现曲线": xs}:
-            return [pricingDay, {"tag": "PricingCurve", "contents": xs}]
-        case {"PVDate": pricingDay, "PVCurve": xs}:
-            return [pricingDay, {"tag": "PricingCurve", "contents": xs}]
+        case {"贴现日": pricingDay, "贴现曲线": xs} | {"PVDate": pricingDay, "PVCurve": xs}:
+            # return [pricingDay, {"tag": "PricingCurve", "contents": xs}]
+            return mkTag(("DiscountCurve",[pricingDay, mkTs("IRateCurve",xs)]))
+        case {"债券":bnd_with_price,"利率曲线":rdps} | {"bonds":bnd_with_price,"curve":rdps}:
+            return mkTag(("RunZSpread",[mkTs("IRateCurve",rdps) ,bnd_with_price ]))
         case _:
             None
+
+# "{\"tag\":\"RunZSpread\",\"contents\":[{\"tag\":\"IRateCurve\",\"contents\":[[\"2020-01-01\",1.0e-2]]}
+#                                        ,{\"A\":[\"2021-01-01\",100.3]}]}"
 
 def mkLiqProviderType(x):
     match x:
@@ -968,3 +973,20 @@ def mkLiqProviderType(x):
             return mkTag(("ReplenishSupport", [mkDatePattern(dp),amt]))
         case {}:
             return mkTag(("UnLimit"))            
+
+
+def readPricingResult(x, locale)->dict:
+    if x is None:
+        return None
+    h = None
+
+    tag = query(x,[S.MVALS,S.ALL,"tag"])[0]
+    if tag=="PriceResult":
+        h = {"cn": ["估值", "票面估值", "WAL", "久期", "应计利息"],
+                "en":["pricing", "face", "WAL", "duration", "accure interest"]}
+    elif tag=="ZSpread":
+        h = {"cn":["静态利差"], "en":["Z-spread"]}
+    else:
+        raise RuntimeError(f"Failed to read princing result: {x} with tag={tag}")
+
+    return pd.DataFrame.from_dict({k:v['contents'] for k,v in x.items()} , orient='index', columns=h[locale]).sort_index()
