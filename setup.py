@@ -32,7 +32,7 @@ if __name__ == "__main__":
             'matplotlib',
             'pyspecter',
             'numpy',
-            'pystest',
+            'pytest',
             'jsondiff',
             'deepdiff'
         ],
