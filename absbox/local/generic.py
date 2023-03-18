@@ -126,8 +126,6 @@ class Generic:
         output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)
         output['pool']['flow'].index.rename(pool_idx, inplace=True)
 
-        output['pricing'] = pd.DataFrame.from_dict(resp[3]
-                                                   , orient='index'
-                                                   , columns=["pricing", "face", "WAL", "duration", "accure interest"]) if resp[3] else None
+        output['pricing'] = readPricingResult(resp[3], 'en')
 
         return output

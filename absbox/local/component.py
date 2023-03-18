@@ -960,7 +960,7 @@ def mkPricingAssump(x):
         case {"债券":bnd_with_price,"利率曲线":rdps} | {"bonds":bnd_with_price,"curve":rdps}:
             return mkTag(("RunZSpread",[mkTs("IRateCurve",rdps) ,bnd_with_price ]))
         case _:
-            None
+            raise RuntimeError(f"Failed to match pricing assumption: {x}")
 
 # "{\"tag\":\"RunZSpread\",\"contents\":[{\"tag\":\"IRateCurve\",\"contents\":[[\"2020-01-01\",1.0e-2]]}
 #                                        ,{\"A\":[\"2021-01-01\",100.3]}]}"
