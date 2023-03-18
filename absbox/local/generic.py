@@ -82,7 +82,7 @@ class Generic:
 
     def read_pricing(self, pricing):
         if pricing:
-            return mkComponent(pricing)
+            return mkPricingAssump(pricing)
         return None
 
     def read(self, resp, position=None):

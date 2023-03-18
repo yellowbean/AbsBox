@@ -982,8 +982,8 @@ def readPricingResult(x, locale)->dict:
 
     tag = query(x,[S.MVALS,S.ALL,"tag"])[0]
     if tag=="PriceResult":
-        h = {"cn": ["估值", "票面估值", "WAL", "久期", "应计利息"],
-                "en":["pricing", "face", "WAL", "duration", "accure interest"]}
+        h = {"cn": ["估值", "票面估值", "WAL", "久期", "凸性", "应计利息"],
+                "en":["pricing", "face", "WAL", "duration","convexity", "accure interest"]}
     elif tag=="ZSpread":
         h = {"cn":["静态利差"], "en":["Z-spread"]}
     else:
