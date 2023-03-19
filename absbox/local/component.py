@@ -520,6 +520,32 @@ def mkStatus(x):
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkStatus")
 
+def readStatus(x, locale):
+    m = {"en":{'amort':"Amortizing"
+               ,'def':"Defaulted"
+               ,'acc':"Accelerated"
+               ,'end':"Ended"
+               ,'pre':"PreClosing" }
+        ,"cn":{'amort':"摊销"
+               ,'def':"违约"
+               ,'acc':"加速清偿"
+               ,'end':"结束"
+               ,'pre':"设计" }}
+    match x:
+        case {"tag":"Amortizing"}:
+            return m[locale]['amort']
+        case {"tag":"DealAccelerated"}:
+            return m[locale]['acc']
+        case {"tag":"DealDefaulted"}:
+            return m[locale]['def']
+        case {"tag":"Ended"}:
+            return m[locale]['end']
+        case {"tag":"PreClosing"}:
+            return m[locale]['pre']
+        case _:
+            raise RuntimeError(f"Failed to read deal status:{x} with locale: {locale}")
+
+
 def mkWhenTrigger(x):
     match x:
         case "回收后"|"BeforeCollect":
@@ -549,9 +575,9 @@ def mkThreshold(x):
 
 def _rateTypeDs(x):
     h = x[0]
-    if h in set(["资产池累积违约率","cumPoolDefaultedRate",
-    "债券系数","bondFactor",
-    "资产池系数","poolFactor"]):
+    if h in set(["资产池累积违约率","cumPoolDefaultedRate"
+                 ,"债券系数","bondFactor"
+                 ,"资产池系数","poolFactor"]):
         return True
     return False
     
@@ -990,3 +1016,25 @@ def readPricingResult(x, locale)->dict:
         raise RuntimeError(f"Failed to read princing result: {x} with tag={tag}")
 
     return pd.DataFrame.from_dict({k:v['contents'] for k,v in x.items()} , orient='index', columns=h[locale]).sort_index()
+
+def readRunSummary(x, locale)->dict:
+
+    r = {}
+    bndStatus ={'cn':[],'en':[]}
+    dealStatusLog = {'cn':["日期","旧状态","新状态"],'en':["Date","From","To"]}
+
+    if x is None:
+        return None
+    h = None
+    
+    bond_defualts = [ _ for _ in x if _['tag'] in set(['BondOutstanding','BondOutstandingInt']) ]
+    r['bonds'] = []
+
+    status_change_logs = [ (_['contents'][0],readStatus(_['contents'][1], locale),readStatus(_['contents'][2], locale)) 
+                            for _ in x if _['tag'] in set(['DealStatusChangeTo'])]
+    r['status'] = pd.DataFrame(data=status_change_logs,columns=dealStatusLog[locale])
+
+    return r
+
+
+

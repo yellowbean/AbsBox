@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 import functools
+
+from absbox import *
 from absbox.local.util import mkTag
 from absbox.local.component import *
 from absbox.local.base import * 
@@ -58,7 +60,7 @@ class Generic:
             for n,ci in self.custom.items():
                 _r["custom"][n] = mkCustom(ci)
         
-        if hasattr(self, "trigger") and self.trigger is  not None:
+        if hasattr(self, "trigger") and self.trigger is not None:
             _trigger  = self.trigger
             _trr = {mkWhenTrigger(_loc):
                        [[mkTrigger(_trig),mkTriggerEffect(_effect)] for (_trig,_effect) in _vs ] 
@@ -120,12 +122,16 @@ class Generic:
         output['agg_accounts'] = agg_acc
 
         output['pool'] = {}
+        
+        _pool_cf_header,_ = guess_pool_flow_header(resp[0]['pool']['futureCf'][0],"english")
+        
         output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
-                                              , columns=english_mortgage_flow_fields_d)
+                                              , columns=_pool_cf_header)
         pool_idx = 'Date'
         output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)
         output['pool']['flow'].index.rename(pool_idx, inplace=True)
 
         output['pricing'] = readPricingResult(resp[3], 'en')
+        output['result'] = readRunSummary(resp[2], 'en')
 
         return output

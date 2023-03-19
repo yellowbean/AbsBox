@@ -184,10 +184,12 @@ class SPV:
         output['pool'] = {}
 
         _pool_cf_header,_ = guess_pool_flow_header(resp[0]['pool']['futureCf'][0],"chinese")
+
         output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
                                               , columns=_pool_cf_header)
-        output['pool']['flow'] = output['pool']['flow'].set_index("日期")
-        output['pool']['flow'].index.rename("日期", inplace=True)
+        pool_idx = "日期"
+        output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)
+        output['pool']['flow'].index.rename(pool_idx, inplace=True)
 
         #output['pricing'] = pd.DataFrame.from_dict(resp[3]
         #                                          , orient='index'
@@ -204,18 +206,20 @@ class SPV:
                     output['position'][k] = output['bonds'][k][['本金','利息','本息合计']].apply(lambda x:x*factor).round(4)
 
 
-        #Get bond defaulted amount 
-        output['result'] = {}
-        bond_defaults = [ (_x['contents'][0],_x['tag'],_x['contents'][1],_x['contents'][2]) for _x in resp[2] if _x['tag'] in set(['BondOutstanding','BondOutstandingInt' ])]
-        _bnds = list(resp[0]['bonds'].keys())
-        _bdefaults = pd.DataFrame(columns=['本金违约','利息违约',"起算余额"],index=_bnds)
-        _dmap = {'BondOutstanding':"本金违约","BondOutstandingInt":"利息违约"}
-        for bn,amt_type,amt,begBal in bond_defaults:
-            _bdefaults.loc[bn][_dmap[amt_type]] = amt
-            _bdefaults.loc[bn]['起算余额'] = begBal
-        _bdefaults.fillna(0,inplace=True)
-        _bdefaults['合计违约'] = _bdefaults['本金违约'] + _bdefaults['利息违约']
-        output['result']['bonds'] = _bdefaults.sort_index()
+        output['result'] = readRunSummary(resp[2], 'cn')
+        
+       # output['result'] = {}
+       # bond_defaults = [ (_x['contents'][0],_x['tag'],_x['contents'][1],_x['contents'][2]) for _x in resp[2] if _x['tag'] in set(['BondOutstanding','BondOutstandingInt' ])]
+       # _bnds = list(resp[0]['bonds'].keys())
+       # _bdefaults = pd.DataFrame(columns=['本金违约','利息违约',"起算余额"],index=_bnds)
+       # _dmap = {'BondOutstanding':"本金违约","BondOutstandingInt":"利息违约"}
+       # for bn,amt_type,amt,begBal in bond_defaults:
+       #     _bdefaults.loc[bn][_dmap[amt_type]] = amt
+       #     _bdefaults.loc[bn]['起算余额'] = begBal
+       # _bdefaults.fillna(0,inplace=True)
+       # _bdefaults['合计违约'] = _bdefaults['本金违约'] + _bdefaults['利息违约']
+       # 
+       # output['result']['bonds'] = _bdefaults.sort_index()
 
         return output
 

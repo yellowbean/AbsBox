@@ -1242,6 +1242,19 @@
         40
       ],
       "tag": "BondOutstanding"
+    },
+    {
+      "contents": [
+        "2021-09-26",
+        {
+          "tag": "Amortizing"
+        },
+        {
+          "contents": null,
+          "tag": "DealAccelerated"
+        }
+      ],
+      "tag": "DealStatusChangeTo"
     }
   ],
   null
