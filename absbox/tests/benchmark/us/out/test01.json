@@ -4,10 +4,10 @@
     "dates": {
       "tag": "PreClosingDates",
       "contents": [
-        "2021-03-01",
+        "2021-03-31",
         "2021-06-15",
         null,
-        "2030-01-01",
+        "2060-12-01",
         [
           "2021-06-15",
           {
@@ -18,12 +18,12 @@
           "2021-07-26",
           {
             "tag": "DayOfMonth",
-            "contents": 20
+            "contents": 26
           }
         ]
       ]
     },
-    "name": "TEST01",
+    "name": "Senior/Junior",
     "status": {
       "tag": "Amortizing"
     },
@@ -33,7 +33,7 @@
           "tag": "Mortgage",
           "contents": [
             {
-              "originBalance": 2200,
+              "originBalance": 120,
               "originRate": {
                 "tag": "Fix",
                 "contents": 0.045
@@ -42,11 +42,11 @@
               "period": "Monthly",
               "startDate": "2021-02-01",
               "prinType": {
-                "tag": "Level"
+                "tag": "Even"
               },
               "tag": "MortgageOriginalInfo"
             },
-            2200,
+            120,
             0.08,
             20,
             null,
@@ -56,17 +56,17 @@
           ]
         }
       ],
-      "asOfDate": "2021-03-01",
+      "asOfDate": "2021-03-31",
       "issuanceStat": null,
       "futureCf": null
     },
     "bonds": {
       "A1": {
         "bndName": "A1",
-        "bndBalance": 1000,
+        "bndBalance": 100,
         "bndRate": 0.07,
         "bndOriginInfo": {
-          "originBalance": 1000,
+          "originBalance": 100,
           "originDate": "2020-01-03",
           "originRate": 0.07
         },
@@ -86,10 +86,10 @@
       },
       "B": {
         "bndName": "B",
-        "bndBalance": 1000,
+        "bndBalance": 20,
         "bndRate": 0.0,
         "bndOriginInfo": {
-          "originBalance": 1000,
+          "originBalance": 100,
           "originDate": "2020-01-03",
           "originRate": 0.07
         },
@@ -116,10 +116,10 @@
             "tag": "PayFee",
             "contents": [
               [
-                "acc01"
+                "\u8d26\u623701"
               ],
               [
-                "trusteeFee"
+                "\u4fe1\u6258\u8d39\u7528"
               ]
             ]
           }
@@ -129,7 +129,7 @@
           {
             "tag": "PayInt",
             "contents": [
-              "acc01",
+              "\u8d26\u623701",
               [
                 "A1"
               ]
@@ -141,7 +141,7 @@
           {
             "tag": "PayPrin",
             "contents": [
-              "acc01",
+              "\u8d26\u623701",
               [
                 "A1"
               ]
@@ -153,7 +153,7 @@
           {
             "tag": "PayPrin",
             "contents": [
-              "acc01",
+              "\u8d26\u623701",
               [
                 "B"
               ]
@@ -166,7 +166,7 @@
             "tag": "PayResidual",
             "contents": [
               null,
-              "acc01",
+              "\u8d26\u623701",
               "B"
             ]
           }
@@ -174,11 +174,11 @@
       ]
     },
     "fees": {
-      "trusteeFee": {
-        "feeName": "trusteeFee",
+      "\u4fe1\u6258\u8d39\u7528": {
+        "feeName": "\u4fe1\u6258\u8d39\u7528",
         "feeType": {
           "tag": "FixFee",
-          "contents": 30
+          "contents": 10
         },
         "feeStart": "2021-06-15",
         "feeDueDate": null,
@@ -188,9 +188,9 @@
       }
     },
     "accounts": {
-      "acc01": {
+      "\u8d26\u623701": {
         "accBalance": 0,
-        "accName": "acc01",
+        "accName": "\u8d26\u623701",
         "accType": null,
         "accInterest": null,
         "accStmt": null
@@ -199,19 +199,19 @@
     "collects": [
       [
         "CollectedInterest",
-        "acc01"
+        "\u8d26\u623701"
       ],
       [
         "CollectedPrincipal",
-        "acc01"
+        "\u8d26\u623701"
       ],
       [
         "CollectedPrepayment",
-        "acc01"
+        "\u8d26\u623701"
       ],
       [
         "CollectedRecoveries",
-        "acc01"
+        "\u8d26\u623701"
       ]
     ]
   }

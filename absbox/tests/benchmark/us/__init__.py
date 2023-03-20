@@ -1,4 +1,5 @@
 import absbox.tests.benchmark.us.test01 as t1
+#import absbox.tests.benchmark.us.test02 as t2
 #import absbox.tests.benchmark.china.test02 as t2
 #import absbox.tests.benchmark.china.test03 as t3
 #import absbox.tests.benchmark.china.test04 as t4
