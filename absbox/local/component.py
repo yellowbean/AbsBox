@@ -1020,16 +1020,26 @@ def readPricingResult(x, locale)->dict:
 def readRunSummary(x, locale)->dict:
 
     r = {}
-    bndStatus ={'cn':[],'en':[]}
-    dealStatusLog = {'cn':["日期","旧状态","新状态"],'en':["Date","From","To"]}
-
     if x is None:
         return None
-    h = None
     
-    bond_defualts = [ _ for _ in x if _['tag'] in set(['BondOutstanding','BondOutstandingInt']) ]
-    r['bonds'] = []
+    bndStatus ={'cn':["本金违约","利息违约","起算余额"],'en':["Balance Defaults","Interest Defaults","Original Balance"]}
+    bond_defaults = [ (_['contents'][0],_['tag'], _['contents'][1], _['contents'][2]) 
+                        for _ in x if _['tag'] in set(['BondOutstanding','BondOutstandingInt']) ]
+    _fmap = {"cn":{'BondOutstanding':"本金违约","BondOutstandingInt":"利息违约"}
+            ,"en":{'BondOutstanding':"Balance Defaults","BondOutstandingInt":"Interest Defaults"}}
+    bndNames = set([ y[0] for y in bond_defaults])
+    bndSummary = pd.DataFrame(columns=bndStatus[locale],index=list(bndNames))
+    print(bond_defaults)
+    for bn,amt_type,amt,begBal in bond_defaults:
+       bndSummary.loc[bn][_fmap[locale][amt_type]] = amt
+       bndSummary.loc[bn][bndStatus[locale][2]] = begBal
+    bndSummary.fillna(0,inplace=True)
+    bndSummary["Total"] = bndSummary[bndStatus[locale][0]] + bndSummary[bndStatus[locale][1]]
 
+    r['bonds'] = bndSummary
+
+    dealStatusLog = {'cn':["日期","旧状态","新状态"],'en':["Date","From","To"]}
     status_change_logs = [ (_['contents'][0],readStatus(_['contents'][1], locale),readStatus(_['contents'][2], locale)) 
                             for _ in x if _['tag'] in set(['DealStatusChangeTo'])]
     r['status'] = pd.DataFrame(data=status_change_logs,columns=dealStatusLog[locale])
