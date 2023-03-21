@@ -273,13 +273,16 @@
         ],
         [
           {
-            "contents": {
-              "contents": [
-                "A1"
-              ],
-              "tag": "CurrentBondBalanceOf"
-            },
-            "tag": "IfZero"
+            "contents": [
+              {
+                "contents": [
+                  "A1"
+                ],
+                "tag": "CurrentBondBalanceOf"
+              },
+              0
+            ],
+            "tag": "IfEqBal"
           },
           {
             "contents": [
@@ -293,13 +296,16 @@
         ],
         [
           {
-            "contents": {
-              "contents": [
-                "A1"
-              ],
-              "tag": "CurrentBondBalanceOf"
-            },
-            "tag": "IfZero"
+            "contents": [
+              {
+                "contents": [
+                  "A1"
+                ],
+                "tag": "CurrentBondBalanceOf"
+              },
+              0
+            ],
+            "tag": "IfEqBal"
           },
           {
             "contents": [
@@ -319,6 +325,7 @@
         "bndRate": 0,
         "bndLastIntPay": null,
         "bndOriginInfo": {
+          "maturityDate": null,
           "originRate": {
             "denominator": 100,
             "numerator": 7
@@ -326,11 +333,10 @@
           "originDate": "2020-01-03",
           "originBalance": 100
         },
-        "bndDueInt": -43.41,
+        "bndDueInt": 0,
         "bndType": {
           "tag": "Equity"
         },
-        "bndMaturiyDate": null,
         "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
@@ -351,7 +357,7 @@
               5.92,
               [
                 "<PayPrin:[\"B\"],Just 14.08>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -366,7 +372,7 @@
               8.38,
               [
                 "<PayPrin:[\"B\"],Just 5.70>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -381,7 +387,7 @@
               8.31,
               [
                 "<PayPrin:[\"B\"],Just 0.00>",
-                "<PayYield:B,Just (-2.61)>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -394,7 +400,7 @@
               0,
               0,
               8.27,
-              "<PayYield:B,Just (-10.88)>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -406,7 +412,7 @@
               0,
               0,
               8.21,
-              "<PayYield:B,Just (-19.09)>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -418,7 +424,7 @@
               0,
               0,
               8.16,
-              "<PayYield:B,Just (-27.25)>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -430,7 +436,7 @@
               0,
               0,
               8.11,
-              "<PayYield:B,Just (-35.36)>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -442,7 +448,7 @@
               0,
               0,
               8.05,
-              "<PayYield:B,Just (-43.41)>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "BondTxn"
           }
@@ -455,6 +461,7 @@
         "bndRate": 0.07,
         "bndLastIntPay": "2022-04-26",
         "bndOriginInfo": {
+          "maturityDate": null,
           "originRate": {
             "denominator": 100,
             "numerator": 7
@@ -483,7 +490,6 @@
           },
           "tag": "PAC"
         },
-        "bndMaturiyDate": null,
         "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
@@ -2436,7 +2442,7 @@
     {
       "contents": [
         "B",
-        -43.41,
+        0,
         20
       ],
       "tag": "BondOutstandingInt"

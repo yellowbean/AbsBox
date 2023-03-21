@@ -4859,7 +4859,8 @@
         "bndOriginInfo": {
           "originBalance": 4000000000.0,
           "originDate": "2022-09-26",
-          "originRate": 0.0335
+          "originRate": 0.0335,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Floater",
@@ -5046,7 +5047,8 @@
         "bndOriginInfo": {
           "originBalance": 5600000000.0,
           "originDate": "2022-09-26",
-          "originRate": 0.0365
+          "originRate": 0.0365,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Floater",
@@ -5297,7 +5299,8 @@
         "bndOriginInfo": {
           "originBalance": 6807000000.0,
           "originDate": "2022-09-26",
-          "originRate": 0.0395
+          "originRate": 0.0395,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Floater",
@@ -5327,7 +5330,8 @@
         "bndOriginInfo": {
           "originBalance": 1957056982.08,
           "originDate": "2022-09-26",
-          "originRate": 0.0
+          "originRate": 0.0,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",
@@ -5584,13 +5588,16 @@
         ],
         [
           {
-            "tag": "IfZero",
-            "contents": {
-              "tag": "CurrentBondBalanceOf",
-              "contents": [
-                "A3"
-              ]
-            }
+            "tag": "IfEqBal",
+            "contents": [
+              {
+                "tag": "CurrentBondBalanceOf",
+                "contents": [
+                  "A3"
+                ]
+              },
+              0
+            ]
           },
           {
             "tag": "PayPrinResidual",

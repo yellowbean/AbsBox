@@ -179,6 +179,7 @@
         "bndRate": 0,
         "bndLastIntPay": null,
         "bndOriginInfo": {
+          "maturityDate": null,
           "originRate": {
             "denominator": 100,
             "numerator": 7
@@ -186,11 +187,10 @@
           "originDate": "2020-01-03",
           "originBalance": 100
         },
-        "bndDueInt": -65.74,
+        "bndDueInt": 0,
         "bndType": {
           "tag": "Equity"
         },
-        "bndMaturiyDate": null,
         "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
@@ -211,7 +211,7 @@
               49.39,
               [
                 "<PayPrin:[\"B\"],Just 0.00>",
-                "<PayYield:B,Just (-29.39)>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -224,7 +224,7 @@
               0,
               0,
               18.24,
-              "<PayYield:B,Just (-47.63)>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -236,7 +236,7 @@
               0,
               0,
               18.11,
-              "<PayYield:B,Just (-65.74)>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -248,7 +248,7 @@
               0,
               0,
               0,
-              "<PayYield:B,Just (-65.74)>"
+              "<PayYield:B,Nothing>"
             ],
             "tag": "BondTxn"
           }
@@ -261,6 +261,7 @@
         "bndRate": 0.07,
         "bndLastIntPay": "2021-11-26",
         "bndOriginInfo": {
+          "maturityDate": null,
           "originRate": {
             "denominator": 100,
             "numerator": 7
@@ -272,7 +273,6 @@
         "bndType": {
           "tag": "Sequential"
         },
-        "bndMaturiyDate": null,
         "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
@@ -704,7 +704,7 @@
     {
       "contents": [
         "B",
-        -65.74,
+        0,
         20
       ],
       "tag": "BondOutstandingInt"

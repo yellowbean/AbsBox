@@ -68,7 +68,8 @@
         "bndOriginInfo": {
           "originBalance": 3000000000,
           "originDate": "2020-01-03",
-          "originRate": 0.03
+          "originRate": 0.03,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Floater",
@@ -98,7 +99,8 @@
         "bndOriginInfo": {
           "originBalance": 5000000000,
           "originDate": "2020-01-03",
-          "originRate": 0.03
+          "originRate": 0.03,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Floater",
@@ -128,7 +130,8 @@
         "bndOriginInfo": {
           "originBalance": 5000000000,
           "originDate": "2020-01-03",
-          "originRate": 0.03
+          "originRate": 0.03,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Floater",
@@ -158,7 +161,8 @@
         "bndOriginInfo": {
           "originBalance": 2123875534.53,
           "originDate": "2020-01-03",
-          "originRate": 0.03
+          "originRate": 0.03,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",

@@ -1241,6 +1241,7 @@
         "bndRate": 0.018,
         "bndLastIntPay": "2023-09-26",
         "bndOriginInfo": {
+          "maturityDate": null,
           "originRate": {
             "denominator": 500,
             "numerator": 9
@@ -1305,7 +1306,6 @@
           },
           "tag": "PAC"
         },
-        "bndMaturiyDate": null,
         "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
@@ -1538,6 +1538,7 @@
         "bndRate": 0,
         "bndLastIntPay": null,
         "bndOriginInfo": {
+          "maturityDate": null,
           "originRate": {
             "denominator": 1,
             "numerator": 0
@@ -1545,11 +1546,10 @@
           "originDate": "2022-09-30",
           "originBalance": 567999932.76
         },
-        "bndDueInt": -121097683.92,
+        "bndDueInt": 0,
         "bndType": {
           "tag": "Equity"
         },
-        "bndMaturiyDate": null,
         "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
@@ -1570,7 +1570,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1585,7 +1585,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1600,7 +1600,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1615,7 +1615,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1630,7 +1630,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1645,7 +1645,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1660,7 +1660,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1675,7 +1675,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1690,7 +1690,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1705,7 +1705,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1720,7 +1720,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1735,7 +1735,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1750,7 +1750,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1765,7 +1765,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1780,7 +1780,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1795,7 +1795,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1810,7 +1810,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1825,7 +1825,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1840,7 +1840,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1855,7 +1855,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1870,7 +1870,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1885,7 +1885,7 @@
               0,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 567999932.76>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1900,7 +1900,7 @@
               51012048.74,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 516987884.02>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1915,7 +1915,7 @@
               78541994.2,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 438445889.82>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1930,7 +1930,7 @@
               77991477.7,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 360454412.12>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1945,7 +1945,7 @@
               77281504.93,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 283172907.19>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1960,7 +1960,7 @@
               76513336.26,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 206659570.93>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1975,7 +1975,7 @@
               75700798.19,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 130958772.74>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -1990,7 +1990,7 @@
               74540634.24,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 56418138.50>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -2005,7 +2005,7 @@
               54107889.58,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 2310248.92>",
-                "<PayYield:\u6b21\u7ea7,Just 0.00>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -2020,7 +2020,7 @@
               36967850.15,
               [
                 "<PayPrin:[\"\\27425\\32423\"],Just 0.00>",
-                "<PayYield:\u6b21\u7ea7,Just (-34657601.23)>"
+                "<PayYield:\u6b21\u7ea7,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -2033,7 +2033,7 @@
               0,
               0,
               20939024.6,
-              "<PayYield:\u6b21\u7ea7,Just (-55596625.83)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2045,7 +2045,7 @@
               0,
               0,
               9937187.84,
-              "<PayYield:\u6b21\u7ea7,Just (-65533813.67)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2057,7 +2057,7 @@
               0,
               0,
               9159842.42,
-              "<PayYield:\u6b21\u7ea7,Just (-74693656.09)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2069,7 +2069,7 @@
               0,
               0,
               8164019.81,
-              "<PayYield:\u6b21\u7ea7,Just (-82857675.90)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2081,7 +2081,7 @@
               0,
               0,
               7152250.57,
-              "<PayYield:\u6b21\u7ea7,Just (-90009926.47)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2093,7 +2093,7 @@
               0,
               0,
               6760988.7,
-              "<PayYield:\u6b21\u7ea7,Just (-96770915.17)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2105,7 +2105,7 @@
               0,
               0,
               6461838.85,
-              "<PayYield:\u6b21\u7ea7,Just (-103232754.02)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2117,7 +2117,7 @@
               0,
               0,
               6220126.89,
-              "<PayYield:\u6b21\u7ea7,Just (-109452880.91)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2129,7 +2129,7 @@
               0,
               0,
               4982288.72,
-              "<PayYield:\u6b21\u7ea7,Just (-114435169.63)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2141,7 +2141,7 @@
               0,
               0,
               3415718.41,
-              "<PayYield:\u6b21\u7ea7,Just (-117850888.04)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2153,7 +2153,7 @@
               0,
               0,
               1720862.41,
-              "<PayYield:\u6b21\u7ea7,Just (-119571750.45)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2165,7 +2165,7 @@
               0,
               0,
               1084320.11,
-              "<PayYield:\u6b21\u7ea7,Just (-120656070.56)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2177,7 +2177,7 @@
               0,
               0,
               441484.66,
-              "<PayYield:\u6b21\u7ea7,Just (-121097555.22)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2189,7 +2189,7 @@
               0,
               0,
               128.7,
-              "<PayYield:\u6b21\u7ea7,Just (-121097683.92)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           },
@@ -2201,7 +2201,7 @@
               0,
               0,
               0,
-              "<PayYield:\u6b21\u7ea7,Just (-121097683.92)>"
+              "<PayYield:\u6b21\u7ea7,Nothing>"
             ],
             "tag": "BondTxn"
           }
@@ -2214,6 +2214,7 @@
         "bndRate": 0.0205,
         "bndLastIntPay": "2024-08-26",
         "bndOriginInfo": {
+          "maturityDate": null,
           "originRate": {
             "denominator": 2000,
             "numerator": 41
@@ -2225,7 +2226,6 @@
         "bndType": {
           "tag": "Sequential"
         },
-        "bndMaturiyDate": null,
         "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
@@ -10579,7 +10579,7 @@
     {
       "contents": [
         "\u6b21\u7ea7",
-        -121097683.92,
+        0,
         567999932.76
       ],
       "tag": "BondOutstandingInt"

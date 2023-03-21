@@ -556,7 +556,8 @@
         "bndOriginInfo": {
           "originBalance": 7920000000,
           "originDate": "2022-10-26",
-          "originRate": 0.0348
+          "originRate": 0.0348,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",
@@ -579,7 +580,8 @@
         "bndOriginInfo": {
           "originBalance": 416842105.26,
           "originDate": "2022-10-26",
-          "originRate": 0.07
+          "originRate": 0.07,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",
@@ -808,13 +810,16 @@
         ],
         [
           {
-            "tag": "IfZero",
-            "contents": {
-              "tag": "CurrentBondBalanceOf",
-              "contents": [
-                "A"
-              ]
-            }
+            "tag": "IfEqBal",
+            "contents": [
+              {
+                "tag": "CurrentBondBalanceOf",
+                "contents": [
+                  "A"
+                ]
+              },
+              0
+            ]
           },
           {
             "tag": "PayPrin",

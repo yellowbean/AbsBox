@@ -74,7 +74,8 @@
         "bndOriginInfo": {
           "originBalance": 100,
           "originDate": "2020-01-03",
-          "originRate": 0.07
+          "originRate": 0.07,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",
@@ -97,7 +98,8 @@
         "bndOriginInfo": {
           "originBalance": 100,
           "originDate": "2020-01-03",
-          "originRate": 0.07
+          "originRate": 0.07,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",

@@ -181,6 +181,8 @@ def mkDs(x):
             return mkTag(("CurrentDueFee",fns))
         case ("已付费用",*fns) | ("lastFeePaid",*fns):
             return mkTag(("LastFeePaid",fns))
+        case ("到期月份",bn) | ("monthsTillMaturity",bn):
+            return mkTag(("MonthsTillMaturity",bn))
         case ("Min", ds1, ds2):
             return mkTag(("Min",[mkDs(ds1),mkDs(ds2)]))
         case ("Max", ds1, ds2):
@@ -208,18 +210,42 @@ def isPre(x):
 
 
 def mkPre(p):
-    dealStatusMap = {"摊还":"Current"
-                     ,"加速清偿":"Accelerated"
-                     ,"循环":"Revolving"}
+    def isIntQuery(y):
+        match y:
+            case ("monthsTillMaturity",_):
+                return True 
+            case ("到期月份",_):
+                return True 
+            case _:
+                return False
+    dealStatusMap = {"摊还":"Current" ,"加速清偿":"Accelerated" ,"循环":"Revolving"}
+
     match p:
+        case [ds,"=",n] :
+            if isIntQuery(ds):
+                return mkTag(("IfEqInt",[mkDs(ds),n]))
+            else:
+                return mkTag(("IfEqBal",[mkDs(ds),n]))
         case [ds,">",amt]:
-            return mkTag(("IfGT",[mkDs(ds),amt]))
+            if isIntQuery(ds):
+                return mkTag(("IfGTInt",[mkDs(ds),amt]))
+            else:
+                return mkTag(("IfGT",[mkDs(ds),amt]))
         case [ds,"<",amt]:
-            return mkTag(("IfLT",[mkDs(ds),amt]))
+            if isIntQuery(ds):
+                return mkTag(("IfLTInt",[mkDs(ds),amt]))
+            else:
+                return mkTag(("IfLT",[mkDs(ds),amt]))
         case [ds,">=",amt]:
-            return mkTag(("IfGET",[mkDs(ds),amt]))
+            if isIntQuery(ds):
+                return mkTag(("IfGETInt",[mkDs(ds),amt]))
+            else:
+                return mkTag(("IfGET",[mkDs(ds),amt]))
         case [ds,"<=",amt]:
-            return mkTag(("IfLET",[mkDs(ds),amt]))
+            if isIntQuery(ds):
+                return mkTag(("IfLETInt",[mkDs(ds),amt]))
+            else:
+                return mkTag(("IfLET",[mkDs(ds),amt]))
         case [ds,"=",0]:
             return mkTag(("IfZero",mkDs(ds)))
         case [">",_d]:
@@ -369,13 +395,14 @@ def mkBnd(bn,x):
               ,"startDate": originDate
               ,"rateType": bndInterestInfo
               ,"bondType": bndType}:
+            md = x.get("到期日",None) or x.get("maturityDate",None)
             return {bn: {"bndName": bn
                         ,"bndBalance": bndBalance
                           , "bndRate": bndRate
                           , "bndOriginInfo":
                            {"originBalance": originBalance
-                               , "originDate": originDate
-                               , "originRate": originRate}
+                            , "originDate": originDate
+                            , "originRate": originRate} | {"maturityDate": md}
                           , "bndInterestInfo": mkBondRate(bndInterestInfo)
                           , "bndType": mkBondType(bndType)
                           , "bndDuePrin": 0
@@ -583,6 +610,18 @@ def _rateTypeDs(x):
     
 def mkTrigger(x):
     match x : 
+        case [">",_d]:
+            return mkTag(("AfterDate",_d))
+        case [">=",_d]:
+            return mkTag(("AfterOnDate",_d))
+        case ["到期日未兑付",_bn] | ["passMaturity",_bn]:
+            return mkTag(("PassMaturityDate",_bn))
+        case ["所有满足",*trgs] | ["all",*trgs]:
+            return mkTag(("AllTrigger",[ mkTrigger(t) for t in trgs ]))
+        case ["任一满足",*trgs] | ["any",*trgs]:
+            return mkTag(("AnyTrigger",[ mkTrigger(t) for t in trgs ]))
+        case ["一直",b] | ["always",b]:
+            return mkTag(("Always",b))
         case [ds,cmp,v] if (isinstance(v,float) and _rateTypeDs(ds)):
             return mkTag(("ThresholdRate",[mkThreshold(cmp),mkDs(ds),v]))
         case [ds,cmp,ts] if _rateTypeDs(ds):
@@ -591,22 +630,6 @@ def mkTrigger(x):
             return mkTag(("ThresholdBal",[mkThreshold(cmp),mkDs(ds),v]))
         case [ds,cmp,ts]:
             return mkTag(("ThresholdBalCurve",[mkThreshold(cmp),mkDs(ds),mkTs("ThresholdCurve",ts)]))
-        case [">",_d]:
-            return mkTag(("AfterDate",_d))
-        case [">=",_d]:
-            return mkTag(("AfterOnDate",_d))
-        case ["到期日未兑付",_bn] | ["passMaturity",_bn]:
-            return mkTag(("PassMaturityDate",_bn))
-        #case ("目标摊还不足",bn):
-        #   return mkTag(("PrinShortfall",bn))
-        #case ["到期日未兑付",bn]:
-        #    return mkTag(("MissMatureDate",bn))
-        case ["所有满足",*trgs] | ["all",*trgs]:
-            return mkTag(("AllTrigger",[ mkTrigger(t) for t in trgs ]))
-        case ["任一满足",*trgs] | ["any",*trgs]:
-            return mkTag(("AnyTrigger",[ mkTrigger(t) for t in trgs ]))
-        case ["一直",b] | ["always",b]:
-            return mkTag(("Always",b))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkTrigger")
 
@@ -1030,7 +1053,6 @@ def readRunSummary(x, locale)->dict:
             ,"en":{'BondOutstanding':"Balance Defaults","BondOutstandingInt":"Interest Defaults"}}
     bndNames = set([ y[0] for y in bond_defaults])
     bndSummary = pd.DataFrame(columns=bndStatus[locale],index=list(bndNames))
-    print(bond_defaults)
     for bn,amt_type,amt,begBal in bond_defaults:
        bndSummary.loc[bn][_fmap[locale][amt_type]] = amt
        bndSummary.loc[bn][bndStatus[locale][2]] = begBal

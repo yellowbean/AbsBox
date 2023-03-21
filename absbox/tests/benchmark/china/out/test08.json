@@ -734,7 +734,8 @@
         "bndOriginInfo": {
           "originBalance": 1500000000.0,
           "originDate": "2022-09-30",
-          "originRate": 0.018
+          "originRate": 0.018,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",
@@ -810,7 +811,8 @@
         "bndOriginInfo": {
           "originBalance": 1990000000.0,
           "originDate": "2022-09-30",
-          "originRate": 0.0205
+          "originRate": 0.0205,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",
@@ -833,7 +835,8 @@
         "bndOriginInfo": {
           "originBalance": 567999932.76,
           "originDate": "2022-09-30",
-          "originRate": 0.0
+          "originRate": 0.0,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",

@@ -133,6 +133,7 @@
         "bndRate": 0.08,
         "bndLastIntPay": "2021-10-26",
         "bndOriginInfo": {
+          "maturityDate": null,
           "originRate": {
             "denominator": 100,
             "numerator": 7
@@ -144,7 +145,6 @@
         "bndType": {
           "tag": "Sequential"
         },
-        "bndMaturiyDate": null,
         "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
@@ -239,6 +239,7 @@
         "bndRate": 0.07,
         "bndLastIntPay": "2022-01-26",
         "bndOriginInfo": {
+          "maturityDate": null,
           "originRate": {
             "denominator": 100,
             "numerator": 7
@@ -250,7 +251,6 @@
         "bndType": {
           "tag": "Sequential"
         },
-        "bndMaturiyDate": null,
         "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [

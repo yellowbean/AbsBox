@@ -9,6 +9,10 @@ a structured finance cashflow engine wrapper
 
     pip install absbox
 
+## Community & Support
+
+* [Discussion](https://github.com/yellowbean/AbsBox/discussions)
+
 ## Goals
 * Provide building blocks to create cashflow models for ABS/MBS
 * Adapt to multiple asset classes

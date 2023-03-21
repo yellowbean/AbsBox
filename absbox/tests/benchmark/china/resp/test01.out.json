@@ -313,6 +313,7 @@
         "bndRate": 0,
         "bndLastIntPay": null,
         "bndOriginInfo": {
+          "maturityDate": null,
           "originRate": {
             "denominator": 100,
             "numerator": 7
@@ -324,7 +325,6 @@
         "bndType": {
           "tag": "Equity"
         },
-        "bndMaturiyDate": null,
         "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [
@@ -345,7 +345,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -360,7 +360,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -375,7 +375,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -390,7 +390,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -405,7 +405,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -420,7 +420,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -435,7 +435,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -450,7 +450,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -465,7 +465,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -480,7 +480,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -495,7 +495,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -510,7 +510,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -525,7 +525,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -540,7 +540,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -555,7 +555,7 @@
               0,
               [
                 "<PayPrin:[\"B\"],Just 20.00>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -570,7 +570,7 @@
               1.43,
               [
                 "<PayPrin:[\"B\"],Just 18.57>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -585,7 +585,7 @@
               6.07,
               [
                 "<PayPrin:[\"B\"],Just 12.50>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -600,7 +600,7 @@
               6.04,
               [
                 "<PayPrin:[\"B\"],Just 6.46>",
-                "<PayYield:B,Just 0.00>"
+                "<PayYield:B,Nothing>"
               ]
             ],
             "tag": "BondTxn"
@@ -614,6 +614,7 @@
         "bndRate": 0.07,
         "bndLastIntPay": "2022-10-26",
         "bndOriginInfo": {
+          "maturityDate": null,
           "originRate": {
             "denominator": 100,
             "numerator": 7
@@ -625,7 +626,6 @@
         "bndType": {
           "tag": "Sequential"
         },
-        "bndMaturiyDate": null,
         "bndLastPrinPay": null,
         "bndInterestInfo": {
           "contents": [

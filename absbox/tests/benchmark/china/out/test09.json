@@ -68,7 +68,8 @@
         "bndOriginInfo": {
           "originBalance": 100,
           "originDate": "2020-01-03",
-          "originRate": 0.07
+          "originRate": 0.07,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",
@@ -108,7 +109,8 @@
         "bndOriginInfo": {
           "originBalance": 100,
           "originDate": "2020-01-03",
-          "originRate": 0.07
+          "originRate": 0.07,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",
@@ -167,13 +169,16 @@
         ],
         [
           {
-            "tag": "IfZero",
-            "contents": {
-              "tag": "CurrentBondBalanceOf",
-              "contents": [
-                "A1"
-              ]
-            }
+            "tag": "IfEqBal",
+            "contents": [
+              {
+                "tag": "CurrentBondBalanceOf",
+                "contents": [
+                  "A1"
+                ]
+              },
+              0
+            ]
           },
           {
             "tag": "PayPrin",
@@ -187,13 +192,16 @@
         ],
         [
           {
-            "tag": "IfZero",
-            "contents": {
-              "tag": "CurrentBondBalanceOf",
-              "contents": [
-                "A1"
-              ]
-            }
+            "tag": "IfEqBal",
+            "contents": [
+              {
+                "tag": "CurrentBondBalanceOf",
+                "contents": [
+                  "A1"
+                ]
+              },
+              0
+            ]
           },
           {
             "tag": "PayResidual",

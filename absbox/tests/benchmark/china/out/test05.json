@@ -94,7 +94,8 @@
         "bndOriginInfo": {
           "originBalance": 3650000000,
           "originDate": "2020-01-03",
-          "originRate": 0.03
+          "originRate": 0.03,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Floater",
@@ -124,7 +125,8 @@
         "bndOriginInfo": {
           "originBalance": 5444000000,
           "originDate": "2020-01-03",
-          "originRate": 0.03
+          "originRate": 0.03,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Floater",
@@ -157,7 +159,8 @@
         "bndOriginInfo": {
           "originBalance": 2123875534.53,
           "originDate": "2020-01-03",
-          "originRate": 0.0
+          "originRate": 0.0,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "InterestByYield",

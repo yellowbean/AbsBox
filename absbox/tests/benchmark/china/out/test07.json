@@ -554,7 +554,8 @@
         "bndOriginInfo": {
           "originBalance": 1730000000.0,
           "originDate": "2022-07-26",
-          "originRate": 0.026
+          "originRate": 0.026,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",
@@ -577,7 +578,8 @@
         "bndOriginInfo": {
           "originBalance": 270000000.0,
           "originDate": "2022-07-26",
-          "originRate": 0.0
+          "originRate": 0.0,
+          "maturityDate": null
         },
         "bndInterestInfo": {
           "tag": "Fix",
