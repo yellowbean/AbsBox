@@ -72,7 +72,7 @@ class SPV:
 
     @property
     def json(self):
-        stated = False # self.日期.get("法定到期日",None) if len(self.日期)==4  # if isinstance(self.日期,dict) else self.日期[3]
+        stated = False 
         dists,collects,cleans = [ self.分配规则.get(wn,[]) for wn in ['未违约','回款后','清仓回购'] ]
         distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
         distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
@@ -185,31 +185,8 @@ class SPV:
                         raise  RuntimeError("持仓系数大于1.0")
                     output['position'][k] = output['bonds'][k][['本金','利息','本息合计']].apply(lambda x:x*factor).round(4)
 
-
         output['result'] = readRunSummary(resp[2], 'cn')
-        
-       # output['result'] = {}
-       # bond_defaults = [ (_x['contents'][0],_x['tag'],_x['contents'][1],_x['contents'][2]) for _x in resp[2] if _x['tag'] in set(['BondOutstanding','BondOutstandingInt' ])]
-       # _bnds = list(resp[0]['bonds'].keys())
-       # _bdefaults = pd.DataFrame(columns=['本金违约','利息违约',"起算余额"],index=_bnds)
-       # _dmap = {'BondOutstanding':"本金违约","BondOutstandingInt":"利息违约"}
-       # for bn,amt_type,amt,begBal in bond_defaults:
-       #     _bdefaults.loc[bn][_dmap[amt_type]] = amt
-       #     _bdefaults.loc[bn]['起算余额'] = begBal
-       # _bdefaults.fillna(0,inplace=True)
-       # _bdefaults['合计违约'] = _bdefaults['本金违约'] + _bdefaults['利息违约']
-       # 
-       # output['result']['bonds'] = _bdefaults.sort_index()
-
         return output
-
-
-def loadAsset(fp, reader, astType):
-    ''' load assets '''
-    with open(fp, 'r') as f:
-        reader = csv.DictReader(f)
-        return [ r for  r in reader ]
-
 
 def show(r, x="full"):
     _comps = ['agg_accounts', 'fees', 'bonds']
@@ -250,92 +227,5 @@ def flow_by_scenario(rs, flowpath,annotation=True,aggFunc=None,rnd=2):
         return pd.concat(dflows,axis=1).round(rnd)
     except ValueError as e:
         return f"需要传入 aggFunc 函数对重复数据进行 Min/Max/Sum 处理"
-
-
-import matplotlib.pyplot as plt
-from matplotlib import font_manager
-
-def init_plot_fonts():
-    define_list = ['Source Han Serif CN','Microsoft Yahei','STXihei']
-    support_list = font_manager.findSystemFonts(fontpaths=None, fontext='ttf')
-    font_p = font_manager.FontProperties()
-    try:
-        for sl in support_list:
-            f = font_manager.get_font(sl)
-            if f.family_name in set(define_list):
-                font_p.set_family(f.family_name)
-                font_p.set_size(14)
-                return font_p
-    except RuntimeError as e:
-        logging.error("中文字体载入失败")
-        return None
-
-font_p = init_plot_fonts()
-
-def plot_bond(rs, bnd, flow='本息合计'):
-    """Plot bonds across scenarios"""
-    plt.figure(figsize=(12,8))
-    _alpha =  0.8
-    for idx,s in enumerate(rs):
-        plt.step(s['bonds'][bnd].index,s['bonds'][bnd][[flow]], alpha=_alpha, linewidth=5, label=f"场景-{idx}")
-
-    plt.legend(loc='upper left', prop=font_p)
-    plt.title(f'{len(rs)} 种场景下 债券:{bnd} - {flow}', fontproperties=font_p)
-
-    plt.grid(True)
-    plt.axis('tight')
-    plt.xticks(rotation=30)
-
-    current_values = plt.gca().get_yticks()
-    plt.gca().set_yticklabels(['{:.0f}(w)'.format(x/10000) for x in current_values])
-    return plt
-
-def plot_bonds(r, bnds:list, flow='本息合计'):
-    "Plot bond flows with in a single run"
-    plt.figure(figsize=(12,8))
-    _alpha =  0.8
-    for b in bnds:
-        b_flow = r['bonds'][b]
-        plt.step(b_flow.index,b_flow[[flow]], alpha=_alpha, linewidth=5, label=f"债券-{b}")
-
-    plt.legend(loc='upper left', prop=font_p)
-    bnd_title = ','.join(bnds)
-    plt.title(f'债券:{bnd_title} - {flow}', fontproperties=font_p)
-
-    plt.grid(True)
-    plt.axis('tight')
-    plt.xticks(rotation=30)
-
-    current_values = plt.gca().get_yticks()
-    plt.gca().set_yticklabels(['{:.0f}(w)'.format(x/10000) for x in current_values])
-    return plt
-
-def plot_by_scenario(rs, flowtype, flowpath):
-    "Plot with multiple scenario"
-    plt.figure(figsize=(12,8))
-    scenario_names = rs.keys()
-    dflows = [query(rs,[s]+flowpath) for s in scenario_names]
-    _alpha =  0.8
-
-    x_labels = reduce(lambda acc,x:acc.union(x) ,[ _.index for _ in dflows ]).unique()
-    x = np.arange(len(x_labels))
-    width = 1 
-    step_length = width / (len(scenario_names)+1)
-
-    for (idx,(scen,dflow)) in enumerate(zip(scenario_names,dflows)):
-        if flowtype=="balance":
-            cb = consolStmtByDate(dflow)
-            plt.step(cb.index, cb, alpha=_alpha, linewidth=5, label=f"{scen}")
-        elif flowtype=="amount":
-            cb = aggStmtByDate(dflow)
-            _bar = plt.bar(x+idx*step_length,cb,width=step_length,label=scen)
-        else:
-            plt.plot(dflow.index,dflow, alpha=_alpha, linewidth=5, label=f"{scen}")
-
-    plt.legend(scenario_names,loc='upper right', prop=font_p)
-    plt.grid(True)
-    plt.axis('tight')
-    plt.xticks(ticks=x,labels=x_labels,rotation=30)
-
 
 信贷ABS = SPV # Legacy ,to be deleted

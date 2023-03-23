@@ -39,6 +39,7 @@ def unify(xs, ns):
                         , dfs)
     return r.sort_index()
 
+
 def backFillBal(x,ds):
     b = pd.DataFrame({"日期": ds})
     b.set_index("日期", inplace=True)
@@ -289,3 +290,18 @@ def str2date(x:str):
 
 def daysBetween(sd,ed):
     return (ed - sd).days
+
+def guess_locale(x):
+    accs = x['accounts']
+
+    assert len(accs)>0,"Failed to identify via deal accounts result"
+
+    acc_cols = set(list(accs.values())[0].columns.to_list())
+    locale = None
+    if acc_cols == set(["余额", "变动额", "备注"]):
+        locale="cn"
+    if acc_cols == set(["balance", "change", "memo"]):
+        locale="en"
+    return locale
+
+    
