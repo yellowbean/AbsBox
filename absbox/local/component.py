@@ -1068,5 +1068,26 @@ def readRunSummary(x, locale)->dict:
 
     return r
 
+def aggAccs(x,locale):
+    _header = {
+        "cn":{"idx":"日期","change":"变动额","bal":("期初余额",'余额',"期末余额")}
+        ,"en":{"idx":"date","change":"change","bal":("begin balance",'balance',"end balance")}
+    }
+    header = _header[locale]
+    agg_acc = {}
+    for k,v in x.items():
+        acc_by_date = v.groupby(header["idx"])
+        acc_txn_amt = acc_by_date.agg(change=(header["change"], sum))
+        ending_bal_column = acc_by_date.last()[header["bal"][1]].rename(header["bal"][2])
+        begin_bal_column = ending_bal_column.shift(1).rename(header["bal"][0])
+        agg_acc[k] = acc_txn_amt.join([begin_bal_column,ending_bal_column])
+        if agg_acc[k].empty:
+            agg_acc[k].columns = header["bal"][0],header['change'],header["bal"][2] 
+            continue
+        fst_idx = agg_acc[k].index[0]
+        agg_acc[k].at[fst_idx, header["bal"][0]] = round(agg_acc[k].at[fst_idx,  header["bal"][2]] - agg_acc[k].at[fst_idx,header['change']], 2)
+        agg_acc[k] = agg_acc[k][[header["bal"][0],header['change'],header["bal"][2]]]
+
+    return agg_acc
 
 

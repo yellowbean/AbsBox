@@ -105,26 +105,10 @@ class Generic:
                           for f, v in output['fees'].items()}
 
         # aggregate accounts
-        agg_acc = {}
-        for k,v in output['accounts'].items():
-            acc_by_date = v.groupby("date")
-            acc_txn_amt = acc_by_date.agg(change=("change", sum))
-            ending_bal_column = acc_by_date.last()['balance'].rename("end balance")
-            begin_bal_column = ending_bal_column.shift(1).rename("begin balance")
-            agg_acc[k] = acc_txn_amt.join([begin_bal_column,ending_bal_column])
-            if agg_acc[k].empty:
-                agg_acc[k].columns = ['begin balance', "change", 'end balance']
-                continue
-            fst_idx = agg_acc[k].index[0]
-            agg_acc[k].at[fst_idx, 'begin balance'] = round(agg_acc[k].at[fst_idx, 'end balance'] - agg_acc[k].at[fst_idx, 'change'], 2)
-            agg_acc[k] = agg_acc[k][['begin balance', "change", 'end balance']]
-
-        output['agg_accounts'] = agg_acc
+        output['agg_accounts'] = aggAccs(output['accounts'], 'en')
 
         output['pool'] = {}
-        
         _pool_cf_header,_ = guess_pool_flow_header(resp[0]['pool']['futureCf'][0],"english")
-        
         output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
                                               , columns=_pool_cf_header)
         pool_idx = 'Date'

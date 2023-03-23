@@ -163,37 +163,17 @@ class SPV:
         output['fees'] = {f: v.groupby('日期').agg({"余额": "min", "支付": "sum", "剩余支付": "min"})
                           for f, v in output['fees'].items()}
 
-
         # aggregate accounts
-        agg_acc = {}
-        for k,v in output['accounts'].items():
-            acc_by_date = v.groupby("日期")
-            acc_txn_amt = acc_by_date.agg(变动额=("变动额", sum))
-            ending_bal_column = acc_by_date.last()['余额'].rename("期末余额")
-            begin_bal_column = ending_bal_column.shift(1).rename("期初余额")
-            agg_acc[k] = acc_txn_amt.join([begin_bal_column,ending_bal_column])
-            if agg_acc[k].empty:
-                agg_acc[k].columns = ['期初余额', "变动额", '期末余额']
-                continue
-            fst_idx = agg_acc[k].index[0]
-            agg_acc[k].at[fst_idx, '期初余额'] = round(agg_acc[k].at[fst_idx, '期末余额'] - agg_acc[k].at[fst_idx, '变动额'], 2)
-            agg_acc[k] = agg_acc[k][['期初余额', "变动额", '期末余额']]
-
-        output['agg_accounts'] = agg_acc
+        output['agg_accounts'] = aggAccs(output['accounts'],'cn')
 
         output['pool'] = {}
-
         _pool_cf_header,_ = guess_pool_flow_header(resp[0]['pool']['futureCf'][0],"chinese")
-
         output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
                                               , columns=_pool_cf_header)
         pool_idx = "日期"
         output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)
         output['pool']['flow'].index.rename(pool_idx, inplace=True)
 
-        #output['pricing'] = pd.DataFrame.from_dict(resp[3]
-        #                                          , orient='index'
-        #                                          , columns=["估值", "票面估值", "WAL", "久期", "应计利息"]).sort_index() if resp[3] else None
         output['pricing'] = readPricingResult(resp[3], 'cn')
         if position:
             output['position'] = {}
