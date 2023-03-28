@@ -5,28 +5,13 @@ import functools, pickle, collections
 import pandas as pd
 import numpy as np
 from urllib.request import unquote
-from enum import Enum
 from functools import reduce 
-import matplotlib.pyplot as plt
+from pyspecter import query
 
 from absbox import *
 from absbox.local.util import mkTag,DC,mkTs,consolStmtByDate,aggStmtByDate
 from absbox.local.component import *
 
-from pyspecter import query
-
-
-
-def readIssuance(pool):
-    if '发行' not in pool.keys():
-        return None
-    issuanceField = {
-        "资产池规模":"IssuanceBalance"
-    }
-    r = {} 
-    for k,v in pool['发行'].items():
-        r[issuanceField[k]] = v
-    return r
 
 @dataclass
 class SPV:
@@ -188,44 +173,6 @@ class SPV:
         output['result'] = readRunSummary(resp[2], 'cn')
         return output
 
-def show(r, x="full"):
-    _comps = ['agg_accounts', 'fees', 'bonds']
 
-    dfs = { c:pd.concat(r[c].values(), axis=1, keys=r[c].keys())
-                             for c in _comps if r[c] }
-
-    dfs2 = {}
-    _m = {"agg_accounts":"账户","fees":"费用","bonds":"债券"}
-    for k,v in dfs.items():
-        dfs2[_m[k]] = pd.concat([v],keys=[_m[k]],axis=1)
-
-    agg_pool = pd.concat([r['pool']['flow']], axis=1, keys=["资产池"])
-    agg_pool = pd.concat([agg_pool], axis=1, keys=["资产池"])
-
-    _full = functools.reduce(lambda acc,x: acc.merge(x,how='outer',on=["日期"]),[agg_pool]+list(dfs2.values()))
-
-    match x:
-        case "full":
-            return _full.loc[:, ["资产池"]+list(dfs2.keys())].sort_index()
-        case "cash":
-            return None # ""
-
-def flow_by_scenario(rs, flowpath,annotation=True,aggFunc=None,rnd=2):
-    "pull flows from multiple scenario"
-    scenario_names = rs.keys()
-    dflow = None
-    aggFM = {"max":pd.Series.max,"sum":pd.Series.sum,"min":pd.Series.min}
-    
-    if aggFunc is None:
-        dflows = [query(rs,[s]+flowpath) for s in scenario_names]
-    else:
-        dflows = [query(rs,[s]+flowpath).groupby("日期").aggregate(aggFM.get(aggFunc,aggFunc)) for s in scenario_names]
-        
-    if annotation:
-        dflows = [f.rename(f"{s}({flowpath[-1]})") for (s,f) in zip(scenario_names,dflows)]
-    try: 
-        return pd.concat(dflows,axis=1).round(rnd)
-    except ValueError as e:
-        return f"需要传入 aggFunc 函数对重复数据进行 Min/Max/Sum 处理"
 
 信贷ABS = SPV # Legacy ,to be deleted

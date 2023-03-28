@@ -1,5 +1,9 @@
 # AbsBox 
-a structured finance cashflow engine wrapper
+a structured finance cashflow engine wrapper:
+
+* transperency -> open source for both wrapper and backend engine
+* human readable waterfall -> no more coding/scripting, just list and maps in Python !
+
 
 [![Python version](https://img.shields.io/pypi/pyversions/absbox)](https://img.shields.io/pypi/pyversions/absbox)
 [![PyPI version](https://badge.fury.io/py/absbox.svg)](https://badge.fury.io/py/absbox)

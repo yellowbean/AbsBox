@@ -33,3 +33,6 @@ english_acc_flow_fields_d = ["date", "balance", "change", "memo"]
 
 # LiqProvider
 china_liq_flow_fields_d = ["日期", "限额", "变动额", "已提供","备注"]
+english_liq_flow_fields_d = ["date", "balance", "change", "used","memo"]
+
+
