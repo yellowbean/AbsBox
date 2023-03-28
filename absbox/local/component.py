@@ -1,6 +1,7 @@
 from absbox.local.util import mkTag, DC, mkTs, guess_locale
 from enum import Enum
 import itertools
+import functools
 import logging
 
 import pandas as pd
