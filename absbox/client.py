@@ -31,7 +31,7 @@ class API:
         echo = json.loads(_r)
         self.server_info = echo
         x,y,z = echo['version'].split(".")
-        logging.info(f"Connect with engine version {echo['version']} successfully")
+        logging.info(f"Connect with engine {self.url} version {echo['version']} successfully")
         if self.version[1] != y:
             logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['version']} , pls upgrade your api package by: pip -U absbox")
             return

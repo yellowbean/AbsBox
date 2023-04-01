@@ -1,4 +1,4 @@
-from absbox.local.util import mkTag, DC, mkTs, guess_locale
+from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr
 from enum import Enum
 import itertools
 import functools
@@ -791,6 +791,9 @@ def mkAssumption(x) -> dict:
             return mkTag(("LeaseGapDays", n))
         case {"租赁间隔表": (tbl, n)} | {"LeaseGapDaysByAmount": (tbl, n)}:
             return mkTag(("LeaseGapDaysByAmount", [tbl, n]))
+        case {"查看":inspects} | {"Inspect":inspects}:
+            inspectVars = [ [mkDatePattern(dp),mkDs(ds)] for dp,ds in inspects ]
+            return mkTag(("InspectOn", inspectVars))
         case _:
             raise RuntimeError(f"Failed to match {x}:Assumption")
 
@@ -880,22 +883,16 @@ def mk(x):
             return mkBnd(bndName, bnd)
         case ["归集规则", collection]:
             return mkCollection(collection)
-        # case ["清仓回购", calls]:
-        #    return mkCall(calls)
 
 
 def mkPricingAssump(x):
     match x:
         case {"贴现日": pricingDay, "贴现曲线": xs} | {"PVDate": pricingDay, "PVCurve": xs}:
-            # return [pricingDay, {"tag": "PricingCurve", "contents": xs}]
             return mkTag(("DiscountCurve", [pricingDay, mkTs("IRateCurve", xs)]))
         case {"债券": bnd_with_price, "利率曲线": rdps} | {"bonds": bnd_with_price, "curve": rdps}:
             return mkTag(("RunZSpread", [mkTs("IRateCurve", rdps), bnd_with_price]))
         case _:
             raise RuntimeError(f"Failed to match pricing assumption: {x}")
-
-# "{\"tag\":\"RunZSpread\",\"contents\":[{\"tag\":\"IRateCurve\",\"contents\":[[\"2020-01-01\",1.0e-2]]}
-#                                        ,{\"A\":[\"2021-01-01\",100.3]}]}"
 
 
 def mkLiqProviderType(x):
@@ -927,6 +924,9 @@ def readPricingResult(x, locale) -> dict:
 
 
 def readRunSummary(x, locale) -> dict:
+    def filter_by_tags(xs, tags):
+        tags_set = set(tags)
+        return [ x for x in xs if x['tag'] in tags_set]
 
     r = {}
     if x is None:
@@ -952,9 +952,22 @@ def readRunSummary(x, locale) -> dict:
     dealStatusLog = {'cn': ["日期", "旧状态", "新状态"], 'en': ["Date", "From", "To"]}
     status_change_logs = [(_['contents'][0], readStatus(_['contents'][1], locale), readStatus(_['contents'][2], locale))
                           for _ in x if _['tag'] in set(['DealStatusChangeTo'])]
-    r['status'] = pd.DataFrame(
-        data=status_change_logs, columns=dealStatusLog[locale])
+    r['status'] = pd.DataFrame(data=status_change_logs, columns=dealStatusLog[locale])
 
+    # inspection variables
+    def uplift_ds(df):
+        ds_name = readTagStr(df['DealStats'].iloc[0])
+        df.drop(columns=["DealStats"],inplace=True)
+        df.rename(columns={"Value":ds_name},inplace=True)
+        df.set_index("Date",inplace=True)
+        return df
+    inspect_vars = filter_by_tags(x, ["InspectBal"])
+    inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),c['contents'][2])   for c in inspect_vars ]
+                                ,columns=["Date","DealStats","Value"])
+
+    grped_inspect_df = inspect_df.groupby("DealStats")
+
+    r['inspect'] = {readTagStr(k):uplift_ds(v) for k,v in grped_inspect_df}
     return r
 
 

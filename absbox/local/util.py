@@ -1,5 +1,5 @@
-import pandas as pd 
-import functools
+import pandas as pd
+import functools,json
 import itertools,re
 from enum import Enum
 import numpy as np
@@ -19,6 +19,15 @@ def mkTag(x):
         case (tagName):
             return {"tag": tagName}
 
+def readTagStr(x:str):
+    _x = json.loads(x.replace("'","\""))
+    if 'contents' in _x:
+        return f"<{_x['tag']}:{','.join(_x['contents'])}>"
+    return f"<{_x['tag']}>"
+
+def readTag(x:dict):
+    return f"<{x['tag']}:{','.join(x['contents'])}>"
+
 
 def isDate(x):
     return re.match(r"\d{4}\-\d{2}\-\d{2}",x)
@@ -29,6 +38,7 @@ def mkTs(n, vs):
 
 
 def unify(xs, ns):
+    "union dataframes by stacking up with names provided"
     index_name = xs[0].index.name
     dfs = []
     for x, n in zip(xs, ns):
@@ -37,6 +47,18 @@ def unify(xs, ns):
                                                 , how='outer'
                                                 , on=[index_name])
                         , dfs)
+    return r.sort_index()
+
+def unifyTs(xs):
+    "unify time-series alike dataframe"
+    _index_set = set([x.index.name for x in xs])
+    assert len(_index_set)==1,f"Index of dataframes should have same name,got:{_index_set}"
+
+    _index_name = list(_index_set)[0]
+    r = functools.reduce(lambda acc, x: acc.merge(x
+                                                , how='outer'
+                                                , on=[_index_name]), xs)
+    
     return r.sort_index()
 
 
