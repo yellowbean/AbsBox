@@ -40,6 +40,10 @@ def mkDatePattern(x):
             return mkTag(("DayOfMonth", _d))
         case ["MonthDayOfYear", _m, _d]:
             return mkTag(("MonthDayOfYear", _m, _d))
+        case ["CustomDate", *_ds]:
+            return mkTag(("CustomDate", _ds))
+        case ["AllDatePattern", *_dps]:
+            return mkTag(("AllDatePattern", [ mkDatePattern(_) for _ in _dps]))
         case _x if (_x in datePattern.values()):
             return mkTag((_x))
         case _x if (_x in datePattern.keys()):
