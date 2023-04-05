@@ -117,10 +117,12 @@ def mkDs(x):
             return mkTag("CurrentBondBalance")
         case ("债券余额", *bnds) | ("bondBalance", *bnds):
             return mkTag(("CurrentBondBalanceOf", bnds))
-        case ("资产池余额",) | ("poolBalance",):
-            return mkTag("CurrentPoolBalance")
         case ("初始债券余额",) | ("originalBondBalance",):
             return mkTag("OriginalBondBalance")
+        case ("到期月份", bn) | ("monthsTillMaturity", bn):
+            return mkTag(("MonthsTillMaturity", bn))
+        case ("资产池余额",) | ("poolBalance",):
+            return mkTag("CurrentPoolBalance")
         case ("初始资产池余额",) | ("originalPoolBalance",):
             return mkTag("OriginalPoolBalance")
         case ("资产池违约余额",) | ("currentPoolDefaultedBalance",):
@@ -137,8 +139,6 @@ def mkDs(x):
             return mkTag("AllAccBalance")
         case ("账户余额", *ans) | ("accountBalance", *ans):
             return mkTag(("AccBalance", ans))
-        case ("系数", ds, f) | ("factor", ds, f):
-            return mkTag(("Factor", [mkDs(ds), f]))
         case ("债券待付利息", *bnds) | ("bondDueInt", *bnds):
             return mkTag(("CurrentDueBondInt", bnds))
         case ("债券已付利息", *bnds) | ("lastBondIntPaid", *bnds):
@@ -157,8 +157,8 @@ def mkDs(x):
             return mkTag(("CurrentDueFee", fns))
         case ("已付费用", *fns) | ("lastFeePaid", *fns):
             return mkTag(("LastFeePaid", fns))
-        case ("到期月份", bn) | ("monthsTillMaturity", bn):
-            return mkTag(("MonthsTillMaturity", bn))
+        case ("系数", ds, f) | ("factor", ds, f):
+            return mkTag(("Factor", [mkDs(ds), f]))
         case ("Min", ds1, ds2):
             return mkTag(("Min", [mkDs(ds1), mkDs(ds2)]))
         case ("Max", ds1, ds2):
