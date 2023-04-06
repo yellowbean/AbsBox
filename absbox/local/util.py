@@ -3,6 +3,7 @@ import functools,json
 import itertools,re
 from enum import Enum
 import numpy as np
+import dataclasses
 from functools import reduce
 from pyxirr import xirr,xnpv
 
@@ -287,11 +288,16 @@ def npv(_flow,**p):
 
 
 def update_deal(d,i,c):
-    "A patch function to update a deal data list in immuntable way"
+    "A patch function to update a deal data component list in immuntable way"
     _d = d.copy()
     _d.pop(i)
     _d.insert(i,c)
     return _d
+
+
+def mkDealsBy(d, m:dict)->dict:
+    return { k:dataclasses.replace(d, **v) 
+                for k,v in m.items()} 
 
 
 class DC(Enum):  # TODO need to check with HS code
