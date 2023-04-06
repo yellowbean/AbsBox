@@ -225,6 +225,12 @@ class API:
             result.sort_index(inplace=True)
         return result
     
+    def runStructs(self, deals, **p):
+
+        assert isinstance(deals, dict),f"Deals should be a dict but got {deals}"
+        
+        return {k: self.run(v,**p) for k,v in deals.items() }
+
     def _send_req(self,_req,_url)->dict:
         try:
             r = requests.post(_url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False)
