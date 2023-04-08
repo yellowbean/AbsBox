@@ -1116,7 +1116,8 @@
         },
         "liqBalance": null,
         "liqCredit": 0,
-        "liqStart": "2022-09-30"
+        "liqStart": "2022-09-30",
+        "liqRate": null
       }
     }
   }

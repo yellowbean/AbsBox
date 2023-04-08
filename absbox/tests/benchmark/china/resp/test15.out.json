@@ -18755,6 +18755,7 @@
     "liqProvider": {
       "\u53d1\u8d77\u4eba": {
         "liqStart": "2022-09-30",
+        "liqRate": null,
         "liqCredit": -1331654905.13,
         "liqType": {
           "tag": "UnLimit"

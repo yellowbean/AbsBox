@@ -351,7 +351,8 @@
         },
         "liqBalance": 10,
         "liqCredit": 0,
-        "liqStart": "2021-06-15"
+        "liqStart": "2021-06-15",
+        "liqRate": null
       }
     }
   }

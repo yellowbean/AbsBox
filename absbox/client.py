@@ -10,9 +10,6 @@ from absbox.local.base import *
 import pandas as pd
 from pyspecter import S,query
 
-from concurrent.futures import ThreadPoolExecutor
-
-
 urllib3.disable_warnings()
 
 @dataclass
@@ -152,7 +149,11 @@ class API:
                     case 'PayFeeResidual':
                         if (action['contents'][1] not in valid_acc) \
                             or (action['contents'][2] not in valid_fee):
-                            error.append(f"{wn},{idx}")        
+                            error.append(f"{wn},{idx}")
+                    case 'PayFeeResidual':
+                        if (action['contents'][1] not in valid_acc) \
+                            or (action['contents'][2] not in valid_fee):
+                            error.append(f"{wn},{idx}")
 
         if warning:
             logging.warning(f"Warning in modelling:{warning}")

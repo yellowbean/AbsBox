@@ -462,6 +462,8 @@ def mkAction(x):
             return mkTag(("LiqRepay", [None, source, target]))
         case ["流动性支持报酬", source, target] | ["liqRepayResidual", source, target]:
             return mkTag(("LiqYield", [None, source, target]))
+        case ["流动性支持计提", target] | ["liqAccrue", target]:
+            return mkTag(("LiqAccrue", target))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkAction")
 
@@ -840,16 +842,42 @@ def mkCustom(x):
             return mkTag(("CustomDS", mkDs(ds)))
 
 
+def mkLiqProviderType(x):
+    match x:
+        case {"总额度": amt} | {"Total": amt}:
+            return mkTag(("FixSupport"))
+        case {"日期": dp, "限额": amt} | {"Reset": dp, "Quota": amt}:
+            return mkTag(("ReplenishSupport", [mkDatePattern(dp), amt]))
+        case {"日期": dp, "公式": ds,"系数":pct} | {"Reset": dp, "Formula":ds, "Pct":pct}:
+            return mkTag(("ByPct", [mkDatePattern(dp),mkDs(ds),pct]))
+        case {}:
+            return mkTag(("UnLimit"))
+        case _:
+            raise RuntimeError(f"Failed to match LiqProvider Type：{x}")
+        
+def mkLiqProviderRate(x):
+    match x:
+        case {"fixRate":r ,"rateAccDates":rateAccDates,"lastAccDate":lastAccDate} | \
+              {"固定利率":r ,"结息日":rateAccDates,"上次结息日":lastAccDate} :
+            return mkTag(("FixRate",[mkDatePattern(rateAccDates),r,lastAccDate]))
+        case _:
+            return None
+
+
 def mkLiqProvider(n, x):
     match x:
         case {"类型": "无限制", "起始日": _sd, **p} \
                 | {"type": "Unlimited", "start": _sd, **p}:
-            return {"liqName": n, "liqType": mkLiqProviderType({}), "liqBalance": None, "liqCredit": p.get("已提供", 0), "liqStart": _sd}
+            return {"liqName": n, "liqType": mkLiqProviderType({})
+                    , "liqBalance": None, "liqCredit": p.get("已提供", 0) | p.get("credit",0), "liqStart": _sd
+                    ,"liqRate":mkLiqProviderRate(p)}
         case {"类型": _sp, "额度": _ab, "起始日": _sd, **p} \
                 | {"type": _sp, "lineOfCredit": _ab, "start": _sd, **p}:
-            return {"liqName": n, "liqType": mkLiqProviderType(_sp), "liqBalance": _ab, "liqCredit": p.get("已提供", 0), "liqStart": _sd}
+            return {"liqName": n, "liqType": mkLiqProviderType(_sp)
+                    , "liqBalance": _ab, "liqCredit": p.get("已提供", 0) | p.get("credit",0), "liqStart": _sd
+                    ,"liqRate":mkLiqProviderRate(p)}
         case _:
-            raise RuntimeError(f"无法匹配流动性支持类型：{n,x}")
+            raise RuntimeError(f"Failed to match LiqProvidere：{x}")
 
 
 def mkCf(x):
@@ -899,14 +927,6 @@ def mkPricingAssump(x):
             raise RuntimeError(f"Failed to match pricing assumption: {x}")
 
 
-def mkLiqProviderType(x):
-    match x:
-        case {"总额度": amt} | {"Total": amt}:
-            return mkTag(("FixSupport"))
-        case {"日期": dp, "限额": amt} | {"Reset": dp, "Quota": amt}:
-            return mkTag(("ReplenishSupport", [mkDatePattern(dp), amt]))
-        case {}:
-            return mkTag(("UnLimit"))
 
 
 def readPricingResult(x, locale) -> dict:

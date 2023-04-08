@@ -90,9 +90,13 @@ class Generic:
     def read(self, resp, position=None):
         read_paths = {'bonds': ('bndStmt' , english_bondflow_fields , "bond")
                      , 'fees': ('feeStmt' , english_fee_flow_fields_d , "fee")
-                     , 'accounts': ('accStmt' , english_acc_flow_fields_d , "account")}
+                     , 'accounts': ('accStmt' , english_acc_flow_fields_d , "account")
+                     , 'liqProvider': ('liqStmt', english_liq_flow_fields_d, "")
+                     }
         output = {}
         for comp_name, comp_v in read_paths.items():
+            if resp[0][comp_name] is None:
+                continue
             output[comp_name] = {}
             for k, x in resp[0][comp_name].items():
                 ir = None
