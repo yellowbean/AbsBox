@@ -876,6 +876,11 @@ def mkLiqProvider(n, x):
             return {"liqName": n, "liqType": mkLiqProviderType(_sp)
                     , "liqBalance": _ab, "liqCredit": p.get("已提供", 0) | p.get("credit",0), "liqStart": _sd
                     ,"liqRate":mkLiqProviderRate(p)}
+        case {"额度": _ab, "起始日": _sd, **p} \
+                | {"lineOfCredit": _ab, "start": _sd, **p}:
+            return {"liqName": n, "liqType": mkTag(("FixSupport"))
+                    , "liqBalance": _ab, "liqCredit": p.get("已提供", 0) | p.get("credit",0), "liqStart": _sd
+                    ,"liqRate":mkLiqProviderRate(p)}
         case _:
             raise RuntimeError(f"Failed to match LiqProvidere：{x}")
 
