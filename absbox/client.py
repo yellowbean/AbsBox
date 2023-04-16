@@ -17,7 +17,7 @@ class API:
     url:str
     lang:str = "chinese"
     server_info = {}
-    version = "0","12","0"
+    version = "0","13","0"
     hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
     def __post_init__(self):

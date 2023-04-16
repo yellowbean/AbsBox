@@ -35,7 +35,11 @@ english_acc_flow_fields_d = ["date", "balance", "change", "memo"]
 china_liq_flow_fields_d = ["日期", "限额", "变动额", "已提供","利息","费用","备注"]
 english_liq_flow_fields_d = ["date", "balance", "change", "used","int","premium","memo"]
 
-# Index 
+# Rate Swap 
+china_rs_flow_fields_d = ["日期", "面额", "变动额", "支付","收取","净额","备注"]
+english_rs_flow_fields_d = ["date", "balance", "amount", "pay","receive","due","memo"]
+
+# Index
 
 
 

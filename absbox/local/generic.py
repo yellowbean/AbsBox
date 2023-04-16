@@ -79,6 +79,7 @@ class Generic:
                      , 'fees': ('feeStmt' , english_fee_flow_fields_d , "fee")
                      , 'accounts': ('accStmt' , english_acc_flow_fields_d , "account")
                      , 'liqProvider': ('liqStmt', english_liq_flow_fields_d, "")
+                     , 'rateSwap': ('rsStmt', english_rs_flow_fields_d, "")
                      }
         output = {}
         for comp_name, comp_v in read_paths.items():
