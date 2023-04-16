@@ -25,6 +25,8 @@
       ],
       "tag": "PreClosingDates"
     },
+    "rateSwap": null,
+    "currencySwap": null,
     "fees": {
       "\u670d\u52a1\u5546\u8d39\u7528": {
         "feeStmt": [

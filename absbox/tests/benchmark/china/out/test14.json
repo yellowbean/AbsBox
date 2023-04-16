@@ -148,6 +148,9 @@
             "tag": "LiqRepay",
             "contents": [
               null,
+              {
+                "tag": "LiqBal"
+              },
               "\u8d26\u623701",
               "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8"
             ]
@@ -337,8 +340,18 @@
         "\u8d26\u623702"
       ]
     ],
+    "rateSwap": null,
+    "currencySwap": null,
+    "custom": null,
+    "triggers": null,
     "liqProvider": {
       "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8": {
+        "liqCredit": 0,
+        "liqDueInt": null,
+        "liqDuePremium": null,
+        "liqRate": null,
+        "liqPremiumRate": null,
+        "liqStmt": null,
         "liqName": "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8",
         "liqType": {
           "tag": "ReplenishSupport",
@@ -350,9 +363,8 @@
           ]
         },
         "liqBalance": 10,
-        "liqCredit": 0,
         "liqStart": "2021-06-15",
-        "liqRate": null
+        "liqPremium": null
       }
     }
   }

@@ -4,10 +4,10 @@
     "dates": {
       "tag": "PreClosingDates",
       "contents": [
-        "2021-03-31",
+        "2021-03-01",
         "2021-06-15",
         null,
-        "2060-12-01",
+        "2030-01-01",
         [
           "2021-06-15",
           {
@@ -18,12 +18,12 @@
           "2021-07-26",
           {
             "tag": "DayOfMonth",
-            "contents": 26
+            "contents": 20
           }
         ]
       ]
     },
-    "name": "Senior/Junior",
+    "name": "TEST01",
     "status": {
       "tag": "Amortizing"
     },
@@ -33,7 +33,7 @@
           "tag": "Mortgage",
           "contents": [
             {
-              "originBalance": 120,
+              "originBalance": 2200,
               "originRate": {
                 "tag": "Fix",
                 "contents": 0.045
@@ -42,11 +42,11 @@
               "period": "Monthly",
               "startDate": "2021-02-01",
               "prinType": {
-                "tag": "Even"
+                "tag": "Level"
               },
               "tag": "MortgageOriginalInfo"
             },
-            120,
+            2200,
             0.08,
             20,
             null,
@@ -56,17 +56,17 @@
           ]
         }
       ],
-      "asOfDate": "2021-03-31",
+      "asOfDate": "2021-03-01",
       "issuanceStat": null,
       "futureCf": null
     },
     "bonds": {
       "A1": {
         "bndName": "A1",
-        "bndBalance": 100,
+        "bndBalance": 1000,
         "bndRate": 0.07,
         "bndOriginInfo": {
-          "originBalance": 100,
+          "originBalance": 1000,
           "originDate": "2020-01-03",
           "originRate": 0.07,
           "maturityDate": null
@@ -87,10 +87,10 @@
       },
       "B": {
         "bndName": "B",
-        "bndBalance": 20,
+        "bndBalance": 1000,
         "bndRate": 0.0,
         "bndOriginInfo": {
-          "originBalance": 100,
+          "originBalance": 1000,
           "originDate": "2020-01-03",
           "originRate": 0.07,
           "maturityDate": null
@@ -118,10 +118,10 @@
             "tag": "PayFee",
             "contents": [
               [
-                "\u8d26\u623701"
+                "acc01"
               ],
               [
-                "\u4fe1\u6258\u8d39\u7528"
+                "trusteeFee"
               ]
             ]
           }
@@ -131,7 +131,7 @@
           {
             "tag": "PayInt",
             "contents": [
-              "\u8d26\u623701",
+              "acc01",
               [
                 "A1"
               ]
@@ -143,7 +143,7 @@
           {
             "tag": "PayPrin",
             "contents": [
-              "\u8d26\u623701",
+              "acc01",
               [
                 "A1"
               ]
@@ -155,7 +155,7 @@
           {
             "tag": "PayPrin",
             "contents": [
-              "\u8d26\u623701",
+              "acc01",
               [
                 "B"
               ]
@@ -168,7 +168,7 @@
             "tag": "PayResidual",
             "contents": [
               null,
-              "\u8d26\u623701",
+              "acc01",
               "B"
             ]
           }
@@ -176,11 +176,11 @@
       ]
     },
     "fees": {
-      "\u4fe1\u6258\u8d39\u7528": {
-        "feeName": "\u4fe1\u6258\u8d39\u7528",
+      "trusteeFee": {
+        "feeName": "trusteeFee",
         "feeType": {
           "tag": "FixFee",
-          "contents": 10
+          "contents": 30
         },
         "feeStart": "2021-06-15",
         "feeDueDate": null,
@@ -190,9 +190,9 @@
       }
     },
     "accounts": {
-      "\u8d26\u623701": {
+      "acc01": {
         "accBalance": 0,
-        "accName": "\u8d26\u623701",
+        "accName": "acc01",
         "accType": null,
         "accInterest": null,
         "accStmt": null
@@ -201,20 +201,25 @@
     "collects": [
       [
         "CollectedInterest",
-        "\u8d26\u623701"
+        "acc01"
       ],
       [
         "CollectedPrincipal",
-        "\u8d26\u623701"
+        "acc01"
       ],
       [
         "CollectedPrepayment",
-        "\u8d26\u623701"
+        "acc01"
       ],
       [
         "CollectedRecoveries",
-        "\u8d26\u623701"
+        "acc01"
       ]
-    ]
+    ],
+    "rateSwap": null,
+    "currencySwap": null,
+    "custom": null,
+    "triggers": null,
+    "liqProvider": null
   }
 }

@@ -1,45 +1,43 @@
-from absbox.local.china import SPV
+from absbox.local.generic import Generic
 
-test01 = SPV(
-    "Senior/Junior"
-    ,{"封包日":"2021-03-31","起息日":"2021-06-15","首次兑付日":"2021-07-26"
-      ,"法定到期日":"2060-12-01","收款频率":"月末","付款频率":["每月",26]}
-    ,{'清单':[["按揭贷款"
-        ,{"放款金额":120,"放款利率":["固定",0.045],"初始期限":30
-          ,"频率":"每月","类型":"等额本金","放款日":"2021-02-01"}
-          ,{"当前余额":120
-          ,"当前利率":0.08
-          ,"剩余期限":20
-          ,"状态":"正常"}]]}
-    ,(("账户01",{"余额":0}),)
-    ,(("A1",{"当前余额":100
-             ,"当前利率":0.07
-             ,"初始余额":100
-             ,"初始利率":0.07
-             ,"起息日":"2020-01-03"
-             ,"利率":{"固定":0.08}
-             ,"债券类型":{"过手摊还":None}})
-      ,("B",{"当前余额":20
-             ,"当前利率":0.0
-             ,"初始余额":100
-             ,"初始利率":0.07
-             ,"起息日":"2020-01-03"
-             ,"利率":{"固定":0.00}
-             ,"债券类型":{"权益":None}
+test01 = Generic(
+    "TEST01"
+    ,{"cutoff":"2021-03-01","closing":"2021-06-15","firstPay":"2021-07-26"
+     ,"payFreq":["DayOfMonth",20],"poolFreq":"MonthEnd","stated":"2030-01-01"}
+    ,{'assets':[["Mortgage"
+        ,{"originBalance":2200,"originRate":["fix",0.045],"originTerm":30
+          ,"freq":"Monthly","type":"Level","originDate":"2021-02-01"}
+          ,{"currentBalance":2200
+          ,"currentRate":0.08
+          ,"remainTerm":20
+          ,"status":"current"}]]}
+    ,(("acc01",{"balance":0}),)
+    ,(("A1",{"balance":1000
+             ,"rate":0.07
+             ,"originBalance":1000
+             ,"originRate":0.07
+             ,"startDate":"2020-01-03"
+             ,"rateType":{"Fixed":0.08}
+             ,"bondType":{"Sequential":None}})
+      ,("B",{"balance":1000
+             ,"rate":0.0
+             ,"originBalance":1000
+             ,"originRate":0.07
+             ,"startDate":"2020-01-03"
+             ,"rateType":{"Fixed":0.00}
+             ,"bondType":{"Equity":None}
              }))
-    ,(("信托费用",{"类型":{"固定费用":10}}),)
-    ,{"未违约":[
-         ["支付费用",["账户01"],['信托费用']]
-         ,["支付利息","账户01",["A1"]]
-         ,["支付本金","账户01",["A1"]]
-         ,["支付本金","账户01",["B"]]
-         ,["支付收益","账户01","B"]
+    ,(("trusteeFee",{"type":{"fixFee":30}}),)
+    ,{"amortizing":[
+         ["payFee",["acc01"],['trusteeFee']]
+         ,["payInt","acc01",["A1"]]
+         ,["payPrin","acc01",["A1"]]
+         ,["payPrin","acc01",["B"]]
+         ,["payResidual","acc01","B"]
      ]}
-    ,(["利息回款","账户01"]
-      ,["本金回款","账户01"]
-      ,["早偿回款","账户01"]
-      ,["回收回款","账户01"])
+    ,[["CollectedInterest","acc01"]
+      ,["CollectedPrincipal","acc01"]
+      ,["CollectedPrepayment","acc01"]
+      ,["CollectedRecoveries","acc01"]]
     ,None
-    ,None
-    ,None
-)
+    ,None)

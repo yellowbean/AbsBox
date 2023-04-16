@@ -32,7 +32,23 @@ english_acc_flow_fields_d = ["date", "balance", "change", "memo"]
 
 
 # LiqProvider
-china_liq_flow_fields_d = ["日期", "限额", "变动额", "已提供","备注"]
-english_liq_flow_fields_d = ["date", "balance", "change", "used","memo"]
+china_liq_flow_fields_d = ["日期", "限额", "变动额", "已提供","利息","费用","备注"]
+english_liq_flow_fields_d = ["date", "balance", "change", "used","int","premium","memo"]
+
+# Index 
 
 
+
+# deal status
+
+
+
+datePattern = {"月末": "MonthEnd", "季度末": "QuarterEnd", "年末": "YearEnd", "月初": "MonthFirst",
+               "季度初": "QuarterFirst", "年初": "YearFirst", "每年": "MonthDayOfYear", "每月": "DayOfMonth", "每周": "DayOfWeek"}
+
+
+freqMap = {"每月": "Monthly", "每季度": "Quarterly", "每半年": "SemiAnnually", "每年": "Annually", "Monthly": "Monthly", "Quarterly": "Quarterly", "SemiAnnually": "SemiAnnually", "Annually": "Annually", "monthly": "Monthly", "quarterly": "Quarterly", "semiAnnually": "SemiAnnually", "annually": "Annually"
+           }
+
+baseMap = {"资产池余额": "CurrentPoolBalance", "资产池期末余额": "CurrentPoolBalance", "资产池期初余额": "CurrentPoolBegBalance", "资产池初始余额": "OriginalPoolBalance", "初始资产池余额": "OriginalPoolBalance", "资产池当期利息": "PoolCollectionInt", "债券余额": "CurrentBondBalance", "债券初始余额": "OriginalBondBalance", "当期已付债券利息": "LastBondIntPaid", "当期已付费用": "LastFeePaid", "当期未付债券利息": "CurrentDueBondInt", "当期未付费用": "CurrentDueFee"}
+           

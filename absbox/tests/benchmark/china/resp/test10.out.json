@@ -70,6 +70,8 @@
       ],
       "tag": "CustomDates"
     },
+    "rateSwap": null,
+    "currencySwap": null,
     "fees": {
       "\u4fe1\u6258\u8d39\u7528": {
         "feeStmt": [

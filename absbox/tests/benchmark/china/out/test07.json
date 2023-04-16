@@ -919,6 +919,11 @@
         "CollectedRecoveries",
         "\u672c\u91d1\u5206\u8d26\u6237"
       ]
-    ]
+    ],
+    "rateSwap": null,
+    "currencySwap": null,
+    "custom": null,
+    "triggers": null,
+    "liqProvider": null
   }
 }

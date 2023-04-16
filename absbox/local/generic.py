@@ -19,11 +19,12 @@ class Generic:
     fees: tuple
     waterfall: dict
     collection: list
-    call: tuple = None 
     liqFacility :dict = None
-    custom: dict = None 
+    rateSwap:dict = None
+    currencySwap:dict = None
     trigger:dict = None
     status:str = "Amortizing"
+    custom: dict = None
 
     @property
     def json(self):
@@ -31,6 +32,7 @@ class Generic:
         distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
         distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
         parsedDates = mkDate(self.dates)
+        closingDate = self.dates['closing']
         """
         get the json formatted string
         """
@@ -42,36 +44,21 @@ class Generic:
                      , "asOfDate": self.dates['cutoff']
                      , "issuanceStat": self.pool.get("issuanceStat")
                      , "futureCf":mkCf(self.pool.get('cashflow', [])) },
-            "bonds": functools.reduce(lambda result, current: result | current
-                                      , [mk(['bond', bn, bo]) for (bn, bo) in self.bonds]),
+            "bonds": { bn: mkBnd(bn,bo) for (bn,bo) in self.bonds},
             "waterfall": mkWaterfall({},self.waterfall.copy()),  
-            "fees": functools.reduce(lambda result, current: result | current
-                                     , [mk(["fee", feeName, feeO]) for (feeName, feeO) in self.fees]) if self.fees else {},
-            "accounts": functools.reduce(lambda result, current: result | current
-                                         , [mk(["account", accName, accO]) for (accName, accO) in self.accounts]),
-            "collects": self.collection
+            "fees": {fn: mkFee(fo|{"name":fn},fsDate = closingDate) 
+                                 for (fn,fo) in self.fees},
+            "accounts": {an:mkAcc(an,ao) for (an,ao) in self.accounts},
+            "collects": self.collection,
+            "rateSwap": { k:mkRateSwap(v) for k,v in self.currencySwap.items()} if self.rateSwap else None,
+            "currencySwap":None ,
+            "custom": {cn:mkCustom(co) for cn,co in self.custom.items()} if self.custom else None ,
+            "triggers": {mkWhenTrigger(tWhen):[[mkTrigger(_trg),mkTriggerEffect(_effect)] 
+                                                 for (_trg,_effect) in trgs ]
+                            for tWhen,trgs in self.trigger.items()} if self.trigger else None,
+            "liqProvider": {ln: mkLiqProvider(ln, lo | {"start":closingDate} ) 
+                               for ln,lo in self.liqFacility.items() } if self.liqFacility else None
         }
-        for fn, fo in _r['fees'].items():
-            if fo['feeStart'] is None:
-                fo['feeStart'] = self.dates['closing']
-
-        if hasattr(self, "custom") and self.custom is not None:
-            _r["custom"] = {}
-            for n,ci in self.custom.items():
-                _r["custom"][n] = mkCustom(ci)
-        
-        if hasattr(self, "trigger") and self.trigger is not None:
-            _trigger  = self.trigger
-            _trr = {mkWhenTrigger(_loc):
-                       [[mkTrigger(_trig),mkTriggerEffect(_effect)] for (_trig,_effect) in _vs ] 
-                       for _loc,_vs in _trigger.items()}
-            _r["triggers"] = _trr
-        
-        if hasattr(self, "liqFacility") and self.liqFacility is not None:
-            _providers = {}
-            for (_k, _p) in self.liqFacility.items():
-                _providers[_k] = mkLiqProvider(_k, ( _p | {"start": self.dates['closing']}))
-            _r["liqProvider"] = _providers
 
         _dealType = identify_deal_type(_r)
 

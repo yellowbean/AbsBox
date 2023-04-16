@@ -239,6 +239,9 @@
         "\u8d26\u623701"
       ]
     ],
+    "rateSwap": null,
+    "currencySwap": null,
+    "custom": null,
     "triggers": {
       "EndDistributionWF": [
         [
@@ -262,6 +265,7 @@
           }
         ]
       ]
-    }
+    },
+    "liqProvider": null
   }
 }

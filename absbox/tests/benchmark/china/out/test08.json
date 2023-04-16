@@ -1200,6 +1200,11 @@
         "CollectedRecoveries",
         "\u4fe1\u6258\u6536\u4ed8\u8d26\u6237"
       ]
-    ]
+    ],
+    "rateSwap": null,
+    "currencySwap": null,
+    "custom": null,
+    "triggers": null,
+    "liqProvider": null
   }
 }

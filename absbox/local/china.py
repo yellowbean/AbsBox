@@ -9,7 +9,7 @@ from functools import reduce
 from pyspecter import query
 
 from absbox import *
-from absbox.local.util import mkTag,DC,mkTs,consolStmtByDate,aggStmtByDate
+from absbox.local.util import mkTag,DC,mkTs,consolStmtByDate,aggStmtByDate,subMap,subMap2
 from absbox.local.component import *
 
 
@@ -23,11 +23,12 @@ class SPV:
     费用: tuple
     分配规则: dict
     归集规则: tuple
-    清仓回购: tuple = None
     流动性支持:dict = None
-    自定义: dict = None
+    利率对冲:dict = None
+    汇率对冲:dict = None
     触发事件: dict = None
     状态:str = "摊销"
+    自定义: dict = None
 
     @classmethod
     def load(cls,p):
@@ -62,7 +63,6 @@ class SPV:
         distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
         distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
         parsedDates = mkDate(self.日期)
-        status = mkStatus(self.状态)
         defaultStartDate = self.日期.get("起息日",None) or self.日期['归集日'][0]
         """
         get the json formatted string
@@ -70,43 +70,26 @@ class SPV:
         _r = {
             "dates": parsedDates,
             "name": self.名称,
-            "status": status,
+            "status": mkStatus(self.状态),
             "pool":{"assets": [mkAsset(x) for x in self.资产池.get('清单',[])]
                 , "asOfDate": self.日期.get('封包日',None) or self.日期['归集日'][0]
                 , "issuanceStat": readIssuance(self.资产池)
                 , "futureCf":mkCf(self.资产池.get('归集表', []))},
-            "bonds": functools.reduce(lambda result, current: result | current
-                                      , [mk(['债券', bn, bo]) for (bn, bo) in self.债券]),
+            "bonds": {bn: mkBnd(bn,bo)  for (bn,bo) in self.债券 },
             "waterfall": mkWaterfall({},self.分配规则.copy()),
-            "fees": functools.reduce(lambda result, current: result | current
-                                     , [mk(["费用", feeName, feeO]) for (feeName, feeO) in self.费用]) if self.费用 else {},
-            "accounts": functools.reduce(lambda result, current: result | current
-                                         , [mk(["账户", accName, accO]) for (accName, accO) in self.账户]),
-            "collects": mkCollection(self.归集规则)
+            "fees": {fn :mkFee(fo|{"名称":fn},fsDate=defaultStartDate) for (fn,fo) in self.费用 },
+            "accounts": {an:mkAcc(an,ao) for (an,ao) in self.账户 },
+            "collects": mkCollection(self.归集规则),
+            "rateSwap": {k:mkRateSwap(v) for k,v in self.利率对冲.items()} if self.利率对冲 else None,
+            "currencySwap": None,
+            "custom": {cn:mkCustom(co) for cn,co in self.自定义.items()} if self.自定义 else None,
+            "triggers": {mkWhenTrigger(tWhen):[[mkTrigger(_trg),mkTriggerEffect(_effect)] 
+                                                 for (_trg,_effect) in trgs ]
+                            for tWhen,trgs in self.触发事件.items()} if self.触发事件 else None,
+            "liqProvider": {ln: mkLiqProvider(ln, lo | {"起始日":defaultStartDate} ) 
+                                for ln,lo in self.流动性支持.items() } if self.流动性支持 else None
         }
         
-        for fn, fo in _r['fees'].items():
-            if fo['feeStart'] is None :
-                fo['feeStart'] = defaultStartDate
-
-        if hasattr(self, "自定义") and self.自定义 is not None:
-            _r["custom"] = {}
-            for n,ci in self.自定义.items():
-                _r["custom"][n] = mkCustom(ci)
-        
-        if hasattr(self, "触发事件") and self.触发事件 is  not None:
-            _trigger  = self.触发事件
-            _trr = {mkWhenTrigger(_loc):
-                       [[mkTrigger(_trig),mkTriggerEffect(_effect)] for (_trig,_effect) in _vs ] 
-                       for _loc,_vs in _trigger.items()}
-            _r["triggers"] = _trr
-        
-        if hasattr(self, "流动性支持") and self.流动性支持 is not None:
-            _providers = {}
-            for (_k, _p) in self.流动性支持.items():
-                _providers[_k] = mkLiqProvider(_k, ( _p | {"起始日": defaultStartDate}))
-            _r["liqProvider"] = _providers
-
         _dealType = identify_deal_type(_r)
 
         return mkTag((_dealType,_r))

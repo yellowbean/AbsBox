@@ -1031,6 +1031,8 @@
         "\u7ecf\u8425\u8d26\u6237"
       ]
     ],
+    "rateSwap": null,
+    "currencySwap": null,
     "custom": {
       "\u6536\u76ca\u8865\u5145\u8d85\u989d\u62c5\u4fdd\u91d1\u989d": {
         "tag": "CustomCurve",
@@ -1108,16 +1110,22 @@
         "contents": 655396658.24
       }
     },
+    "triggers": null,
     "liqProvider": {
       "\u53d1\u8d77\u4eba": {
+        "liqCredit": 0,
+        "liqDueInt": null,
+        "liqDuePremium": null,
+        "liqRate": null,
+        "liqPremiumRate": null,
+        "liqStmt": null,
         "liqName": "\u53d1\u8d77\u4eba",
         "liqType": {
           "tag": "UnLimit"
         },
         "liqBalance": null,
-        "liqCredit": 0,
         "liqStart": "2022-09-30",
-        "liqRate": null
+        "liqPremium": null
       }
     }
   }

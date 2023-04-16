@@ -30,10 +30,15 @@ def translate(input_cases,output_folder):
     for d,o in pair:
         print(f"Translating>>{d}>>{o}")
         benchfile =  os.path.join(case_out,o)
-        if not os.path.exists(benchfile):
+        if not os.path.exists(benchfile) or os.stat(benchfile).st_size < 10 :
             print(f"Skipping:{benchfile}")
             with open(benchfile,'w',encoding='utf8') as newbench:
-                print(f"Writing new bench out case -> size {len(d.json)}")
+                try:
+                    print(f"Writing new bench out case -> size {len(d.json)}")
+                except Exception as e:
+                    print(f"Error in build deal json:{e}")
+                assert d.json is not None, f"None: Failed to generate Deal JSON file:{d.json}"
+                assert d.json != "", f"Empty: Failed to generate Deal JSON file:{d.json}"
                 json.dump(d.json,newbench,indent=2)
             logging.info(f"Create new case for {o}")
             continue
@@ -62,6 +67,7 @@ def run_deal(input_folder, pair):
     input_scen_folder = os.path.join(input_folder,"scenario")
     input_resp_folder = os.path.join(input_folder,"resp")
     test_server = config["test_server"] #https://deal-bench.xyz/api/run_deal2" 
+    
     #test_server = "http://localhost:8081/run_deal2" 
     for dinput, sinput, eoutput in pair:
         print(f"Comparing:{dinput},{sinput},{eoutput}")
@@ -69,6 +75,7 @@ def run_deal(input_folder, pair):
             with open(os.path.join(input_scen_folder,sinput), 'r') as sq: # scenario request 
                 print(f"With deal request=> {dinput}, scenario => {sinput}")
                 req = {"deal":json.load(dq), "assump": {"tag":"Single", "contents":json.load(sq)}, "bondPricing":None}
+                print("build req done")
                 hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
                 tresp = requests.post(test_server, data=json.dumps(req).encode('utf-8'), headers=hdrs, verify=False)
                 if tresp.status_code != 200:
@@ -93,6 +100,11 @@ def run_deal(input_folder, pair):
                                 print(f"Bond {bn} is not matching")
                                 print(DeepDiff(s_result[0]['bonds'][bn], bv))
 
+                    #for i in ['status','dates','pool','fees','bonds','accounts']:
+                    #    assert local_result[0][i]==s_result[0][i], f"Deal {i} is not matching"
+                    bench_keys = local_result[0].keys()
+                    result_keys = s_result[0].keys()
+                    assert set(bench_keys) == set(result_keys),f"keys are not matching: bench {bench_keys},result {result_keys}"
                     for i in ['status','dates','pool','fees','bonds','accounts']:
                         assert local_result[0][i]==s_result[0][i], f"Deal {i} is not matching"
                     assert s_result == local_result , f"Server Test Failed {dinput} {sinput} {eoutput} "

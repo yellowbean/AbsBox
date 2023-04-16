@@ -1,7 +1,7 @@
 from absbox.local.generic import Generic
 
-test01 = Generic(
-    "Multiple Waterfall"
+test03 = Generic(
+    "If in Waterfall"
     ,{"cutoff":"2021-03-01","closing":"2021-06-15","firstPay":"2021-07-26"
      ,"payFreq":["DayOfMonth",20],"poolFreq":"MonthEnd","stated":"2030-01-01"}
     ,{'assets':[["Mortgage"
@@ -17,6 +17,7 @@ test01 = Generic(
              ,"originBalance":500
              ,"originRate":0.07
              ,"startDate":"2020-01-03"
+             ,"maturityDate":"2022-03-31"
              ,"rateType":{"Fixed":0.08}
              ,"bondType":{"Sequential":None}})
       ,("A2",{"balance":500
@@ -25,7 +26,7 @@ test01 = Generic(
              ,"originRate":0.07
              ,"startDate":"2020-01-03"
              ,"rateType":{"Fixed":0.08}
-             ,"bondType":{"Sequential":None}})      
+             ,"bondType":{"Sequential":None}})
       ,("B",{"balance":1000
              ,"rate":0.0
              ,"originBalance":1000
@@ -38,20 +39,11 @@ test01 = Generic(
     ,{"amortizing":[
          ["payFee",["acc01"],['trusteeFee']]
          ,["payInt","acc01",["A1","A2"]]
-         ,["payPrin","acc01",["A1","A2"]]
+         ,[[("monthsTillMaturity","A1"),"<",3]
+           ,["payPrin","acc01",["A1","A2"]]
+           ]
          ,["payPrin","acc01",["B"]]
          ,["payResidual","acc01","B"]]
-      ,"cleanUp":[]
-      ,"endOfCollection":[]       # execute when collect money from pool
-      ,("amortizing","defaulted"):[]   #execute when deal is `defaulted`
-      ,("amortizing","accelerated"):[ #execute when deal is `accelerated`
-         ["payFee",["acc01"],['trusteeFee']]
-         ,["payInt","acc01",["A1","A2"]]
-         ,["payPrin","acc01",["A1"]] 
-         ,["payPrin","acc01",["A2"]]
-         ,["payPrin","acc01",["B"]]
-         ,["payResidual","acc01","B"]
-      ] 
       }
     ,[["CollectedInterest","acc01"]
       ,["CollectedPrincipal","acc01"]
@@ -60,9 +52,5 @@ test01 = Generic(
     ,None
     ,None
     ,None
-    ,{"AfterCollect":[
-        ([("cumPoolDefaultedRate",),">",0.05]
-          ,("newStatus","Accelerated"))]
-      }
-)
-
+    ,None
+    )

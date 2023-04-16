@@ -332,4 +332,21 @@ def guess_locale(x):
         locale="en"
     return locale
 
-    
+def renameKs(m:dict,mapping,opt_key=False):
+    for (o,n) in mapping:
+        if opt_key and o not in m:
+            continue
+        m[n] = m[o]
+        del m[o]
+    return m
+
+def subMap(m:dict,ks:list):
+    fieldNames = [ fName for (fName,fDefaultValue) in ks]
+    return {k:m.get(k,defaultVal) for (k,defaultVal) in ks}
+
+def subMap2(m:dict,ks:list):
+    fieldNames = [ fName for (fName,fTargetName,fDefaultValue) in ks]
+    _m = {k:m.get(k,defaultVal) for (k,_,defaultVal) in ks}
+    _mapping = [ _[:2] for _ in ks ]
+    return renameKs(_m,_mapping)
+
