@@ -332,6 +332,14 @@ def guess_locale(x):
         locale="en"
     return locale
 
+def guess_pool_locale(x):
+    if "cutoffDate" in x:
+        return "english"
+    elif '封包日' in x:
+        return "chinese"
+    else:
+        raise RuntimeError("Failed to match {x} in guess pool locale")
+
 def renameKs(m:dict,mapping,opt_key=False):
     for (o,n) in mapping:
         if opt_key and o not in m:

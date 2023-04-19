@@ -4,7 +4,7 @@ import requests
 from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass,field
-from absbox.local.util import mkTag,isDate,flat
+from absbox.local.util import mkTag,isDate,flat,guess_pool_locale
 from absbox.local.component import mkPool,mkAssumption,mkAssumption2
 from absbox.local.base import *
 import pandas as pd
@@ -214,12 +214,12 @@ class API:
 
     def runPool(self, pool, assumptions=[],read=True):
         url = f"{self.url}/run_pool"        
+        pool_lang = guess_pool_locale(pool)
         req = self.build_pool_req(pool, assumptions=assumptions)
-
         result = self._send_req(req,url)
 
         if read:
-            flow_header,idx = guess_pool_flow_header(result[0],self.lang)
+            flow_header,idx = guess_pool_flow_header(result[0],pool_lang)
             try:
                 result = pd.DataFrame([_['contents'] for _ in result] , columns=flow_header)
             except ValueError as e:
