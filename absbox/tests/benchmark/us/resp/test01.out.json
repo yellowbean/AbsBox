@@ -1,2389 +1,2405 @@
 [
   {
-    "status": {
-      "tag": "Amortizing"
-    },
-    "dates": {
-      "contents": [
-        "2021-03-01",
-        "2021-06-15",
-        null,
-        "2030-01-01",
-        [
-          "2021-06-15",
-          {
-            "tag": "MonthEnd"
-          }
-        ],
-        [
-          "2021-07-26",
-          {
-            "contents": 20,
-            "tag": "DayOfMonth"
-          }
-        ]
-      ],
-      "tag": "PreClosingDates"
-    },
-    "rateSwap": null,
-    "currencySwap": null,
-    "fees": {
-      "trusteeFee": {
-        "feeStmt": [
-          {
-            "contents": [
-              "2021-07-26",
-              0,
-              30,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2021-08-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2021-09-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2021-10-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2021-11-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2021-12-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2022-01-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2022-02-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2022-03-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2022-04-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2022-05-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2022-06-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2022-07-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2022-08-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2022-09-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2022-10-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          },
-          {
-            "contents": [
-              "2022-11-20",
-              0,
-              0,
-              0,
-              "<PayFee:trusteeFee,0.00>"
-            ],
-            "tag": "ExpTxn"
-          }
-        ],
-        "feeStart": "2021-06-15",
-        "feeName": "trusteeFee",
-        "feeArrears": 0,
-        "feeType": {
-          "contents": 30,
-          "tag": "FixFee"
-        },
-        "feeDueDate": "2021-06-15",
-        "feeLastPaidDay": "2022-11-20",
-        "feeDue": 0
-      }
-    },
-    "collects": [
-      [
-        "CollectedInterest",
-        "acc01"
-      ],
-      [
-        "CollectedPrincipal",
-        "acc01"
-      ],
-      [
-        "CollectedPrepayment",
-        "acc01"
-      ],
-      [
-        "CollectedRecoveries",
-        "acc01"
-      ]
-    ],
-    "custom": null,
-    "name": "TEST01",
-    "waterfall": {
-      "DistributionDay Amortizing": [
-        [
-          null,
-          {
-            "contents": [
-              [
-                "acc01"
-              ],
-              [
-                "trusteeFee"
-              ]
-            ],
-            "tag": "PayFee"
-          }
-        ],
-        [
-          null,
-          {
-            "contents": [
-              "acc01",
-              [
-                "A1"
-              ]
-            ],
-            "tag": "PayInt"
-          }
-        ],
-        [
-          null,
-          {
-            "contents": [
-              "acc01",
-              [
-                "A1"
-              ]
-            ],
-            "tag": "PayPrin"
-          }
-        ],
-        [
-          null,
-          {
-            "contents": [
-              "acc01",
-              [
-                "B"
-              ]
-            ],
-            "tag": "PayPrin"
-          }
-        ],
-        [
-          null,
-          {
-            "contents": [
-              null,
-              "acc01",
-              "B"
-            ],
-            "tag": "PayResidual"
-          }
-        ]
-      ]
-    },
-    "liqProvider": null,
-    "bonds": {
-      "B": {
-        "bndName": "B",
-        "bndRate": 0,
-        "bndLastIntPay": null,
-        "bndOriginInfo": {
-          "maturityDate": null,
-          "originRate": {
-            "denominator": 100,
-            "numerator": 7
-          },
-          "originDate": "2020-01-03",
-          "originBalance": 1000
-        },
-        "bndDueInt": 0,
-        "bndType": {
-          "tag": "Equity"
-        },
-        "bndLastPrinPay": null,
-        "bndInterestInfo": {
-          "contents": [
-            0,
-            "DC_ACT_365F"
-          ],
-          "tag": "Fix"
-        },
-        "bndDueIntDate": null,
-        "bndStmt": [
-          {
-            "contents": [
-              "2021-07-26",
-              1000,
-              0,
-              0,
-              0,
-              0,
-              [
-                "<PayPrin:[\"B\"],Just 1000.00>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2021-08-20",
-              1000,
-              0,
-              0,
-              0,
-              0,
-              [
-                "<PayPrin:[\"B\"],Just 1000.00>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2021-09-20",
-              1000,
-              0,
-              0,
-              0,
-              0,
-              [
-                "<PayPrin:[\"B\"],Just 1000.00>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2021-10-20",
-              1000,
-              0,
-              0,
-              0,
-              0,
-              [
-                "<PayPrin:[\"B\"],Just 1000.00>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2021-11-20",
-              1000,
-              0,
-              0,
-              0,
-              0,
-              [
-                "<PayPrin:[\"B\"],Just 1000.00>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2021-12-20",
-              986.33,
-              0,
-              13.67,
-              0,
-              13.67,
-              [
-                "<PayPrin:[\"B\"],Just 986.33>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2022-01-20",
-              868.47,
-              0,
-              117.86,
-              0,
-              117.86,
-              [
-                "<PayPrin:[\"B\"],Just 868.47>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2022-02-20",
-              750.61,
-              0,
-              117.86,
-              0,
-              117.86,
-              [
-                "<PayPrin:[\"B\"],Just 750.61>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2022-03-20",
-              632.75,
-              0,
-              117.86,
-              0,
-              117.86,
-              [
-                "<PayPrin:[\"B\"],Just 632.75>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2022-04-20",
-              514.89,
-              0,
-              117.86,
-              0,
-              117.86,
-              [
-                "<PayPrin:[\"B\"],Just 514.89>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2022-05-20",
-              397.03,
-              0,
-              117.86,
-              0,
-              117.86,
-              [
-                "<PayPrin:[\"B\"],Just 397.03>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2022-06-20",
-              279.17,
-              0,
-              117.86,
-              0,
-              117.86,
-              [
-                "<PayPrin:[\"B\"],Just 279.17>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2022-07-20",
-              161.31,
-              0,
-              117.86,
-              0,
-              117.86,
-              [
-                "<PayPrin:[\"B\"],Just 161.31>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2022-08-20",
-              43.45,
-              0,
-              117.86,
-              0,
-              117.86,
-              [
-                "<PayPrin:[\"B\"],Just 43.45>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2022-09-20",
-              0,
-              74.41,
-              43.45,
-              0,
-              117.86,
-              [
-                "<PayPrin:[\"B\"],Just 0.00>",
-                "<PayYield:B,Nothing>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2022-10-20",
-              0,
-              117.86,
-              0,
-              0,
-              117.86,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2022-11-20",
-              0,
-              117.86,
-              0,
-              0,
-              117.86,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "BondTxn"
-          }
-        ],
-        "bndBalance": 0,
-        "bndDuePrin": 0
+    "tag": "MDeal",
+    "contents": {
+      "name": "TEST01",
+      "status": {
+        "tag": "Amortizing"
       },
-      "A1": {
-        "bndName": "A1",
-        "bndRate": 0.07,
-        "bndLastIntPay": "2021-12-20",
-        "bndOriginInfo": {
-          "maturityDate": null,
-          "originRate": {
-            "denominator": 100,
-            "numerator": 7
-          },
-          "originDate": "2020-01-03",
-          "originBalance": 1000
-        },
-        "bndDueInt": 0,
-        "bndType": {
-          "tag": "Sequential"
-        },
-        "bndLastPrinPay": null,
-        "bndInterestInfo": {
-          "contents": [
-            0.08,
-            "DC_ACT_365F"
-          ],
-          "tag": "Fix"
-        },
-        "bndDueIntDate": "2021-12-20",
-        "bndStmt": [
-          {
-            "contents": [
-              "2021-07-26",
-              566.42,
-              7.86,
-              433.58,
-              0.07,
-              441.44,
-              [
-                "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just 566.42>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2021-08-20",
-              451.27,
-              2.71,
-              115.15,
-              0.07,
-              117.86,
-              [
-                "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just 451.27>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2021-09-20",
-              336.09,
-              2.68,
-              115.18,
-              0.07,
-              117.86,
-              [
-                "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just 336.09>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2021-10-20",
-              220.16,
-              1.93,
-              115.93,
-              0.07,
-              117.86,
-              [
-                "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just 220.16>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2021-11-20",
-              103.6,
-              1.3,
-              116.56,
-              0.07,
-              117.86,
-              [
-                "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just 103.60>"
-              ]
-            ],
-            "tag": "BondTxn"
-          },
-          {
-            "contents": [
-              "2021-12-20",
-              0,
-              0.59,
-              103.6,
-              0.07,
-              104.19,
-              [
-                "<PayInt:[\"A1\"],Just 0.00>",
-                "<PayPrin:[\"A1\"],Just 0.00>"
-              ]
-            ],
-            "tag": "BondTxn"
-          }
-        ],
-        "bndBalance": 0,
-        "bndDuePrin": 0
-      }
-    },
-    "overrides": null,
-    "accounts": {
-      "acc01": {
-        "accName": "acc01",
-        "accStmt": [
-          {
-            "contents": [
-              "2021-06-15",
-              54.39,
-              54.39,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-06-15",
-              471.44,
-              417.05,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-06-15",
-              471.44,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-06-15",
-              471.44,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-26",
-              441.44,
-              -30,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-26",
-              433.58,
-              -7.86,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-26",
-              0,
-              -433.58,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-26",
-              0,
-              0,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-26",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-31",
-              11.88,
-              11.88,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-31",
-              117.86,
-              105.98,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-07-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-20",
-              115.15,
-              -2.71,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-20",
-              0,
-              -115.15,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-20",
-              0,
-              0,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-31",
-              11.55,
-              11.55,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-31",
-              117.86,
-              106.31,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-08-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-20",
-              115.18,
-              -2.68,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-20",
-              0,
-              -115.18,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-20",
-              0,
-              0,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-30",
-              10.81,
-              10.81,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-30",
-              117.86,
-              107.05,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-30",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-09-30",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-10-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-10-20",
-              115.93,
-              -1.93,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-10-20",
-              0,
-              -115.93,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-10-20",
-              0,
-              0,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-10-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-10-31",
-              9.75,
-              9.75,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-10-31",
-              117.86,
-              108.11,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-10-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-10-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-11-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-11-20",
-              116.56,
-              -1.3,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-11-20",
-              0,
-              -116.56,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-11-20",
-              0,
-              0,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-11-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-11-30",
-              9.33,
-              9.33,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-11-30",
-              117.86,
-              108.53,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-11-30",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-11-30",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-12-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-12-20",
-              117.27,
-              -0.59,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-12-20",
-              13.67,
-              -103.6,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-12-20",
-              0,
-              -13.67,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-12-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-12-31",
-              8.31,
-              8.31,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-12-31",
-              117.86,
-              109.55,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-12-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2021-12-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-01-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-01-20",
-              117.86,
-              0,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-01-20",
-              117.86,
-              0,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-01-20",
-              0,
-              -117.86,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-01-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-01-31",
-              7.83,
-              7.83,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-01-31",
-              117.86,
-              110.03,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-01-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-01-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-02-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-02-20",
-              117.86,
-              0,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-02-20",
-              117.86,
-              0,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-02-20",
-              0,
-              -117.86,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-02-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-02-28",
-              7.07,
-              7.07,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-02-28",
-              117.86,
-              110.79,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-02-28",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-02-28",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-03-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-03-20",
-              117.86,
-              0,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-03-20",
-              117.86,
-              0,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-03-20",
-              0,
-              -117.86,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-03-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-03-31",
-              5.7,
-              5.7,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-03-31",
-              117.86,
-              112.16,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-03-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-03-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-04-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-04-20",
-              117.86,
-              0,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-04-20",
-              117.86,
-              0,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-04-20",
-              0,
-              -117.86,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-04-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-04-30",
-              5.54,
-              5.54,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-04-30",
-              117.86,
-              112.32,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-04-30",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-04-30",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-05-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-05-20",
-              117.86,
-              0,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-05-20",
-              117.86,
-              0,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-05-20",
-              0,
-              -117.86,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-05-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-05-31",
-              4.61,
-              4.61,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-05-31",
-              117.86,
-              113.25,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-05-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-05-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-06-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-06-20",
-              117.86,
-              0,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-06-20",
-              117.86,
-              0,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-06-20",
-              0,
-              -117.86,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-06-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-06-30",
-              3.98,
-              3.98,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-06-30",
-              117.86,
-              113.88,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-06-30",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-06-30",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-07-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-07-20",
-              117.86,
-              0,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-07-20",
-              117.86,
-              0,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-07-20",
-              0,
-              -117.86,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-07-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-07-31",
-              3.09,
-              3.09,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-07-31",
-              117.86,
-              114.77,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-07-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-07-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-08-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-08-20",
-              117.86,
-              0,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-08-20",
-              117.86,
-              0,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-08-20",
-              0,
-              -117.86,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-08-20",
-              0,
-              0,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-08-31",
-              2.41,
-              2.41,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-08-31",
-              117.86,
-              115.45,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-08-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-08-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-09-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-09-20",
-              117.86,
-              0,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-09-20",
-              117.86,
-              0,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-09-20",
-              74.41,
-              -43.45,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-09-20",
-              0,
-              -74.41,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-09-30",
-              1.61,
-              1.61,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-09-30",
-              117.86,
-              116.25,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-09-30",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-09-30",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-10-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-10-20",
-              117.86,
-              0,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-10-20",
-              117.86,
-              0,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-10-20",
-              117.86,
-              0,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-10-20",
-              0,
-              -117.86,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-10-31",
-              0.79,
-              0.79,
-              "<PoolInflow:CollectedInterest>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-10-31",
-              117.86,
-              117.07,
-              "<PoolInflow:CollectedPrincipal>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-10-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedPrepayment>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-10-31",
-              117.86,
-              0,
-              "<PoolInflow:CollectedRecoveries>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-11-20",
-              117.86,
-              0,
-              "<SeqPayFee:[\"trusteeFee\"]>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-11-20",
-              117.86,
-              0,
-              "<PayInt:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-11-20",
-              117.86,
-              0,
-              "<PayPrin:[\"A1\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-11-20",
-              117.86,
-              0,
-              "<PayPrin:[\"B\"],Nothing>"
-            ],
-            "tag": "AccTxn"
-          },
-          {
-            "contents": [
-              "2022-11-20",
-              0,
-              -117.86,
-              "<PayYield:B,Nothing>"
-            ],
-            "tag": "AccTxn"
-          }
-        ],
-        "accType": null,
-        "accInterest": null,
-        "accBalance": 0
-      }
-    },
-    "call": null,
-    "triggers": null,
-    "pool": {
-      "issuanceStat": null,
-      "asOfDate": "2021-03-01",
-      "futureCf": [
-        {
-          "contents": [
+      "dates": {
+        "tag": "PreClosingDates",
+        "contents": [
+          "2021-03-01",
+          "2021-06-15",
+          null,
+          "2030-01-01",
+          [
             "2021-06-15",
-            1782.95,
-            417.05,
-            54.39,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-07-31",
-            1676.97,
-            105.98,
-            11.88,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-08-31",
-            1570.66,
-            106.31,
-            11.55,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-09-30",
-            1463.61,
-            107.05,
-            10.81,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-10-31",
-            1355.5,
-            108.11,
-            9.75,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-11-30",
-            1246.97,
-            108.53,
-            9.33,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2021-12-31",
-            1137.42,
-            109.55,
-            8.31,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2022-01-31",
-            1027.39,
-            110.03,
-            7.83,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2022-02-28",
-            916.6,
-            110.79,
-            7.07,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2022-03-31",
-            804.44,
-            112.16,
-            5.7,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2022-04-30",
-            692.12,
-            112.32,
-            5.54,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2022-05-31",
-            578.87,
-            113.25,
-            4.61,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2022-06-30",
-            464.99,
-            113.88,
-            3.98,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2022-07-31",
-            350.22,
-            114.77,
-            3.09,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2022-08-31",
-            234.77,
-            115.45,
-            2.41,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2022-09-30",
-            118.52,
-            116.25,
-            1.61,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        },
-        {
-          "contents": [
-            "2022-10-31",
-            1.45,
-            117.07,
-            0.79,
-            0,
-            0,
-            0,
-            0,
-            0.045,
-            null
-          ],
-          "tag": "MortgageFlow"
-        }
-      ],
-      "assets": [
-        {
-          "contents": [
             {
-              "originRate": {
-                "contents": 0.045,
-                "tag": "Fix"
-              },
-              "originTerm": 30,
-              "prinType": {
-                "tag": "Level"
-              },
-              "tag": "MortgageOriginalInfo",
-              "period": "Monthly",
-              "startDate": "2021-02-01",
-              "originBalance": 2200
-            },
-            2200,
-            0.08,
-            20,
-            null,
-            {
-              "tag": "Current"
+              "tag": "MonthEnd"
             }
           ],
-          "tag": "Mortgage"
+          [
+            "2021-07-26",
+            {
+              "tag": "DayOfMonth",
+              "contents": 20
+            }
+          ]
+        ]
+      },
+      "accounts": {
+        "acc01": {
+          "accBalance": 0,
+          "accName": "acc01",
+          "accInterest": null,
+          "accType": null,
+          "accStmt": [
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-06-15",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-06-15",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-06-15",
+                417.05,
+                417.05,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-06-15",
+                471.44,
+                54.39,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-07-26",
+                441.44,
+                -30,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-07-26",
+                433.58,
+                -7.86,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-07-26",
+                0,
+                -433.58,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-07-26",
+                0,
+                0,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-07-26",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-07-31",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-07-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-07-31",
+                105.98,
+                105.98,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-07-31",
+                117.86,
+                11.88,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-08-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-08-20",
+                115.15,
+                -2.71,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-08-20",
+                0,
+                -115.15,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-08-20",
+                0,
+                0,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-08-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-08-31",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-08-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-08-31",
+                106.31,
+                106.31,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-08-31",
+                117.86,
+                11.55,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-09-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-09-20",
+                115.18,
+                -2.68,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-09-20",
+                0,
+                -115.18,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-09-20",
+                0,
+                0,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-09-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-09-30",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-09-30",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-09-30",
+                107.05,
+                107.05,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-09-30",
+                117.86,
+                10.81,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-20",
+                115.93,
+                -1.93,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-20",
+                0,
+                -115.93,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-20",
+                0,
+                0,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-31",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-31",
+                108.11,
+                108.11,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-31",
+                117.86,
+                9.75,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-11-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-11-20",
+                116.56,
+                -1.3,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-11-20",
+                0,
+                -116.56,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-11-20",
+                0,
+                0,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-11-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-11-30",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-11-30",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-11-30",
+                108.53,
+                108.53,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-11-30",
+                117.86,
+                9.33,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-20",
+                117.27,
+                -0.59,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-20",
+                13.67,
+                -103.6,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-20",
+                0,
+                -13.67,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                109.55,
+                109.55,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                117.86,
+                8.31,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-20",
+                117.86,
+                0,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-20",
+                117.86,
+                0,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-20",
+                0,
+                -117.86,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-31",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-31",
+                110.03,
+                110.03,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-31",
+                117.86,
+                7.83,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-02-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-02-20",
+                117.86,
+                0,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-02-20",
+                117.86,
+                0,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-02-20",
+                0,
+                -117.86,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-02-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-02-28",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-02-28",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-02-28",
+                110.79,
+                110.79,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-02-28",
+                117.86,
+                7.07,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-03-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-03-20",
+                117.86,
+                0,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-03-20",
+                117.86,
+                0,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-03-20",
+                0,
+                -117.86,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-03-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-03-31",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-03-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-03-31",
+                112.16,
+                112.16,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-03-31",
+                117.86,
+                5.7,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-04-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-04-20",
+                117.86,
+                0,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-04-20",
+                117.86,
+                0,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-04-20",
+                0,
+                -117.86,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-04-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-04-30",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-04-30",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-04-30",
+                112.32,
+                112.32,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-04-30",
+                117.86,
+                5.54,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-05-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-05-20",
+                117.86,
+                0,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-05-20",
+                117.86,
+                0,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-05-20",
+                0,
+                -117.86,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-05-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-05-31",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-05-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-05-31",
+                113.25,
+                113.25,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-05-31",
+                117.86,
+                4.61,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-06-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-06-20",
+                117.86,
+                0,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-06-20",
+                117.86,
+                0,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-06-20",
+                0,
+                -117.86,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-06-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-06-30",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-06-30",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-06-30",
+                113.88,
+                113.88,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-06-30",
+                117.86,
+                3.98,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-07-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-07-20",
+                117.86,
+                0,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-07-20",
+                117.86,
+                0,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-07-20",
+                0,
+                -117.86,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-07-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-07-31",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-07-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-07-31",
+                114.77,
+                114.77,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-07-31",
+                117.86,
+                3.09,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-08-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-08-20",
+                117.86,
+                0,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-08-20",
+                117.86,
+                0,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-08-20",
+                0,
+                -117.86,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-08-20",
+                0,
+                0,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-08-31",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-08-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-08-31",
+                115.45,
+                115.45,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-08-31",
+                117.86,
+                2.41,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-09-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-09-20",
+                117.86,
+                0,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-09-20",
+                117.86,
+                0,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-09-20",
+                74.41,
+                -43.45,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-09-20",
+                0,
+                -74.41,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-09-30",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-09-30",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-09-30",
+                116.25,
+                116.25,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-09-30",
+                117.86,
+                1.61,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-10-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-10-20",
+                117.86,
+                0,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-10-20",
+                117.86,
+                0,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-10-20",
+                117.86,
+                0,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-10-20",
+                0,
+                -117.86,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-10-31",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-10-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-10-31",
+                117.07,
+                117.07,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-10-31",
+                117.86,
+                0.79,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-11-20",
+                117.86,
+                0,
+                "<SeqPayFee:[\"trusteeFee\"]>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-11-20",
+                117.86,
+                0,
+                "<PayInt:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-11-20",
+                117.86,
+                0,
+                "<PayPrin:[\"A1\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-11-20",
+                117.86,
+                0,
+                "<PayPrin:[\"B\"],Nothing>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-11-20",
+                0,
+                -117.86,
+                "<PayYield:B,Nothing>"
+              ]
+            }
+          ]
         }
-      ]
+      },
+      "fees": {
+        "trusteeFee": {
+          "feeName": "trusteeFee",
+          "feeType": {
+            "tag": "FixFee",
+            "contents": 30
+          },
+          "feeStart": "2021-06-15",
+          "feeDue": 0,
+          "feeDueDate": "2021-06-15",
+          "feeArrears": 0,
+          "feeLastPaidDay": "2022-11-20",
+          "feeStmt": [
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2021-07-26",
+                0,
+                30,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2021-08-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2021-09-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2021-10-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2021-11-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2021-12-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2022-01-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2022-02-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2022-03-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2022-04-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2022-05-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2022-06-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2022-07-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2022-08-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2022-09-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2022-10-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            },
+            {
+              "tag": "ExpTxn",
+              "contents": [
+                "2022-11-20",
+                0,
+                0,
+                0,
+                "<PayFee:trusteeFee,0.00>"
+              ]
+            }
+          ]
+        }
+      },
+      "bonds": {
+        "A1": {
+          "bndName": "A1",
+          "bndType": {
+            "tag": "Sequential"
+          },
+          "bndOriginInfo": {
+            "originBalance": 1000,
+            "originDate": "2020-01-03",
+            "originRate": {
+              "numerator": 7,
+              "denominator": 100
+            },
+            "maturityDate": null
+          },
+          "bndInterestInfo": {
+            "tag": "Fix",
+            "contents": [
+              0.08,
+              "DC_ACT_365F"
+            ]
+          },
+          "bndBalance": 0,
+          "bndRate": 0.07,
+          "bndDuePrin": 0,
+          "bndDueInt": 0,
+          "bndDueIntDate": "2021-12-20",
+          "bndLastIntPay": "2021-12-20",
+          "bndLastPrinPay": null,
+          "bndStmt": [
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2021-07-26",
+                566.42,
+                7.86,
+                433.58,
+                0.07,
+                441.44,
+                [
+                  "<PayInt:[\"A1\"],Just 0.00>",
+                  "<PayPrin:[\"A1\"],Just 566.42>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2021-08-20",
+                451.27,
+                2.71,
+                115.15,
+                0.07,
+                117.86,
+                [
+                  "<PayInt:[\"A1\"],Just 0.00>",
+                  "<PayPrin:[\"A1\"],Just 451.27>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2021-09-20",
+                336.09,
+                2.68,
+                115.18,
+                0.07,
+                117.86,
+                [
+                  "<PayInt:[\"A1\"],Just 0.00>",
+                  "<PayPrin:[\"A1\"],Just 336.09>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2021-10-20",
+                220.16,
+                1.93,
+                115.93,
+                0.07,
+                117.86,
+                [
+                  "<PayInt:[\"A1\"],Just 0.00>",
+                  "<PayPrin:[\"A1\"],Just 220.16>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2021-11-20",
+                103.6,
+                1.3,
+                116.56,
+                0.07,
+                117.86,
+                [
+                  "<PayInt:[\"A1\"],Just 0.00>",
+                  "<PayPrin:[\"A1\"],Just 103.60>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2021-12-20",
+                0,
+                0.59,
+                103.6,
+                0.07,
+                104.19,
+                [
+                  "<PayInt:[\"A1\"],Just 0.00>",
+                  "<PayPrin:[\"A1\"],Just 0.00>"
+                ]
+              ]
+            }
+          ]
+        },
+        "B": {
+          "bndName": "B",
+          "bndType": {
+            "tag": "Equity"
+          },
+          "bndOriginInfo": {
+            "originBalance": 1000,
+            "originDate": "2020-01-03",
+            "originRate": {
+              "numerator": 7,
+              "denominator": 100
+            },
+            "maturityDate": null
+          },
+          "bndInterestInfo": {
+            "tag": "Fix",
+            "contents": [
+              0,
+              "DC_ACT_365F"
+            ]
+          },
+          "bndBalance": 0,
+          "bndRate": 0,
+          "bndDuePrin": 0,
+          "bndDueInt": 0,
+          "bndDueIntDate": null,
+          "bndLastIntPay": null,
+          "bndLastPrinPay": null,
+          "bndStmt": [
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2021-07-26",
+                1000,
+                0,
+                0,
+                0,
+                0,
+                [
+                  "<PayPrin:[\"B\"],Just 1000.00>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2021-08-20",
+                1000,
+                0,
+                0,
+                0,
+                0,
+                [
+                  "<PayPrin:[\"B\"],Just 1000.00>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2021-09-20",
+                1000,
+                0,
+                0,
+                0,
+                0,
+                [
+                  "<PayPrin:[\"B\"],Just 1000.00>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2021-10-20",
+                1000,
+                0,
+                0,
+                0,
+                0,
+                [
+                  "<PayPrin:[\"B\"],Just 1000.00>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2021-11-20",
+                1000,
+                0,
+                0,
+                0,
+                0,
+                [
+                  "<PayPrin:[\"B\"],Just 1000.00>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2021-12-20",
+                986.33,
+                0,
+                13.67,
+                0,
+                13.67,
+                [
+                  "<PayPrin:[\"B\"],Just 986.33>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2022-01-20",
+                868.47,
+                0,
+                117.86,
+                0,
+                117.86,
+                [
+                  "<PayPrin:[\"B\"],Just 868.47>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2022-02-20",
+                750.61,
+                0,
+                117.86,
+                0,
+                117.86,
+                [
+                  "<PayPrin:[\"B\"],Just 750.61>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2022-03-20",
+                632.75,
+                0,
+                117.86,
+                0,
+                117.86,
+                [
+                  "<PayPrin:[\"B\"],Just 632.75>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2022-04-20",
+                514.89,
+                0,
+                117.86,
+                0,
+                117.86,
+                [
+                  "<PayPrin:[\"B\"],Just 514.89>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2022-05-20",
+                397.03,
+                0,
+                117.86,
+                0,
+                117.86,
+                [
+                  "<PayPrin:[\"B\"],Just 397.03>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2022-06-20",
+                279.17,
+                0,
+                117.86,
+                0,
+                117.86,
+                [
+                  "<PayPrin:[\"B\"],Just 279.17>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2022-07-20",
+                161.31,
+                0,
+                117.86,
+                0,
+                117.86,
+                [
+                  "<PayPrin:[\"B\"],Just 161.31>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2022-08-20",
+                43.45,
+                0,
+                117.86,
+                0,
+                117.86,
+                [
+                  "<PayPrin:[\"B\"],Just 43.45>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2022-09-20",
+                0,
+                74.41,
+                43.45,
+                0,
+                117.86,
+                [
+                  "<PayPrin:[\"B\"],Just 0.00>",
+                  "<PayYield:B,Nothing>"
+                ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2022-10-20",
+                0,
+                117.86,
+                0,
+                0,
+                117.86,
+                "<PayYield:B,Nothing>"
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2022-11-20",
+                0,
+                117.86,
+                0,
+                0,
+                117.86,
+                "<PayYield:B,Nothing>"
+              ]
+            }
+          ]
+        }
+      },
+      "pool": {
+        "assets": [
+          {
+            "tag": "Mortgage",
+            "contents": [
+              {
+                "tag": "MortgageOriginalInfo",
+                "originBalance": 2200,
+                "originRate": {
+                  "tag": "Fix",
+                  "contents": 0.045
+                },
+                "originTerm": 30,
+                "period": "Monthly",
+                "startDate": "2021-02-01",
+                "prinType": {
+                  "tag": "Level"
+                }
+              },
+              2200,
+              0.08,
+              20,
+              null,
+              {
+                "tag": "Current"
+              }
+            ]
+          }
+        ],
+        "futureCf": [
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2021-06-15",
+              1782.95,
+              417.05,
+              54.39,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2021-07-31",
+              1676.97,
+              105.98,
+              11.88,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2021-08-31",
+              1570.66,
+              106.31,
+              11.55,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2021-09-30",
+              1463.61,
+              107.05,
+              10.81,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2021-10-31",
+              1355.5,
+              108.11,
+              9.75,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2021-11-30",
+              1246.97,
+              108.53,
+              9.33,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2021-12-31",
+              1137.42,
+              109.55,
+              8.31,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2022-01-31",
+              1027.39,
+              110.03,
+              7.83,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2022-02-28",
+              916.6,
+              110.79,
+              7.07,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2022-03-31",
+              804.44,
+              112.16,
+              5.7,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2022-04-30",
+              692.12,
+              112.32,
+              5.54,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2022-05-31",
+              578.87,
+              113.25,
+              4.61,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2022-06-30",
+              464.99,
+              113.88,
+              3.98,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2022-07-31",
+              350.22,
+              114.77,
+              3.09,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2022-08-31",
+              234.77,
+              115.45,
+              2.41,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2022-09-30",
+              118.52,
+              116.25,
+              1.61,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2022-10-31",
+              1.45,
+              117.07,
+              0.79,
+              0,
+              0,
+              0,
+              0,
+              0.045,
+              null
+            ]
+          }
+        ],
+        "asOfDate": "2021-03-01",
+        "issuanceStat": null
+      },
+      "waterfall": {
+        "DistributionDay Amortizing": [
+          [
+            null,
+            {
+              "tag": "PayFee",
+              "contents": [
+                [
+                  "acc01"
+                ],
+                [
+                  "trusteeFee"
+                ]
+              ]
+            }
+          ],
+          [
+            null,
+            {
+              "tag": "PayInt",
+              "contents": [
+                "acc01",
+                [
+                  "A1"
+                ]
+              ]
+            }
+          ],
+          [
+            null,
+            {
+              "tag": "PayPrin",
+              "contents": [
+                "acc01",
+                [
+                  "A1"
+                ]
+              ]
+            }
+          ],
+          [
+            null,
+            {
+              "tag": "PayPrin",
+              "contents": [
+                "acc01",
+                [
+                  "B"
+                ]
+              ]
+            }
+          ],
+          [
+            null,
+            {
+              "tag": "PayResidual",
+              "contents": [
+                null,
+                "acc01",
+                "B"
+              ]
+            }
+          ]
+        ]
+      },
+      "collects": [
+        {
+          "tag": "Collect",
+          "contents": [
+            "CollectedInterest",
+            "acc01"
+          ]
+        },
+        {
+          "tag": "Collect",
+          "contents": [
+            "CollectedPrincipal",
+            "acc01"
+          ]
+        },
+        {
+          "tag": "Collect",
+          "contents": [
+            "CollectedPrepayment",
+            "acc01"
+          ]
+        },
+        {
+          "tag": "Collect",
+          "contents": [
+            "CollectedRecoveries",
+            "acc01"
+          ]
+        }
+      ],
+      "call": null,
+      "liqProvider": null,
+      "rateSwap": null,
+      "currencySwap": null,
+      "custom": null,
+      "triggers": null,
+      "overrides": null
     }
   },
   [
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2021-06-15",
         1782.95,
@@ -2395,10 +2411,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2021-07-31",
         1676.97,
@@ -2410,10 +2426,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2021-08-31",
         1570.66,
@@ -2425,10 +2441,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2021-09-30",
         1463.61,
@@ -2440,10 +2456,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2021-10-31",
         1355.5,
@@ -2455,10 +2471,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2021-11-30",
         1246.97,
@@ -2470,10 +2486,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2021-12-31",
         1137.42,
@@ -2485,10 +2501,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2022-01-31",
         1027.39,
@@ -2500,10 +2516,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2022-02-28",
         916.6,
@@ -2515,10 +2531,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2022-03-31",
         804.44,
@@ -2530,10 +2546,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2022-04-30",
         692.12,
@@ -2545,10 +2561,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2022-05-31",
         578.87,
@@ -2560,10 +2576,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2022-06-30",
         464.99,
@@ -2575,10 +2591,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2022-07-31",
         350.22,
@@ -2590,10 +2606,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2022-08-31",
         234.77,
@@ -2605,10 +2621,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2022-09-30",
         118.52,
@@ -2620,10 +2636,10 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     },
     {
+      "tag": "MortgageFlow",
       "contents": [
         "2022-10-31",
         1.45,
@@ -2635,42 +2651,41 @@
         0,
         0.045,
         null
-      ],
-      "tag": "MortgageFlow"
+      ]
     }
   ],
   [
     {
+      "tag": "BondOutstandingInt",
       "contents": [
         "A1",
         0,
         1000
-      ],
-      "tag": "BondOutstandingInt"
+      ]
     },
     {
+      "tag": "BondOutstandingInt",
       "contents": [
         "B",
         0,
         1000
-      ],
-      "tag": "BondOutstandingInt"
+      ]
     },
     {
+      "tag": "BondOutstanding",
       "contents": [
         "A1",
         0,
         1000
-      ],
-      "tag": "BondOutstanding"
+      ]
     },
     {
+      "tag": "BondOutstanding",
       "contents": [
         "B",
         0,
         1000
-      ],
-      "tag": "BondOutstanding"
+      ]
     }
   ],
   null

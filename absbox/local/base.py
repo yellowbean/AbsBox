@@ -56,3 +56,38 @@ freqMap = {"每月": "Monthly", "每季度": "Quarterly", "每半年": "SemiAnnu
 
 baseMap = {"资产池余额": "CurrentPoolBalance", "资产池期末余额": "CurrentPoolBalance", "资产池期初余额": "CurrentPoolBegBalance", "资产池初始余额": "OriginalPoolBalance", "初始资产池余额": "OriginalPoolBalance", "资产池当期利息": "PoolCollectionInt", "债券余额": "CurrentBondBalance", "债券初始余额": "OriginalBondBalance", "当期已付债券利息": "LastBondIntPaid", "当期已付费用": "LastFeePaid", "当期未付债券利息": "CurrentDueBondInt", "当期未付费用": "CurrentDueFee"}
            
+           
+#pool income mapping
+poolSourceMapping = {"利息回款": "CollectedInterest"
+                    , "本金回款": "CollectedPrincipal"
+                    , "早偿回款": "CollectedPrepayment"
+                    , "回收回款": "CollectedRecoveries"
+                    , "租金回款": "CollectedRental"
+                    , "CollectedInterest": "CollectedInterest"
+                    , "CollectedPrincipal": "CollectedPrincipal"
+                    , "CollectedPrepayment": "CollectedPrepayment"
+                    , "CollectedRecoveries": "CollectedRecoveries"
+                    , "CollectedRental": "CollectedRental"
+                     }
+
+op_map = {
+    ">":"G"
+    ,">=":"GE"
+    ,"<":"L"
+    ,"<=":"LE"
+    ,"=":"E"
+}
+
+dealStatusMap = {"摊还": "Current", "加速清偿": "Accelerated", "循环": "Revolving"}
+
+
+#Deal Cycle
+chinaDealCycle = {"回收后":"EndCollection"
+                 ,"回收动作后":"EndCollectionWF"
+                 ,"分配前":"BeginDistributionWF"
+                 ,"分配后":"EndDistributionWF"}
+
+englishDealCycle = {"BeforeCollect":"EndCollection"
+                 ,"AfterCollect":"EndCollectionWF"
+                 ,"BeforeDistribution":"BeginDistributionWF"
+                 ,"AfterDistribution":"EndDistributionWF"}

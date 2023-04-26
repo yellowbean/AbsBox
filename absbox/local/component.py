@@ -119,9 +119,9 @@ def mkDs(x):
             return mkTag("OriginalPoolBalance")
         case ("资产池违约余额",) | ("currentPoolDefaultedBalance",):
             return mkTag("CurrentPoolDefaultedBalance")
-        case ("资产池累积违约余额",) | ("cumPoolDefaultedBalance",):
+        case ("资产池累计违约余额",) | ("cumPoolDefaultedBalance",):
             return mkTag("CumulativePoolDefaultedBalance")
-        case ("资产池累积违约率",) | ("cumPoolDefaultedRate",):
+        case ("资产池累计违约率",) | ("cumPoolDefaultedRate",):
             return mkTag("CumulativePoolDefaultedRate")
         case ("债券系数",) | ("bondFactor",):
             return mkTag("BondFactor")
@@ -170,6 +170,10 @@ def mkDs(x):
         case _:
             raise RuntimeError(f"Failed to match DS/Formula: {x}")
 
+def mkCurve(tag,xs):
+    return mkTag((tag,xs))
+
+
 
 def isPre(x):
     try:
@@ -179,58 +183,39 @@ def isPre(x):
 
 
 def mkPre(p):
-    def isIntQuery(y):
+    def queryType(y):
         match y:
-            case ("monthsTillMaturity", _):
-                return True
-            case ("到期月份", _):
-                return True
+            case ("bondFactor",)|\
+                 ("poolFactor",)|\
+                 ("cumulativePoolDefaultedRate",)|\
+                 ("资产池累计违约率",)|\
+                 ("债券系数",)|\
+                 ("资产池系数",):
+                return "IfRate"
+            case ("borrowerNumber")|\
+                ("monthsTillMaturity"):
+                return "IfInt"
             case _:
-                return False
-    dealStatusMap = {"摊还": "Current", "加速清偿": "Accelerated", "循环": "Revolving"}
+                return "If"
 
     match p:
-        case [ds, "=", n]:
-            if isIntQuery(ds):
-                return mkTag(("IfEqInt", [mkDs(ds), n]))
-            else:
-                return mkTag(("IfEqBal", [mkDs(ds), n]))
-        case [ds, ">", amt]:
-            if isIntQuery(ds):
-                return mkTag(("IfGTInt", [mkDs(ds), amt]))
-            else:
-                return mkTag(("IfGT", [mkDs(ds), amt]))
-        case [ds, "<", amt]:
-            if isIntQuery(ds):
-                return mkTag(("IfLTInt", [mkDs(ds), amt]))
-            else:
-                return mkTag(("IfLT", [mkDs(ds), amt]))
-        case [ds, ">=", amt]:
-            if isIntQuery(ds):
-                return mkTag(("IfGETInt", [mkDs(ds), amt]))
-            else:
-                return mkTag(("IfGET", [mkDs(ds), amt]))
-        case [ds, "<=", amt]:
-            if isIntQuery(ds):
-                return mkTag(("IfLETInt", [mkDs(ds), amt]))
-            else:
-                return mkTag(("IfLET", [mkDs(ds), amt]))
         case [ds, "=", 0]:
             return mkTag(("IfZero", mkDs(ds)))
-        case [">", _d]:
-            return mkTag(("IfAfterDate", _d))
-        case ["<", _d]:
-            return mkTag(("IfBeforeDate", _d))
-        case [">=", _d]:
-            return mkTag(("IfAfterOnDate", _d))
-        case ["<=", _d]:
-            return mkTag(("IfBeforeOnDate", _d))
+        case [ds, op, curve] if isinstance(curve, list):
+            q = queryType(ds)
+            # qmap = {"If":"BalanceCurve","IfRate":"RatioCurve","IfInt":"IntCurve"}
+            return mkTag((f"{q}Curve", [op_map[op], mkDs(ds), mkCurve("ThresholdCurve",curve)]))
+        case [ds, op, n]:
+            q = queryType(ds)
+            return mkTag((q, [op_map[op], mkDs(ds), n]))
+        case [op, _d]:
+            return mkTag(("IfDate",[op_map[op], _d]))
         case ["状态", _st] | ["status", _st]:
             return mkTag(("IfDealStatus", mkStatus(_st)))
-        case ["同时满足", _p1, _p2] | ["all", _p1, _p2]:
-            return mkTag(("And", mkPre(_p1), mkPre(_p2)))
-        case ["任一满足", _p1, _p2] | ["any", _p1, _p2]:
-            return mkTag(("Or", mkPre(_p1), mkPre(_p2)))
+        case ["同时满足", *_p] | ["all", *_p]:
+            return mkTag(("All", [mkPre(p) for p in _p]))
+        case ["任一满足", *_p] | ["any", *_p]:
+            return mkTag(("Any", [mkPre(p) for p in _p]))
         case _:
             raise RuntimeError(f"Failed to match on Pre: {p}")
 
@@ -605,26 +590,11 @@ def _rateTypeDs(x):
 
 def mkTrigger(x):
     match x:
-        case [">", _d]:
-            return mkTag(("AfterDate", _d))
-        case [">=", _d]:
-            return mkTag(("AfterOnDate", _d))
-        case ["到期日未兑付", _bn] | ["passMaturity", _bn]:
-            return mkTag(("PassMaturityDate", _bn))
-        case ["所有满足", *trgs] | ["all", *trgs]:
-            return mkTag(("AllTrigger", [mkTrigger(t) for t in trgs]))
-        case ["任一满足", *trgs] | ["any", *trgs]:
-            return mkTag(("AnyTrigger", [mkTrigger(t) for t in trgs]))
-        case ["一直", b] | ["always", b]:
-            return mkTag(("Always", b))
-        case [ds, cmp, v] if (isinstance(v, float) and _rateTypeDs(ds)):
-            return mkTag(("ThresholdRate", [mkThreshold(cmp), mkDs(ds), v]))
-        case [ds, cmp, ts] if _rateTypeDs(ds):
-            return mkTag(("ThresholdRateCurve", [mkThreshold(cmp), mkDs(ds), mkTs("ThresholdCurve", ts)]))
-        case [ds, cmp, v] if (isinstance(v, float) or isinstance(v, int)):
-            return mkTag(("ThresholdBal", [mkThreshold(cmp), mkDs(ds), v]))
-        case [ds, cmp, ts]:
-            return mkTag(("ThresholdBalCurve", [mkThreshold(cmp), mkDs(ds), mkTs("ThresholdCurve", ts)]))
+        case {"condition":p,"effects":e,"status":st,"curable":c} | {"条件":p,"效果":e,"状态":st,"重置":c}:
+            return {"trgCondition":mkPre(p)
+                    ,"trgEffects":mkTriggerEffect(e)
+                    ,"trgStatus":st
+                    ,"trgCurable":c}
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkTrigger")
 
@@ -813,6 +783,7 @@ def mkCallOptions(x):
 
 
 def mkAssumption(x) -> dict:
+    assert isinstance(x, dict),f"An assumption should be a map/dict,but got {x}, type:{type(x)}"
     match x:
         case {"CPR": cpr} if isinstance(cpr, list):
             return mkTag(("PrepaymentVec", cpr))
@@ -856,19 +827,20 @@ def mkAssumption(x) -> dict:
 
 
 def mkAssumpList(xs):
-    return [mkAssumption(x) for x in xs]
+    assert isinstance(xs, list), f"Assumption should be a list, but got {xs}"
+    return [ mkAssumption(x) for x in xs ]
 
 
 def mkAssumption2(x) -> dict:
     match x:
-        case (assetAssumpList, dealAssump) if isinstance(x, tuple):
+        case ["ByIndex",assetAssumpList, dealAssump]:
             return mkTag(("ByIndex", [[(ids, mkAssumpList(aps)) for ids, aps in assetAssumpList], mkAssumpList(dealAssump)]))
         case xs if isinstance(xs, list):
             return mkTag(("PoolLevel", mkAssumpList(xs)))
         case None:
             return None
         case _:
-            raise RuntimeError(f"Failed to match {x}:mkAssumption2")
+            raise RuntimeError(f"Failed to match {x}:mkAssumption2, type:{type(x)}")
 
 
 def mkPool(x):
@@ -964,10 +936,14 @@ def mkCf(x):
         return [mkTag(("MortgageFlow", _x+[0.0]*5+[None])) for _x in x]
 
 
-def mkCollection(xs):
-    sourceMapping = {"利息回款": "CollectedInterest", "本金回款": "CollectedPrincipal", "早偿回款": "CollectedPrepayment", "回收回款": "CollectedRecoveries", "租金回款": "CollectedRental", "CollectedInterest": "CollectedInterest", "CollectedPrincipal": "CollectedPrincipal", "CollectedPrepayment": "CollectedPrepayment", "CollectedRecoveries": "CollectedRecoveries", "CollectedRental": "CollectedRental"
-                     }
-    return [[sourceMapping[x], acc] for (x, acc) in xs]
+def mkCollection(x):
+    match x :
+        case [s,acc] if isinstance(acc, str):
+            return mkTag(("Collect",[poolSourceMapping[s],acc]))
+        case [s,pcts] if isinstance(pct, list):
+            return mkTag(("CollectByPct" ,[poolSourceMapping[s] ,pcts]))
+        case _:
+            raise RuntimeError(f"Failed to match collection rule {x}")
 
 
 def mkAccTxn(xs):
@@ -984,8 +960,6 @@ def mk(x):
             return {"assets": [mkAsset(a) for a in assets]}
         case ["账户", accName, attrs] | ["account", accName, attrs]:
             return {accName: mkAcc(accName, attrs)}
-        case ["归集规则", collection]:
-            return mkCollection(collection)
 
 def mkFee(x,fsDate=None):
     match x :

@@ -358,3 +358,19 @@ def subMap2(m:dict,ks:list):
     _mapping = [ _[:2] for _ in ks ]
     return renameKs(_m,_mapping)
 
+def mapValsBy(m:dict, f):
+    assert isinstance(m, dict),"M is not a map"
+    return {k: f(v) for k,v in m.items()}
+
+def mapListValBy(m:dict, f):
+    assert isinstance(m, dict),"M is not a map"
+    return {k: [f(_v) for _v in v] for k,v in m.items()}
+
+def renameKs2(m:dict,kmapping):
+    assert isinstance(m, dict),"M is not a map"
+    assert isinstance(kmapping, dict),f"Mapping is not a map: {kmapping}"
+    assert set(m.keys()).issubset(set(kmapping.keys()))
+    return {kmapping[k]:v for k,v in m.items()}
+
+def ensure100(xs,msg=""):
+    assert sum(xs)==1.0,f"Doesn't not sum up 100%: {msg}"

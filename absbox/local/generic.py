@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import functools
 
 from absbox import *
-from absbox.local.util import mkTag
+from absbox.local.util import mkTag,mapListValBy,mapValsBy,renameKs2
 from absbox.local.component import *
 from absbox.local.base import * 
 import pandas as pd
@@ -49,13 +49,11 @@ class Generic:
             "fees": {fn: mkFee(fo|{"name":fn},fsDate = closingDate) 
                                  for (fn,fo) in self.fees},
             "accounts": {an:mkAcc(an,ao) for (an,ao) in self.accounts},
-            "collects": self.collection,
+            "collects": [ mkCollection(c) for c in self.collection],
             "rateSwap": { k:mkRateSwap(v) for k,v in self.currencySwap.items()} if self.rateSwap else None,
             "currencySwap":None ,
             "custom": {cn:mkCustom(co) for cn,co in self.custom.items()} if self.custom else None ,
-            "triggers": {mkWhenTrigger(tWhen):[[mkTrigger(_trg),mkTriggerEffect(_effect)] 
-                                                 for (_trg,_effect) in trgs ]
-                            for tWhen,trgs in self.trigger.items()} if self.trigger else None,
+            "triggers": renameKs2(mapListValBy(self.trigger,mkTrigger),englishDealCycle) if self.trigger else None,
             "liqProvider": {ln: mkLiqProvider(ln, lo | {"start":closingDate} ) 
                                for ln,lo in self.liqFacility.items() } if self.liqFacility else None
         }
@@ -81,12 +79,13 @@ class Generic:
                      , 'liqProvider': ('liqStmt', english_liq_flow_fields_d, "")
                      , 'rateSwap': ('rsStmt', english_rs_flow_fields_d, "")
                      }
+        deal_content = resp[0]['contents']
         output = {}
         for comp_name, comp_v in read_paths.items():
-            if resp[0][comp_name] is None:
+            if deal_content[comp_name] is None:
                 continue
             output[comp_name] = {}
-            for k, x in resp[0][comp_name].items():
+            for k, x in deal_content[comp_name].items():
                 ir = None
                 if x[comp_v[0]]:
                     ir = [_['contents'] for _ in x[comp_v[0]]]
@@ -100,8 +99,8 @@ class Generic:
         output['agg_accounts'] = aggAccs(output['accounts'], 'en')
 
         output['pool'] = {}
-        _pool_cf_header,_ = guess_pool_flow_header(resp[0]['pool']['futureCf'][0],"english")
-        output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
+        _pool_cf_header,_ = guess_pool_flow_header(deal_content['pool']['futureCf'][0],"english")
+        output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['futureCf']]
                                               , columns=_pool_cf_header)
         pool_idx = 'Date'
         output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)

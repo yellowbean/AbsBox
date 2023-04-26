@@ -378,22 +378,34 @@
       }
     },
     "collects": [
-      [
-        "CollectedInterest",
-        "\u6536\u5165\u5206\u8d26\u6237"
-      ],
-      [
-        "CollectedPrincipal",
-        "\u672c\u91d1\u5206\u8d26\u6237"
-      ],
-      [
-        "CollectedPrepayment",
-        "\u672c\u91d1\u5206\u8d26\u6237"
-      ],
-      [
-        "CollectedRecoveries",
-        "\u672c\u91d1\u5206\u8d26\u6237"
-      ]
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedInterest",
+          "\u6536\u5165\u5206\u8d26\u6237"
+        ]
+      },
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedPrincipal",
+          "\u672c\u91d1\u5206\u8d26\u6237"
+        ]
+      },
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedPrepayment",
+          "\u672c\u91d1\u5206\u8d26\u6237"
+        ]
+      },
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedRecoveries",
+          "\u672c\u91d1\u5206\u8d26\u6237"
+        ]
+      }
     ],
     "rateSwap": null,
     "currencySwap": null,

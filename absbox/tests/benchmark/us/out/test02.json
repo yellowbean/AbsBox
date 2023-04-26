@@ -304,47 +304,61 @@
       }
     },
     "collects": [
-      [
-        "CollectedInterest",
-        "acc01"
-      ],
-      [
-        "CollectedPrincipal",
-        "acc01"
-      ],
-      [
-        "CollectedPrepayment",
-        "acc01"
-      ],
-      [
-        "CollectedRecoveries",
-        "acc01"
-      ]
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedInterest",
+          "acc01"
+        ]
+      },
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedPrincipal",
+          "acc01"
+        ]
+      },
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedPrepayment",
+          "acc01"
+        ]
+      },
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedRecoveries",
+          "acc01"
+        ]
+      }
     ],
     "rateSwap": null,
     "currencySwap": null,
     "custom": null,
     "triggers": {
       "EndCollectionWF": [
-        [
-          {
-            "tag": "ThresholdRate",
+        {
+          "trgCondition": {
+            "tag": "If",
             "contents": [
-              "Above",
+              "G",
               {
                 "tag": "CumulativePoolDefaultedRate"
               },
               0.05
             ]
           },
-          {
+          "trgEffects": {
             "tag": "DealStatusTo",
             "contents": {
               "tag": "DealAccelerated",
               "contents": null
             }
-          }
-        ]
+          },
+          "trgStatus": false,
+          "trgCurable": false
+        }
       ]
     },
     "liqProvider": null

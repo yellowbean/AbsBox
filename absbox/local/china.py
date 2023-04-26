@@ -1,5 +1,5 @@
 import logging, os, re, itertools
-import requests, shutil
+import requests, shutil, json
 from dataclasses import dataclass,field
 import functools, pickle, collections
 import pandas as pd
@@ -9,7 +9,7 @@ from functools import reduce
 from pyspecter import query
 
 from absbox import *
-from absbox.local.util import mkTag,DC,mkTs,consolStmtByDate,aggStmtByDate,subMap,subMap2
+from absbox.local.util import mkTag,DC,mkTs,consolStmtByDate,aggStmtByDate,subMap,subMap2,mapValsBy,mapListValBy,renameKs2
 from absbox.local.component import *
 
 
@@ -79,13 +79,11 @@ class SPV:
             "waterfall": mkWaterfall({},self.分配规则.copy()),
             "fees": {fn :mkFee(fo|{"名称":fn},fsDate=defaultStartDate) for (fn,fo) in self.费用 },
             "accounts": {an:mkAcc(an,ao) for (an,ao) in self.账户 },
-            "collects": mkCollection(self.归集规则),
+            "collects": [ mkCollection(c) for c in self.归集规则],
             "rateSwap": {k:mkRateSwap(v) for k,v in self.利率对冲.items()} if self.利率对冲 else None,
             "currencySwap": None,
             "custom": {cn:mkCustom(co) for cn,co in self.自定义.items()} if self.自定义 else None,
-            "triggers": {mkWhenTrigger(tWhen):[[mkTrigger(_trg),mkTriggerEffect(_effect)] 
-                                                 for (_trg,_effect) in trgs ]
-                            for tWhen,trgs in self.触发事件.items()} if self.触发事件 else None,
+            "triggers": renameKs2(mapListValBy(self.触发事件,mkTrigger),chinaDealCycle) if self.触发事件 else None,
             "liqProvider": {ln: mkLiqProvider(ln, lo | {"起始日":defaultStartDate} ) 
                                 for ln,lo in self.流动性支持.items() } if self.流动性支持 else None
         }
@@ -115,13 +113,15 @@ class SPV:
                     , 'fees': ('feeStmt', china_fee_flow_fields_d, "费用")
                     , 'accounts': ('accStmt', china_acc_flow_fields_d , "账户")
                     , 'liqProvider': ('liqStmt', china_liq_flow_fields_d, "流动性支持")
+                    , 'rateSwap': ('rsStmt', china_rs_flow_fields_d, "")
                     }
+        deal_content = resp[0]['contents']
         output = {}
         for comp_name, comp_v in read_paths.items():
-            if (not comp_name in resp[0]) or (resp[0][comp_name] is None):
+            if (not comp_name in deal_content) or (deal_content[comp_name] is None):
                 continue
             output[comp_name] = {}
-            for k, x in resp[0][comp_name].items():
+            for k, x in deal_content[comp_name].items():
                 ir = None
                 if x[comp_v[0]]:
                     ir = [_['contents'] for _ in x[comp_v[0]]]
@@ -135,8 +135,8 @@ class SPV:
         output['agg_accounts'] = aggAccs(output['accounts'],'cn')
 
         output['pool'] = {}
-        _pool_cf_header,_ = guess_pool_flow_header(resp[0]['pool']['futureCf'][0],"chinese")
-        output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in resp[0]['pool']['futureCf']]
+        _pool_cf_header,_ = guess_pool_flow_header(deal_content['pool']['futureCf'][0],"chinese")
+        output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['futureCf']]
                                               , columns=_pool_cf_header)
         pool_idx = "日期"
         output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)

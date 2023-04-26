@@ -191,8 +191,11 @@
           "tag": "Either",
           "contents": [
             {
-              "tag": "IfBeforeOnDate",
-              "contents": "2021-10-01"
+              "tag": "IfDate",
+              "contents": [
+                "LE",
+                "2021-10-01"
+              ]
             },
             {
               "tag": "FixReserve",
@@ -216,22 +219,34 @@
       }
     },
     "collects": [
-      [
-        "CollectedInterest",
-        "\u8d26\u623701"
-      ],
-      [
-        "CollectedPrincipal",
-        "\u8d26\u623701"
-      ],
-      [
-        "CollectedPrepayment",
-        "\u8d26\u623701"
-      ],
-      [
-        "CollectedRecoveries",
-        "\u8d26\u623701"
-      ]
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedInterest",
+          "\u8d26\u623701"
+        ]
+      },
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedPrincipal",
+          "\u8d26\u623701"
+        ]
+      },
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedPrepayment",
+          "\u8d26\u623701"
+        ]
+      },
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedRecoveries",
+          "\u8d26\u623701"
+        ]
+      }
     ],
     "rateSwap": null,
     "currencySwap": null,

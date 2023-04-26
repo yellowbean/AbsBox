@@ -1,16 +1,19 @@
 import logging, json, datetime, pickle,re
 from json.decoder import JSONDecodeError
+from concurrent.futures import Executor
 import requests
 from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass,field
-from absbox.local.util import mkTag,isDate,flat,guess_pool_locale
+from absbox.local.util import mkTag,isDate,flat,guess_pool_locale,mapValsBy
 from absbox.local.component import mkPool,mkAssumption,mkAssumption2
 from absbox.local.base import *
 import pandas as pd
 from pyspecter import S,query
 
+
 urllib3.disable_warnings()
+
 
 @dataclass
 class API:
@@ -18,7 +21,7 @@ class API:
     lang:str = "chinese"
     server_info = {}
     version = "0","13","0"
-    hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+    hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain','Accept':'*/*'}
 
     def __post_init__(self):
         try:
@@ -30,29 +33,42 @@ class API:
 
         echo = json.loads(_r)
         self.server_info = echo
-        x,y,z = echo['version'].split(".")
-        logging.info(f"Connect with engine {self.url} version {echo['version']} successfully")
+        x,y,z = echo['_version'].split(".")
+        logging.info(f"Connect with engine {self.url} version {echo['_version']} successfully")
         if self.version[1] != y:
             logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['version']} , pls upgrade your api package by: pip -U absbox")
             return
 
-    def build_req(self, deal, assumptions=None, pricing=None, read=None) -> str:
+    def build_req(self, deal, assumptions=None, pricing=None) -> str:
+        r = None
         _assump = None 
+        _deal = deal.json
+        _pricing = mkPricingAssump(pricing) if pricing else None
         if isinstance(assumptions, dict):
-            _assump = mkTag(("Multiple", { scenarioName:mkAssumption2(a) for (scenarioName,a) in assumptions.items()}))
-        elif isinstance(assumptions, list) or  isinstance(assumptions, tuple):   
-            _assump = mkTag(("Single",mkAssumption2(assumptions)))
-        else:
-            _assump = None
-        return json.dumps({"deal": deal.json
-                          ,"assump": _assump
-                          ,"bondPricing": deal.read_pricing(pricing) if (pricing is not None) else None}
-                          , ensure_ascii=False)
+            # _assump = { scenarioName:mkAssumption2(a) for (scenarioName,a) in assumptions.items()}
+            _assump = mapValsBy(assumptions, mkAssumption2(x))
+            r = mkTag(("MultiScenarioRunReq",[_deal, _assump, _pricing]))
+        elif isinstance(assumptions, list) :   
+            # _assump = mkTag(("Single",mkAssumption2(assumptions)))
+            _assump = mkAssumption2(assumptions)
+            r = mkTag(("SingleRunReq",[_deal, _assump, _pricing]))
+        elif assumptions is None:
+            r = mkTag(("SingleRunReq",[_deal, None, _pricing]))
+        return json.dumps(r , ensure_ascii=False)
 
-    def build_pool_req(self, pool, assumptions=[], read=None) -> str:
-        return json.dumps({"pool": mkPool(pool)
-                          ,"pAssump": mkAssumption2(assumptions)}
-                          ,ensure_ascii=False)
+    def build_pool_req(self, pool, assumptions, read=None) -> str:
+        r = None
+        if isinstance(assumptions, list):
+            r = mkTag(("SingleRunPoolReq"
+                      ,[mkPool(pool)
+                        ,mkAssumption2(assumptions)])) 
+        elif isinstance(assumptions, dict):
+            r = mkTag(("MultiScenarioRunPoolReq"
+                      ,[mkPool(pool)
+                        ,mapValsBy(assumptions, mkAssumption2)])) 
+        else:
+            raise RuntimeError("Error in build pool req")
+        return json.dumps(r , ensure_ascii=False)
 
     def _validate_assump(self,x,e,w):
         def asset_check(_e,_w):
@@ -170,7 +186,6 @@ class API:
             deal,
             assumptions=None,
             pricing=None,
-            custom_endpoint=None,
             read=True,
             position=None,
             timing=False):
@@ -179,15 +194,8 @@ class API:
             assumptions = pickle.load(assumptions)
 
         # if run req is a multi-scenario run
-        if assumptions:
-            multi_run_flag = isinstance(assumptions, dict)
-        else:
-            multi_run_flag = False 
-        
-        # overwrite any custom_endpoint
-        url = f"{self.url}/run_deal"
-        if custom_endpoint:
-            url = f"{self.url}/{custom_endpoint}"
+        multi_run_flag = True if isinstance(assumptions, dict) else False
+        url = f"{self.url}/runDealByScenarios"  if multi_run_flag  else f"{self.url}/runDeal"
 
         if isinstance(deal, str):
             with open(deal,'rb') as _f:
@@ -204,36 +212,55 @@ class API:
 
         result = self._send_req(req,url)
 
-        if read:
-            if multi_run_flag:
+        if read and multi_run_flag:
                 return { n:deal.read(_r,position=position) for (n,_r) in result.items()}
-            else:
+        elif read :
                 return deal.read(result,position=position)
         else:
             return result
 
-    def runPool(self, pool, assumptions=[],read=True):
-        url = f"{self.url}/run_pool"        
-        pool_lang = guess_pool_locale(pool)
-        req = self.build_pool_req(pool, assumptions=assumptions)
-        result = self._send_req(req,url)
-
-        if read:
-            flow_header,idx = guess_pool_flow_header(result[0],pool_lang)
+    def runPool(self, pool, assumptions,read=True):
+        def read_single(pool_resp):
+            flow_header,idx = guess_pool_flow_header(pool_resp[0],pool_lang)
             try:
-                result = pd.DataFrame([_['contents'] for _ in result] , columns=flow_header)
+                result = pd.DataFrame([_['contents'] for _ in pool_resp] , columns=flow_header)
             except ValueError as e:
                 logging.error(f"Failed to match header:{flow_header} with {result[0]['contents']}")
             result = result.set_index(idx)
             result.index.rename(idx, inplace=True)
             result.sort_index(inplace=True)
-        return result
-    
-    def runStructs(self, deals, **p):
+            return result
+            
+        multi_scenario = True if isinstance(assumptions, dict) else False 
+        url = f"{self.url}/runPoolByScenarios" if multi_scenario else f"{self.url}/runPool"
+        pool_lang = guess_pool_locale(pool)
+        req = self.build_pool_req(pool, assumptions=assumptions)
+        result = self._send_req(req, url)
 
+        if read and (not multi_scenario):
+            return read_single(result)
+        elif read and multi_scenario : 
+            return mapValsBy(result, read_single)
+        else:
+            return result
+
+    
+    def runStructs(self, deals, assumptions=None, pricing=None, read=True ):
         assert isinstance(deals, dict),f"Deals should be a dict but got {deals}"
-        
-        return {k: self.run(v,**p) for k,v in deals.items() }
+        url = f"{self.url}/runMultiDeals" 
+        _assumptions = mkAssumption2(assumptions) if assumptions else None 
+        _pricing = mkPricingAssump(pricing) if pricing else None
+        req = json.dumps(mkTag(("MultiDealRunReq"
+                                ,[{k:v.json for k,v in deals.items()}
+                                  ,_assumptions
+                                  ,_pricing]))
+                        ,ensure_ascii=False)
+
+        result = self._send_req(req,url)
+        if read :
+            return {k:deals[k].read(v) for k,v in result.items()}    
+        else:
+            return result
 
     def _send_req(self,_req,_url)->dict:
         try:
@@ -250,7 +277,10 @@ class API:
         except JSONDecodeError as e:
             raise RuntimeError(e)        
 
+
+
 def guess_pool_flow_header(x,l):
+    assert isinstance(x, dict), f"x is not a map but {x}, type:{type(x)}"
     match (x['tag'],l):
         case ('MortgageFlow','chinese'):
             return (china_mortgage_flow_fields_d,"日期")
