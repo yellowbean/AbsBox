@@ -187,13 +187,13 @@ def mkPre(p):
         match y:
             case ("bondFactor",)|\
                  ("poolFactor",)|\
-                 ("cumulativePoolDefaultedRate",)|\
+                 ("cumPoolDefaultedRate",)|\
                  ("资产池累计违约率",)|\
                  ("债券系数",)|\
                  ("资产池系数",):
                 return "IfRate"
-            case ("borrowerNumber")|\
-                ("monthsTillMaturity"):
+            case ("borrowerNumber",_)|\
+                ("monthsTillMaturity",_):
                 return "IfInt"
             case _:
                 return "If"
@@ -940,7 +940,7 @@ def mkCollection(x):
     match x :
         case [s,acc] if isinstance(acc, str):
             return mkTag(("Collect",[poolSourceMapping[s],acc]))
-        case [s,pcts] if isinstance(pct, list):
+        case [s,pcts] if isinstance(pcts, list):
             return mkTag(("CollectByPct" ,[poolSourceMapping[s] ,pcts]))
         case _:
             raise RuntimeError(f"Failed to match collection rule {x}")

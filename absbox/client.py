@@ -1,15 +1,14 @@
-import logging, json, datetime, pickle,re
+import logging, json, datetime, pickle, re
 from json.decoder import JSONDecodeError
-from concurrent.futures import Executor
 import requests
 from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass,field
-from absbox.local.util import mkTag,isDate,flat,guess_pool_locale,mapValsBy
-from absbox.local.component import mkPool,mkAssumption,mkAssumption2
+from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy
+from absbox.local.component import mkPool, mkAssumption, mkAssumption2
 from absbox.local.base import *
 import pandas as pd
-from pyspecter import S,query
+from pyspecter import query
 
 from importlib.metadata import version
 
@@ -19,8 +18,8 @@ urllib3.disable_warnings()
 
 @dataclass
 class API:
-    url:str
-    lang:str = "chinese"
+    url: str
+    lang: str = "chinese"
     server_info = {}
     #version = "0","14","1"
     version = VERSION_NUM.split(".")
@@ -73,51 +72,40 @@ class API:
             raise RuntimeError("Error in build pool req")
         return json.dumps(r , ensure_ascii=False)
 
-    def _validate_assump(self,x,e,w):
-        def asset_check(_e,_w):
-            return _e,_w
-        a = x['assump']
-        asset_ids = set(range(len(query(x,['deal','contents','pool','assets']))))
+    def _validate_assump(self, x, e, w):
+        def asset_check(_e, _w):
+            return _e, _w
+        a = x['contents'][1]
+        asset_ids = set(range(len(query(x['contents'][0], ['contents', 'pool', 'assets']))))
         match a:
-            case {'tag':'Single','contents':{'tag':'PoolLevel'}}:
-                return [True,e,w]
-            case {'tag':'Multiple','contents':{'tag':'PoolLevel'}}:
-                return [True,e,w]
-            case {'tag':'Single', 'contents':{'tag':'ByIndex', 'contents':(assumps,_)}}:
+            case {'tag': 'PoolLevel'}:
+                return [True, e, w]
+            case {'tag':'ByIndex', 'contents':(assumps, _)}:
                 _ids = set(flat([ assump[0] for assump in assumps ]))
                 if not _ids.issubset(asset_ids):
                     e.append(f"Not Valid Asset ID:{_ids - asset_ids}")
                 missing_asset_id = asset_ids - _ids
-                if len(missing_asset_id)>0:
+                if len(missing_asset_id) > 0:
                     w.append(f"Missing Asset to set assumption:{missing_asset_id}")            
-            case {'tag':'Multiple', 'contents':scenarioMap}:
-                for k,v in scenarioMap.items():
-                    if v['tag']=='PoolLevel':
-                        continue
-                    _ids = set(flat([ _a[0] for _a in v['contents'][0]]))
-                    if not _ids.issubset(asset_ids):
-                        e.append(f"Scenario:{k},Not Valid Asset ID:{_ids - asset_ids}")
-                    missing_asset_id = asset_ids - _ids
-                    if len(missing_asset_id)>0:
-                        w.append(f"Scenario:{k},Missing Asset to set assumption:{missing_asset_id}")
             case None:
-                return [True,e,w]
-            case _ :
+                return [True, e, w]
+            case _:
                 raise RuntimeError(f"Failed to match:{a}")
-        if len(e)>0:
-            return [False,e,w]
-        return [True,e,w]
+        if len(e) > 0:
+            return [False, e, w]
+        return [True, e, w]
 
     def validate(self, _r) -> list:
         error = []
         warning = []
         _r = json.loads(_r)
-        __d = _r['deal']
+        __d = _r['contents'][0]
         _d = __d['contents']
         valid_acc = set(_d['accounts'].keys())
         valid_bnd = set(_d['bonds'].keys())
         valid_fee = set(_d['fees'].keys())
         _w = _d['waterfall']
+        #print("Waterfall",_w)
 
         _,error,warning = self._validate_assump(_r,error,warning)
 
