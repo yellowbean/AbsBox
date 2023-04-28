@@ -11,7 +11,9 @@ from absbox.local.base import *
 import pandas as pd
 from pyspecter import S,query
 
+from importlib.metadata import version
 
+VERSION_NUM = version("absbox")
 urllib3.disable_warnings()
 
 
@@ -20,7 +22,8 @@ class API:
     url:str
     lang:str = "chinese"
     server_info = {}
-    version = "0","13","0"
+    #version = "0","14","1"
+    version = VERSION_NUM.split(".")
     hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain','Accept':'*/*'}
 
     def __post_init__(self):

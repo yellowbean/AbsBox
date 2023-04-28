@@ -151,7 +151,7 @@ class SPV:
                     factor = v / b["初始余额"] / 100
                     if factor > 1.0:
                         raise  RuntimeError("持仓系数大于1.0")
-                    output['position'][k] = output['bonds'][k][['本金','利息','本息合计']].apply(lambda x:x*factor).round(4)
+                    output['position'][k] = output['bonds'][k][china_bond_cashflow].apply(lambda x:x*factor).round(4)
 
         output['result'] = readRunSummary(resp[2], 'cn')
         return output

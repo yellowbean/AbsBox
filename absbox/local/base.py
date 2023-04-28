@@ -2,6 +2,7 @@
 # Bond 
 china_bondflow_fields = ["日期", "余额", "利息", "本金", "执行利率", "本息合计", "备注"]
 china_bondflow_fields_s = ["余额", "利息", "本金", "执行利率", "本息合计", "备注"]
+china_bond_cashflow = ["本金","利息","本息合计"]
 english_bondflow_fields = ["date", "balance", "interest", "principal", "rate", "cash", "memo"]
 english_bondflow_fields_s = ["balance", "interest", "principal", "rate", "cash", "memo"]
 

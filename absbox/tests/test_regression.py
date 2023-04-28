@@ -91,7 +91,11 @@ def run_deal(input_folder, pair):
     input_req_folder = os.path.join(input_folder,"out")
     input_scen_folder = os.path.join(input_folder,"scenario")
     input_resp_folder = os.path.join(input_folder,"resp")
+
     test_server = config["test_server"] #https://deal-bench.xyz/api/run_deal2" 
+    if 'TEST_RUN_SERVER' in os.environ and os.environ['TEST_RUN_SERVER'] != "" :
+        test_server = os.environ['TEST_RUN_SERVER']
+    #test_server = "https://absbox.org/api/dev" # config["test_server"] #https://deal-bench.xyz/api/run_deal2" 
     
     for dinput, sinput, eoutput in pair:
         print(f"Comparing:{dinput},{sinput},{eoutput}")
@@ -106,17 +110,20 @@ def run_deal(input_folder, pair):
                 
                 print("build req done")
                 hdrs = {'Content-type': 'application/json', 'Accept': '*/*'}
-                tresp = requests.post(test_server
+                tresp = requests.post(f"{test_server}/runDeal"
                                       , data=json.dumps(req, ensure_ascii=False).encode('utf-8')
                                       , headers=hdrs
                                       , verify=False)
                 if tresp.status_code != 200:
                     print(f"Failed to finish req:{dinput}")
-                    print(tresp.text)
+                    print(f"response=>{tresp}")
                 else:
                     print(f"responds received")
-
-                s_result = json.loads(tresp.text)
+                try:
+                    s_result = json.loads(tresp.text)
+                except JSONDecodeError as e:
+                    logging.error(f"Error parsing {tresp.text}")
+                    #break
                 local_bench_file = os.path.join(input_resp_folder,eoutput)
                 if not os.path.exists(local_bench_file):
                     with open(local_bench_file,'w') as wof: # write output file
@@ -161,8 +168,8 @@ def test_resp():
             ,("test11.json","rates.json","test11.out.json")
             ,("test12.json","empty.json","test12.out.json")
             ,("test13.json","empty.json","test13.out.json")
-            #,("test14.json","empty.json","test14.out.json")
-            #,("test15.json","empty.json","test15.out.json")
+            ,("test14.json","empty.json","test14.out.json")
+            ,("test15.json","empty.json","test15.out.json")
             ,("test16.json","empty.json","test16.out.json")
             ,("test17.json","empty.json","test17.out.json")
             ,("test18.json","empty.json","test18.out.json")
