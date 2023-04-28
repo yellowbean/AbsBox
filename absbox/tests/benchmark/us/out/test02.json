@@ -340,7 +340,7 @@
       "EndCollectionWF": [
         {
           "trgCondition": {
-            "tag": "If",
+            "tag": "IfRate",
             "contents": [
               "G",
               {

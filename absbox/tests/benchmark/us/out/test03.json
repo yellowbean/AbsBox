@@ -165,7 +165,7 @@
         ],
         [
           {
-            "tag": "If",
+            "tag": "IfInt",
             "contents": [
               "L",
               {

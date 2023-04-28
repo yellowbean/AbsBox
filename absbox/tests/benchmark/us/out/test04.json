@@ -115,20 +115,6 @@
         [
           null,
           {
-            "tag": "TransferBy",
-            "contents": [
-              {
-                "tag": "DuePct",
-                "contents": 0.1
-              },
-              "acc01",
-              "acc02"
-            ]
-          }
-        ],
-        [
-          null,
-          {
             "tag": "PayFee",
             "contents": [
               [
@@ -221,17 +207,35 @@
     },
     "collects": [
       {
-        "tag": "Collect",
+        "tag": "CollectByPct",
         "contents": [
           "CollectedInterest",
-          "acc01"
+          [
+            [
+              0.8,
+              "acc01"
+            ],
+            [
+              0.2,
+              "acc02"
+            ]
+          ]
         ]
       },
       {
-        "tag": "Collect",
+        "tag": "CollectByPct",
         "contents": [
           "CollectedPrincipal",
-          "acc01"
+          [
+            [
+              0.8,
+              "acc01"
+            ],
+            [
+              0.2,
+              "acc02"
+            ]
+          ]
         ]
       },
       {
