@@ -5,7 +5,7 @@ from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass,field
 from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy
-from absbox.local.component import mkPool, mkAssumption, mkAssumption2
+from absbox.local.component import mkPool, mkAssumption, mkAssumption2, mkPricingAssump
 from absbox.local.base import *
 import pandas as pd
 from pyspecter import query
@@ -48,7 +48,7 @@ class API:
         _pricing = mkPricingAssump(pricing) if pricing else None
         if isinstance(assumptions, dict):
             # _assump = { scenarioName:mkAssumption2(a) for (scenarioName,a) in assumptions.items()}
-            _assump = mapValsBy(assumptions, mkAssumption2(x))
+            _assump = mapValsBy(assumptions, mkAssumption2)
             r = mkTag(("MultiScenarioRunReq",[_deal, _assump, _pricing]))
         elif isinstance(assumptions, list) :   
             # _assump = mkTag(("Single",mkAssumption2(assumptions)))
@@ -75,22 +75,30 @@ class API:
     def _validate_assump(self, x, e, w):
         def asset_check(_e, _w):
             return _e, _w
+        def _validate_single_assump(z):
+            match z:
+                case {'tag': 'PoolLevel'}:
+                    return [True, e, w]
+                case {'tag':'ByIndex', 'contents':(assumps, _)}:
+                    _ids = set(flat([ assump[0] for assump in assumps ]))
+                    if not _ids.issubset(asset_ids):
+                        e.append(f"Not Valid Asset ID:{_ids - asset_ids}")
+                    if len(missing_asset_id := asset_ids - _ids) > 0:
+                        w.append(f"Missing Asset to set assumption:{missing_asset_id}")            
+                case None:
+                    return [True, e, w]
+                case _:
+                    raise RuntimeError(f"Failed to match:{a}")
         a = x['contents'][1]
         asset_ids = set(range(len(query(x['contents'][0], ['contents', 'pool', 'assets']))))
-        match a:
-            case {'tag': 'PoolLevel'}:
-                return [True, e, w]
-            case {'tag':'ByIndex', 'contents':(assumps, _)}:
-                _ids = set(flat([ assump[0] for assump in assumps ]))
-                if not _ids.issubset(asset_ids):
-                    e.append(f"Not Valid Asset ID:{_ids - asset_ids}")
-                missing_asset_id = asset_ids - _ids
-                if len(missing_asset_id) > 0:
-                    w.append(f"Missing Asset to set assumption:{missing_asset_id}")            
-            case None:
-                return [True, e, w]
-            case _:
-                raise RuntimeError(f"Failed to match:{a}")
+        match x:
+            case {"tag":"SingleRunReq","contents":[d,ma,_]}:
+                _validate_single_assump(ma)
+            case {"tag":"MultiScenarioRunReq","contents":[d,mam,_]}:
+                mapValsBy(mam, _validate_single_assump)
+            case {"tag":"MultiDealRunReq","contents":[dm,ma,_]}:
+                _validate_single_assump(ma)
+
         if len(e) > 0:
             return [False, e, w]
         return [True, e, w]
