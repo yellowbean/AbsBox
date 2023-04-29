@@ -2,6 +2,9 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[project]
+version = "0.14.12"
+name = "absbox"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
