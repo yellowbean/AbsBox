@@ -174,14 +174,6 @@ def mkCurve(tag,xs):
     return mkTag((tag,xs))
 
 
-
-def isPre(x):
-    try:
-        return mkPre(x) is not None
-    except RuntimeError as e:
-        return False
-
-
 def mkPre(p):
     def queryType(y):
         match y:
@@ -500,20 +492,10 @@ def mkAction(x):
             return mkTag(("LiqYield", [None, source, target]))
         case ["流动性支持计提", target] | ["liqAccrue", target]:
             return mkTag(("LiqAccrue", target))
+        case ["条件执行", pre, *actions] | ["If", pre, *actions]:
+            return mkTag(("ActionWithPre", [mkPre(pre), [mkAction(a) for a in actions] ] ))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkAction")
-
-
-def mkWaterfall2(x):
-    match x:
-        case (pre, *_action) if isPre(pre) and len(x) > 2:  # pre with multiple actions
-            _pre = mkPre(pre)
-            return [[_pre, mkAction(a)] for a in _action]
-        case (pre, _action) if isPre(pre) and len(x) == 2:  # pre with 1 actions
-            _pre = mkPre(pre)
-            return [[_pre, mkAction(_action)]]
-        case _:
-            return [[None, mkAction(x)]]
 
 
 def mkStatus(x):
@@ -643,7 +625,8 @@ def mkWaterfall(r, x):
             _w_tag = f"OnClosingDay"
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkWaterfall")
-    r[_w_tag] = itertools.chain.from_iterable([mkWaterfall2(_a) for _a in _v])
+    # r[_w_tag] = itertools.chain.from_iterable([mkAction(_a) for _a in _v])
+    r[_w_tag] = [mkAction(_a) for _a in _v]
     return mkWaterfall(r, x)
 
 

@@ -87,7 +87,7 @@ def valAssumption(d, ma , error, warning) -> list:
                     _w.append(f"Missing Asset to set assumption:{missing_asset_id}")            
                 return _e,_w
             case _:
-                raise RuntimeError(f"Failed to match:{a}")
+                raise RuntimeError(f"Failed to match:{z}")
     
     asset_ids = set(range(len(query(d, ['pool', 'assets']))))
     

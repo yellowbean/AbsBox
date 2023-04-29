@@ -38,7 +38,8 @@ test01 = Generic(
          ,["payInt","acc01",["A1","B"]]
          ,["payPrin","acc02",["A1"]]
          ,["payPrin","acc02",["B"]]
-         ,[[("bondBalance","A1","B"),"=",0]
+         ,["If"
+           ,[("bondBalance","A1","B"),"=",0]
            ,["payInt","acc02",["A1","B"]]
            ,["liqRepay","bal","acc01","insuranceProvider"]
            ,["liqRepay","bal","acc02","insuranceProvider"]]

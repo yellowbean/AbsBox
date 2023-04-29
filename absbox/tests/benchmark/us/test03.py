@@ -39,9 +39,9 @@ test03 = Generic(
     ,{"amortizing":[
          ["payFee",["acc01"],['trusteeFee']]
          ,["payInt","acc01",["A1","A2"]]
-         ,[[("monthsTillMaturity","A1"),"<",3]
-           ,["payPrin","acc01",["A1","A2"]]
-           ]
+         ,["If"
+           ,[("monthsTillMaturity","A1"),"<",3]
+           ,["payPrin","acc01",["A1","A2"]]]
          ,["payPrin","acc01",["B"]]
          ,["payResidual","acc01","B"]]
       }
