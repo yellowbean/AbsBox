@@ -9,6 +9,7 @@ from absbox.local.component import mkPool, mkAssumption, mkAssumption2, mkPricin
 from absbox.local.base import *
 import pandas as pd
 from pyspecter import query
+from absbox.validation import valReq,valAssumption
 
 from importlib.metadata import version
 
@@ -23,11 +24,13 @@ class API:
     server_info = {}
     #version = "0","14","1"
     version = VERSION_NUM.split(".")
-    hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain','Accept':'*/*'}
+    hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain','Accept':'*/*'
+            ,'Accept-Encoding':'gzip'}
+    session = None
 
     def __post_init__(self):
         try:
-            _r = requests.get(f"{self.url}/version",verify=False).text
+            _r = requests.get(f"{self.url}/version",verify=False, timeout=5).text
         except (ConnectionRefusedError, ConnectionError):
             logging.error(f"Error: Can't not connect to API server {self.url}")
             self.url = None
@@ -40,6 +43,8 @@ class API:
         if self.version[1] != y:
             logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['version']} , pls upgrade your api package by: pip -U absbox")
             return
+        else:
+            self.session = requests.Session() 
 
     def build_req(self, deal, assumptions=None, pricing=None) -> str:
         r = None
@@ -47,11 +52,9 @@ class API:
         _deal = deal.json
         _pricing = mkPricingAssump(pricing) if pricing else None
         if isinstance(assumptions, dict):
-            # _assump = { scenarioName:mkAssumption2(a) for (scenarioName,a) in assumptions.items()}
             _assump = mapValsBy(assumptions, mkAssumption2)
             r = mkTag(("MultiScenarioRunReq",[_deal, _assump, _pricing]))
         elif isinstance(assumptions, list) :   
-            # _assump = mkTag(("Single",mkAssumption2(assumptions)))
             _assump = mkAssumption2(assumptions)
             r = mkTag(("SingleRunReq",[_deal, _assump, _pricing]))
         elif assumptions is None:
@@ -72,110 +75,15 @@ class API:
             raise RuntimeError("Error in build pool req")
         return json.dumps(r , ensure_ascii=False)
 
-    def _validate_assump(self, x, e, w):
-        def asset_check(_e, _w):
-            return _e, _w
-        def _validate_single_assump(z):
-            match z:
-                case {'tag': 'PoolLevel'}:
-                    return [True, e, w]
-                case {'tag':'ByIndex', 'contents':(assumps, _)}:
-                    _ids = set(flat([ assump[0] for assump in assumps ]))
-                    if not _ids.issubset(asset_ids):
-                        e.append(f"Not Valid Asset ID:{_ids - asset_ids}")
-                    if len(missing_asset_id := asset_ids - _ids) > 0:
-                        w.append(f"Missing Asset to set assumption:{missing_asset_id}")            
-                case None:
-                    return [True, e, w]
-                case _:
-                    raise RuntimeError(f"Failed to match:{a}")
-        a = x['contents'][1]
-        asset_ids = set(range(len(query(x['contents'][0], ['contents', 'pool', 'assets']))))
-        match x:
-            case {"tag":"SingleRunReq","contents":[d,ma,_]}:
-                _validate_single_assump(ma)
-            case {"tag":"MultiScenarioRunReq","contents":[d,mam,_]}:
-                mapValsBy(mam, _validate_single_assump)
-            case {"tag":"MultiDealRunReq","contents":[dm,ma,_]}:
-                _validate_single_assump(ma)
-
-        if len(e) > 0:
-            return [False, e, w]
-        return [True, e, w]
-
     def validate(self, _r) -> list:
-        error = []
-        warning = []
-        _r = json.loads(_r)
-        __d = _r['contents'][0]
-        _d = __d['contents']
-        valid_acc = set(_d['accounts'].keys())
-        valid_bnd = set(_d['bonds'].keys())
-        valid_fee = set(_d['fees'].keys())
-        _w = _d['waterfall']
-        #print("Waterfall",_w)
-
-        _,error,warning = self._validate_assump(_r,error,warning)
-
-        if _w is None:
-            raise RuntimeError("Waterfall is None")
-
         # validatin waterfall
-        for wn,wa in _w.items():
-            for idx,action in enumerate(wa):
-                action = action[1]
-                match action['tag']:
-                    case 'PayFeeBy':
-                        if (not set(action['contents'][1]).issubset(valid_acc)) \
-                            or (not set(action['contents'][2]).issubset(valid_fee)):
-                            error.append(f"{wn},{idx}")
-                    case 'PayFee':
-                        if (not set(action['contents'][0]).issubset(valid_acc)) \
-                            or (not set(action['contents'][1]).issubset(valid_fee)):
-                            error.append(f"{wn},{idx}")     
-                    case 'PayInt':
-                        if (action['contents'][0] not in valid_acc) \
-                            or (not set(action['contents'][1]).issubset(valid_bnd)):
-                            error.append(f"{wn},{idx}")  
-                    case 'PayPrin':
-                        if (action['contents'][0] not in valid_acc) \
-                            or (not set(action['contents'][1]).issubset(valid_bnd)):
-                            error.append(f"{wn},{idx}")  
-                    case 'PayPrinBy':
-                        if (action['contents'][1] not in valid_acc) \
-                            or (not set(action['contents'][2]).issubset(valid_bnd)):
-                            error.append(f"{wn},{idx}")  
-                    case 'PayResidual':
-                        if (action['contents'][1] not in valid_acc) \
-                            or (action['contents'][2] not in valid_bnd):
-                            error.append(f"{wn},{idx}")  
-                    case 'Transfer':
-                        if (action['contents'][0] not in valid_acc) \
-                            or (action['contents'][1] not in valid_acc):
-                            error.append(f"{wn},{idx}")
-                    case 'TransferBy':
-                        if (action['contents'][1] not in valid_acc) \
-                            or (action['contents'][2] not in valid_acc):
-                            error.append(f"{wn},{idx}")
-                    case 'PayTillYield':
-                        if (action['contents'][0] not in valid_acc) \
-                            or (not set(action['contents'][1]).issubset(valid_bnd)):
-                            error.append(f"{wn},{idx}")
-                    case 'PayFeeResidual':
-                        if (action['contents'][1] not in valid_acc) \
-                            or (action['contents'][2] not in valid_fee):
-                            error.append(f"{wn},{idx}")
-                    case 'PayFeeResidual':
-                        if (action['contents'][1] not in valid_acc) \
-                            or (action['contents'][2] not in valid_fee):
-                            error.append(f"{wn},{idx}")
+        error, warning = valReq(_r)
 
         if warning:
-            logging.warning(f"Warning in modelling:{warning}")
+            logging.warning(f"Warning in model :{warning}")
 
         if len(error)>0:
-            if error:
-                logging.error(f"Error in modelling:{error}")
+            logging.error(f"Error in model :{error}")
             return False,error,warning
         else:
             return True,error,warning
@@ -205,16 +113,16 @@ class API:
         req = self.build_req(deal, assumptions, pricing)
 
         #validate deal
-        deal_validate,err,warn = self.validate(req)
-        if not deal_validate:
-            return deal_validate,err,warn
+        val_result, err, warn = self.validate(req)
+        if not val_result:
+            return val_result, err, warn
 
         result = self._send_req(req,url)
 
         if read and multi_run_flag:
-                return { n:deal.read(_r,position=position) for (n,_r) in result.items()}
+            return { n:deal.read(_r,position=position) for (n,_r) in result.items()}
         elif read :
-                return deal.read(result,position=position)
+            return deal.read(result,position=position)
         else:
             return result
 
@@ -263,7 +171,7 @@ class API:
 
     def _send_req(self,_req,_url)->dict:
         try:
-            r = requests.post(_url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False)
+            r = self.session.post(_url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False, timeout=10)
         except (ConnectionRefusedError, ConnectionError):
             return None
 
