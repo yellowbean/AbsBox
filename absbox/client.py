@@ -4,7 +4,7 @@ import requests
 from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass,field
-from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy
+from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header
 from absbox.local.component import mkPool, mkAssumption, mkAssumption2, mkPricingAssump
 from absbox.local.base import *
 import pandas as pd
@@ -277,24 +277,6 @@ class API:
             raise RuntimeError(e)        
 
 
-
-def guess_pool_flow_header(x,l):
-    assert isinstance(x, dict), f"x is not a map but {x}, type:{type(x)}"
-    match (x['tag'],l):
-        case ('MortgageFlow','chinese'):
-            return (china_mortgage_flow_fields_d,"日期")
-        case ('MortgageFlow','english'):
-            return (english_mortgage_flow_fields_d,"Date")
-        case ('LoanFlow','chinese'):
-            return (china_loan_flow_d,"日期")
-        case ('LoanFlow','english'):
-            return (english_loan_flow_d,"Date")
-        case ('LeaseFlow','chinese'):
-            return (china_rental_flow_d,"日期")
-        case ('LeaseFlow','english'):
-            return (english_rental_flow_d,"Date")
-        case _:
-            raise RuntimeError(f"Failed to match pool header with {x['tag']}{l}")
 
 
 def save(deal,p:str):

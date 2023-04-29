@@ -374,3 +374,23 @@ def renameKs2(m:dict,kmapping):
 
 def ensure100(xs,msg=""):
     assert sum(xs)==1.0,f"Doesn't not sum up 100%: {msg}"
+
+
+def guess_pool_flow_header(x,l):
+    assert isinstance(x, dict), f"x is not a map but {x}, type:{type(x)}"
+    match (x['tag'],l):
+        case ('MortgageFlow','chinese'):
+            return (china_mortgage_flow_fields_d,"日期")
+        case ('MortgageFlow','english'):
+            return (english_mortgage_flow_fields_d,"Date")
+        case ('LoanFlow','chinese'):
+            return (china_loan_flow_d,"日期")
+        case ('LoanFlow','english'):
+            return (english_loan_flow_d,"Date")
+        case ('LeaseFlow','chinese'):
+            return (china_rental_flow_d,"日期")
+        case ('LeaseFlow','english'):
+            return (english_rental_flow_d,"Date")
+        case _:
+            raise RuntimeError(f"Failed to match pool header with {x['tag']}{l}")
+
