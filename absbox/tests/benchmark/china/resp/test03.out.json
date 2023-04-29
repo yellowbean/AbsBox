@@ -525,102 +525,81 @@
       "waterfall": {
         "EndOfPoolCollection": [],
         "DistributionDay Amortizing": [
-          [
-            null,
-            {
-              "tag": "PayInt",
-              "contents": [
-                "\u8d26\u623701",
-                [
-                  "A1"
-                ]
+          {
+            "tag": "PayInt",
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "A1"
               ]
-            }
-          ],
-          [
-            null,
-            {
-              "tag": "PayPrin",
-              "contents": [
-                "\u8d26\u623701",
-                [
-                  "A1"
-                ]
+            ]
+          },
+          {
+            "tag": "PayPrin",
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "A1"
               ]
-            }
-          ],
-          [
-            null,
-            {
-              "tag": "PayPrin",
-              "contents": [
-                "\u8d26\u623701",
-                [
-                  "B"
-                ]
-              ]
-            }
-          ],
-          [
-            null,
-            {
-              "tag": "PayResidual",
-              "contents": [
-                null,
-                "\u8d26\u623701",
+            ]
+          },
+          {
+            "tag": "PayPrin",
+            "contents": [
+              "\u8d26\u623701",
+              [
                 "B"
               ]
-            }
-          ]
+            ]
+          },
+          {
+            "tag": "PayResidual",
+            "contents": [
+              null,
+              "\u8d26\u623701",
+              "B"
+            ]
+          }
         ],
         "CleanUp": [
-          [
-            null,
-            {
-              "tag": "LiquidatePool",
-              "contents": [
-                {
-                  "tag": "BalanceFactor",
-                  "contents": [
-                    {
-                      "numerator": 1,
-                      "denominator": 1
-                    },
-                    {
-                      "numerator": 0,
-                      "denominator": 1
-                    }
-                  ]
-                },
-                "\u8d26\u623701"
-              ]
-            }
-          ],
-          [
-            null,
-            {
-              "tag": "PayFeeResidual",
-              "contents": [
-                {
-                  "tag": "DuePct",
-                  "contents": 0.7
-                },
-                "\u8d26\u623701",
-                "\u670d\u52a1\u5546\u8d39\u7528"
-              ]
-            }
-          ],
-          [
-            null,
-            {
-              "tag": "PayResidual",
-              "contents": [
-                null,
-                "\u8d26\u623701",
-                "B"
-              ]
-            }
-          ]
+          {
+            "tag": "LiquidatePool",
+            "contents": [
+              {
+                "tag": "BalanceFactor",
+                "contents": [
+                  {
+                    "numerator": 1,
+                    "denominator": 1
+                  },
+                  {
+                    "numerator": 0,
+                    "denominator": 1
+                  }
+                ]
+              },
+              "\u8d26\u623701"
+            ]
+          },
+          {
+            "tag": "PayFeeResidual",
+            "contents": [
+              {
+                "tag": "DuePct",
+                "contents": 0.7
+              },
+              "\u8d26\u623701",
+              "\u670d\u52a1\u5546\u8d39\u7528"
+            ]
+          },
+          {
+            "tag": "PayResidual",
+            "contents": [
+              null,
+              "\u8d26\u623701",
+              "B"
+            ]
+          }
         ]
       },
       "collects": [

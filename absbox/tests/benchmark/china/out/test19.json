@@ -116,80 +116,62 @@
       "CleanUp": [],
       "EndOfPoolCollection": [],
       "DistributionDay (DealAccelerated Nothing)": [
-        [
-          null,
-          {
-            "tag": "PayInt",
-            "contents": [
-              "\u8d26\u623701",
-              [
-                "A1"
-              ]
+        {
+          "tag": "PayInt",
+          "contents": [
+            "\u8d26\u623701",
+            [
+              "A1"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrinResidual",
-            "contents": [
-              "\u8d26\u623701",
-              [
-                "A1"
-              ]
+          ]
+        },
+        {
+          "tag": "PayPrinResidual",
+          "contents": [
+            "\u8d26\u623701",
+            [
+              "A1"
             ]
-          }
-        ]
+          ]
+        }
       ],
       "DistributionDay Amortizing": [
-        [
-          null,
-          {
-            "tag": "PayInt",
-            "contents": [
-              "\u8d26\u623701",
-              [
-                "A1"
-              ]
+        {
+          "tag": "PayInt",
+          "contents": [
+            "\u8d26\u623701",
+            [
+              "A1"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayInt",
-            "contents": [
-              "\u8d26\u623701",
-              [
-                "B"
-              ]
+          ]
+        },
+        {
+          "tag": "PayInt",
+          "contents": [
+            "\u8d26\u623701",
+            [
+              "B"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "\u8d26\u623701",
-              [
-                "A1"
-              ]
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u8d26\u623701",
+            [
+              "A1"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "\u8d26\u623701",
-              [
-                "B"
-              ]
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u8d26\u623701",
+            [
+              "B"
             ]
-          }
-        ]
+          ]
+        }
       ]
     },
     "fees": {},

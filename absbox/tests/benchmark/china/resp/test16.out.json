@@ -42475,74 +42475,56 @@
       },
       "waterfall": {
         "DistributionDay Amortizing": [
-          [
-            null,
-            {
-              "tag": "Transfer",
-              "contents": [
-                "\u50a8\u5907\u8d26\u6237",
-                "\u8d26\u623701"
+          {
+            "tag": "Transfer",
+            "contents": [
+              "\u50a8\u5907\u8d26\u6237",
+              "\u8d26\u623701"
+            ]
+          },
+          {
+            "tag": "PayInt",
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "A1"
               ]
-            }
-          ],
-          [
-            null,
-            {
-              "tag": "PayInt",
-              "contents": [
-                "\u8d26\u623701",
-                [
-                  "A1"
-                ]
+            ]
+          },
+          {
+            "tag": "TransferReserve",
+            "contents": [
+              "Target",
+              "\u8d26\u623701",
+              "\u50a8\u5907\u8d26\u6237"
+            ]
+          },
+          {
+            "tag": "PayPrin",
+            "contents": [
+              "\u8d26\u623701",
+              [
+                "A1"
               ]
-            }
-          ],
-          [
-            null,
-            {
-              "tag": "TransferReserve",
-              "contents": [
-                "Target",
-                "\u8d26\u623701",
-                "\u50a8\u5907\u8d26\u6237"
-              ]
-            }
-          ],
-          [
-            null,
-            {
-              "tag": "PayPrin",
-              "contents": [
-                "\u8d26\u623701",
-                [
-                  "A1"
-                ]
-              ]
-            }
-          ],
-          [
-            null,
-            {
-              "tag": "PayPrin",
-              "contents": [
-                "\u8d26\u623701",
-                [
-                  "B"
-                ]
-              ]
-            }
-          ],
-          [
-            null,
-            {
-              "tag": "PayResidual",
-              "contents": [
-                null,
-                "\u8d26\u623701",
+            ]
+          },
+          {
+            "tag": "PayPrin",
+            "contents": [
+              "\u8d26\u623701",
+              [
                 "B"
               ]
-            }
-          ]
+            ]
+          },
+          {
+            "tag": "PayResidual",
+            "contents": [
+              null,
+              "\u8d26\u623701",
+              "B"
+            ]
+          }
         ]
       },
       "collects": [

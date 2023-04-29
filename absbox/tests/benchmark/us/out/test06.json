@@ -112,160 +112,126 @@
     },
     "waterfall": {
       "DistributionDay Amortizing": [
-        [
-          null,
-          {
-            "tag": "CalcBondInt",
-            "contents": [
+        {
+          "tag": "CalcBondInt",
+          "contents": [
+            "A1"
+          ]
+        },
+        {
+          "tag": "LiqSupport",
+          "contents": [
+            {
+              "tag": "DS",
+              "contents": {
+                "tag": "Max",
+                "contents": [
+                  {
+                    "tag": "Substract",
+                    "contents": [
+                      {
+                        "tag": "CurrentDueBondInt",
+                        "contents": [
+                          "A1",
+                          "B"
+                        ]
+                      },
+                      {
+                        "tag": "AccBalance",
+                        "contents": [
+                          "acc01"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "Constant",
+                    "contents": 0.0
+                  }
+                ]
+              }
+            },
+            "insuranceProvider",
+            "acc01"
+          ]
+        },
+        {
+          "tag": "PayInt",
+          "contents": [
+            "acc01",
+            [
+              "A1",
+              "B"
+            ]
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "acc02",
+            [
               "A1"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "LiqSupport",
-            "contents": [
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "acc02",
+            [
+              "B"
+            ]
+          ]
+        },
+        {
+          "tag": "ActionWithPre",
+          "contents": [
+            {
+              "tag": "IfZero",
+              "contents": {
+                "tag": "CurrentBondBalanceOf",
+                "contents": [
+                  "A1",
+                  "B"
+                ]
+              }
+            },
+            [
               {
-                "tag": "DS",
-                "contents": {
-                  "tag": "Max",
-                  "contents": [
-                    {
-                      "tag": "Substract",
-                      "contents": [
-                        {
-                          "tag": "CurrentDueBondInt",
-                          "contents": [
-                            "A1",
-                            "B"
-                          ]
-                        },
-                        {
-                          "tag": "AccBalance",
-                          "contents": [
-                            "acc01"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "tag": "Constant",
-                      "contents": 0.0
-                    }
+                "tag": "PayInt",
+                "contents": [
+                  "acc02",
+                  [
+                    "A1",
+                    "B"
                   ]
-                }
+                ]
               },
-              "insuranceProvider",
-              "acc01"
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayInt",
-            "contents": [
-              "acc01",
-              [
-                "A1",
-                "B"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "acc02",
-              [
-                "A1"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "acc02",
-              [
-                "B"
-              ]
-            ]
-          }
-        ],
-        [
-          {
-            "tag": "IfZero",
-            "contents": {
-              "tag": "CurrentBondBalanceOf",
-              "contents": [
-                "A1",
-                "B"
-              ]
-            }
-          },
-          {
-            "tag": "PayInt",
-            "contents": [
-              "acc02",
-              [
-                "A1",
-                "B"
-              ]
-            ]
-          }
-        ],
-        [
-          {
-            "tag": "IfZero",
-            "contents": {
-              "tag": "CurrentBondBalanceOf",
-              "contents": [
-                "A1",
-                "B"
-              ]
-            }
-          },
-          {
-            "tag": "LiqRepay",
-            "contents": [
-              null,
               {
-                "tag": "LiqBal"
+                "tag": "LiqRepay",
+                "contents": [
+                  null,
+                  {
+                    "tag": "LiqBal"
+                  },
+                  "acc01",
+                  "insuranceProvider"
+                ]
               },
-              "acc01",
-              "insuranceProvider"
-            ]
-          }
-        ],
-        [
-          {
-            "tag": "IfZero",
-            "contents": {
-              "tag": "CurrentBondBalanceOf",
-              "contents": [
-                "A1",
-                "B"
-              ]
-            }
-          },
-          {
-            "tag": "LiqRepay",
-            "contents": [
-              null,
               {
-                "tag": "LiqBal"
-              },
-              "acc02",
-              "insuranceProvider"
+                "tag": "LiqRepay",
+                "contents": [
+                  null,
+                  {
+                    "tag": "LiqBal"
+                  },
+                  "acc02",
+                  "insuranceProvider"
+                ]
+              }
             ]
-          }
-        ]
+          ]
+        }
       ]
     },
     "fees": {},

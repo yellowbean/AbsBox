@@ -112,67 +112,52 @@
     },
     "waterfall": {
       "DistributionDay Amortizing": [
-        [
-          null,
-          {
-            "tag": "PayFee",
-            "contents": [
-              [
-                "\u8d26\u623701"
-              ],
-              [
-                "\u4fe1\u6258\u8d39\u7528"
-              ]
+        {
+          "tag": "PayFee",
+          "contents": [
+            [
+              "\u8d26\u623701"
+            ],
+            [
+              "\u4fe1\u6258\u8d39\u7528"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayInt",
-            "contents": [
-              "\u8d26\u623701",
-              [
-                "A1"
-              ]
+          ]
+        },
+        {
+          "tag": "PayInt",
+          "contents": [
+            "\u8d26\u623701",
+            [
+              "A1"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "\u8d26\u623701",
-              [
-                "A1"
-              ]
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u8d26\u623701",
+            [
+              "A1"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "\u8d26\u623701",
-              [
-                "B"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayResidual",
-            "contents": [
-              null,
-              "\u8d26\u623701",
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u8d26\u623701",
+            [
               "B"
             ]
-          }
-        ]
+          ]
+        },
+        {
+          "tag": "PayResidual",
+          "contents": [
+            null,
+            "\u8d26\u623701",
+            "B"
+          ]
+        }
       ]
     },
     "fees": {

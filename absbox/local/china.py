@@ -59,9 +59,6 @@ class SPV:
     @property
     def json(self):
         stated = False 
-        dists,collects,cleans = [ self.分配规则.get(wn,[]) for wn in ['未违约','回款后','清仓回购'] ]
-        distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
-        distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
         parsedDates = mkDate(self.日期)
         defaultStartDate = self.日期.get("起息日",None) or self.日期['归集日'][0]
         """

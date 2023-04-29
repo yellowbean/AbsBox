@@ -176,145 +176,112 @@
     },
     "waterfall": {
       "EndOfPoolCollection": [
-        [
-          null,
-          {
-            "tag": "CalcFee",
-            "contents": [
-              "\u589e\u503c\u7a0e"
-            ]
-          }
-        ]
+        {
+          "tag": "CalcFee",
+          "contents": [
+            "\u589e\u503c\u7a0e"
+          ]
+        }
       ],
       "DistributionDay Amortizing": [
-        [
-          null,
-          {
-            "tag": "PayFee",
-            "contents": [
-              [
-                "\u6536\u5165\u5206\u8d26\u6237"
-              ],
-              [
-                "\u6267\u884c\u8d39\u7528"
-              ]
+        {
+          "tag": "PayFee",
+          "contents": [
+            [
+              "\u6536\u5165\u5206\u8d26\u6237"
+            ],
+            [
+              "\u6267\u884c\u8d39\u7528"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayFeeBy",
-            "contents": [
-              {
-                "tag": "DuePct",
-                "contents": 0.1
-              },
-              [
-                "\u6536\u5165\u5206\u8d26\u6237"
-              ],
-              [
-                "\u670d\u52a1\u5546\u8d39\u7528"
-              ]
+          ]
+        },
+        {
+          "tag": "PayFeeBy",
+          "contents": [
+            {
+              "tag": "DuePct",
+              "contents": 0.1
+            },
+            [
+              "\u6536\u5165\u5206\u8d26\u6237"
+            ],
+            [
+              "\u670d\u52a1\u5546\u8d39\u7528"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayInt",
-            "contents": [
-              "\u6536\u5165\u5206\u8d26\u6237",
-              [
-                "A1",
-                "A2"
-              ]
+          ]
+        },
+        {
+          "tag": "PayInt",
+          "contents": [
+            "\u6536\u5165\u5206\u8d26\u6237",
+            [
+              "A1",
+              "A2"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayFee",
-            "contents": [
-              [
-                "\u6536\u5165\u5206\u8d26\u6237"
-              ],
-              [
-                "\u670d\u52a1\u5546\u8d39\u7528"
-              ]
+          ]
+        },
+        {
+          "tag": "PayFee",
+          "contents": [
+            [
+              "\u6536\u5165\u5206\u8d26\u6237"
+            ],
+            [
+              "\u670d\u52a1\u5546\u8d39\u7528"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayTillYield",
-            "contents": [
-              "\u6536\u5165\u5206\u8d26\u6237",
-              [
-                "\u6b21\u7ea7"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "Transfer",
-            "contents": [
-              "\u6536\u5165\u5206\u8d26\u6237",
-              "\u672c\u91d1\u5206\u8d26\u6237"
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "\u672c\u91d1\u5206\u8d26\u6237",
-              [
-                "A1"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "\u672c\u91d1\u5206\u8d26\u6237",
-              [
-                "A2"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "\u672c\u91d1\u5206\u8d26\u6237",
-              [
-                "\u6b21\u7ea7"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayResidual",
-            "contents": [
-              null,
-              "\u672c\u91d1\u5206\u8d26\u6237",
+          ]
+        },
+        {
+          "tag": "PayTillYield",
+          "contents": [
+            "\u6536\u5165\u5206\u8d26\u6237",
+            [
               "\u6b21\u7ea7"
             ]
-          }
-        ]
+          ]
+        },
+        {
+          "tag": "Transfer",
+          "contents": [
+            "\u6536\u5165\u5206\u8d26\u6237",
+            "\u672c\u91d1\u5206\u8d26\u6237"
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u672c\u91d1\u5206\u8d26\u6237",
+            [
+              "A1"
+            ]
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u672c\u91d1\u5206\u8d26\u6237",
+            [
+              "A2"
+            ]
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u672c\u91d1\u5206\u8d26\u6237",
+            [
+              "\u6b21\u7ea7"
+            ]
+          ]
+        },
+        {
+          "tag": "PayResidual",
+          "contents": [
+            null,
+            "\u672c\u91d1\u5206\u8d26\u6237",
+            "\u6b21\u7ea7"
+          ]
+        }
       ]
     },
     "fees": {

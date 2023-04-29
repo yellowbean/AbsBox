@@ -122,134 +122,104 @@
     },
     "waterfall": {
       "EndOfPoolCollection": [
-        [
-          null,
-          {
-            "tag": "CalcFee",
-            "contents": [
-              "\u589e\u503c\u7a0e"
-            ]
-          }
-        ]
+        {
+          "tag": "CalcFee",
+          "contents": [
+            "\u589e\u503c\u7a0e"
+          ]
+        }
       ],
       "DistributionDay Amortizing": [
-        [
-          null,
-          {
-            "tag": "CalcBondInt",
-            "contents": [
+        {
+          "tag": "CalcBondInt",
+          "contents": [
+            "A1"
+          ]
+        },
+        {
+          "tag": "LiqRepay",
+          "contents": [
+            null,
+            {
+              "tag": "LiqBal"
+            },
+            "\u8d26\u623701",
+            "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8"
+          ]
+        },
+        {
+          "tag": "LiqSupport",
+          "contents": [
+            {
+              "tag": "DS",
+              "contents": {
+                "tag": "ReserveAccGap",
+                "contents": [
+                  "\u8d26\u623701"
+                ]
+              }
+            },
+            "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8",
+            "\u8d26\u623701"
+          ]
+        },
+        {
+          "tag": "PayFee",
+          "contents": [
+            [
+              "\u8d26\u623701"
+            ],
+            [
+              "\u589e\u503c\u7a0e"
+            ]
+          ]
+        },
+        {
+          "tag": "PayFee",
+          "contents": [
+            [
+              "\u8d26\u623701"
+            ],
+            [
+              "\u627f\u9500\u8d39"
+            ]
+          ]
+        },
+        {
+          "tag": "PayInt",
+          "contents": [
+            "\u8d26\u623701",
+            [
               "A1"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "LiqRepay",
-            "contents": [
-              null,
-              {
-                "tag": "LiqBal"
-              },
-              "\u8d26\u623701",
-              "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8"
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u8d26\u623702",
+            [
+              "A1"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "LiqSupport",
-            "contents": [
-              {
-                "tag": "DS",
-                "contents": {
-                  "tag": "ReserveAccGap",
-                  "contents": [
-                    "\u8d26\u623701"
-                  ]
-                }
-              },
-              "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8",
-              "\u8d26\u623701"
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayFee",
-            "contents": [
-              [
-                "\u8d26\u623701"
-              ],
-              [
-                "\u589e\u503c\u7a0e"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayFee",
-            "contents": [
-              [
-                "\u8d26\u623701"
-              ],
-              [
-                "\u627f\u9500\u8d39"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayInt",
-            "contents": [
-              "\u8d26\u623701",
-              [
-                "A1"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "\u8d26\u623702",
-              [
-                "A1"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "\u8d26\u623702",
-              [
-                "B"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayResidual",
-            "contents": [
-              null,
-              "\u8d26\u623702",
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u8d26\u623702",
+            [
               "B"
             ]
-          }
-        ]
+          ]
+        },
+        {
+          "tag": "PayResidual",
+          "contents": [
+            null,
+            "\u8d26\u623702",
+            "B"
+          ]
+        }
       ]
     },
     "fees": {

@@ -136,148 +136,115 @@
     },
     "waterfall": {
       "DistributionDay (DealAccelerated Nothing)": [
-        [
-          null,
-          {
-            "tag": "PayFee",
-            "contents": [
-              [
-                "acc01"
-              ],
-              [
-                "trusteeFee"
-              ]
+        {
+          "tag": "PayFee",
+          "contents": [
+            [
+              "acc01"
+            ],
+            [
+              "trusteeFee"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayInt",
-            "contents": [
-              "acc01",
-              [
-                "A1",
-                "A2"
-              ]
+          ]
+        },
+        {
+          "tag": "PayInt",
+          "contents": [
+            "acc01",
+            [
+              "A1",
+              "A2"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "acc01",
-              [
-                "A1"
-              ]
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "acc01",
+            [
+              "A1"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "acc01",
-              [
-                "A2"
-              ]
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "acc01",
+            [
+              "A2"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "acc01",
-              [
-                "B"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayResidual",
-            "contents": [
-              null,
-              "acc01",
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "acc01",
+            [
               "B"
             ]
-          }
-        ]
+          ]
+        },
+        {
+          "tag": "PayResidual",
+          "contents": [
+            null,
+            "acc01",
+            "B"
+          ]
+        }
       ],
       "DistributionDay (DealDefaulted Nothing)": [],
       "EndOfPoolCollection": [],
       "CleanUp": [],
       "DistributionDay Amortizing": [
-        [
-          null,
-          {
-            "tag": "PayFee",
-            "contents": [
-              [
-                "acc01"
-              ],
-              [
-                "trusteeFee"
-              ]
+        {
+          "tag": "PayFee",
+          "contents": [
+            [
+              "acc01"
+            ],
+            [
+              "trusteeFee"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayInt",
-            "contents": [
-              "acc01",
-              [
-                "A1",
-                "A2"
-              ]
+          ]
+        },
+        {
+          "tag": "PayInt",
+          "contents": [
+            "acc01",
+            [
+              "A1",
+              "A2"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "acc01",
-              [
-                "A1",
-                "A2"
-              ]
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "acc01",
+            [
+              "A1",
+              "A2"
             ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayPrin",
-            "contents": [
-              "acc01",
-              [
-                "B"
-              ]
-            ]
-          }
-        ],
-        [
-          null,
-          {
-            "tag": "PayResidual",
-            "contents": [
-              null,
-              "acc01",
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "acc01",
+            [
               "B"
             ]
-          }
-        ]
+          ]
+        },
+        {
+          "tag": "PayResidual",
+          "contents": [
+            null,
+            "acc01",
+            "B"
+          ]
+        }
       ]
     },
     "fees": {

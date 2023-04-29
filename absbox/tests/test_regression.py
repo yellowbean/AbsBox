@@ -135,7 +135,10 @@ def run_deal(input_folder, pair):
                     local_result_content = local_result[0]['contents']
                     s_result_content = s_result[0]['contents']
                     if not local_result_content['waterfall']==s_result_content['waterfall']:
-                        assert False,f"diff in waterfall: {diff(local_result_content['waterfall'],s_result[0]['waterfall'])}"
+                        for (idx,(local_w,test_w)) in enumerate(zip(local_result_content['waterfall'],s_result_content['waterfall'])):
+                            assert local_w == test_w, f"diff in waterfall action {idx},local={local_w},test={test_w}"
+
+                        #assert False,f"diff in waterfall: {diff(local_result_content['waterfall'],s_result_content['waterfall'])}"
                     if local_result_content['bonds']!=s_result_content['bonds']:
                         print("Bonds are not matching")
                         for bn,bv in local_result_content['bonds'].items():
