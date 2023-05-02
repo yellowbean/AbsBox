@@ -34,6 +34,8 @@ def mkDatePattern(x):
             return mkTag(("MonthDayOfYear", _m, _d))
         case ["CustomDate", *_ds]:
             return mkTag(("CustomDate", _ds))
+        case ["EveryNMonth", d, n]:
+            return mkTag(("EveryNMonth", [d, n]))
         case ["AllDatePattern", *_dps]:
             return mkTag(("AllDatePattern", [ mkDatePattern(_) for _ in _dps]))
         case _x if (_x in datePattern.values()):
@@ -637,9 +639,7 @@ def mkAssetRate(x):
         case ["浮动", r, {"基准": idx, "利差": spd, "重置频率": p}]:
             return mkTag(("Floater", [idx, spd, r, freqMap[p], None]))
         case ["floater", r, {"index": idx, "spread": spd, "reset": p}]:
-            return mkTag(("Floater", [idx, spd, r, freqMap[p], None]))
-        case ["Floater", r, {"index": idx, "spread": spd, "reset": p}]:
-            return mkTag(("Floater", [idx, spd, r, freqMap[p], None]))
+            return mkTag(("Floater2", [idx, spd, r, mkDatePattern(p)]))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAssetRate")
 
@@ -657,11 +657,40 @@ def mkAmortPlan(x) -> dict:
         case _:
             raise RuntimeError(f"Failed to match AmortPlan {x}:mkAmortPlan")
 
+def mkArm(x):
+    match x:
+        case {"initPeriod":ip}:
+            fc = x.get("firstCap",None)
+            pc = x.get("periodicCap",None)
+            floor = x.get("lifeFloor",None)
+            cap = x.get("lifeCap",None)
+            return mkTag(("ARM",[ip,fc,pc,cap,floor]))
+        case _:
+            raise RuntimeError(f"Failed to match AmortPlan {x}:mkArm")
+
 
 def mkAsset(x):
     _statusMapping = {"正常": mkTag(("Current")), "违约": mkTag(("Defaulted", None)), "current": mkTag(("Current")), "defaulted": mkTag(("Defaulted", None)), "Current": mkTag(("Current")), "Defaulted": mkTag(("Defaulted", None))
                       }
     match x:
+        case ["AdjustRateMortgage", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate, "arm": arm}
+             , {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
+            borrowerNum1 = x[2].get("borrowerNum", None)
+            return mkTag(("AdjustRateMortgage",
+                          [{"originBalance": originBalance,
+                            "originRate": mkAssetRate(originRate),
+                            "originTerm": originTerm,
+                            "period": freqMap[freq],
+                            "startDate": startDate,
+                            "prinType": mkAmortPlan(_type)
+                            } | mkTag("MortgageOriginalInfo"),
+                            mkArm(arm),
+                            currentBalance,
+                            currentRate,
+                            remainTerms,
+                            borrowerNum1,
+                            _statusMapping[status]]
+            )) 
         case ["按揭贷款", {"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "当前利率": currentRate, "剩余期限": remainTerms, "状态": status}] | \
                 ["Mortgage", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
 
@@ -733,6 +762,8 @@ def identify_deal_type(x):
             return "LDeal"
         case {"pool": {"assets": [{'tag': 'Mortgage'}, *rest]}}:
             return "MDeal"
+        case {"pool": {"assets": [{'tag': 'AdjustRateMortgage'}, *rest]}}:
+            return "MDeal"
         case {"pool": {"assets": [], "futureCf": cfs}} if cfs[0]['tag'] == 'MortgageFlow':
             return "MDeal"
         case {"pool": {"assets": [{'tag': 'Installment'}, *rest]}}:
@@ -787,7 +818,9 @@ def mkAssumption(x) -> dict:
         case {"Rate": [idx, rate]} if isinstance(rate, float):
             return mkTag(("InterestRateConstant", [idx, rate]))
         case {"利率": [idx, *rateCurve]} | {"Rate": [idx, *rateCurve]}:
-            return mkTag(("InterestRateCurve", [idx, *rateCurve]))
+            # curve = mkTag(("IRateCurve", [ mkTag(("TsPoint",[t,v])) for (t,v) in rateCurve]))
+            curve = mkTag(("IRateCurve", [ [t,v] for (t,v) in rateCurve]))
+            return mkTag(("InterestRateCurve", [idx, curve]))
         case {"清仓": opts} | {"CleanUp": opts}:
             return mkTag(("CallWhen", [mkCallOptions(co) for co in opts]))
         case {"停止": d} | {"StopAt": d}:
