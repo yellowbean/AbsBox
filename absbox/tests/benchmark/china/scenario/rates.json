@@ -1,4 +1,6 @@
 {"tag": "PoolLevel", "contents":[
-    {"tag": "InterestRateCurve", "contents": ["LPR5Y", [["2020-10-01", 0.05]]]}
-    ,{"tag": "InterestRateCurve", "contents": ["LPR1Y", [["2020-10-01", 0.04]]]}
+    {"tag": "InterestRateCurve"
+    , "contents": ["LPR5Y", {"tag":"IRateCurve","contents":[["2020-10-01", 0.05]]}]}
+    ,{"tag": "InterestRateCurve"
+    , "contents": ["LPR1Y", {"tag":"IRateCurve","contents":[["2020-10-01", 0.04]]}]}
 ]}
