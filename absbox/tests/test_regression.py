@@ -94,7 +94,10 @@ def run_deal(input_folder, pair):
 
     test_server = config["test_server"] #https://deal-bench.xyz/api/run_deal2" 
     if 'TEST_RUN_SERVER' in os.environ and os.environ['TEST_RUN_SERVER'] != "" :
+        logging.info(f"Using Env Server {os.environ['TEST_RUN_SERVER']}")
         test_server = os.environ['TEST_RUN_SERVER']
+    else:
+        logging.info(f"Using Server from Config {test_server}")
     #test_server = "https://absbox.org/api/dev" # config["test_server"] #https://deal-bench.xyz/api/run_deal2" 
     
     for dinput, sinput, eoutput in pair:

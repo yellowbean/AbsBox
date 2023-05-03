@@ -20,7 +20,7 @@ a structured finance cashflow engine wrapper for structured credit professionals
 ## Goals
 * Provide building blocks to create cashflow models for ABS/MBS
 * Adapt to multiple asset classes
-    * Residential Mortgage / Auto Loans
+    * Residential Mortgage / AdjustRateMortgage / Auto Loans
     * Corp Loans
     * Consumer Credit
     * Lease

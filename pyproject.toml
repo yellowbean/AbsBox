@@ -3,8 +3,17 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "0.14.12"
+version = "0.15.4"
 name = "absbox"
+
+dependencies = [
+    "requests ==2.27.1",
+    "pandas ==1.4.3",
+    "numpy ==1.23.1",
+    "matplotlib ==3.5.2",
+    "pyxirr",
+    "pyspecter"
+]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -13,3 +22,9 @@ testpaths = [
     "absbox/tests",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "jsondiff",
+    "deepdiff",
+]
