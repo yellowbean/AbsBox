@@ -668,10 +668,20 @@ def mkArm(x):
         case _:
             raise RuntimeError(f"Failed to match AmortPlan {x}:mkArm")
 
+def mkAssetStatus(x):
+    match x:
+        case "正常"|"Current"|"current":
+            return mkTag(("Current"))
+        case "违约"|"Defaulted"|"defaulted":
+            return mkTag(("Defaulted",None))
+        case ("违约",d) |("Defaulted",d)|("defaulted",d):
+            return mkTag(("Defaulted",d))
+        case _:
+            raise RuntimeError(f"Failed to match asset statuts {x}:mkAssetStatus")
+
+
 
 def mkAsset(x):
-    _statusMapping = {"正常": mkTag(("Current")), "违约": mkTag(("Defaulted", None)), "current": mkTag(("Current")), "defaulted": mkTag(("Defaulted", None)), "Current": mkTag(("Current")), "Defaulted": mkTag(("Defaulted", None))
-                      }
     match x:
         case ["AdjustRateMortgage", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate, "arm": arm}
              , {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
@@ -689,7 +699,7 @@ def mkAsset(x):
                             currentRate,
                             remainTerms,
                             borrowerNum1,
-                            _statusMapping[status]]
+                            mkAssetStatus(status)]
             )) 
         case ["按揭贷款", {"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "当前利率": currentRate, "剩余期限": remainTerms, "状态": status}] | \
                 ["Mortgage", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
@@ -709,7 +719,7 @@ def mkAsset(x):
                 currentRate,
                 remainTerms,
                 (borrowerNum1 or borrowerNum2),
-                _statusMapping[status]]))
+                mkAssetStatus(status)]))
         case ["贷款", {"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "当前利率": currentRate, "剩余期限": remainTerms, "状态": status}] \
                 | ["Loan", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
             return mkTag(("PersonalLoan", [
@@ -723,7 +733,7 @@ def mkAsset(x):
                 currentBalance,
                 currentRate,
                 remainTerms,
-                _statusMapping[status]]))
+                mkAssetStatus(status)]))
         case ["分期", {"放款金额": originBalance, "放款费率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate, "剩余期限": remainTerms}, {"当前余额": currentBalance, "状态": status}] \
                 | ["Installment", {"originBalance": originBalance, "feeRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate, "remainTerm": remainTerms}, {"currentBalance": currentBalance, "status": status}]:
             return mkTag(("Installment", [
@@ -736,7 +746,7 @@ def mkAsset(x):
                  } | mkTag("LoanOriginalInfo"),
                 currentBalance,
                 remainTerms,
-                _statusMapping[status]]))
+                mkAssetStatus(status)]))
         case ["租赁", {"固定租金": dailyRate, "初始期限": originTerm, "频率": dp, "起始日": startDate, "状态": status, "剩余期限": remainTerms}] \
                 | ["Lease", {"fixRental": dailyRate, "originTerm": originTerm, "freq": dp, "originDate": startDate, "status": status, "remainTerm": remainTerms}]:
             return mkTag(("RegularLease", [{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp), "originRental": dailyRate} | mkTag("LeaseInfo"), 0, remainTerms, _statusMapping[status]]))
@@ -751,7 +761,7 @@ def mkAsset(x):
             else:
                 dailyRatePlan = mkTag(
                     ("ByRateCurve", [mkDatePattern(accDp), rate]))
-            return mkTag(("StepUpLease", [{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp), "originRental": dailyRate} | mkTag("LeaseInfo"), dailyRatePlan, 0, remainTerms, _statusMapping[status]]))
+            return mkTag(("StepUpLease", [{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp), "originRental": dailyRate} | mkTag("LeaseInfo"), dailyRatePlan, 0, remainTerms, mkAssetStatus(status)]))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 
@@ -811,6 +821,8 @@ def mkAssumption(x) -> dict:
             return mkTag(("DefaultCDR", cdr))
         case {"CDR调整": [*cdrAdj, ed]} | {"CDRAdjust": [*cdrAdj, ed]}:
             return mkTag(("DefaultFactors", mkTs("FactorCurveClosed", [cdrAdj, ed])))
+        case {"DefaultedRecovery":[r,lag,timing]} | {"已违约回收":[r,lag,timing]}:
+            return mkTag(("DefaultedRecovery",[r,lag,timing]))
         case {"回收": (rr, rlag)} | {"Recovery": (rr, rlag)}:
             return mkTag(("Recovery", (rr, rlag)))
         case {"利率": [idx, rate]} if isinstance(rate, float):

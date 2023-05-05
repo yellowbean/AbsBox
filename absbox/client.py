@@ -22,7 +22,6 @@ class API:
     url: str
     lang: str = "chinese"
     server_info = {}
-    #version = "0","14","1"
     version = VERSION_NUM.split(".")
     hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain','Accept':'*/*'
             ,'Accept-Encoding':'gzip'}
@@ -178,7 +177,8 @@ class API:
 
         if r.status_code != 200:
             print(json.loads(_req))
-            raise RuntimeError(r.text)
+            error_resp = json.loads(r.text)
+            raise RuntimeError(error_resp.get("error","Empty Error Body"))
         try:
             result = json.loads(r.text)
             return result
