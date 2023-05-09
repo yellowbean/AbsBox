@@ -77,11 +77,8 @@
             "LPR5Y",
             0.025,
             {
-              "tag": "ByInterval",
-              "contents": [
-                "Monthly",
-                null
-              ]
+              "tag": "DayOfMonth",
+              "contents": 1
             },
             "DC_ACT_365F",
             null,

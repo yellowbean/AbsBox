@@ -116,8 +116,11 @@
             "LPR5Y",
             0.012,
             {
-              "tag": "MonthOfYear",
-              "contents": 3
+              "tag": "MonthDayOfYear",
+              "contents": [
+                3,
+                1
+              ]
             },
             "DC_ACT_365F",
             null,
@@ -147,8 +150,11 @@
             "LPR5Y",
             0.012,
             {
-              "tag": "MonthOfYear",
-              "contents": 3
+              "tag": "MonthDayOfYear",
+              "contents": [
+                3,
+                1
+              ]
             },
             "DC_ACT_365F",
             null,
@@ -178,8 +184,11 @@
             "LPR5Y",
             0.002,
             {
-              "tag": "MonthOfYear",
-              "contents": 3
+              "tag": "MonthDayOfYear",
+              "contents": [
+                3,
+                1
+              ]
             },
             "DC_ACT_365F",
             null,

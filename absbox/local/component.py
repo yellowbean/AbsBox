@@ -1,4 +1,4 @@
-from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs
+from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100
 from absbox.local.base import *
 from enum import Enum
 import itertools
@@ -38,6 +38,8 @@ def mkDatePattern(x):
             return mkTag(("EveryNMonth", [d, n]))
         case ["AllDatePattern", *_dps]:
             return mkTag(("AllDatePattern", [ mkDatePattern(_) for _ in _dps]))
+        case ["After", _d, dp] | ["之后", _d, dp]:
+            return mkTag(("StartsExclusive", [ _d, mkDatePattern(dp) ]))
         case _x if (_x in datePattern.values()):
             return mkTag((_x))
         case _x if (_x in datePattern.keys()):
@@ -197,7 +199,6 @@ def mkPre(p):
             return mkTag(("IfZero", mkDs(ds)))
         case [ds, op, curve] if isinstance(curve, list):
             q = queryType(ds)
-            # qmap = {"If":"BalanceCurve","IfRate":"RatioCurve","IfInt":"IntCurve"}
             return mkTag((f"{q}Curve", [op_map[op], mkDs(ds), mkCurve("ThresholdCurve",curve)]))
         case [ds, op, n]:
             q = queryType(ds)
@@ -289,30 +290,19 @@ def mkBondType(x):
             raise RuntimeError(f"Failed to match bond type: {x}")
 
 
-def mkRateReset(x):
-    match x:
-        case {"重置期间": interval, "起始": sdate} | {"resetInterval": interval, "starts": sdate}:
-            return mkTag(("ByInterval", [freqMap[interval], sdate]))
-        case {"重置期间": interval} | {"resetInterval": interval}:
-            return mkTag(("ByInterval", [freqMap[interval], None]))
-        case {"重置月份": monthOfYear} | {"resetMonth": monthOfYear}:
-            return mkTag(("MonthOfYear", monthOfYear))
-        case _:
-            raise RuntimeError(f"Failed to match:{x}: mkRateReset")
-
-
 def mkBondRate(x):
-    indexMapping = {"LPR5Y": "LPR5Y", "LIBOR1M": "LIBOR1M"}
     match x:
         case {"浮动": [_index, Spread, resetInterval], "日历": dc} | \
                 {"floater": [_index, Spread, resetInterval], "dayCount": dc}:
-            return mkTag(("Floater", [indexMapping[_index], Spread, mkRateReset(resetInterval), dc, None, None]))
+            return mkTag(("Floater", [_index, Spread, mkDatePattern(resetInterval), dc, None, None]))
         case {"浮动": [_index, Spread, resetInterval]} | {"floater": [_index, Spread, resetInterval]}:
             return mkBondRate(x | {"日历": DC.DC_ACT_365F.value, "dayCount": DC.DC_ACT_365F.value})
         case {"固定": _rate, "日历": dc} | {"fix": _rate, "dayCount": dc}:
             return mkTag(("Fix", [_rate, dc]))
         case {"固定": _rate} | {"Fixed": _rate}:
             return mkTag(("Fix", [_rate, DC.DC_ACT_365F.value]))
+        case {"调息": _rate, "幅度":spd, "调息日":dp} | {"StepUp": _rate, "Spread":spd, "When":dp}:
+            return mkTag(("StepUpFix", [_rate, DC.DC_ACT_365F.value, mkDatePattern(dp), spd ]))
         case {"期间收益": _yield}:
             return mkTag(("InterestByYield", _yield))
         case _:
@@ -734,8 +724,8 @@ def mkAsset(x):
                 currentRate,
                 remainTerms,
                 mkAssetStatus(status)]))
-        case ["分期", {"放款金额": originBalance, "放款费率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate, "剩余期限": remainTerms}, {"当前余额": currentBalance, "状态": status}] \
-                | ["Installment", {"originBalance": originBalance, "feeRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate, "remainTerm": remainTerms}, {"currentBalance": currentBalance, "status": status}]:
+        case ["分期", {"放款金额": originBalance, "放款费率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "剩余期限": remainTerms, "状态": status}] \
+                | ["Installment", {"originBalance": originBalance, "feeRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "remainTerm": remainTerms, "status": status}]:
             return mkTag(("Installment", [
                 {"originBalance": originBalance,
                  "originRate": mkAssetRate(originRate),
@@ -822,6 +812,7 @@ def mkAssumption(x) -> dict:
         case {"CDR调整": [*cdrAdj, ed]} | {"CDRAdjust": [*cdrAdj, ed]}:
             return mkTag(("DefaultFactors", mkTs("FactorCurveClosed", [cdrAdj, ed])))
         case {"DefaultedRecovery":[r,lag,timing]} | {"已违约回收":[r,lag,timing]}:
+            ensure100(timing,"Sum of Recovery Timing")
             return mkTag(("DefaultedRecovery",[r,lag,timing]))
         case {"回收": (rr, rlag)} | {"Recovery": (rr, rlag)}:
             return mkTag(("Recovery", (rr, rlag)))
@@ -861,7 +852,7 @@ def mkAssumpList(xs):
 
 def mkAssumption2(x) -> dict:
     match x:
-        case ["ByIndex",assetAssumpList, dealAssump] | ["明细",assetAssumpList, dealAssump]:
+        case ["ByIndex", assetAssumpList, dealAssump] | ["明细", assetAssumpList, dealAssump]:
             return mkTag(("ByIndex"
                          , [[(ids, mkAssumpList(aps)) for ids, aps in assetAssumpList]
                          , mkAssumpList(dealAssump)]))

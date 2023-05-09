@@ -103,8 +103,11 @@
             "LPR5Y",
             -0.0169,
             {
-              "tag": "MonthOfYear",
-              "contents": 3
+              "tag": "MonthDayOfYear",
+              "contents": [
+                3,
+                1
+              ]
             },
             "DC_ACT_365F",
             null,
@@ -134,10 +137,10 @@
             "LPR5Y",
             -0.0091,
             {
-              "tag": "ByInterval",
+              "tag": "MonthDayOfYear",
               "contents": [
-                "Annually",
-                "2022-11-01"
+                3,
+                1
               ]
             },
             "DC_ACT_365F",
