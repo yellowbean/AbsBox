@@ -32,8 +32,7 @@ a structured finance cashflow engine wrapper for structured credit professionals
 
 ## Data flow
 
-![image](https://absbox-doc.readthedocs.io/en/latest/_images/Intergration.png)
-
+<img src="https://absbox-doc.readthedocs.io/en/latest/_images/Intergration.png" width="600" height="347"/>
 
 ## Documentation
 * English -> https://absbox-doc.readthedocs.io
