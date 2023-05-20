@@ -1,4 +1,4 @@
-from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100
+from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100, mapListValBy, uplift_m_list,mapValsBy
 from absbox.local.base import *
 from enum import Enum
 import itertools
@@ -841,6 +841,8 @@ def mkAssumption(x) -> dict:
         case {"查看":inspects} | {"Inspect":inspects}:
             inspectVars = [ [mkDatePattern(dp),mkDs(ds)] for dp,ds in inspects ]
             return mkTag(("InspectOn", inspectVars))
+        case {"FinancialReports": {"dates":dp} } | {"财务报表": {"日期":dp}} : 
+            return mkTag(("BuildFinancialReport", mkDatePattern(dp)))
         case _:
             raise RuntimeError(f"Failed to match {x}:Assumption")
 
@@ -1036,12 +1038,12 @@ def readRunSummary(x, locale) -> dict:
     if x is None:
         return None
 
-    bndStatus = {'cn': ["本金违约", "利息违约", "起算余额"], 'en': [
-        "Balance Defaults", "Interest Defaults", "Original Balance"]}
+    bndStatus = {'cn': ["本金违约", "利息违约", "起算余额"]
+                ,'en': ["Balance Defaults", "Interest Defaults", "Original Balance"]}
     bond_defaults = [(_['contents'][0], _['tag'], _['contents'][1], _['contents'][2])
                      for _ in x if _['tag'] in set(['BondOutstanding', 'BondOutstandingInt'])]
-    _fmap = {"cn": {'BondOutstanding': "本金违约", "BondOutstandingInt": "利息违约"}, "en": {
-        'BondOutstanding': "Balance Defaults", "BondOutstandingInt": "Interest Defaults"}}
+    _fmap = {"cn": {'BondOutstanding': "本金违约", "BondOutstandingInt": "利息违约"}
+            ,"en": {'BondOutstanding': "Balance Defaults", "BondOutstandingInt": "Interest Defaults"}}
     bndNames = set([y[0] for y in bond_defaults])
     bndSummary = pd.DataFrame(columns=bndStatus[locale], index=list(bndNames))
     for bn, amt_type, amt, begBal in bond_defaults:
@@ -1072,6 +1074,52 @@ def readRunSummary(x, locale) -> dict:
     grped_inspect_df = inspect_df.groupby("DealStats")
 
     r['inspect'] = {readTagStr(k):uplift_ds(v) for k,v in grped_inspect_df}
+    
+    # build financial reports
+    def mapItem(z):
+        match z:
+            case {"tag":"Item","contents":[accName,accBal]}:
+                return {accName:accBal}
+            case {"tag":"ParentItem","contents":[accName,subItems]}:
+                items = [ mapItem(i) for i in subItems]
+                return {accName : items}
+
+    def buildBalanceSheet(bsData):
+        bsRptDate = bsData.pop("reportDate")
+        bs = mapListValBy(bsData, mapItem)
+        return mapValsBy(bs, uplift_m_list) | {"reportDate":bsRptDate}
+
+    def buildBsType(yname, y:dict)-> pd.DataFrame:
+        mi = pd.MultiIndex.from_product([[yname],y.keys()])
+        d = y.values()
+        return pd.DataFrame(d, index=mi).T
+    
+    def buildBS(bs):
+        bs_df = pd.concat([  buildBsType(k,v)  for k,v in bs.items() if k!="reportDate"],axis=1)
+        bs_df['reportDate'] = bs['reportDate']
+        return bs_df.set_index("reportDate")
+
+    def buildCashReport(cashData):
+        sd = cashData.pop('startDate')
+        ed = cashData.pop('endDate')
+        net = cashData.pop('net')
+        cashList = mapListValBy(cashData, mapItem)
+        cashMap = {k:uplift_m_list(v) for k,v in cashList.items() }
+        cashMap = pd.concat([  buildBsType(k,v) for k,v in cashMap.items() ],axis=1)
+        cashMap['startDate'] = sd
+        cashMap['endDate'] = ed
+        cashMap['Net'] = net
+        return cashMap.set_index(["startDate","endDate"])
+
+    balanceSheetIdx = 2
+    cashReportIdx = 3
+    rpts = [ _['contents'] for  _ in  (filter_by_tags(x, ["FinancialReport"])) ]
+    if rpts:
+        r['report'] = {}
+        r['report']['balanceSheet'] = pd.concat([buildBS(buildBalanceSheet(rpt[balanceSheetIdx])) for rpt in rpts])
+        r['report']['cash'] = pd.concat([buildCashReport(rpt[cashReportIdx]) for rpt in rpts])[["inflow","outflow","Net"]]
+    
+
     return r
 
 

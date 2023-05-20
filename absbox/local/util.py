@@ -394,3 +394,8 @@ def guess_pool_flow_header(x,l):
         case _:
             raise RuntimeError(f"Failed to match pool header with {x['tag']}{l}")
 
+def uplift_m_list(l:list):
+    return {k:v
+            for m in l
+            for k,v in m.items()
+            }

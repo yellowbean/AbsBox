@@ -91,12 +91,14 @@ def run_deal(input_folder, pair):
     input_req_folder = os.path.join(input_folder,"out")
     input_scen_folder = os.path.join(input_folder,"scenario")
     input_resp_folder = os.path.join(input_folder,"resp")
-
+    print("Select server to run")
     test_server = config["test_server"] #https://deal-bench.xyz/api/run_deal2" 
     if 'TEST_RUN_SERVER' in os.environ and os.environ['TEST_RUN_SERVER'] != "" :
+        print("Using Custom Server")
         logging.info(f"Using Env Server {os.environ['TEST_RUN_SERVER']}")
         test_server = os.environ['TEST_RUN_SERVER']
     else:
+        print("Using Config Server")
         logging.info(f"Using Server from Config {test_server}")
     #test_server = "https://absbox.org/api/dev" # config["test_server"] #https://deal-bench.xyz/api/run_deal2" 
     
