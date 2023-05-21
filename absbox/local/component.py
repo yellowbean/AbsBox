@@ -143,12 +143,11 @@ def mkDs(x):
             return mkTag(("BondBalanceGap", bn))
         case ("债务人数量",) | ("borrowerNumber",):
             return mkTag(("CurrentPoolBorrowerNum"))
-
-        #   , "当期已付债券利息":"LastBondIntPaid"
-        #   , "当期已付费用" :"LastFeePaid"
-        #   , "当期未付债券利息" :"CurrentDueBondInt"
-        #   , "当期未付费用": "CurrentDueFee"
-
+        case ("事件", loc, idx) | ("trigger", loc ,idx):
+            dealCycleM = chinaDealCycle | englishDealCycle
+            if not loc in dealCycleM:
+                raise RuntimeError(f" {loc} not in map {dealCycleM}")
+            return mkTag(("TriggersStatusAt",[dealCycleM[loc], idx]))
         case ("待付费用", *fns) | ("feeDue", *fns):
             return mkTag(("CurrentDueFee", fns))
         case ("已付费用", *fns) | ("lastFeePaid", *fns):
@@ -174,6 +173,7 @@ def mkDs(x):
         case _:
             raise RuntimeError(f"Failed to match DS/Formula: {x}")
 
+
 def mkCurve(tag,xs):
     return mkTag((tag,xs))
 
@@ -197,6 +197,8 @@ def mkPre(p):
     match p:
         case [ds, "=", 0]:
             return mkTag(("IfZero", mkDs(ds)))
+        case [ds, b] | [ds, b] if isinstance(b, bool):
+            return mkTag(("IfBool",[mkDs(ds), b]))
         case [ds, op, curve] if isinstance(curve, list):
             q = queryType(ds)
             return mkTag((f"{q}Curve", [op_map[op], mkDs(ds), mkCurve("ThresholdCurve",curve)]))
@@ -525,21 +527,6 @@ def readStatus(x, locale):
         case _:
             raise RuntimeError(
                 f"Failed to read deal status:{x} with locale: {locale}")
-
-
-def mkWhenTrigger(x):
-    match x:
-        case "回收后" | "BeforeCollect":
-            return "BeginCollectionWF"
-        case "回收动作后" | "AfterCollect":
-            return "EndCollectionWF"
-        case "分配前" | "BeforeDistribution":
-            return "BeginDistributionWF"
-        case "分配后" | "AfterDistribution":
-            return "EndDistributionWF"
-        case _:
-            raise RuntimeError(f"Failed to match :{x}:mkWhenTrigger")
-
 
 def mkThreshold(x):
     match x:
@@ -1067,10 +1054,9 @@ def readRunSummary(x, locale) -> dict:
         df.rename(columns={"Value":ds_name},inplace=True)
         df.set_index("Date",inplace=True)
         return df
-    inspect_vars = filter_by_tags(x, ["InspectBal"])
-    inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),c['contents'][2])   for c in inspect_vars ]
-                                ,columns=["Date","DealStats","Value"])
-
+    inspect_vars = filter_by_tags(x, ["InspectBal","InspectBool"])
+    inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),c['contents'][2]) for c in inspect_vars ]
+                              ,columns = ["Date","DealStats","Value"])
     grped_inspect_df = inspect_df.groupby("DealStats")
 
     r['inspect'] = {readTagStr(k):uplift_ds(v) for k,v in grped_inspect_df}

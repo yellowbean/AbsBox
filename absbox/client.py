@@ -15,7 +15,7 @@ from importlib.metadata import version
 
 VERSION_NUM = version("absbox")
 urllib3.disable_warnings()
-
+version_check = True
 
 @dataclass
 class API:
@@ -40,8 +40,8 @@ class API:
         engine_version = echo['_version'].split(".")
         logging.info(f"Connect with engine {self.url} version {echo['_version']} successfully")
         
-        if self.version[1] != engine_version[1]:
-            logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['version']} , pls upgrade your api package by: pip -U absbox")
+        if version_check and (self.version[1] != engine_version[1]):
+            logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['_version']} , pls upgrade your api package by: pip -U absbox")
             return
         else:
             self.session = requests.Session() 

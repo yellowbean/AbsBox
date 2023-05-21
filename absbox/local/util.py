@@ -22,9 +22,15 @@ def mkTag(x):
 
 def readTagStr(x:str):
     _x = json.loads(x.replace("'","\""))
-    if 'contents' in _x:
-        return f"<{_x['tag']}:{','.join(_x['contents'])}>"
-    return f"<{_x['tag']}>"
+    match _x:
+        case {"tag":_t,"contents":_c} if isinstance(_c, list):
+            _cs = [str(_) for _ in _c]
+            return f"<{_t}:{','.join(_cs)}>"
+        case {"tag": _t }:
+            return f"<{_t}>"
+        case _ :
+            return f"<{_x}>"
+
 
 def readTag(x:dict):
     return f"<{x['tag']}:{','.join(x['contents'])}>"
