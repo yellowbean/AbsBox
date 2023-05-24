@@ -40,6 +40,11 @@ def mkDatePattern(x):
             return mkTag(("AllDatePattern", [ mkDatePattern(_) for _ in _dps]))
         case ["After", _d, dp] | ["之后", _d, dp]:
             return mkTag(("StartsExclusive", [ _d, mkDatePattern(dp) ]))
+        case ["ExcludeDatePattern", _d, _dps] | ["排除", _d, _dps]:
+            return mkTag(("Exclude", [ mkDatePattern(_d)
+                                     , [mkDatePattern(_) for _ in _dps]])
+        case ["OffsetDateDattern", _dp, n] | ["平移", _dp, n]:
+            return mkTag(("OffsetBy", [ mkDatePattern(_dp), n]))
         case _x if (_x in datePattern.values()):
             return mkTag((_x))
         case _x if (_x in datePattern.keys()):
