@@ -15,11 +15,11 @@ from importlib.metadata import version
 
 VERSION_NUM = version("absbox")
 urllib3.disable_warnings()
-version_check = True
 
 @dataclass
 class API:
     url: str
+    check: bool = True
     lang: str = "chinese"
     server_info = {}
     version = VERSION_NUM.split(".")
@@ -40,10 +40,11 @@ class API:
         engine_version = echo['_version'].split(".")
         logging.info(f"Connect with engine {self.url} version {echo['_version']} successfully")
         
-        if version_check and (self.version[1] != engine_version[1]):
+        if self.check and (self.version[1] != engine_version[1]):
             logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['_version']} , pls upgrade your api package by: pip -U absbox")
             return
         else:
+            logging.info(f"version match with server, lib:{self.version}, server:{engine_version}, API setup successfully")
             self.session = requests.Session() 
 
     def build_req(self, deal, assumptions=None, pricing=None) -> str:
@@ -180,13 +181,9 @@ class API:
             error_resp = json.loads(r.text)
             raise RuntimeError(error_resp.get("error","Empty Error Body"))
         try:
-            result = json.loads(r.text)
-            return result
+            return json.loads(r.text)
         except JSONDecodeError as e:
             raise RuntimeError(e)        
-
-
-
 
 def save(deal,p:str):
     def save_to(b):

@@ -42,7 +42,7 @@ def mkDatePattern(x):
             return mkTag(("StartsExclusive", [ _d, mkDatePattern(dp) ]))
         case ["ExcludeDatePattern", _d, _dps] | ["排除", _d, _dps]:
             return mkTag(("Exclude", [ mkDatePattern(_d)
-                                     , [mkDatePattern(_) for _ in _dps]])
+                                     , [mkDatePattern(_) for _ in _dps]]))
         case ["OffsetDateDattern", _dp, n] | ["平移", _dp, n]:
             return mkTag(("OffsetBy", [ mkDatePattern(_dp), n]))
         case _x if (_x in datePattern.values()):
@@ -330,12 +330,14 @@ def mkBnd(bn, x):
 
 def mkLiqMethod(x):
     match x:
-        case ["正常|违约", a, b] | ["Cuurent|Defaulted", a, b]:
+        case ["正常|违约", a, b] | ["Current|Defaulted", a, b]:
             return mkTag(("BalanceFactor", [a, b]))
         case ["正常|拖欠|违约", a, b, c] | ["Cuurent|Delinquent|Defaulted", a, b, c]:
             return mkTag(("BalanceFactor2", [a, b, c]))
         case ["贴现|违约", a, b] | ["PV|Defaulted", a, b]:
             return mkTag(("PV", [a, b]))
+        case ["贴现曲线", ts] | ["PVCurve", ts]:
+            return mkTag(("PVCurve", mkTs("PricingCurve", ts)))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkLiqMethod")
 
@@ -493,6 +495,8 @@ def mkAction(x):
             return mkTag(("LiqAccrue", target))
         case ["条件执行", pre, *actions] | ["If", pre, *actions]:
             return mkTag(("ActionWithPre", [mkPre(pre), [mkAction(a) for a in actions] ] ))
+        case ["购买资产", liq, source, _limit] | ["buyAsset", liq, source, _limit]:
+            return mkTag(("BuyAsset", [_limit, mkLiqMethod(liq), source]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkAction")
 
@@ -813,7 +817,6 @@ def mkAssumption(x) -> dict:
         case {"Rate": [idx, rate]} if isinstance(rate, float):
             return mkTag(("InterestRateConstant", [idx, rate]))
         case {"利率": [idx, *rateCurve]} | {"Rate": [idx, *rateCurve]}:
-            # curve = mkTag(("IRateCurve", [ mkTag(("TsPoint",[t,v])) for (t,v) in rateCurve]))
             curve = mkTag(("IRateCurve", [ [t,v] for (t,v) in rateCurve]))
             return mkTag(("InterestRateCurve", [idx, curve]))
         case {"清仓": opts} | {"CleanUp": opts}:
@@ -835,14 +838,38 @@ def mkAssumption(x) -> dict:
             return mkTag(("InspectOn", inspectVars))
         case {"FinancialReports": {"dates":dp} } | {"财务报表": {"日期":dp}} : 
             return mkTag(("BuildFinancialReport", mkDatePattern(dp)))
+        case {"RevolvingAssets": [rpool,rassumps]} | {"循环资产": [rpool,rassumps]}:
+            assumps = [ mkAssumption(ra) for ra in rassumps ]
+            return mkTag(("AvailableAssets",[mkRevolvingPool(rpool), assumps]))
         case _:
             raise RuntimeError(f"Failed to match {x}:Assumption")
 
+def mkAssetUnion(x):
+    match x[0]:
+        case "AdjustRateMortgage" | "Mortgage" | "按揭贷款" :
+            return mkTag(("MO",mkAsset(x)))
+        case "贷款" | "Loan" : 
+            return mkTag(("LO",mkAsset(x)))
+        case "分期" | "Installment" : 
+            return mkTag(("IL",mkAsset(x)))
+        case "租赁" | "Lease" : 
+            return mkTag(("LS",mkAsset(x)))
+        case _:
+            raise RuntimeError(f"Failed to match AssetUnion {x}")
+
+def mkRevolvingPool(x):
+    match x:
+        case ["constant",asts]|["固定",asts]:
+            return mkTag(("ConstantAsset",[ mkAssetUnion(_) for _ in asts]))
+        case ["static",asts]|["静态",asts]:
+            return mkTag(("StaticAsset",[ mkAssetUnion(_) for _ in asts]))
+        case ["curve",astsWithDates]|["曲线",astsWithDates]:
+            assetCurve = [ [d, [mkAssetUnion(a) for a in asts]] for (d,asts) in astsWithDates ]            
+            return mkTag(("AssetCurve",assetCurve))
 
 def mkAssumpList(xs):
     assert isinstance(xs, list), f"Assumption should be a list, but got {xs}"
     return [ mkAssumption(x) for x in xs ]
-
 
 def mkAssumption2(x) -> dict:
     match x:
@@ -988,8 +1015,6 @@ def mkFee(x,fsDate=None):
             return  {"feeName": fn, "feeType": mkFeeType(feeType)} | opt_fields
         case _:
             raise RuntimeError(f"Failed to match fee: {x}")
-            
-
 
 def mkPricingAssump(x):
     match x:
@@ -999,9 +1024,6 @@ def mkPricingAssump(x):
             return mkTag(("RunZSpread", [mkTs("IRateCurve", rdps), bnd_with_price]))
         case _:
             raise RuntimeError(f"Failed to match pricing assumption: {x}")
-
-
-
 
 def readPricingResult(x, locale) -> dict:
     if x is None:
