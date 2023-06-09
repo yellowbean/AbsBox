@@ -13,7 +13,7 @@ def flat(xss) -> list:
     return reduce(lambda xs, ys: xs + ys, xss)
 
 
-def mkTag(x):
+def mkTag(x) -> dict:
     match x:
         case (tagName, tagValue):
             return {"tag": tagName, "contents": tagValue}
@@ -35,14 +35,11 @@ def readTagStr(x:str):
 def readTag(x:dict):
     return f"<{x['tag']}:{','.join(x['contents'])}>"
 
-
 def isDate(x):
     return re.match(r"\d{4}\-\d{2}\-\d{2}",x)
 
-
 def mkTs(n, vs):
     return mkTag((n, vs))
-
 
 def unify(xs, ns):
     "union dataframes by stacking up with names provided"

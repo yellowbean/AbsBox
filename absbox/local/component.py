@@ -1,4 +1,4 @@
-from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100, mapListValBy, uplift_m_list,mapValsBy
+from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100, mapListValBy, uplift_m_list, mapValsBy
 from absbox.local.base import *
 from enum import Enum
 import itertools
@@ -200,10 +200,19 @@ def mkPre(p):
                 return "If"
 
     match p:
+        case ["状态", _st] | ["status", _st]:
+            return mkTag(("IfDealStatus", mkStatus(_st)))
+        case ["同时满足", *_p] | ["all", *_p]:
+            return mkTag(("All", [mkPre(p) for p in _p]))
+        case ["任一满足", *_p] | ["any", *_p]:
+            return mkTag(("Any", [mkPre(p) for p in _p]))
         case [ds, "=", 0]:
             return mkTag(("IfZero", mkDs(ds)))
         case [ds, b] | [ds, b] if isinstance(b, bool):
             return mkTag(("IfBool",[mkDs(ds), b]))
+        case [ds1, op, ds2] if (isinstance(ds1, tuple) and isinstance(ds2, tuple)):
+            q = queryType(ds1)
+            return mkTag((f"{q}2", [op_map[op], mkDs(ds1), mkDs(ds2)]))
         case [ds, op, curve] if isinstance(curve, list):
             q = queryType(ds)
             return mkTag((f"{q}Curve", [op_map[op], mkDs(ds), mkCurve("ThresholdCurve",curve)]))
@@ -212,12 +221,6 @@ def mkPre(p):
             return mkTag((q, [op_map[op], mkDs(ds), n]))
         case [op, _d]:
             return mkTag(("IfDate",[op_map[op], _d]))
-        case ["状态", _st] | ["status", _st]:
-            return mkTag(("IfDealStatus", mkStatus(_st)))
-        case ["同时满足", *_p] | ["all", *_p]:
-            return mkTag(("All", [mkPre(p) for p in _p]))
-        case ["任一满足", *_p] | ["any", *_p]:
-            return mkTag(("Any", [mkPre(p) for p in _p]))
         case _:
             raise RuntimeError(f"Failed to match on Pre: {p}")
 
