@@ -580,8 +580,10 @@ def mkTriggerEffect(x):
             return mkTag(("DealStatusTo", mkStatus(s)))
         case ["计提费用", *fn] | ["accrueFees", *fn]:
             return mkTag(("DoAccrueFee", fn))
-        case ["新增事件", trg] | ["newTrigger", trg]:
+        case ["新增事件", trg] | ["newTrigger", trg]: # not implementd in Hastructure
             return mkTag(("AddTrigger", mkTrigger(trg)))
+        case ["新储备目标",accName,newReserve] | ["newReserveBalance",accName,newReserve]:
+            return mkTag(("ChangeReserveBalance",[accName, mkAccType(newReserve)]))
         case ["结果", *efs] | ["Effects", *efs]:
             return mkTag(("TriggerEffects", [mkTriggerEffect(e) for e in efs]))
         case _:
