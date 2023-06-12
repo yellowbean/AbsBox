@@ -38,6 +38,9 @@ def readTag(x:dict):
 def isDate(x):
     return re.match(r"\d{4}\-\d{2}\-\d{2}",x)
 
+def allList(xs):
+    return all([ isinstance(x,list)  for x in xs])
+
 def mkTs(n, vs):
     return mkTag((n, vs))
 

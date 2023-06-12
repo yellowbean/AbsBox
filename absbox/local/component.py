@@ -1,4 +1,4 @@
-from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100, mapListValBy, uplift_m_list, mapValsBy
+from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100, mapListValBy, uplift_m_list, mapValsBy, allList
 from absbox.local.base import *
 from enum import Enum
 import itertools
@@ -498,6 +498,8 @@ def mkAction(x):
             return mkTag(("LiqAccrue", target))
         case ["条件执行", pre, *actions] | ["If", pre, *actions]:
             return mkTag(("ActionWithPre", [mkPre(pre), [mkAction(a) for a in actions] ] ))
+        case ["条件执行2", pre, actions1, actions2] | ["IfElse", pre, actions1, actions2]:
+            return mkTag(("ActionWithPre2", [mkPre(pre), [mkAction(a) for a in actions1], [mkAction(a) for a in actions2]] ))
         case ["购买资产", liq, source, _limit] | ["buyAsset", liq, source, _limit]:
             return mkTag(("BuyAsset", [_limit, mkLiqMethod(liq), source]))
         case _:
