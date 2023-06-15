@@ -225,7 +225,7 @@ def mapListValBy(m:dict, f):
 def renameKs2(m:dict,kmapping):
     assert isinstance(m, dict),"M is not a map"
     assert isinstance(kmapping, dict),f"Mapping is not a map: {kmapping}"
-    assert set(m.keys()).issubset(set(kmapping.keys()))
+    assert set(m.keys()).issubset(set(kmapping.keys())),f"{m.keys()} not in {kmapping.keys()}"
     return {kmapping[k]:v for k,v in m.items()}
 
 def ensure100(xs,msg=""):

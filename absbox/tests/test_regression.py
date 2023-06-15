@@ -107,23 +107,22 @@ def run_deal(input_folder, pair):
         with open(os.path.join(input_req_folder,dinput), 'r') as dq:  # deal request
             with open(os.path.join(input_scen_folder,sinput), 'r') as sq: # scenario request 
                 print(f"With deal request=> {dinput}, scenario => {sinput}")
-                
-                req = mkTag(("SingleRunReq", 
-                             [json.load(dq)
-                             , json.load(sq)
-                             , None])) 
+                req = mkTag(("SingleRunReq", [json.load(dq) , json.load(sq) , None])) 
                 
                 print("build req done")
                 hdrs = {'Content-type': 'application/json', 'Accept': '*/*'}
-                tresp = requests.post(f"{test_server}/runDeal"
-                                      , data=json.dumps(req, ensure_ascii=False).encode('utf-8')
-                                      , headers=hdrs
-                                      , verify=False)
-                if tresp.status_code != 200:
-                    print(f"Failed to finish req:{dinput}")
-                    print(f"response=>{tresp}")
-                else:
-                    print(f"responds received")
+                try:
+                    tresp = requests.post(f"{test_server}/runDeal"
+                                          , data=json.dumps(req, ensure_ascii=False).encode('utf-8')
+                                          , headers=hdrs
+                                          , verify=False)
+                    if tresp.status_code != 200:
+                        print(f"Failed to finish req:{dinput}")
+                        print(f"response=>{tresp}")
+                    else:
+                        print(f"responds received")
+                except requests.exceptions.ConnectionError as e:
+                    print(f"Failed to get resp from {dinput}")
                 try:
                     s_result = json.loads(tresp.text)
                 except JSONDecodeError as e:
@@ -163,7 +162,8 @@ def run_deal(input_folder, pair):
 
 
 def test_resp():
-    pair = [("test01.json","empty.json","test01.out.json")
+    pair = [
+            ("test01.json","empty.json","test01.out.json")
             ,("test02.json","empty.json","test02.out.json")
             ,("test03.json","empty.json","test03.out.json")
             ,("test04.json","empty.json","test04.out.json")

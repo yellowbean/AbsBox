@@ -78,7 +78,7 @@ def mkDate(x):
 def mkFeeType(x):
     match x:
         case {"年化费率": [base, rate]} | {"annualPctFee": [base, rate]}:
-            return mkTag(("AnnualRateFee", [mkTag((baseMap[base], '1970-01-01')), rate]))
+            return mkTag(("AnnualRateFee", [mkTag((baseMap.get(base,base), '1970-01-01')), rate]))
         case {"百分比费率": [*desc, rate]} | {"pctFee": [*desc, rate]}:
             match desc:
                 case ["资产池回款", "利息"] | ["poolCollection", "interest"]:
@@ -480,7 +480,7 @@ def mkAction(x):
         case ["支付收益", source, target] | ["payResidual", source, target]:
             return mkTag(("PayResidual", [None, source, target]))
         case ["储备账户转移", source, target, satisfy] | ["transferReserve", source, target, satisfy]:
-            _map = {"源储备": "Source", "目标储备": "Target"}
+            _map = {"源储备": "Source", "目标储备": "Target","Source":"Source","Target":"Target"}
             return mkTag(("TransferReserve", [_map[satisfy], source, target]))
         case ["出售资产", liq, target] | ["sellAsset", liq, target]:
             return mkTag(("LiquidatePool", [mkLiqMethod(liq), target]))
@@ -502,6 +502,9 @@ def mkAction(x):
             return mkTag(("ActionWithPre2", [mkPre(pre), [mkAction(a) for a in actions1], [mkAction(a) for a in actions2]] ))
         case ["购买资产", liq, source, _limit] | ["buyAsset", liq, source, _limit]:
             return mkTag(("BuyAsset", [_limit, mkLiqMethod(liq), source]))
+        case ["更新事件", idx] | ["runTrigger", idx]:
+            dealCycleM = chinaDealCycle | englishDealCycle
+            return mkTag(("RunTrigger", ["InWF",idx]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkAction")
 
@@ -526,7 +529,8 @@ def mkStatus(x):
 
 def readStatus(x, locale):
     m = {"en": {'amort': "Amortizing", 'def': "Defaulted", 'acc': "Accelerated", 'end': "Ended",
-                'pre': "PreClosing"}, "cn": {'amort': "摊销", 'def': "违约", 'acc': "加速清偿", 'end': "结束", 'pre': "设计"}}
+                'pre': "PreClosing",'revol':"Revolving"}
+        , "cn": {'amort': "摊销", 'def': "违约", 'acc': "加速清偿", 'end': "结束", 'pre': "设计","revol":"循环"}}
     match x:
         case {"tag": "Amortizing"}:
             return m[locale]['amort']
@@ -538,6 +542,8 @@ def readStatus(x, locale):
             return m[locale]['end']
         case {"tag": "PreClosing"}:
             return m[locale]['pre']
+        case {"tag": "Revolving"}:
+            return m[locale]['revol']
         case _:
             raise RuntimeError(
                 f"Failed to read deal status:{x} with locale: {locale}")
@@ -618,9 +624,10 @@ def mkWaterfall(r, x):
             _w_tag = f"EndOfPoolCollection"
         case "设立日" | "closingDay":
             _w_tag = f"OnClosingDay"
+        case "默认" | "default":
+            _w_tag = f"DefaultDistribution"
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkWaterfall")
-    # r[_w_tag] = itertools.chain.from_iterable([mkAction(_a) for _a in _v])
     r[_w_tag] = [mkAction(_a) for _a in _v]
     return mkWaterfall(r, x)
 
