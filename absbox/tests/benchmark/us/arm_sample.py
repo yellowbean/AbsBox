@@ -1,6 +1,6 @@
 from absbox import API
 
-localAPI = API("https://absbox.org/api/dev")
+localAPI = API("https://absbox.org/api/latest")
 
 myPool = {'assets':[
             ["AdjustRateMortgage"

@@ -1,4 +1,8 @@
 from absbox.local.generic import Generic
+from absbox import API
+
+
+localAPI = API("https://absbox.org/api/latest")
 
 test01 = Generic(
     "TEST01"
@@ -46,5 +50,5 @@ test01 = Generic(
 r = localAPI.run(test01,assumptions=[{"Rate":["SOFR1Y"
                                               ,["2021-01-01",0.03]
                                               ,["2022-01-01",0.05]
-                                              ,["2022-08-01",0.06]]}])
+                                             ,["2022-08-01",0.06]]}])
 r['bonds']['A1']    
