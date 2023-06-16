@@ -18,9 +18,13 @@ china,test17.py,test01
 china,test18.py,test01
 china,test19.py,test01
 china,test20.py,test01
+china,test21.py,test01
+china,test23.py,JY_RMBS_2019_1
+china,test24.py,德宝天元202301
 us,test01.py,test01
 us,test02.py,test01
 us,test03.py,test03
 us,test04.py,test01
 us,test05.py,test01
 us,test06.py,test01
+us,test07.py,BMW202301

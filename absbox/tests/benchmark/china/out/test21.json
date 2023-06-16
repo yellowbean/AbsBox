@@ -1,0 +1,248 @@
+{
+  "tag": "MDeal",
+  "contents": {
+    "dates": {
+      "tag": "PreClosingDates",
+      "contents": [
+        "2021-03-31",
+        "2021-06-15",
+        null,
+        "2060-12-01",
+        [
+          "2021-06-15",
+          {
+            "tag": "MonthEnd"
+          }
+        ],
+        [
+          "2021-07-26",
+          {
+            "tag": "DayOfMonth",
+            "contents": 26
+          }
+        ]
+      ]
+    },
+    "name": "Apply Assumption on Loan Level",
+    "status": {
+      "tag": "Amortizing"
+    },
+    "pool": {
+      "assets": [
+        {
+          "tag": "Mortgage",
+          "contents": [
+            {
+              "originBalance": 120,
+              "originRate": {
+                "tag": "Fix",
+                "contents": 0.045
+              },
+              "originTerm": 30,
+              "period": "Monthly",
+              "startDate": "2021-02-01",
+              "prinType": {
+                "tag": "Even"
+              },
+              "tag": "MortgageOriginalInfo"
+            },
+            120,
+            0.08,
+            20,
+            null,
+            {
+              "tag": "Current"
+            }
+          ]
+        },
+        {
+          "tag": "Mortgage",
+          "contents": [
+            {
+              "originBalance": 60,
+              "originRate": {
+                "tag": "Fix",
+                "contents": 0.045
+              },
+              "originTerm": 30,
+              "period": "Monthly",
+              "startDate": "2021-02-01",
+              "prinType": {
+                "tag": "Even"
+              },
+              "tag": "MortgageOriginalInfo"
+            },
+            60,
+            0.08,
+            20,
+            null,
+            {
+              "tag": "Current"
+            }
+          ]
+        }
+      ],
+      "asOfDate": "2021-03-31",
+      "issuanceStat": null,
+      "futureCf": null
+    },
+    "bonds": {
+      "A1": {
+        "bndName": "A1",
+        "bndBalance": 100,
+        "bndRate": 0.07,
+        "bndOriginInfo": {
+          "originBalance": 100,
+          "originDate": "2020-01-03",
+          "originRate": 0.07,
+          "maturityDate": null
+        },
+        "bndInterestInfo": {
+          "tag": "Fix",
+          "contents": [
+            0.08,
+            "DC_ACT_365F"
+          ]
+        },
+        "bndType": {
+          "tag": "Sequential"
+        },
+        "bndDuePrin": 0,
+        "bndDueInt": 0,
+        "bndDueIntDate": null
+      },
+      "B": {
+        "bndName": "B",
+        "bndBalance": 20,
+        "bndRate": 0.0,
+        "bndOriginInfo": {
+          "originBalance": 100,
+          "originDate": "2020-01-03",
+          "originRate": 0.07,
+          "maturityDate": null
+        },
+        "bndInterestInfo": {
+          "tag": "Fix",
+          "contents": [
+            0.0,
+            "DC_ACT_365F"
+          ]
+        },
+        "bndType": {
+          "tag": "Equity"
+        },
+        "bndDuePrin": 0,
+        "bndDueInt": 0,
+        "bndDueIntDate": null
+      }
+    },
+    "waterfall": {
+      "DistributionDay Amortizing": [
+        {
+          "tag": "PayFee",
+          "contents": [
+            [
+              "\u8d26\u623701"
+            ],
+            [
+              "\u4fe1\u6258\u8d39\u7528"
+            ]
+          ]
+        },
+        {
+          "tag": "PayInt",
+          "contents": [
+            "\u8d26\u623701",
+            [
+              "A1"
+            ]
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u8d26\u623701",
+            [
+              "A1"
+            ]
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            "\u8d26\u623701",
+            [
+              "B"
+            ]
+          ]
+        },
+        {
+          "tag": "PayResidual",
+          "contents": [
+            null,
+            "\u8d26\u623701",
+            "B"
+          ]
+        }
+      ]
+    },
+    "fees": {
+      "\u4fe1\u6258\u8d39\u7528": {
+        "feeName": "\u4fe1\u6258\u8d39\u7528",
+        "feeType": {
+          "tag": "FixFee",
+          "contents": 30
+        },
+        "feeStart": "2021-06-15",
+        "feeDueDate": null,
+        "feeDue": 0,
+        "feeArrears": 0,
+        "feeLastPaidDay": null
+      }
+    },
+    "accounts": {
+      "\u8d26\u623701": {
+        "accBalance": 0,
+        "accName": "\u8d26\u623701",
+        "accType": null,
+        "accInterest": null,
+        "accStmt": null
+      }
+    },
+    "collects": [
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedInterest",
+          "\u8d26\u623701"
+        ]
+      },
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedPrincipal",
+          "\u8d26\u623701"
+        ]
+      },
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedPrepayment",
+          "\u8d26\u623701"
+        ]
+      },
+      {
+        "tag": "Collect",
+        "contents": [
+          "CollectedRecoveries",
+          "\u8d26\u623701"
+        ]
+      }
+    ],
+    "rateSwap": null,
+    "currencySwap": null,
+    "custom": null,
+    "triggers": null,
+    "liqProvider": null
+  }
+}

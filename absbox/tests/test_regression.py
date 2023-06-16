@@ -162,8 +162,7 @@ def run_deal(input_folder, pair):
 
 
 def test_resp():
-    pair = [
-            ("test01.json","empty.json","test01.out.json")
+    pair = [("test01.json","empty.json","test01.out.json")
             ,("test02.json","empty.json","test02.out.json")
             ,("test03.json","empty.json","test03.out.json")
             ,("test04.json","empty.json","test04.out.json")
@@ -183,12 +182,22 @@ def test_resp():
             ,("test18.json","empty.json","test18.out.json")
             ,("test19.json","defaults01.json","test19.out.json")
             ,("test20.json","empty.json","test20.out.json")
+            ,("test21.json","empty.json","test21.out.json")
+            ,("test23.json","empty.json","test23.out.json")
+            ,("test24.json","empty.json","test24.out.json")
             ]
     print(">>>> Runing China Bench Files")
     run_deal(china_folder, pair)
     
     print(">>>> Runing US Bench Files")
-    pair = [("test01.json","empty.json","test01.out.json") ]
+    pair = [("test01.json","empty.json","test01.out.json")
+            ,("test02.json","empty.json","test02.out.json")
+            ,("test03.json","empty.json","test03.out.json")
+            ,("test04.json","empty.json","test04.out.json")
+            ,("test05.json","empty.json","test05.out.json")
+            ,("test06.json","empty.json","test06.out.json")
+            ,("test07.json","empty.json","test07.out.json")
+            ]
     run_deal(us_folder, pair)
 
 
