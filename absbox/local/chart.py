@@ -72,10 +72,6 @@ def viz(x):
                 return f"{source} -> {target}"
             case ["流动性支持计提", target] | ["liqAccrue", target]:
                 return f"{target}"
-            case ["条件执行", pre, *actions] | ["If", pre, *actions]:
-                return mkTag(("ActionWithPre", [mkPre(pre), [mkAction(a) for a in actions] ] ))
-            case ["条件执行2", pre, actions1, actions2] | ["IfElse", pre, actions1, actions2]:
-                return mkTag(("ActionWithPre2", [mkPre(pre), [mkAction(a) for a in actions1], [mkAction(a) for a in actions2]] ))
             case ["购买资产", liq, source, _limit] | ["buyAsset", liq, source, _limit]:
                 return f"{source} -> {liq} -> {_limit} "
             case ["更新事件", idx] | ["runTrigger", idx]:
