@@ -150,11 +150,9 @@ def update_deal(d,i,c):
     _d.insert(i,c)
     return _d
 
-
 def mkDealsBy(d, m:dict)->dict:
     return { k:dataclasses.replace(d, **v) 
                 for k,v in m.items()} 
-
 
 class DC(Enum):  # TODO need to check with HS code
     DC_30E_360 = "DC_30E_360"
@@ -231,7 +229,6 @@ def renameKs2(m:dict,kmapping):
 def ensure100(xs,msg=""):
     assert sum(xs)==1.0,f"Doesn't not sum up 100%: {msg}"
 
-
 def guess_pool_flow_header(x,l):
     assert isinstance(x, dict), f"x is not a map but {x}, type:{type(x)}"
     match (x['tag'],l):
@@ -253,5 +250,15 @@ def guess_pool_flow_header(x,l):
 def uplift_m_list(l:list):
     return {k:v
             for m in l
-            for k,v in m.items()
-            }
+            for k,v in m.items()}
+
+def getValWithKs(m:dict,ks:list):
+    if isinstance(m, dict):
+        for k in ks:
+            if k in m:
+                return m[k]
+    else:
+        for k in ks:
+            if hasattr(m, k):
+                return getattr(m, k)
+    return None
