@@ -1,5 +1,6 @@
 import pandas as pd
 import functools,json
+import logging
 import itertools,re
 from enum import Enum
 import numpy as np
@@ -262,3 +263,15 @@ def getValWithKs(m:dict,ks:list):
             if hasattr(m, k):
                 return getattr(m, k)
     return None
+
+def _read_cf(x, lang):
+    flow_header,idx = guess_pool_flow_header(x[0],lang)
+    try:
+        result = pd.DataFrame([_['contents'] for _ in x] , columns=flow_header)
+    except ValueError as e:
+        logging.error(f"Failed to match header:{flow_header} with {result[0]['contents']}")
+    result = result.set_index(idx)
+    result.index.rename(idx, inplace=True)
+    result.sort_index(inplace=True)
+    return result
+ 

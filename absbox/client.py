@@ -4,8 +4,8 @@ import requests
 from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass,field
-from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header
-from absbox.local.component import mkPool, mkAssumption, mkAssumption2, mkPricingAssump
+from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header, _read_cf
+from absbox.local.component import mkPool, mkAssumption, mkAssumption2, mkPricingAssump,mkLiqMethod,mkAssetUnion
 from absbox.local.base import *
 import pandas as pd
 from pyspecter import query
@@ -19,8 +19,8 @@ urllib3.disable_warnings()
 @dataclass
 class API:
     url: str
-    check: bool = True
     lang: str = "chinese"
+    check: bool = True
     server_info = {}
     version = VERSION_NUM.split(".")
     hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain','Accept':'*/*'
@@ -167,6 +167,24 @@ class API:
         result = self._send_req(req,url)
         if read :
             return {k:deals[k].read(v) for k,v in result.items()}    
+        else:
+            return result
+
+    def runAsset(self, date, _assets, assumptions=None, pricing=None, read=True):
+        assert isinstance(_assets, list),f"Assets passed in must be a list"
+        def readResult(x):
+            (cfs,pricingResult) = x
+            cfs = _read_cf(cfs, self.lang)
+            return (cfs,0)
+        url = f"{self.url}/runAsset"
+        _assumptions = mkAssumption2(assumptions) if assumptions else []
+        _pricing =  mkLiqMethod(pricing) if pricing else None
+        assets = [ mkAssetUnion(_) for _ in _assets] 
+        req = json.dumps([date ,assets ,_assumptions ,_pricing]
+                         ,ensure_ascii=False)
+        result = self._send_req(req,url)
+        if read :
+            return readResult(result)
         else:
             return result
 
