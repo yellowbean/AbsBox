@@ -274,4 +274,10 @@ def _read_cf(x, lang):
     result.index.rename(idx, inplace=True)
     result.sort_index(inplace=True)
     return result
+
+def _read_asset_pricing(xs, lang):
+    header = assetPricingHeader[lang]
+    data = [ x['contents'] for x in xs]
+    return pd.DataFrame(data, columns = header)
+
  

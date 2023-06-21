@@ -4,7 +4,7 @@ import requests
 from requests.exceptions import ConnectionError
 import urllib3
 from dataclasses import dataclass,field
-from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header, _read_cf
+from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header, _read_cf, _read_asset_pricing
 from absbox.local.component import mkPool, mkAssumption, mkAssumption2, mkPricingAssump,mkLiqMethod,mkAssetUnion
 from absbox.local.base import *
 import pandas as pd
@@ -173,9 +173,10 @@ class API:
     def runAsset(self, date, _assets, assumptions=None, pricing=None, read=True):
         assert isinstance(_assets, list),f"Assets passed in must be a list"
         def readResult(x):
-            (cfs,pricingResult) = x
+            (cfs,pr) = x
             cfs = _read_cf(cfs, self.lang)
-            return (cfs,0)
+            pricingResult = _read_asset_pricing(pr, self.lang)
+            return (cfs,pricingResult)
         url = f"{self.url}/runAsset"
         _assumptions = mkAssumption2(assumptions) if assumptions else []
         _pricing =  mkLiqMethod(pricing) if pricing else None

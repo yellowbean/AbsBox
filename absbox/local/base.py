@@ -105,3 +105,9 @@ englishDealCycle = {"BeforeCollect":"EndCollection"
                  ,"BeforeDistribution":"BeginDistributionWF"
                  ,"AfterDistribution":"EndDistributionWF"
                  ,"InDistribution":"InWF"}
+
+#Asset pricing 
+assetPricingHeader = {
+    "chinese":["估值","WAL","Duration","Convexity","AccruedInterest"]
+    ,"english":["Pricing","WAL","Duration","Convexity","AccruedInterest"]
+}
