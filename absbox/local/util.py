@@ -171,6 +171,10 @@ class DC(Enum):  # TODO need to check with HS code
 def str2date(x:str):
     return datetime.strptime(x, '%Y-%m-%d').date()
 
+def normDate(x:str):
+    if len(x)==8:
+        return f"{x[:4]}-{x[4:6]}-{x[6:8]}"
+
 def daysBetween(sd,ed):
     return (ed - sd).days
 

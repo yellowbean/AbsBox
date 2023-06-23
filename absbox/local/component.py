@@ -21,7 +21,6 @@ def mkLiq(x):
         case _:
             raise RuntimeError(f"Failed to match {x} in Liquidation Method")
 
-
 def mkDatePattern(x):
     match x:
         case ["每月", _d]:

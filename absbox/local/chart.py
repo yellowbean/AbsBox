@@ -4,7 +4,6 @@ def viz(x):
     import graphviz
     
     waterfall =  getValWithKs(x,["分配规则","waterfall"])
-    #agg = getattr(x,"归集规则","collection")
     agg = getValWithKs(x,["归集规则","collection"])
     accounts = getValWithKs(x,["账户","accounts"])
     fees = getValWithKs(x,["费用","fees"])
@@ -16,14 +15,12 @@ def viz(x):
     #bonds = getattr(x,"状态","bonds")
     
     def build_agg(d, y):
-        print("agg rule ->",y)
         for s,a in y:
             d.node(a)
             d.node(s)
             d.edge(s,a)
             
     def build_action(action):
-        ActionName = action[0]
         match action:
             case ["账户转移", source, target] | ["transfer", source, target]:
                 return f"{source} -> {target}"
@@ -94,16 +91,16 @@ def viz(x):
                     [ d.edge(root_name,new_root_name,label=prevLabel) for root_name in pre_names ]
                     if action[0] in if_branching_id:
                         if_true_actions = action[2:]
-                        (_,last_action) = build_waterfall2(d, None, [f"{new_root_name}"], 0 ,if_true_actions, prevLabel="True")
+                        (_,last_action) = build_waterfall2(d, start_name, [f"{new_root_name}"], 0 ,if_true_actions, prevLabel="True")
                         if len(rest_actions)>0:
-                            return build_waterfall2(d, None, [last_action,new_root_name], 0 , rest_actions)
+                            return build_waterfall2(d, start_name, [last_action,new_root_name], 0 , rest_actions)
                     else:
                         if_true_actions = action[2]
                         if_false_actions = action[3]
-                        (_,true_end_action) = build_waterfall2(d, None, [new_root_name], 0 ,if_true_actions, prevLabel="True")
-                        (_,false_end_action) = build_waterfall2(d, None, [new_root_name], 0 ,if_false_actions, prevLabel="False")
+                        (_,true_end_action) = build_waterfall2(d, start_name, [new_root_name], 0 ,if_true_actions, prevLabel="True")
+                        (_,false_end_action) = build_waterfall2(d, start_name, [new_root_name], 0 ,if_false_actions, prevLabel="False")
                         if len(rest_actions)>0:
-                            return build_waterfall2(d, None, [true_end_action,false_end_action], 0 , rest_actions)
+                            return build_waterfall2(d, start_name, [true_end_action,false_end_action], 0 , rest_actions)
                 case [action,*rest_actions] :
                     new_root_name = f"{_root_name}-{new_index}-{action[0]}"
                     d.node(new_root_name,f"{action[0]}:{build_action(action)}",shape="box")
@@ -117,20 +114,18 @@ def viz(x):
         with d.subgraph(name=f"cluster_{dealStatus}", node_attr={'shape':'box'}) as c:
             c.attr(style='filled', color='lightgrey')
             c.node_attr.update(style='filled', color='white')
-            (start_action,end_action) = build_waterfall2(c, None, [dealStatus],0,actions)
-            #print("return start action from waterfall",dealStatus,start_action)
+            (start_action,end_action) = build_waterfall2(c, None, [],0,actions)
             c.attr(label=dealStatus)
             return start_action
             
     def build_waterfall(d, y):
         deal_status = y.keys()
+        assert len(deal_status)>0,f"Waterfall shall be non-0, but {deal_status}"
         head_of_waterfalls = [build_subwaterfall(d, ds, waterfall[ds]) for ds in deal_status]
-        #print("head of wf", head_of_waterfalls)
-        return deal_status
+        return head_of_waterfalls
             
     dot = graphviz.Digraph('round-table', comment="", format='svg')
     build_agg(dot, agg)
     head_of_waterfalls = build_waterfall(dot, waterfall)
     [ dot.edge('start',_, lhead = f"cluster_{_}") for _ in head_of_waterfalls ]
-    # dot.node("<End>")
     return dot
