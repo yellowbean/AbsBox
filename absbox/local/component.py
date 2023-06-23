@@ -74,12 +74,19 @@ def mkDate(x):
         case _:
             raise RuntimeError(f"Failed to match:{x} in Dates")
 
+def mkDsRate(x):
+    if isinstance(x,float):
+        return mkDs(("constant",x))
+    else:
+        return mkDs(x)
 
 def mkFeeType(x):
     match x:
         case {"年化费率": [base, rate]} | {"annualPctFee": [base, rate]}:
-            return mkTag(("AnnualRateFee", [mkTag((baseMap.get(base,base), '1970-01-01')), rate]))
-        case {"百分比费率": [*desc, rate]} | {"pctFee": [*desc, rate]}:
+            return mkTag(("AnnualRateFee", [mkTag((baseMap.get(base,base), '1970-01-01'))
+                                           ,mkDsRate(rate)]))
+        case {"百分比费率": [*desc, _rate]} | {"pctFee": [*desc, _rate]}:
+            rate = mkDsRate(_rate)
             match desc:
                 case ["资产池回款", "利息"] | ["poolCollection", "interest"]:
                     return mkTag(("PctFee", [mkTag(("PoolCollectionIncome", "CollectedInterest")), rate]))
@@ -173,6 +180,8 @@ def mkDs(x):
             return mkTag(("ReserveAccGap", accs))
         case ("自定义", n) | ("custom", n):
             return mkTag(("UseCustomData", n))
+        case ("区间内",floor,cap,s) | ("floorCap",floor,cap,s):
+            return mkTag(("FloorAndCap", [floor,cap,s]))
         case legacy if (legacy in baseMap.keys()):
             return mkDs((legacy,))
         case _:
