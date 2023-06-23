@@ -19313,8 +19313,11 @@
                 "contents": "CollectedInterest"
               },
               {
-                "numerator": 13,
-                "denominator": 400
+                "tag": "Constant",
+                "contents": {
+                  "numerator": 13,
+                  "denominator": 400
+                }
               }
             ]
           },
@@ -19334,8 +19337,11 @@
                 "tag": "CurrentPoolBalance"
               },
               {
-                "numerator": 1,
-                "denominator": 50
+                "tag": "Constant",
+                "contents": {
+                  "numerator": 1,
+                  "denominator": 50
+                }
               }
             ]
           },

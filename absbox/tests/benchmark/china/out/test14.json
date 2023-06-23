@@ -229,7 +229,10 @@
               "tag": "PoolCollectionIncome",
               "contents": "CollectedInterest"
             },
-            0.0326
+            {
+              "tag": "Constant",
+              "contents": 0.0326
+            }
           ]
         },
         "feeStart": "2021-06-15",

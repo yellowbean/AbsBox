@@ -417,8 +417,11 @@
                 "tag": "CurrentBondBalance"
               },
               {
-                "numerator": 1,
-                "denominator": 50
+                "tag": "Constant",
+                "contents": {
+                  "numerator": 1,
+                  "denominator": 50
+                }
               }
             ]
           },

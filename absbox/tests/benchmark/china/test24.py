@@ -134,93 +134,95 @@ from absbox.local.china import SPV
 )
 
 
-from absbox import API
-localAPI = API("https://absbox.org/api/latest")
-
-
-revol_asset = ["Mortgage"
-                ,{"originBalance":220,"originRate":["fix",0.043],"originTerm":48
-                  ,"freq":"Monthly","type":"Level","originDate":"2021-07-01"}
-                  ,{"currentBalance":220
-                  ,"currentRate":0.043
-                  ,"remainTerm":36
-                  ,"status":"current"}]
-
-r = localAPI.run(德宝天元202301,
-           assumptions=[{"RevolvingAssets":[["constant",[revol_asset]]
-                                            ,[{"CDR":0.01}]]}
-                       ,{"CDR":0.0012} 
+if __name__ == '__main__':
+    from absbox import API
+    localAPI = API("https://absbox.org/api/latest")
+    
+    
+    revol_asset = ["Mortgage"
+                    ,{"originBalance":220,"originRate":["fix",0.043],"originTerm":48
+                      ,"freq":"Monthly","type":"Level","originDate":"2021-07-01"}
+                      ,{"currentBalance":220
+                      ,"currentRate":0.043
+                      ,"remainTerm":36
+                      ,"status":"current"}]
+    
+    r = localAPI.run(德宝天元202301,
+               assumptions=[{"RevolvingAssets":[["constant",[revol_asset]]
+                                                ,[{"CDR":0.01}]]}
+                           ,{"CDR":0.0012} 
+                           ,{"清仓":[{"债券余额剩余比率":0.05}]}
+                           ,{"FinancialReports":{"dates":"MonthEnd"}} 
+                           ],
+               read=True)
+    
+    # view pool balance changes
+    r['pool']['flow']['余额'].iloc[2:,].plot.area(rot=45
+                                                 ,title="循环资产池余额变化"
+                                                 ,ylabel="资产池余额"
+                                                 )
+    # view balance sheet
+    bs = r['result']['report']['balanceSheet']
+    
+    # view capital structure
+    col_to_keep = [('asset', 'Pool Performing')
+                   ,('asset', '现金储备分账户')
+                   ,('liability', 'A')
+                   ,('liability', '次级')
+                   #,('ratio',"A-OC")
+                  ]
+    start_index = 25
+    chart = bs.iloc[start_index:50,][col_to_keep].plot.area(rot=45,stacked=True,secondary_y=['OC-A'])
+    chart.set_title("资产负债结构")
+    
+    
+    # scenario analysis on revolving
+    rates = (0.043,0.065)
+    terms = ((24,12),(48,36))
+    
+    rAssets = [["Mortgage"
+               ,{"originBalance":220,"originRate":["fix",r],"originTerm":t[0]
+               ,"freq":"Monthly","type":"Level","originDate":"2021-07-01"}
+               ,{"currentBalance":220
+               ,"currentRate":r
+               ,"remainTerm":t[1]
+               ,"status":"current"}]
+               for r in rates 
+               for t in terms ]
+    
+    revol_low_rate_short_term, revol_low_rate_long_term, revol_high_rate_short_term, revol_high_rate_long_term = rAssets
+    
+    scenarios=[("low_rate_long_term",revol_low_rate_long_term)
+              ,("low_rate_short_term",revol_low_rate_short_term)
+              ,("high_rate_long_term",revol_high_rate_long_term)
+              ,("high_rate_short_term",revol_high_rate_short_term)]
+    
+    base_assumption = [{"CDR":0.0012}
                        ,{"清仓":[{"债券余额剩余比率":0.05}]}
-                       ,{"FinancialReports":{"dates":"MonthEnd"}} 
-                       ],
-           read=True)
-
-# view pool balance changes
-r['pool']['flow']['余额'].iloc[2:,].plot.area(rot=45
-                                             ,title="循环资产池余额变化"
-                                             ,ylabel="资产池余额"
-                                             )
-# view balance sheet
-bs = r['result']['report']['balanceSheet']
-
-# view capital structure
-col_to_keep = [('asset', 'Pool Performing')
-               ,('asset', '现金储备分账户')
-               ,('liability', 'A')
-               ,('liability', '次级')
-               #,('ratio',"A-OC")
-              ]
-start_index = 25
-chart = bs.iloc[start_index:50,][col_to_keep].plot.area(rot=45,stacked=True,secondary_y=['OC-A'])
-chart.set_title("资产负债结构")
-
-
-# scenario analysis on revolving
-rates = (0.043,0.065)
-terms = ((24,12),(48,36))
-
-rAssets = [["Mortgage"
-           ,{"originBalance":220,"originRate":["fix",r],"originTerm":t[0]
-           ,"freq":"Monthly","type":"Level","originDate":"2021-07-01"}
-           ,{"currentBalance":220
-           ,"currentRate":r
-           ,"remainTerm":t[1]
-           ,"status":"current"}]
-           for r in rates 
-           for t in terms ]
-
-revol_low_rate_short_term, revol_low_rate_long_term, revol_high_rate_short_term, revol_high_rate_long_term = rAssets
-
-scenarios=[("low_rate_long_term",revol_low_rate_long_term)
-          ,("low_rate_short_term",revol_low_rate_short_term)
-          ,("high_rate_long_term",revol_high_rate_long_term)
-          ,("high_rate_short_term",revol_high_rate_short_term)]
-
-base_assumption = [{"CDR":0.0012}
-                   ,{"清仓":[{"债券余额剩余比率":0.05}]}
-                   ,{"FinancialReports":{"dates":"MonthEnd"}}]
-
-multiScenario = {k:base_assumption+[{"RevolvingAssets":[["constant",[v]]
-                                                        ,[{"CDR":0.0012}]]}] 
-                   for (k,v) in scenarios}
-
-# scenario run
-rm = localAPI.run(德宝天元202301,
-                   assumptions=multiScenario,
-                   pricing= {"贴现日":"2023-05-26","贴现曲线":[["2020-01-01",0.0275]]},
-                   read=True)
-
-# view scenario run result
-import pandas
-pandas.DataFrame.from_dict(
-    {scenarioName:
-        (f"{result['fees']['宝马金融服务商费用']['支付'].sum().round(2):,}"
-         ,f"{result['bonds']['次级']['利息'].sum().round(2):,}"
-         ,f"{result['fees']['宝马金融']['支付'].sum().round(2):,}"
-         ,f"{result['pricing'].loc['A']['WAL']}")
-        for (scenarioName,result) in rm.items()}
-     , orient='index'
-     , columns=["服务商费用"
-                ,"次级超额收益"
-                ,"原始权益人剩余收益"
-                ,"优先级平均期限"])
+                       ,{"FinancialReports":{"dates":"MonthEnd"}}]
+    
+    multiScenario = {k:base_assumption+[{"RevolvingAssets":[["constant",[v]]
+                                                            ,[{"CDR":0.0012}]]}] 
+                       for (k,v) in scenarios}
+    
+    # scenario run
+    rm = localAPI.run(德宝天元202301,
+                       assumptions=multiScenario,
+                       pricing= {"贴现日":"2023-05-26","贴现曲线":[["2020-01-01",0.0275]]},
+                       read=True)
+    
+    # view scenario run result
+    import pandas
+    pandas.DataFrame.from_dict(
+        {scenarioName:
+            (f"{result['fees']['宝马金融服务商费用']['支付'].sum().round(2):,}"
+             ,f"{result['bonds']['次级']['利息'].sum().round(2):,}"
+             ,f"{result['fees']['宝马金融']['支付'].sum().round(2):,}"
+             ,f"{result['pricing'].loc['A']['WAL']}")
+            for (scenarioName,result) in rm.items()}
+         , orient='index'
+         , columns=["服务商费用"
+                    ,"次级超额收益"
+                    ,"原始权益人剩余收益"
+                    ,"优先级平均期限"])
+    

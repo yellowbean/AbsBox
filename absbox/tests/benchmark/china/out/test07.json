@@ -768,7 +768,10 @@
               "tag": "PoolCollectionIncome",
               "contents": "CollectedInterest"
             },
-            0.0326
+            {
+              "tag": "Constant",
+              "contents": 0.0326
+            }
           ]
         },
         "feeStart": "2022-07-26",
@@ -786,7 +789,10 @@
               "tag": "CurrentPoolBalance",
               "contents": "1970-01-01"
             },
-            0.0012
+            {
+              "tag": "Constant",
+              "contents": 0.0012
+            }
           ]
         },
         "feeStart": "2022-07-26",

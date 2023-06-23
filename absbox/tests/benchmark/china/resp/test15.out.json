@@ -53346,8 +53346,11 @@
                 ]
               },
               {
-                "numerator": 1,
-                "denominator": 5000
+                "tag": "Constant",
+                "contents": {
+                  "numerator": 1,
+                  "denominator": 5000
+                }
               }
             ]
           },
@@ -57941,8 +57944,11 @@
                 ]
               },
               {
-                "numerator": 1,
-                "denominator": 5000
+                "tag": "Constant",
+                "contents": {
+                  "numerator": 1,
+                  "denominator": 5000
+                }
               }
             ]
           },
@@ -62534,8 +62540,11 @@
                 "contents": "CollectedInterest"
               },
               {
-                "numerator": 163,
-                "denominator": 5000
+                "tag": "Constant",
+                "contents": {
+                  "numerator": 163,
+                  "denominator": 5000
+                }
               }
             ]
           },
@@ -67126,8 +67135,11 @@
                 "tag": "CurrentPoolBalance"
               },
               {
-                "numerator": 1,
-                "denominator": 200
+                "tag": "Constant",
+                "contents": {
+                  "numerator": 1,
+                  "denominator": 200
+                }
               }
             ]
           },

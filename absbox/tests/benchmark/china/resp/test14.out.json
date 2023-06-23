@@ -34858,8 +34858,11 @@
                 "contents": "CollectedInterest"
               },
               {
-                "numerator": 163,
-                "denominator": 5000
+                "tag": "Constant",
+                "contents": {
+                  "numerator": 163,
+                  "denominator": 5000
+                }
               }
             ]
           },
