@@ -92,15 +92,15 @@ def viz(x):
                     if action[0] in if_branching_id:
                         if_true_actions = action[2:]
                         (_,last_action) = build_waterfall2(d, start_name, [f"{new_root_name}"], 0 ,if_true_actions, prevLabel="True")
-                        if len(rest_actions)>0:
-                            return build_waterfall2(d, start_name, [last_action,new_root_name], 0 , rest_actions)
+                        #if len(rest_actions)>0:
+                        return build_waterfall2(d, start_name, [last_action,new_root_name], 0 , rest_actions)
                     else:
                         if_true_actions = action[2]
                         if_false_actions = action[3]
                         (_,true_end_action) = build_waterfall2(d, start_name, [new_root_name], 0 ,if_true_actions, prevLabel="True")
                         (_,false_end_action) = build_waterfall2(d, start_name, [new_root_name], 0 ,if_false_actions, prevLabel="False")
-                        if len(rest_actions)>0:
-                            return build_waterfall2(d, start_name, [true_end_action,false_end_action], 0 , rest_actions)
+                        #if len(rest_actions)>0:
+                        return build_waterfall2(d, start_name, [true_end_action,false_end_action], 0 , rest_actions)
                 case [action,*rest_actions] :
                     new_root_name = f"{_root_name}-{new_index}-{action[0]}"
                     d.node(new_root_name,f"{action[0]}:{build_action(action)}",shape="box")
@@ -127,5 +127,6 @@ def viz(x):
     dot = graphviz.Digraph('round-table', comment="", format='svg')
     build_agg(dot, agg)
     head_of_waterfalls = build_waterfall(dot, waterfall)
+    dot.node("end",label="end")
     [ dot.edge('start',_, lhead = f"cluster_{_}") for _ in head_of_waterfalls ]
     return dot
