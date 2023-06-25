@@ -37,7 +37,7 @@ test01 = Generic(
     ,(("trusteeFee",{"type":{"fixFee":30}}),)
     ,{"amortizing":[
          ["payFee",["acc01"],['trusteeFee']]
-         ,["payInt","acc01",["A1","A2"]]
+         ,["accrueAndPayInt","acc01",["A1","A2"]]
          ,["payPrin","acc01",["A1","A2"]]
          ,["payPrin","acc01",["B"]]
          ,["payResidual","acc01","B"]]
@@ -46,7 +46,7 @@ test01 = Generic(
       ,("amortizing","defaulted"):[]   #execute when deal is `defaulted`
       ,("amortizing","accelerated"):[ #execute when deal is `accelerated`
          ["payFee",["acc01"],['trusteeFee']]
-         ,["payInt","acc01",["A1","A2"]]
+         ,["accrueAndPayInt","acc01",["A1","A2"]]
          ,["payPrin","acc01",["A1"]] 
          ,["payPrin","acc01",["A2"]]
          ,["payPrin","acc01",["B"]]

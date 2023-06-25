@@ -175,10 +175,10 @@ class API:
         def readResult(x):
             (cfs,pr) = x
             cfs = _read_cf(cfs, self.lang)
-            pricingResult = _read_asset_pricing(pr, self.lang)
+            pricingResult = _read_asset_pricing(pr, self.lang) if pr else None
             return (cfs,pricingResult)
         url = f"{self.url}/runAsset"
-        _assumptions = mkAssumption2(assumptions) if assumptions else []
+        _assumptions = mkAssumption2(assumptions) 
         _pricing =  mkLiqMethod(pricing) if pricing else None
         assets = [ mkAssetUnion(_) for _ in _assets] 
         req = json.dumps([date ,assets ,_assumptions ,_pricing]

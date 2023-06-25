@@ -102,3 +102,48 @@ def plot_by_scenario(rs, flowtype, flowpath):
     plt.axis('tight')
     plt.xticks(ticks=x,labels=x_labels,rotation=30)
 
+def plot_bs(x, excludeItems=["FeeDue","IntAccrue","Account"]):
+    dates = x.index.to_list() 
+
+    liabilityItems = x['liability'].to_dict(orient='list')
+    assetItems = x['asset'].to_dict(orient='list')
+    
+    highest_y1 = max([ max(v) for k,v in liabilityItems.items()])
+    highest_y2 = max([ max(v) for k,v in assetItems.items()])
+    
+    if "FeeDue" in set(excludeItems):
+        liabilityItems = {k:v for (k,v) in liabilityItems.items() if (not k.startswith("Fee Due:"))}
+
+    if "IntAccrue" in set(excludeItems):
+        liabilityItems = {k:v for (k,v) in liabilityItems.items() if (not k.startswith("Accured Int:")) }
+   
+    if "Account" in set(excludeItems):
+        assetItems = {k:v for (k,v) in assetItems.items()  if k not in excludeItems }
+
+    balanceItems = {
+        'Asset': assetItems,
+        'Liability': liabilityItems,
+    }
+
+    x = np.arange(len(dates))  # the label locations
+    width = 0.40  # the width of the bars
+    multiplier = 0
+
+    fig, ax = plt.subplots(layout='constrained')
+
+    for assetClass, assetBreakdown in balanceItems.items():
+        offset = width * multiplier
+        bottom = np.zeros(len(dates))
+        for (breakdownsK,breakdowns) in assetBreakdown.items():
+            rects = ax.bar(x + offset, breakdowns, width, label=breakdownsK, bottom=bottom)
+            bottom += breakdowns
+
+            ax.bar_label(rects, padding=1,label_type="center")
+        multiplier += 1
+
+    ax.set_ylabel('Amount')
+    ax.set_title('Projected Captial Structure')
+    ax.set_xticks(x + width/2, dates)
+    ax.legend(loc='upper right')
+    ax.set_ylim(0, max([highest_y1,highest_y2])*1.2)
+    plt.show()

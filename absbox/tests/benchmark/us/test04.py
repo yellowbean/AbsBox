@@ -30,7 +30,7 @@ test01 = Generic(
     ,(("trusteeFee",{"type":{"fixFee":30}}),)
     ,{"amortizing":[
           ["payFee",["acc01"],['trusteeFee']]
-         ,["payInt","acc01",["A1"]]
+         ,["accrueAndPayInt","acc01",["A1"]]
          ,["payPrin","acc01",["A1"]]
          ,["payPrin","acc01",["B"]]
          ,["payResidual","acc01","B"]

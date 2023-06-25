@@ -35,12 +35,12 @@ test01 = Generic(
              ,("substract",("bondDueInt","A1","B"),("accountBalance","acc01"))
              ,("constant",0.0)
             )]
-         ,["payInt","acc01",["A1","B"]]
+         ,["accrueAndPayInt","acc01",["A1","B"]]
          ,["payPrin","acc02",["A1"]]
          ,["payPrin","acc02",["B"]]
          ,["If"
            ,[("bondBalance","A1","B"),"=",0]
-           ,["payInt","acc02",["A1","B"]]
+           ,["accrueAndPayInt","acc02",["A1","B"]]
            ,["liqRepay","bal","acc01","insuranceProvider"]
            ,["liqRepay","bal","acc02","insuranceProvider"]]
      ]}

@@ -1,4 +1,4 @@
-from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100, mapListValBy, uplift_m_list, mapValsBy, allList
+from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100, mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs
 from absbox.local.base import *
 from enum import Enum
 import itertools
@@ -51,6 +51,14 @@ def mkDatePattern(x):
         case _:
             raise RuntimeError(f"Failed to match {x}")
 
+def getStartDate(x):
+    match x:
+        case {"封包日": a, "起息日": b, "首次兑付日": c, "法定到期日": d, "收款频率": pf, "付款频率": bf} | \
+             {"cutoff": a, "closing": b, "firstPay": c, "stated": d, "poolFreq": pf, "payFreq": bf}:
+            return (a,b)
+        case {"归集日": (lastCollected, nextCollect), "兑付日": (pp, np), "法定到期日": c, "收款频率": pf, "付款频率": bf} | \
+             {"collect": (lastCollected, nextCollect), "pay": (pp, np), "stated": c, "poolFreq": pf, "payFreq": bf}:
+            return (lastCollected,pp)
 
 def mkDate(x):
     match x:
@@ -82,8 +90,7 @@ def mkDsRate(x):
 def mkFeeType(x):
     match x:
         case {"年化费率": [base, rate]} | {"annualPctFee": [base, rate]}:
-            return mkTag(("AnnualRateFee", [mkTag((baseMap.get(base,base), '1970-01-01'))
-                                           ,mkDsRate(rate)]))
+            return mkTag(("AnnualRateFee", [mkDs(base) ,mkDsRate(rate)]))
         case {"百分比费率": [*desc, _rate]} | {"pctFee": [*desc, _rate]}:
             rate = mkDsRate(_rate)
             match desc:
@@ -142,6 +149,10 @@ def mkDs(x):
             return mkTag("BondFactor")
         case ("资产池系数",) | ("poolFactor",):
             return mkTag("PoolFactor")
+        case ("债券利率",bn) | ("bondRate",bn):
+            return mkTag(("BondRate", bn))
+        case ("资产池利率",) | ("poolWaRate",):
+            return mkTag("PoolWaRate")
         case ("所有账户余额",) | ("accountBalance"):
             return mkTag("AllAccBalance")
         case ("账户余额", *ans) | ("accountBalance", *ans):
@@ -330,10 +341,15 @@ def mkBondRate(x):
 def mkBnd(bn, x):
     match x:
         case {"当前余额": bndBalance, "当前利率": bndRate, "初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
-                {"balance": bndBalance, "rate": bndRate, "originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
-            md = x.get("到期日", None) or x.get("maturityDate", None)
-            return {"bndName": bn, "bndBalance": bndBalance, "bndRate": bndRate, "bndOriginInfo":
-                    {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}, "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType), "bndDuePrin": 0, "bndDueInt": 0, "bndDueIntDate": None}
+             {"balance": bndBalance, "rate": bndRate, "originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
+            md = getValWithKs(x,["到期日","maturityDate"])
+            lastAccrueDate = getValWithKs(x,["计提日","lastAccrueDate"])
+            lastIntPayDate = getValWithKs(x,["付息日","lastIntPayDate"])
+            return {"bndName": bn, "bndBalance": bndBalance, "bndRate": bndRate
+                    , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
+                    , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
+                    , "bndDuePrin": 0, "bndDueInt": 0, "bndDueIntDate": lastAccrueDate
+                    , "bndLastIntPayDate": lastIntPayDate}
 
         case _:
             raise RuntimeError(f"Failed to match bond:{bn},{x}:mkBnd")
@@ -472,6 +488,8 @@ def mkAction(x):
         case ["支付费用限额", source, target, _limit] | ["payFeeBy", source, target, _limit]:
             limit = mkFeeCapType(_limit)
             return mkTag(("PayFeeBy", [limit, source, target]))
+        case ["计提支付利息", source, target] | ["accrueAndPayInt", source, target]:
+            return mkTag(("AccrueAndPayInt", [source, target]))
         case ["支付利息", source, target] | ["payInt", source, target]:
             return mkTag(("PayInt", [source, target]))
         case ["支付本金", source, target, _limit] | ["payPrin", source, target, _limit]:
@@ -902,7 +920,7 @@ def mkAssumption2(x) -> dict:
         case xs if isinstance(xs, list):
             return mkTag(("PoolLevel", mkAssumpList(xs)))
         case None:
-            return None
+            return mkTag(("PoolLevel", []))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAssumption2, type:{type(x)}")
 
@@ -1017,7 +1035,6 @@ def mkAccTxn(xs):
     else:
         return [mkTag(("AccTxn", x)) for x in xs]
 
-
 def mk(x):
     match x:
         case ["资产", assets]:
@@ -1029,7 +1046,7 @@ def mkFee(x,fsDate=None):
     match x :
         case {"name":fn, "type": feeType, **fi}:
             opt_fields = subMap(fi, [("feeStart",fsDate),("feeDueDate",None),("feeDue",0),
-                                    ("feeArrears",0),("feeLastPaidDay",None)])
+                                    ("feeArrears",0),("feeLastPaidDate",None)])
             return  {"feeName": fn, "feeType": mkFeeType(feeType)} | opt_fields
         case {"名称":fn , "类型": feeType, **fi}:
             opt_fields = subMap2(fi, [("起算日","feeStart",fsDate),("计算日","feeDueDate",None),("应计费用","feeDue",0),

@@ -93,8 +93,8 @@ BMW202301 = Generic(
          ,["transfer",'cashReserve',"distAcc"]
          ,["payFee",["distAcc",'cashReserve'],["admFee"]]
          ,["payFee",["distAcc",'cashReserve'],["serviceFee"]]
-         ,["payInt","distAcc",["A"]]
-         ,["payInt","cashReserve",["A"]]
+         ,["accrueAndPayInt","distAcc",["A"]]
+         ,["accrueAndPayInt","cashReserve",["A"]]
         
          ,["runTrigger",0] # update the trigger status during the waterfall
         
@@ -113,7 +113,7 @@ BMW202301 = Generic(
             ,["payFeeResidual", "distAcc", "bmwFee"]]]]
      ,"endOfCollection":[["calcFee","serviceFee"]] # accure fee by end of collection period
      ,"cleanUp":[["sellAsset", ["Current|Defaulted",1.0,0], "distAcc"]
-                 ,["payInt","distAcc",["A"]]
+                 ,["accrueAndPayInt","distAcc",["A"]]
                  ,["payPrin","distAcc",["A"]]
                  ,["payPrin","distAcc",["Sub"]]
                  ,["payFeeResidual", "distAcc", "bmwFee"]]

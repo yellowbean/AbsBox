@@ -32,7 +32,7 @@ class Generic:
         distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
         distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
         parsedDates = mkDate(self.dates)
-        closingDate = self.dates['closing']
+        (lastAssetDate,lastCloseDate) = getStartDate(self.dates)
         """
         get the json formatted string
         """
@@ -41,12 +41,12 @@ class Generic:
             "name": self.name,
             "status":mkTag((self.status)),
             "pool": {"assets": [mkAsset(x) for x in self.pool.get('assets', [])]
-                     , "asOfDate": self.dates['cutoff']
+                     , "asOfDate": lastAssetDate
                      , "issuanceStat": self.pool.get("issuanceStat")
                      , "futureCf":mkCf(self.pool.get('cashflow', [])) },
             "bonds": { bn: mkBnd(bn,bo) for (bn,bo) in self.bonds},
             "waterfall": mkWaterfall({},self.waterfall.copy()),  
-            "fees": {fn: mkFee(fo|{"name":fn},fsDate = closingDate) 
+            "fees": {fn: mkFee(fo|{"name":fn},fsDate = lastCloseDate) 
                                  for (fn,fo) in self.fees},
             "accounts": {an:mkAcc(an,ao) for (an,ao) in self.accounts},
             "collects": [ mkCollection(c) for c in self.collection],
@@ -54,7 +54,7 @@ class Generic:
             "currencySwap":None ,
             "custom": {cn:mkCustom(co) for cn,co in self.custom.items()} if self.custom else None ,
             "triggers": renameKs2(mapListValBy(self.trigger,mkTrigger),englishDealCycle) if self.trigger else None,
-            "liqProvider": {ln: mkLiqProvider(ln, lo | {"start":closingDate} ) 
+            "liqProvider": {ln: mkLiqProvider(ln, lo | {"start":lastCloseDate} ) 
                                for ln,lo in self.liqFacility.items() } if self.liqFacility else None
         }
 
@@ -99,12 +99,15 @@ class Generic:
         output['agg_accounts'] = aggAccs(output['accounts'], 'en')
 
         output['pool'] = {}
-        _pool_cf_header,_ = guess_pool_flow_header(deal_content['pool']['futureCf'][0],"english")
-        output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['futureCf']]
-                                              , columns=_pool_cf_header)
-        pool_idx = 'Date'
-        output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)
-        output['pool']['flow'].index.rename(pool_idx, inplace=True)
+        if deal_content['pool']['futureCf'] is None:
+            output['pool']['flow'] = None
+        else:
+            _pool_cf_header,_ = guess_pool_flow_header(deal_content['pool']['futureCf'][0],"english")
+            output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['futureCf']]
+                                                  , columns=_pool_cf_header)
+            pool_idx = 'Date'
+            output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)
+            output['pool']['flow'].index.rename(pool_idx, inplace=True)
 
         output['pricing'] = readPricingResult(resp[3], 'en')
         output['result'] = readRunSummary(resp[2], 'en')
