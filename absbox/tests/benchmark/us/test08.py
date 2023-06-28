@@ -1,6 +1,5 @@
 from absbox import API
 
-
 asset = ["AdjustRateMortgage"
         ,{"originBalance":73_875.00
           ,"originRate":["floater",0.04,{"index":"USCMT1Y"
@@ -42,25 +41,41 @@ GNMA_36208ALG4 = Generic(
                                 ,("Max"
                                   ,("substract",("poolWaRate",),("bondRate","A1"))
                                   ,("constant",0))]}
-       ,"feeDueDate":"2023-04-26"})
-     )
+       ,"feeDueDate":"2023-04-26"}))
     ,{"amortizing":[
          ["calcFee","Ginnie_Mae_guaranty","service_fee"]
          ,["payFee",["acc01"],['Ginnie_Mae_guaranty',"service_fee"]]
          ,["payInt","acc01",["A1"]]
          ,["payPrin","acc01",["A1"]]]
       ,"endOfCollection":[
-          ["calcInt","A1"]
-      ]}
+          ["liqSupport","Ginnie_Mae","acc01"
+              ,{"formula": 
+                ("substract",("cumPoolDefaultedBalance",)
+                            ,("liqCredit","Ginnie_Mae"))}]
+          ,["calcInt","A1"]]}
     ,[["CollectedInterest","acc01"]
       ,["CollectedPrincipal","acc01"]
       ,["CollectedPrepayment","acc01"]
       ,["CollectedRecoveries","acc01"]]
-    ,None
+    ,{"Ginnie_Mae":{"type":"Unlimited","start":"2023-05-26"}}
     ,None)
 
-if __name__ == "__main__":
-    localAPI = API("http://localhost:8081",lang='english')
+if __name__ == '__main__':
+    
+    localAPI = API("https://absbox.org/api/dev",lang='english')
+
     r = localAPI.run(GNMA_36208ALG4
-                    ,assumptions = [{"Rate":["USCMT1Y",0.0468]}]
-                    ,read=True)
+                 ,assumptions = [{"Rate":["USCMT1Y",0.0468]}
+                                ,{"CDR":0.005} 
+                                ,{"Inspect":[("MonthEnd",("cumPoolDefaultedBalance",))
+                                           ,("MonthEnd",("liqCredit","Ginnie_Mae"))]}]
+                 ,read=True)
+    
+    # Inspect cumulative defaulted balance
+    r['result']['inspect']['<CumulativePoolDefaultedBalance>']
+
+    # Inspect credit provided by Ginnie Mae
+    r['result']['inspect']['<LiqCredit:Ginnie_Mae>']
+
+    # the cash deposited to SPV in account `acc01`
+    r['accounts']['acc01'][r['accounts']['acc01']["memo"]=="<Support:Ginnie_Mae>"]
