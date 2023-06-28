@@ -163,6 +163,8 @@ def mkDs(x):
             return mkTag(("LastBondIntPaid", bnds))
         case ("债券低于目标余额", bn) | ("behindTargetBalance", bn):
             return mkTag(("BondBalanceGap", bn))
+        case ("已提供流动性", liqName) | ("liqCredit", liqName):
+            return mkTag(("LiqCredit", liqName))
         case ("债务人数量",) | ("borrowerNumber",):
             return mkTag(("CurrentPoolBorrowerNum"))
         case ("事件", loc, idx) | ("trigger", loc ,idx):
@@ -511,7 +513,7 @@ def mkAction(x):
         case ["出售资产", liq, target] | ["sellAsset", liq, target]:
             return mkTag(("LiquidatePool", [mkLiqMethod(liq), target]))
         case ["流动性支持", source, target, limit] | ["liqSupport", source, target, limit]:
-            return mkTag(("LiqSupport", [mkTag(("DS", mkDs(limit))), source, target]))
+            return mkTag(("LiqSupport", [   mkTransferLimit(limit), source, target]))
         case ["流动性支持", source, target] | ["liqSupport", source, target]:
             return mkTag(("LiqSupport", [None, source, target]))
         case ["流动性支持偿还", rpt, source, target] | ["liqRepay", rpt, source, target]:
@@ -949,12 +951,12 @@ def mkCustom(x):
 
 def mkLiqProviderType(x):
     match x:
-        case {"总额度": amt} | {"Total": amt}:
+        case {"总额度": amt} | {"total": amt}:
             return mkTag(("FixSupport"))
-        case {"日期": dp, "限额": amt} | {"Reset": dp, "Quota": amt}:
+        case {"日期": dp, "限额": amt} | {"reset": dp, "quota": amt}:
             return mkTag(("ReplenishSupport", [mkDatePattern(dp), amt]))
-        case {"日期": dp, "公式": ds,"系数":pct} | {"Reset": dp, "Formula":ds, "Pct":pct}:
-            return mkTag(("ByPct", [mkDatePattern(dp),mkDs(ds),pct]))
+        case {"公式": ds, "系数":pct} | {"formula":ds, "pct":pct}:
+            return mkTag(("ByPct", [mkDs(ds), pct]))
         case {}:
             return mkTag(("UnLimit"))
         case _:
@@ -999,13 +1001,12 @@ def mkLiqProvider(n, x):
             r = {"liqName": n, "liqType": mkLiqProviderType(_sp)
                     ,"liqBalance": _ab,  "liqStart": _sd
                     ,"liqRate":mkLiqProviderRate(p)} | buildOptionalLiqProvider(p)
-        case {"额度": _ab, "起始日": _sd, **p} \
-                | {"lineOfCredit": _ab, "start": _sd, **p}:
+        case {"额度": _ab, "起始日": _sd, **p} | {"lineOfCredit": _ab, "start": _sd, **p}:
             r = {"liqName": n, "liqType": mkTag(("FixSupport"))
                     ,"liqBalance": _ab,  "liqStart": _sd
                     ,"liqRate":mkLiqProviderRate(p)} | buildOptionalLiqProvider(p)
         case _:
-            raise RuntimeError(f"Failed to match LiqProvider：{x}")
+            raise RuntimeError(f"Failed to match LiqProvider:{x}")
 
     if r is not None:
        return opt_fields | r 

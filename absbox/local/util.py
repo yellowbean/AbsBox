@@ -13,7 +13,6 @@ from absbox.local.base import *
 def flat(xss) -> list:
     return reduce(lambda xs, ys: xs + ys, xss)
 
-
 def mkTag(x) -> dict:
     match x:
         case (tagName, tagValue):
