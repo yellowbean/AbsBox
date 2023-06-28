@@ -163,7 +163,7 @@ def mkDs(x):
             return mkTag(("LastBondIntPaid", bnds))
         case ("债券低于目标余额", bn) | ("behindTargetBalance", bn):
             return mkTag(("BondBalanceGap", bn))
-        case ("已提供流动性", liqName) | ("liqCredit", liqName):
+        case ("已提供流动性", *liqName) | ("liqCredit", *liqName):
             return mkTag(("LiqCredit", liqName))
         case ("债务人数量",) | ("borrowerNumber",):
             return mkTag(("CurrentPoolBorrowerNum"))
