@@ -1162,8 +1162,8 @@
           "bndRate": 0.07,
           "bndDuePrin": 0,
           "bndDueInt": 0,
-          "bndDueIntDate": "2022-12-26",
-          "bndLastIntPay": "2022-12-26",
+          "bndDueIntDate": "2023-01-26",
+          "bndLastIntPay": "2023-01-26",
           "bndLastPrinPay": null,
           "bndStmt": [
             {
@@ -1449,6 +1449,18 @@
                   "<PayInt:[\"A1\"]>",
                   "<PayPrin:[\"A1\"]>"
                 ]
+              ]
+            },
+            {
+              "tag": "BondTxn",
+              "contents": [
+                "2023-01-26",
+                0,
+                0,
+                0,
+                0.07,
+                0,
+                "<PayInt:[\"A1\"]>"
               ]
             }
           ]
@@ -1973,7 +1985,7 @@
         "EndOfPoolCollection": [],
         "DistributionDay Amortizing": [
           {
-            "tag": "PayInt",
+            "tag": "AccrueAndPayInt",
             "contents": [
               "\u8d26\u623701",
               [
@@ -2045,7 +2057,8 @@
       "currencySwap": null,
       "custom": null,
       "triggers": null,
-      "overrides": null
+      "overrides": null,
+      "ledgers": null
     }
   },
   [

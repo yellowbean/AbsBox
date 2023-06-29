@@ -83,7 +83,8 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
-        "bndDueIntDate": null
+        "bndDueIntDate": null,
+        "bndLastIntPayDate": null
       },
       "A2": {
         "bndName": "A2",
@@ -107,7 +108,8 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
-        "bndDueIntDate": null
+        "bndDueIntDate": null,
+        "bndLastIntPayDate": null
       },
       "B": {
         "bndName": "B",
@@ -131,7 +133,8 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
-        "bndDueIntDate": null
+        "bndDueIntDate": null,
+        "bndLastIntPayDate": null
       }
     },
     "waterfall": {
@@ -148,7 +151,7 @@
           ]
         },
         {
-          "tag": "PayInt",
+          "tag": "AccrueAndPayInt",
           "contents": [
             "acc01",
             [
@@ -209,7 +212,7 @@
           ]
         },
         {
-          "tag": "PayInt",
+          "tag": "AccrueAndPayInt",
           "contents": [
             "acc01",
             [
@@ -258,7 +261,7 @@
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDate": null
       }
     },
     "accounts": {

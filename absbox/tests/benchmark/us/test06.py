@@ -31,10 +31,10 @@ test01 = Generic(
     ,{"amortizing":[
          ["calcInt","A1"]
          ,["liqSupport", "insuranceProvider","acc01"
-           ,("Max"
+           ,{"formula":
+             ("Max"
              ,("substract",("bondDueInt","A1","B"),("accountBalance","acc01"))
-             ,("constant",0.0)
-            )]
+             ,("constant",0.0))}]
          ,["accrueAndPayInt","acc01",["A1","B"]]
          ,["payPrin","acc02",["A1"]]
          ,["payPrin","acc02",["B"]]

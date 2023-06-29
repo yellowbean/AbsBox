@@ -85,7 +85,7 @@ BMW202301 = Generic(
              ,"startDate":"2023-04-03"
              ,"rateType":{"Fixed":0.0}
              ,"bondType":{"Equity":None}}))
-    ,(("serviceFee",{"type":{"annualPctFee":["CurrentPoolBalance",0.01]}})
+    ,(("serviceFee",{"type":{"annualPctFee":[("poolBalance",),0.01]}})
       ,("bmwFee",{"type":{"fixFee":0}})
       ,("admFee", {"type":{"recurFee":["MonthFirst",15000]}}))
     ,{"default":[

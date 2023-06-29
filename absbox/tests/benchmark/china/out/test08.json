@@ -802,7 +802,8 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
-        "bndDueIntDate": null
+        "bndDueIntDate": null,
+        "bndLastIntPayDate": null
       },
       "\u4f18\u5148A2": {
         "bndName": "\u4f18\u5148A2",
@@ -826,7 +827,8 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
-        "bndDueIntDate": null
+        "bndDueIntDate": null,
+        "bndLastIntPayDate": null
       },
       "\u6b21\u7ea7": {
         "bndName": "\u6b21\u7ea7",
@@ -850,7 +852,8 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
-        "bndDueIntDate": null
+        "bndDueIntDate": null,
+        "bndLastIntPayDate": null
       }
     },
     "waterfall": {
@@ -887,7 +890,7 @@
           ]
         },
         {
-          "tag": "PayInt",
+          "tag": "AccrueAndPayInt",
           "contents": [
             "\u4fe1\u6258\u6536\u4ed8\u8d26\u6237",
             [
@@ -962,7 +965,7 @@
           ]
         },
         {
-          "tag": "PayInt",
+          "tag": "AccrueAndPayInt",
           "contents": [
             "\u4fe1\u6258\u6536\u4ed8\u8d26\u6237",
             [
@@ -1053,8 +1056,7 @@
           "tag": "AnnualRateFee",
           "contents": [
             {
-              "tag": "CurrentPoolBalance",
-              "contents": "1970-01-01"
+              "tag": "CurrentPoolBalance"
             },
             {
               "tag": "Constant",

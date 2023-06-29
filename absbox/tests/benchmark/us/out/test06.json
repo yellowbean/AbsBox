@@ -83,7 +83,8 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
-        "bndDueIntDate": null
+        "bndDueIntDate": null,
+        "bndLastIntPayDate": null
       },
       "B": {
         "bndName": "B",
@@ -107,7 +108,8 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
-        "bndDueIntDate": null
+        "bndDueIntDate": null,
+        "bndLastIntPayDate": null
       }
     },
     "waterfall": {
@@ -156,7 +158,7 @@
           ]
         },
         {
-          "tag": "PayInt",
+          "tag": "AccrueAndPayInt",
           "contents": [
             "acc01",
             [
@@ -198,7 +200,7 @@
             },
             [
               {
-                "tag": "PayInt",
+                "tag": "AccrueAndPayInt",
                 "contents": [
                   "acc02",
                   [
@@ -295,16 +297,7 @@
         "liqStmt": null,
         "liqName": "insuranceProvider",
         "liqType": {
-          "tag": "ByPct",
-          "contents": [
-            {
-              "tag": "MonthEnd"
-            },
-            {
-              "tag": "CurrentBondBalance"
-            },
-            0.0015
-          ]
+          "tag": "UnLimit"
         },
         "liqBalance": 100,
         "liqStart": "2021-06-15",

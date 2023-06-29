@@ -108,7 +108,6 @@ def run_deal(input_folder, pair):
             with open(os.path.join(input_scen_folder,sinput), 'r') as sq: # scenario request 
                 print(f"With deal request=> {dinput}, scenario => {sinput}")
                 req = mkTag(("SingleRunReq", [json.load(dq) , json.load(sq) , None])) 
-                
                 print("build req done")
                 hdrs = {'Content-type': 'application/json', 'Accept': '*/*'}
                 try:

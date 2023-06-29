@@ -82,7 +82,8 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
-        "bndDueIntDate": null
+        "bndDueIntDate": null,
+        "bndLastIntPayDate": null
       },
       "B": {
         "bndName": "B",
@@ -106,7 +107,8 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
-        "bndDueIntDate": null
+        "bndDueIntDate": null,
+        "bndLastIntPayDate": null
       }
     },
     "waterfall": {
@@ -123,7 +125,7 @@
           ]
         },
         {
-          "tag": "PayInt",
+          "tag": "AccrueAndPayInt",
           "contents": [
             "\u8d26\u623701",
             [
