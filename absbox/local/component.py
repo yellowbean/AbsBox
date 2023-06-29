@@ -178,10 +178,10 @@ def mkDs(x):
             return mkTag(("LastFeePaid", fns))
         case ("系数", ds, f) | ("factor", ds, f):
             return mkTag(("Factor", [mkDs(ds), f]))
-        case ("Min", ds1, ds2):
-            return mkTag(("Min", [mkDs(ds1), mkDs(ds2)]))
-        case ("Max", ds1, ds2):
-            return mkTag(("Max", [mkDs(ds1), mkDs(ds2)]))
+        case ("Min", *ds):
+            return mkTag(("Min", [mkDs(s) for s in ds]))
+        case ("Max", *ds):
+            return mkTag(("Max", [mkDs(s) for s in ds]))
         case ("合计", *ds) | ("sum", *ds):
             return mkTag(("Sum", [mkDs(_ds) for _ds in ds]))
         case ("差额", *ds) | ("substract", *ds):
@@ -194,6 +194,12 @@ def mkDs(x):
             return mkTag(("UseCustomData", n))
         case ("区间内",floor,cap,s) | ("floorCap",floor,cap,s):
             return mkTag(("FloorAndCap", [floor,cap,s]))
+        case ("floorWith", ds1, ds2):
+            return mkTag(("FloorWith", [mkDs(ds1),mkDs(ds2)]))
+        case ("floorWithZero", ds1):
+            return mkTag(("FloorWithZero", mkDs(ds1)))
+        case ("capWith", ds1, ds2):
+            return mkTag(("CapWith", [mkDs(ds1),mkDs(ds2)]))
         case legacy if (legacy in baseMap.keys()):
             return mkDs((legacy,))
         case _:
