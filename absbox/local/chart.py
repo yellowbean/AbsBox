@@ -124,7 +124,7 @@ def viz(x):
         head_of_waterfalls = [build_subwaterfall(d, ds, waterfall[ds]) for ds in deal_status]
         return head_of_waterfalls
             
-    dot = graphviz.Digraph('round-table', comment="", format='svg')
+    dot = graphviz.Digraph('round-table', comment="", filename=x.name, format='svg')
     build_agg(dot, agg)
     head_of_waterfalls = build_waterfall(dot, waterfall)
     dot.node("end",label="end")
