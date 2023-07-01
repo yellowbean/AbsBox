@@ -25,6 +25,7 @@ class Generic:
     trigger:dict = None
     status:str = "Amortizing"
     custom: dict = None
+    ledgers:dict = None
 
     @property
     def json(self):
@@ -55,7 +56,8 @@ class Generic:
             "custom": {cn:mkCustom(co) for cn,co in self.custom.items()} if self.custom else None ,
             "triggers": renameKs2(mapListValBy(self.trigger,mkTrigger),englishDealCycle) if self.trigger else None,
             "liqProvider": {ln: mkLiqProvider(ln, lo | {"start":lastCloseDate} ) 
-                               for ln,lo in self.liqFacility.items() } if self.liqFacility else None
+                               for ln,lo in self.liqFacility.items() } if self.liqFacility else None,
+            "ledgers": {ln: mkLedger(ln, v) for ln,v in self.ledgers.items()} if self.ledgers else None
         }
 
         _dealType = identify_deal_type(_r)

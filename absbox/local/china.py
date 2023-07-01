@@ -29,6 +29,7 @@ class SPV:
     触发事件: dict = None
     状态:str = "摊销"
     自定义: dict = None
+    科目: dict = None
 
     @classmethod
     def load(cls,p):
@@ -82,7 +83,8 @@ class SPV:
             "custom": {cn:mkCustom(co) for cn,co in self.自定义.items()} if self.自定义 else None,
             "triggers": renameKs2(mapListValBy(self.触发事件,mkTrigger),chinaDealCycle) if self.触发事件 else None,
             "liqProvider": {ln: mkLiqProvider(ln, lo | {"起始日":defaultStartDate} ) 
-                                for ln,lo in self.流动性支持.items() } if self.流动性支持 else None
+                                for ln,lo in self.流动性支持.items() } if self.流动性支持 else None,
+            "ledgers": {ln: mkLedger(ln, v) for ln,v in self.科目.items()} if self.科目 else None
         }
         
         _dealType = identify_deal_type(_r)

@@ -157,6 +157,8 @@ def mkDs(x):
             return mkTag("AllAccBalance")
         case ("账户余额", *ans) | ("accountBalance", *ans):
             return mkTag(("AccBalance", ans))
+        case ("账簿余额", *ans) | ("ledgerBalance", *ans):
+            return mkTag(("LedgerBalance", ans))
         case ("债券待付利息", *bnds) | ("bondDueInt", *bnds):
             return mkTag(("CurrentDueBondInt", bnds))
         case ("债券已付利息", *bnds) | ("lastBondIntPaid", *bnds):
@@ -415,6 +417,8 @@ def mkTransferLimit(x):
             return mkTag(("Formula", "ABCD"))
         case {"公式": formula} | {"formula": formula}:
             return mkTag(("DS", mkDs(formula)))
+        case {"PDL贷记":an} | {"clearPDL":an}:
+            return mkTag(("ClearPDL", an))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkTransferLimit")
 
@@ -446,7 +450,6 @@ def mkRateSwapType(rr,pr):
         case _:
             raise RuntimeError(f"Failed to match :{rr,pr}:Interest Swap Type")
 
-
 def mkRsBase(x):
     match x:
         case {"fixed":bal} | {"固定":bal}:
@@ -475,6 +478,14 @@ def mkRateSwap(x):
         case _:
             raise RuntimeError(f"Failed to match :{x}:Interest Swap")
 
+def mkBookLedgerType(x):
+    match x:
+        case ["PDL",defaults,ledgers]:
+            return mkTag(("PDL",[mkDs(defaults)
+                                ,[ (ln,mkDs(ds)) for ln,ds in ledgers]]))
+        case _:
+            raise RuntimeError(f"Failed to match :{x}:mkBookLedgerType")
+
 
 def mkAction(x):
     match x:
@@ -482,6 +493,8 @@ def mkAction(x):
             return mkTag(("Transfer", [source, target]))
         case ["按公式账户转移", _limit, source, target] | ["transferBy", _limit, source, target]:
             return mkTag(("TransferBy", [mkTransferLimit(_limit), source, target]))
+        case ["簿记", bookLedgerType] | ["bookBy", bookLedgerType]:
+            return mkTag(("BookBy", mkBookLedgerType(bookLedgerType)))
         case ["计提费用", *feeNames] | ["calcFee", *feeNames]:
             return mkTag(("CalcFee", feeNames))
         case ["计提利息", *bndNames] | ["calcInt", *bndNames]:
@@ -1017,6 +1030,14 @@ def mkLiqProvider(n, x):
     if r is not None:
        return opt_fields | r 
 
+def mkLedger(n, x):
+    match x:
+        case {"balance":bal,"txn":_tx} | {"余额":bal,"记录":_tx}:
+            tx = mkAccTxn(_tx)
+            return {"ledgName":n,"ledgBalance":bal,"ledgStmt":tx}
+        case _:
+            raise RuntimeError(f"Failed to match Ledger:{x}")
+        
 
 def mkCf(x):
     if len(x) == 0:
