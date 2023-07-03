@@ -1,20 +1,24 @@
-import logging, json, datetime, pickle, re
+import json, datetime, pickle, re, urllib3
+from importlib.metadata import version
 from json.decoder import JSONDecodeError
+from dataclasses import dataclass,field
+
+import rich
+from rich.console import Console
+from rich.json import JSON
 import requests
 from requests.exceptions import ConnectionError
-import urllib3
-from dataclasses import dataclass,field
+import pandas as pd
+from pyspecter import query
+
 from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header, _read_cf, _read_asset_pricing
 from absbox.local.component import mkPool, mkAssumption, mkAssumption2, mkPricingAssump,mkLiqMethod,mkAssetUnion
 from absbox.local.base import *
-import pandas as pd
-from pyspecter import query
 from absbox.validation import valReq,valAssumption
-
-from importlib.metadata import version
 
 VERSION_NUM = version("absbox")
 urllib3.disable_warnings()
+console = Console()
 
 @dataclass
 class API:
@@ -23,29 +27,28 @@ class API:
     check: bool = True
     server_info = {}
     version = VERSION_NUM.split(".")
-    hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain','Accept':'*/*'
-            ,'Accept-Encoding':'gzip'}
+    hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain','Accept':'*/*' ,'Accept-Encoding':'gzip'}
     session = None
 
     def __post_init__(self):
-        try:
-            _r = requests.get(f"{self.url}/version",verify=False, timeout=5).text
-        except (ConnectionRefusedError, ConnectionError):
-            logging.error(f"Error: Can't not connect to API server {self.url}")
-            self.url = None
-            return
+        with console.status("[magenta]Connecting engine server..") as status:
+            try:
+                _r = requests.get(f"{self.url}/version",verify=False, timeout=5).text
+            except (ConnectionRefusedError, ConnectionError):
+                console.print(f"[bold red]Error: Can't not connect to API server {self.url}")
+                self.url = None
+                return
 
-        echo = json.loads(_r)
-        self.server_info = echo
-        engine_version = echo['_version'].split(".")
-        logging.info(f"Connect with engine {self.url} version {echo['_version']} successfully")
-        
-        if self.check and (self.version[1] != engine_version[1]):
-            logging.error(f"Failed to init the api instance, lib support={self.version} but server version={echo['_version']} , pls upgrade your api package by: pip -U absbox")
-            return
-        else:
-            logging.info(f"version match with server, lib:{self.version}, server:{engine_version}, API setup successfully")
-            self.session = requests.Session() 
+            echo = json.loads(_r)
+            self.server_info = echo
+            engine_version = echo['_version'].split(".")
+            console.print(f"Connect with engine {self.url} version {echo['_version']} successfully")
+            
+            if self.check and (self.version[1] != engine_version[1]):
+                console.print(f"[bold red]Failed to init the api instance, lib support={self.version} but server version={echo['_version']} , pls upgrade your api package by: pip -U absbox")
+                return
+        console.print(f"[bold green]version match with server, lib:{self.version}, server:{engine_version}, API setup successfully")
+        self.session = requests.Session() 
 
     def build_req(self, deal, assumptions=None, pricing=None) -> str:
         r = None
@@ -67,11 +70,11 @@ class API:
         if isinstance(assumptions, list):
             r = mkTag(("SingleRunPoolReq"
                       ,[mkPool(pool)
-                        ,mkAssumption2(assumptions)])) 
+                      ,mkAssumption2(assumptions)])) 
         elif isinstance(assumptions, dict):
             r = mkTag(("MultiScenarioRunPoolReq"
                       ,[mkPool(pool)
-                        ,mapValsBy(assumptions, mkAssumption2)])) 
+                      ,mapValsBy(assumptions, mkAssumption2)])) 
         else:
             raise RuntimeError("Error in build pool req")
         return json.dumps(r , ensure_ascii=False)
@@ -81,10 +84,10 @@ class API:
         error, warning = valReq(_r)
 
         if warning:
-            logging.warning(f"Warning in model :{warning}")
+            console.print(f"[bold yellow]Warning in model :{warning}")
 
         if len(error)>0:
-            logging.error(f"Error in model :{error}")
+            console.print(f"[bold red]Error in model :{error}")
             return False,error,warning
         else:
             return True,error,warning
@@ -112,13 +115,15 @@ class API:
 
         # construct request
         req = self.build_req(deal, assumptions, pricing)
-
         #validate deal
         val_result, err, warn = self.validate(req)
         if not val_result:
             return val_result, err, warn
 
         result = self._send_req(req,url)
+        if result is None:
+            console.print("[bold red]Failed to get response from run")
+            return None
 
         if read and multi_run_flag:
             return { n:deal.read(_r,position=position) for (n,_r) in result.items()}
@@ -133,7 +138,7 @@ class API:
             try:
                 result = pd.DataFrame([_['contents'] for _ in pool_resp] , columns=flow_header)
             except ValueError as e:
-                logging.error(f"Failed to match header:{flow_header} with {result[0]['contents']}")
+                console.print(f"[bold red]Failed to match header:{flow_header} with {result[0]['contents']}")
             result = result.set_index(idx)
             result.index.rename(idx, inplace=True)
             result.sort_index(inplace=True)
@@ -190,19 +195,25 @@ class API:
             return result
 
     def _send_req(self,_req,_url)->dict:
-        try:
-            r = self.session.post(_url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False, timeout=10)
-        except (ConnectionRefusedError, ConnectionError):
-            return None
-
-        if r.status_code != 200:
-            print(json.loads(_req))
-            error_resp = json.loads(r.text)
-            raise RuntimeError(error_resp.get("error","Empty Error Body"))
-        try:
-            return json.loads(r.text)
-        except JSONDecodeError as e:
-            raise RuntimeError(e)        
+        with console.status("") as status:
+            try:
+                r = self.session.post(_url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False, timeout=10)
+            except (ConnectionRefusedError, ConnectionError):
+                console.log(f"Failed to talk to server {_url}")
+                console.rule()
+                return None
+            if r.status_code != 200:
+                console.print_json(_req)
+                console.rule()
+                console.print_json(r.text)
+                console.rule()
+                return None
+            try:
+                return json.loads(r.text)
+            except JSONDecodeError as e:
+                console.print(e)
+                console.rule()
+                return None
 
 def save(deal,p:str):
     def save_to(b):

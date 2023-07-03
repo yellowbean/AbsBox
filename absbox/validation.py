@@ -9,12 +9,14 @@ def inSet(xs,validSet):
     else:
         return False
 
-
 def valDeal(d, error, warning) -> list:
     acc_names = set(d['accounts'].keys())
     bnd_names = set(d['bonds'].keys())
     fee_names = set(d['fees'].keys())
     w = d['waterfall']
+    #optional
+    if d['ledgers']:
+        ledger_names = set(d['ledgers'].keys())
     assert w is not None ,"Waterfall is None"
 
     for wn,waterfallActions in w.items():
