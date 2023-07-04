@@ -39,15 +39,14 @@ class API:
                 self.url = None
                 return
 
-            echo = json.loads(_r)
-            self.server_info = echo
-            engine_version = echo['_version'].split(".")
-            console.print(f"Connect with engine {self.url} version {echo['_version']} successfully")
+            self.server_info = self.server_info | json.loads(_r)
+            engine_version = self.server_info['_version'].split(".")
+            console.print(f"Connect with engine {self.url} version {self.server_info['_version']} successfully")
             
             if self.check and (self.version[1] != engine_version[1]):
-                console.print(f"[bold red]Failed to init the api instance, lib support={self.version} but server version={echo['_version']} , pls upgrade your api package by: pip -U absbox")
+                console.print(f"[bold red]Failed to init the api instance, lib support={self.version} but server version={self.server_info['_version']} , pls upgrade your api package by: pip -U absbox")
                 return
-        console.print(f"[bold green]version match with server, lib:{self.version}, server:{engine_version}, API setup successfully")
+        console.print(f"[bold green]version match with server, lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}, connect to API engine successfully")
         self.session = requests.Session() 
 
     def build_req(self, deal, assumptions=None, pricing=None) -> str:
@@ -92,26 +91,15 @@ class API:
         else:
             return True,error,warning
 
-
-    def run(self,
-            deal,
+    def run(self, deal,
             assumptions=None,
             pricing=None,
             read=True,
-            position=None,
-            timing=False):
-
-        if isinstance(assumptions,str):
-            assumptions = pickle.load(assumptions)
+            position=None):
 
         # if run req is a multi-scenario run
         multi_run_flag = True if isinstance(assumptions, dict) else False
         url = f"{self.url}/runDealByScenarios"  if multi_run_flag  else f"{self.url}/runDeal"
-
-        if isinstance(deal, str):
-            with open(deal,'rb') as _f:
-                c = _f.read()
-                deal = pickle.loads(c)
 
         # construct request
         req = self.build_req(deal, assumptions, pricing)
@@ -156,7 +144,6 @@ class API:
             return mapValsBy(result, read_single)
         else:
             return result
-
     
     def runStructs(self, deals, assumptions=None, pricing=None, read=True ):
         assert isinstance(deals, dict),f"Deals should be a dict but got {deals}"
@@ -214,6 +201,46 @@ class API:
                 console.print(e)
                 console.rule()
                 return None
+    
+def _build_doc(d,bondIdMap:dict={},metaMap:dict={}):
+    def assoc(m,ks:list,k,v):
+        if ks==[]:
+            m[k] = v 
+            return m
+        else:
+            assoc(m[ks[0]],ks[1:],k,v)
+    
+    import pymongo 
+    d_doc = {}
+    d_doc['deal'] = d.json
+    if bondIdMap:
+        bds = d_doc['deal']['contents']['bonds']
+        {k: v['bndOriginInfo'].update(bondIdMap.get(k,{})) for k,v in bds.items()}
+        d_doc['deal']['contents']['bonds'] = bds 
+    d_doc['meta'] = metaMap
+    
+    return d_doc
+
+def _upload_deal(pw:str,doc:dict):
+    from pymongo import MongoClient
+    from pymongo.server_api import ServerApi
+    uri = f"mongodb+srv://alwayszhang:{pw}@cluster0.elnrf1t.mongodb.net/?retryWrites=true&w=majority"
+
+    # Create a new client and connect to the server
+    client = MongoClient(uri, server_api=ServerApi('1'))
+    # Send a ping to confirm a successful connection
+    try:
+        client.admin.command('ping')
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+
+    deal_library_db = client['deal-library']
+    deals_collection = deal_library_db['deals']
+
+    doc['meta']['ts'] = datetime.datetime.now()
+    
+    return deals_collection.insert_one(doc).inserted_id
 
 def save(deal,p:str):
     def save_to(b):
