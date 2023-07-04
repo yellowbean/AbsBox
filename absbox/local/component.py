@@ -1,4 +1,4 @@
-from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100, mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs
+from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100, mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey
 from absbox.local.base import *
 from enum import Enum
 import itertools
@@ -678,6 +678,14 @@ def mkWaterfall(r, x):
     r[_w_tag] = [mkAction(_a) for _a in _v]
     return mkWaterfall(r, x)
 
+def mkRoundingType(x):
+    match x:
+        case ["floor",r]:
+            return mkTag(("RoundFloor",r))
+        case ["ceiling",r]:
+            return mkTag(("RoundCeil",r))
+        case _:
+            raise RuntimeError(f"Failed to match {x}:mkRoundingType")
 
 def mkAssetRate(x):
     match x:
@@ -685,11 +693,12 @@ def mkAssetRate(x):
             return mkTag(("Fix", r))
         case ["浮动", r, {"基准": idx, "利差": spd, "重置频率": p}]:
             return mkTag(("Floater", [idx, spd, r, freqMap[p], None]))
-        case ["floater", r, {"index": idx, "spread": spd, "reset": p}]:
-            return mkTag(("Floater2", [idx, spd, r, mkDatePattern(p)]))
+        case ["floater", r, {"index": idx, "spread": spd, "reset": p} as m]:
+            _m = subMap(m,[("cap",None),("floor",None),("rounding",None)])
+            _m = applyFnToKey(_m, mkRoundingType, 'rounding')
+            return mkTag(("Floater2", [idx, spd, r, mkDatePattern(p), _m['floor'], _m['cap'],_m['rounding']]))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAssetRate")
-
 
 def mkAmortPlan(x) -> dict:
     match x:
@@ -725,7 +734,6 @@ def mkAssetStatus(x):
             return mkTag(("Defaulted",d))
         case _:
             raise RuntimeError(f"Failed to match asset statuts {x}:mkAssetStatus")
-
 
 
 def mkAsset(x):

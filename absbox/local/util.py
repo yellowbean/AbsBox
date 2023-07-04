@@ -207,7 +207,7 @@ def renameKs(m:dict,mapping,opt_key=False):
     return m
 
 def subMap(m:dict,ks:list):
-    fieldNames = [ fName for (fName,fDefaultValue) in ks]
+    ''' get a map subset by keys,if keys not found, supplied with default value '''
     return {k:m.get(k,defaultVal) for (k,defaultVal) in ks}
 
 def subMap2(m:dict,ks:list):
@@ -223,6 +223,18 @@ def mapValsBy(m:dict, f):
 def mapListValBy(m:dict, f):
     assert isinstance(m, dict),"M is not a map"
     return {k: [f(_v) for _v in v] for k,v in m.items()}
+
+def applyFnToKey(m:dict, f, k, applyNone=False):
+    assert isinstance(m, dict),f"{m} is not a map"
+    assert k in m, f"{k} is not in map {m}"
+    match (m[k],applyNone):
+        case (None,True):
+            m[k] = f(m[k])
+        case (None,False):
+            pass
+        case (_, _):
+            m[k] = f(m[k])
+    return m
 
 def renameKs2(m:dict,kmapping):
     assert isinstance(m, dict),"M is not a map"
@@ -257,6 +269,7 @@ def uplift_m_list(l:list):
             for k,v in m.items()}
 
 def getValWithKs(m:dict,ks:list):
+    ''' Get first available key/value in m'''
     if isinstance(m, dict):
         for k in ks:
             if k in m:
