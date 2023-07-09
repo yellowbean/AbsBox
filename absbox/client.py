@@ -7,7 +7,7 @@ import rich
 from rich.console import Console
 from rich.json import JSON
 import requests
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError,ReadTimeout
 import pandas as pd
 from pyspecter import query
 
@@ -31,22 +31,21 @@ class API:
     session = None
 
     def __post_init__(self):
-        with console.status("[magenta]Connecting engine server..") as status:
+        self.url = self.url.rstrip("/")
+        with console.status(f"[magenta]Connecting engine server -> {self.url}") as status:
             try:
                 _r = requests.get(f"{self.url}/version",verify=False, timeout=5).text
             except (ConnectionRefusedError, ConnectionError):
-                console.print(f"[bold red]Error: Can't not connect to API server {self.url}")
+                console.print(f"❌[bold red]Error: Can't not connect to API server {self.url}")
                 self.url = None
                 return
 
             self.server_info = self.server_info | json.loads(_r)
             engine_version = self.server_info['_version'].split(".")
-            console.print(f"Connect with engine {self.url} version {self.server_info['_version']} successfully")
-            
             if self.check and (self.version[1] != engine_version[1]):
-                console.print(f"[bold red]Failed to init the api instance, lib support={self.version} but server version={self.server_info['_version']} , pls upgrade your api package by: pip -U absbox")
+                console.print(f"❌[bold red]Failed to init the api instance, lib support={self.version} but server version={self.server_info['_version']} , pls upgrade your api package by: pip -U absbox")
                 return
-        console.print(f"[bold green]version match with server, lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}, connect to API engine successfully")
+        console.print(f"✅[bold green]Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
         self.session = requests.Session() 
 
     def build_req(self, deal, assumptions=None, pricing=None) -> str:
@@ -81,12 +80,10 @@ class API:
     def validate(self, _r) -> list:
         # validatin waterfall
         error, warning = valReq(_r)
-
         if warning:
-            console.print(f"[bold yellow]Warning in model :{warning}")
-
+            console.print(f"❕[bold yellow]Warning in model :{warning}")
         if len(error)>0:
-            console.print(f"[bold red]Error in model :{error}")
+            console.print(f"❌[bold red]Error in model :{error}")
             return False,error,warning
         else:
             return True,error,warning
@@ -107,14 +104,15 @@ class API:
         val_result, err, warn = self.validate(req)
         if not val_result:
             return val_result, err, warn
-
-        result = self._send_req(req,url)
+        if pricing is None:
+            result = self._send_req(req,url)
+        else:
+            result = self._send_req(req,url,timeout=30)
         if result is None:
-            console.print("[bold red]Failed to get response from run")
+            console.print("❌[bold red]Failed to get response from run")
             return None
-
         if read and multi_run_flag:
-            return { n:deal.read(_r,position=position) for (n,_r) in result.items()}
+            return {n:deal.read(_r,position=position) for (n,_r) in result.items()}
         elif read :
             return deal.read(result,position=position)
         else:
@@ -126,7 +124,7 @@ class API:
             try:
                 result = pd.DataFrame([_['contents'] for _ in pool_resp] , columns=flow_header)
             except ValueError as e:
-                console.print(f"[bold red]Failed to match header:{flow_header} with {result[0]['contents']}")
+                console.print(f"❌[bold red]Failed to match header:{flow_header} with {result[0]['contents']}")
             result = result.set_index(idx)
             result.index.rename(idx, inplace=True)
             result.sort_index(inplace=True)
@@ -180,18 +178,46 @@ class API:
             return readResult(result)
         else:
             return result
+        
+    def queryLibrary(self,ks,**q):
+        deal_library_url = q['deal_library']+"/query"
+        d = {"bond_id": [k for k in ks] }
+        q = {"read":True} | q
+        result = self._send_req(json.dumps(d), deal_library_url)
+        if q['read'] == True:
+            return pd.DataFrame(result['data'],columns=result['header'])
+        else:
+            return result
 
-    def _send_req(self,_req,_url)->dict:
+    def runLibrary(self,_id,**p):
+        deal_library_url = p['deal_library']+"/run"
+        read = p.get("read",True)
+        pricingAssump = p.get("pricing",None)
+        dealAssump = p.get("assump",None)
+        d = {'user':None, 'dealid':_id, 'assump':dealAssump, 'pricing':pricingAssump} | p
+        result = self._send_req(json.dumps(d), deal_library_url)
+        
+        if read:
+            return result
+        else:
+            return result
+
+    def _send_req(self,_req,_url,timeout=10)->dict:
         with console.status("") as status:
             try:
-                r = self.session.post(_url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False, timeout=10)
+                r = self.session.post(_url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False, timeout=timeout)
             except (ConnectionRefusedError, ConnectionError):
-                console.log(f"Failed to talk to server {_url}")
+                console.print(f"❌[bold red] Failed to talk to server {_url}")
+                console.rule()
+                return None
+            except ReadTimeout:
+                console.print(f"❌[bold red] Failed to get response from server")
                 console.rule()
                 return None
             if r.status_code != 200:
                 console.print_json(_req)
                 console.rule()
+                print(">>>",r.text)
                 console.print_json(r.text)
                 console.rule()
                 return None
@@ -202,45 +228,7 @@ class API:
                 console.rule()
                 return None
     
-def _build_doc(d,bondIdMap:dict={},metaMap:dict={}):
-    def assoc(m,ks:list,k,v):
-        if ks==[]:
-            m[k] = v 
-            return m
-        else:
-            assoc(m[ks[0]],ks[1:],k,v)
-    
-    import pymongo 
-    d_doc = {}
-    d_doc['deal'] = d.json
-    if bondIdMap:
-        bds = d_doc['deal']['contents']['bonds']
-        {k: v['bndOriginInfo'].update(bondIdMap.get(k,{})) for k,v in bds.items()}
-        d_doc['deal']['contents']['bonds'] = bds 
-    d_doc['meta'] = metaMap
-    
-    return d_doc
 
-def _upload_deal(pw:str,doc:dict):
-    from pymongo import MongoClient
-    from pymongo.server_api import ServerApi
-    uri = f"mongodb+srv://alwayszhang:{pw}@cluster0.elnrf1t.mongodb.net/?retryWrites=true&w=majority"
-
-    # Create a new client and connect to the server
-    client = MongoClient(uri, server_api=ServerApi('1'))
-    # Send a ping to confirm a successful connection
-    try:
-        client.admin.command('ping')
-        print("Pinged your deployment. You successfully connected to MongoDB!")
-    except Exception as e:
-        print(e)
-
-    deal_library_db = client['deal-library']
-    deals_collection = deal_library_db['deals']
-
-    doc['meta']['ts'] = datetime.datetime.now()
-    
-    return deals_collection.insert_one(doc).inserted_id
 
 def save(deal,p:str):
     def save_to(b):
