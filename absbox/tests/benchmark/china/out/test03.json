@@ -249,6 +249,7 @@
     "currencySwap": null,
     "custom": null,
     "triggers": null,
-    "liqProvider": null
+    "liqProvider": null,
+    "ledgers": null
   }
 }

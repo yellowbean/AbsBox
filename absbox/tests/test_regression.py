@@ -1,13 +1,14 @@
-import pandas as pd
-import os,pickle,sys
+import os,pickle,sys,json,csv,logging
+from json.decoder import JSONDecodeError
+import importlib
+import pprint as pp
+
 from absbox import API
 from absbox.local.china import show,信贷ABS
 from absbox.local.util import mkTag
 import requests
-import json
-import pprint as pp
-from json.decoder import JSONDecodeError
-import importlib
+import pandas as pd
+import rich
 
 from jsondiff import diff
 from deepdiff import DeepDiff
@@ -15,7 +16,6 @@ from deepdiff import DeepDiff
 import absbox.tests.benchmark.us as us
 import absbox.tests.benchmark.china as cn
 
-import csv,logging
 
 this_file = os.path.dirname(__file__)
 china_folder = os.path.join("absbox","tests","benchmark","china")

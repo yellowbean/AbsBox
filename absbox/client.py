@@ -185,7 +185,10 @@ class API:
         q = {"read":True} | q
         result = self._send_req(json.dumps(d), deal_library_url)
         if q['read'] == True:
-            return pd.DataFrame(result['data'],columns=result['header'])
+            if 'data' in result:
+                return pd.DataFrame(result['data'],columns=result['header'])
+            elif 'error' in result:
+                return pd.DataFrame([result["error"]],columns=["error"])
         else:
             return result
 
