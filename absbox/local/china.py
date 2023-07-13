@@ -106,8 +106,9 @@ class SPV:
         if pricing:
             return mkPricingAssump(pricing)
         return None
-
-    def read(self, resp, position=None):
+    
+    @staticmethod
+    def read(resp, position=None):
         read_paths = {'bonds': ('bndStmt', china_bondflow_fields, "债券")
                     , 'fees': ('feeStmt', china_fee_flow_fields_d, "费用")
                     , 'accounts': ('accStmt', china_acc_flow_fields_d , "账户")

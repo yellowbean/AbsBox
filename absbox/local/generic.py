@@ -73,8 +73,9 @@ class Generic:
         if pricing:
             return mkPricingAssump(pricing)
         return None
-
-    def read(self, resp, position=None):
+    
+    @staticmethod
+    def read(resp, position=None):
         read_paths = {'bonds': ('bndStmt' , english_bondflow_fields , "bond")
                      , 'fees': ('feeStmt' , english_fee_flow_fields_d , "fee")
                      , 'accounts': ('accStmt' , english_acc_flow_fields_d , "account")

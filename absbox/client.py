@@ -178,12 +178,24 @@ class API:
             return readResult(result)
         else:
             return result
-        
+
+    def loginLibrary(self, user, pw, **q):
+        deal_library_url = q['deal_library']+"/token"
+        cred = {"user":user,"password":pw}
+        r = self._send_req(json.dumps(cred), deal_library_url)
+        if 'token' in r:
+            console.print(f"✅[bold green],login successfully")
+            self.token = r['token']
+        else:
+            console.print(f"❌[bold red]Failed to login")
+            return None
+            
+    
     def queryLibrary(self,ks,**q):
         deal_library_url = q['deal_library']+"/query"
         d = {"bond_id": [k for k in ks] }
         q = {"read":True} | q
-        result = self._send_req(json.dumps(d), deal_library_url)
+        result = self._send_req(json.dumps(d), deal_library_url,headers= {"Authorization":f"Bearer {self.token}"})
         if q['read'] == True:
             if 'data' in result:
                 return pd.DataFrame(result['data'],columns=result['header'])
@@ -198,17 +210,22 @@ class API:
         pricingAssump = p.get("pricing",None)
         dealAssump = p.get("assump",None)
         d = {'user':None, 'dealid':_id, 'assump':dealAssump, 'pricing':pricingAssump} | p
-        result = self._send_req(json.dumps(d), deal_library_url)
         
-        if read:
-            return result
+        result = self._send_req(json.dumps(d), deal_library_url,headers={"Authorization":f"Bearer {self.token}"})
+        classReader = p['reader']
+        
+        if read and isinstance(result,list):
+            return classReader.read(result)
+        elif read and isinstance(result, dict):
+            return {k:classReader.read(v) for k,v in result.items()}
         else:
             return result
 
-    def _send_req(self,_req,_url,timeout=10)->dict:
+    def _send_req(self,_req,_url,timeout=10,headers={})->dict:
         with console.status("") as status:
             try:
-                r = self.session.post(_url, data=_req.encode('utf-8'), headers=self.hdrs, verify=False, timeout=timeout)
+                hdrs = self.hdrs | headers
+                r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
             except (ConnectionRefusedError, ConnectionError):
                 console.print(f"❌[bold red] Failed to talk to server {_url}")
                 console.rule()
