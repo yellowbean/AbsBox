@@ -188,7 +188,7 @@ class API:
         cred = {"user":user,"password":pw}
         r = self._send_req(json.dumps(cred), deal_library_url)
         if 'token' in r:
-            console.print(f"✅[bold green],login successfully")
+            console.print(f"✅[bold green] login successfully")
             self.token = r['token']
         else:
             console.print(f"❌[bold red]Failed to login")
@@ -200,6 +200,8 @@ class API:
         d = {"bond_id": [k for k in ks] }
         q = {"read":True} | q
         result = self._send_req(json.dumps(d), deal_library_url,headers= {"Authorization":f"Bearer {self.token}"})
+
+        console.print(f"✅[bold green] query success")
         if q['read'] == True:
             if 'data' in result:
                 return pd.DataFrame(result['data'],columns=result['header'])
@@ -219,7 +221,8 @@ class API:
         try:
             result = json.loads(result)
         except Exception as e:
-            console.print(f"error parsing resp from engine:{result}")
+            console.print(f"❌[bold red]message from API server:{result}")
+            console.print(f"❌[bold red]{e}")
         def lookupReader(x):
             match x:
                 case "china.SPV":
@@ -229,6 +232,7 @@ class API:
                 case _:
                     raise RuntimeError(f"Failed to match reader:{x}")
                 
+        console.print(f"✅[bold green],run success")
         classReader = lookupReader(p['reader'])
         if read and isinstance(result,list):
             return classReader.read(result)
