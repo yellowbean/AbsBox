@@ -16,6 +16,10 @@ from absbox.local.component import mkPool, mkAssumption, mkAssumption2, mkPricin
 from absbox.local.base import *
 from absbox.validation import valReq,valAssumption
 
+from absbox.local.china import SPV
+from absbox.local.generic import Generic
+
+
 VERSION_NUM = version("absbox")
 urllib3.disable_warnings()
 console = Console()
@@ -51,7 +55,7 @@ class API:
     def build_req(self, deal, assumptions=None, pricing=None) -> str:
         r = None
         _assump = None 
-        _deal = deal.json
+        _deal = deal.json if not isinstance(deal,str) else deal
         _pricing = mkPricingAssump(pricing) if pricing else None
         if isinstance(assumptions, dict):
             _assump = mapValsBy(assumptions, mkAssumption2)
@@ -112,9 +116,9 @@ class API:
             console.print("❌[bold red]Failed to get response from run")
             return None
         if read and multi_run_flag:
-            return {n:deal.read(_r,position=position) for (n,_r) in result.items()}
+            return {n:deal.read(_r) for (n,_r) in result.items()}
         elif read :
-            return deal.read(result,position=position)
+            return deal.read(result)
         else:
             return result
 
@@ -209,11 +213,23 @@ class API:
         read = p.get("read",True)
         pricingAssump = p.get("pricing",None)
         dealAssump = p.get("assump",None)
-        d = {'user':None, 'dealid':_id, 'assump':dealAssump, 'pricing':pricingAssump} | p
-        
-        result = self._send_req(json.dumps(d), deal_library_url,headers={"Authorization":f"Bearer {self.token}"})
-        classReader = p['reader']
-        
+        #d = {'dealid':_id, 'assump':dealAssump, 'pricing':pricingAssump} | p
+        runReq = self.build_req(_id, dealAssump, pricingAssump)
+        result = self._send_req(runReq, deal_library_url, headers={"Authorization":f"Bearer {self.token}"})
+        try:
+            result = json.loads(result)
+        except Exception as e:
+            console.print(f"error parsing resp from engine:{result}")
+        def lookupReader(x):
+            match x:
+                case "china.SPV":
+                    return SPV
+                case "generic.Generic":
+                    return Generic
+                case _:
+                    raise RuntimeError(f"Failed to match reader:{x}")
+                
+        classReader = lookupReader(p['reader'])
         if read and isinstance(result,list):
             return classReader.read(result)
         elif read and isinstance(result, dict):

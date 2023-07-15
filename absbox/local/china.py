@@ -9,7 +9,7 @@ from functools import reduce
 from pyspecter import query
 
 from absbox import *
-from absbox.local.util import mkTag,DC,mkTs,consolStmtByDate,aggStmtByDate,subMap,subMap2,mapValsBy,mapListValBy,renameKs2
+from absbox.local.util import *
 from absbox.local.component import *
 
 
@@ -108,13 +108,14 @@ class SPV:
         return None
     
     @staticmethod
-    def read(resp, position=None):
+    def read(resp):
         read_paths = {'bonds': ('bndStmt', china_bondflow_fields, "债券")
                     , 'fees': ('feeStmt', china_fee_flow_fields_d, "费用")
                     , 'accounts': ('accStmt', china_acc_flow_fields_d , "账户")
                     , 'liqProvider': ('liqStmt', china_liq_flow_fields_d, "流动性支持")
                     , 'rateSwap': ('rsStmt', china_rs_flow_fields_d, "")
                     }
+        assert isinstance(resp,list),f"<read>:resp should be list,but it is {type(resp)} => {resp}"
         deal_content = resp[0]['contents']
         output = {}
         for comp_name, comp_v in read_paths.items():
@@ -143,16 +144,6 @@ class SPV:
         output['pool']['flow'].index.rename(pool_idx, inplace=True)
 
         output['pricing'] = readPricingResult(resp[3], 'cn')
-        if position:
-            output['position'] = {}
-            for k,v in position.items():
-                if k in output['bonds']:
-                    b = self._get_bond(k)
-                    factor = v / b["初始余额"] / 100
-                    if factor > 1.0:
-                        raise  RuntimeError("持仓系数大于1.0")
-                    output['position'][k] = output['bonds'][k][china_bond_cashflow].apply(lambda x:x*factor).round(4)
-
         output['result'] = readRunSummary(resp[2], 'cn')
         return output
 

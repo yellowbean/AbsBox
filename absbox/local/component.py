@@ -552,6 +552,8 @@ def mkAction(x):
         case ["更新事件", idx] | ["runTrigger", idx]:
             dealCycleM = chinaDealCycle | englishDealCycle
             return mkTag(("RunTrigger", ["InWF",idx]))
+        case ["查看",*ds] | ["inspect",*ds]:
+            return mkTag(("WatchVal",[None,[mkDs(_) for _ in ds]]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkAction")
 

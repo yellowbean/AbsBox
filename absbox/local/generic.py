@@ -75,7 +75,7 @@ class Generic:
         return None
     
     @staticmethod
-    def read(resp, position=None):
+    def read(resp):
         read_paths = {'bonds': ('bndStmt' , english_bondflow_fields , "bond")
                      , 'fees': ('feeStmt' , english_fee_flow_fields_d , "fee")
                      , 'accounts': ('accStmt' , english_acc_flow_fields_d , "account")
