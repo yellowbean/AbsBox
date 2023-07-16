@@ -199,7 +199,7 @@ class API:
         deal_library_url = q['deal_library']+"/query"
         d = {"bond_id": [k for k in ks] }
         q = {"read":True} | q
-        result = self._send_req(json.dumps(d), deal_library_url,headers= {"Authorization":f"Bearer {self.token}"})
+        result = self._send_req(json.dumps(d|q), deal_library_url,headers= {"Authorization":f"Bearer {self.token}"})
 
         console.print(f"✅[bold green] query success")
         if q['read'] == True:
