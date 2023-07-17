@@ -218,11 +218,6 @@ class API:
         #d = {'dealid':_id, 'assump':dealAssump, 'pricing':pricingAssump} | p
         runReq = self.build_req(_id, dealAssump, pricingAssump)
         result = self._send_req(runReq, deal_library_url, headers={"Authorization":f"Bearer {self.token}"})
-        try:
-            result = json.loads(result)
-        except Exception as e:
-            console.print(f"❌[bold red]message from API server:{result}")
-            console.print(f"❌[bold red]{e}")
         def lookupReader(x):
             match x:
                 case "china.SPV":
@@ -231,15 +226,23 @@ class API:
                     return Generic
                 case _:
                     raise RuntimeError(f"Failed to match reader:{x}")
-                
-        console.print(f"✅[bold green],run success")
-        classReader = lookupReader(p['reader'])
-        if read and isinstance(result,list):
-            return classReader.read(result)
-        elif read and isinstance(result, dict):
-            return {k:classReader.read(v) for k,v in result.items()}
-        else:
-            return result
+        try:
+            result = json.loads(result)
+               
+            classReader = lookupReader(p['reader'])
+            #if "error" in result:
+            #    console.print(f"❌[bold red]-> Error: {result['error']}")
+            #    return None
+            console.print(f"✅[bold green],run success")
+            if read and isinstance(result,list):
+                return classReader.read(result)
+            elif read and isinstance(result, dict):
+                return {k:classReader.read(v) for k,v in result.items()}
+            else:
+                return result
+        except Exception as e:
+            console.print(f"❌[bold red]message from API server:{result}")
+            console.print(f"❌[bold red]{e}")
 
     def _send_req(self,_req,_url,timeout=10,headers={})->dict:
         with console.status("") as status:
