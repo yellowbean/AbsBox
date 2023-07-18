@@ -211,11 +211,10 @@ class API:
 
     def listLibrary(self,**q):
         deal_library_url = q['deal_library']+"/list"
-        
         result = self._send_req(json.dumps({}), deal_library_url)
-        console.print(f"✅[bold green] list success")
-        if q.get('read',False) == True:
-            return result
+        console.print(f"✅[bold green]list success")
+        if ('read' in q) and (q['read'] == True):
+            return pd.DataFrame(result['data'],columns=result['header'])
         else:
             return result
 
@@ -238,7 +237,7 @@ class API:
             result = json.loads(result)
                
             classReader = lookupReader(p['reader'])
-            console.print(f"✅[bold green],run success")
+            console.print(f"✅[bold green]run success")
             if read and isinstance(result,list):
                 return classReader.read(result)
             elif read and isinstance(result, dict):
