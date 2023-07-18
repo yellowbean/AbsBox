@@ -200,7 +200,6 @@ class API:
         d = {"bond_id": [k for k in ks] }
         q = {"read":True} | q
         result = self._send_req(json.dumps(d|q), deal_library_url,headers= {"Authorization":f"Bearer {self.token}"})
-
         console.print(f"✅[bold green] query success")
         if q['read'] == True:
             if 'data' in result:
@@ -210,13 +209,22 @@ class API:
         else:
             return result
 
+    def listLibrary(self,**q):
+        deal_library_url = q['deal_library']+"/list"
+        
+        result = self._send_req(json.dumps({}), deal_library_url)
+        console.print(f"✅[bold green] list success")
+        if q.get('read',False) == True:
+            return result
+        else:
+            return result
+
     def runLibrary(self,_id,**p):
         deal_library_url = p['deal_library']+"/run"
         read = p.get("read",True)
         pricingAssump = p.get("pricing",None)
         dealAssump = p.get("assump",None)
-        #d = {'dealid':_id, 'assump':dealAssump, 'pricing':pricingAssump} | p
-        runReq = self.build_req(_id, dealAssump, pricingAssump)
+        runReq = self.build_req(_id, dealAssump, pricingAssump) # {"production":p.get("production",True)}
         result = self._send_req(runReq, deal_library_url, headers={"Authorization":f"Bearer {self.token}"})
         def lookupReader(x):
             match x:
@@ -230,9 +238,6 @@ class API:
             result = json.loads(result)
                
             classReader = lookupReader(p['reader'])
-            #if "error" in result:
-            #    console.print(f"❌[bold red]-> Error: {result['error']}")
-            #    return None
             console.print(f"✅[bold green],run success")
             if read and isinstance(result,list):
                 return classReader.read(result)
