@@ -224,6 +224,9 @@ class API:
         pricingAssump = p.get("pricing",None)
         dealAssump = p.get("assump",None)
         runReq = self.build_req(_id, dealAssump, pricingAssump) # {"production":p.get("production",True)}
+        if not hasattr(self,"token"):
+            console.print(f"❌[bold red] No token found , please call loginLibrary() to login")
+            return 
         result = self._send_req(runReq, deal_library_url, headers={"Authorization":f"Bearer {self.token}"})
         def lookupReader(x):
             match x:
