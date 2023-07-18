@@ -1107,7 +1107,7 @@ def readPricingResult(x, locale) -> dict:
         return None
     h = None
 
-    tag = query(x, [S.MVALS, S.ALL, "tag"])[0]
+    tag = list(x.values())[0]["tag"]
     if tag == "PriceResult":
         h = {"cn": ["估值", "票面估值", "WAL", "久期", "凸性", "应计利息"],
              "en": ["pricing", "face", "WAL", "duration", "convexity", "accure interest"]}
