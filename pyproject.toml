@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "0.19.2"
+version = "0.19.3"
 name = "absbox"
 
 dependencies = [
