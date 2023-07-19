@@ -21,6 +21,7 @@ china,test20.py,test01
 china,test21.py,test01
 china,test23.py,JY_RMBS_2019_1
 china,test24.py,德宝天元202301
+china,test25.py,YYJH01
 us,test01.py,test01
 us,test02.py,test01
 us,test03.py,test03

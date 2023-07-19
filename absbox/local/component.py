@@ -482,7 +482,7 @@ def mkBookLedgerType(x):
     match x:
         case ["PDL",defaults,ledgers]:
             return mkTag(("PDL",[mkDs(defaults)
-                                ,[ (ln,mkDs(ds)) for ln,ds in ledgers]]))
+                                 ,[(ln,mkDs(ds)) for ln,ds in ledgers]]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkBookLedgerType")
 
@@ -1047,7 +1047,6 @@ def mkLedger(n, x):
             return {"ledgName":n,"ledgBalance":bal,"ledgStmt":tx}
         case _:
             raise RuntimeError(f"Failed to match Ledger:{x}")
-        
 
 def mkCf(x):
     if len(x) == 0:

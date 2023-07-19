@@ -31,32 +31,6 @@ class SPV:
     自定义: dict = None
     科目: dict = None
 
-    @classmethod
-    def load(cls,p):
-        with open(p,'rb') as _f:
-            c = _f.read()
-        return pickle.loads(c)
-
-    @classmethod
-    def pull(cls,_id,p,url=None,pw=None):
-        def get_filename_from_cd(cd):
-            if not cd:
-                return None
-            fname = re.findall("filename\*=utf-8''(.+)", cd)
-            if len(fname) == 0:
-                fname1 = re.findall("filename=\"(.+)\"", cd)
-                return fname1[0]
-            return unquote(fname[0])
-        with requests.get(f"{url}/china/deal/{_id}",stream=True,verify=False) as r:
-            filename = get_filename_from_cd(r.headers.get('content-disposition'))
-            if filename is None:
-                logging.error("Can't not find the Deal Name")
-                return None
-            with open(os.path.join(p,filename),'wb') as f:
-                shutil.copyfileobj(r.raw, f)
-            logging.info(f"Download {p} {filename} done ")
-
-
     @property
     def json(self):
         stated = False 
