@@ -81,6 +81,7 @@ class Generic:
                      , 'accounts': ('accStmt' , english_acc_flow_fields_d , "account")
                      , 'liqProvider': ('liqStmt', english_liq_flow_fields_d, "")
                      , 'rateSwap': ('rsStmt', english_rs_flow_fields_d, "")
+                     , 'ledgers': ('ledgStmt', english_ledger_flow_fields_d, "")
                      }
         deal_content = resp[0]['contents']
         output = {}
