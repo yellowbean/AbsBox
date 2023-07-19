@@ -184,6 +184,7 @@ def test_resp():
             ,("test21.json","empty.json","test21.out.json")
             ,("test23.json","empty.json","test23.out.json")
             ,("test24.json","empty.json","test24.out.json")
+            ,("test25.json","empty.json","test25.out.json")
             ]
     print(">>>> Runing China Bench Files")
     run_deal(china_folder, pair)
