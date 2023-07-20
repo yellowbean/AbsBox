@@ -143,6 +143,8 @@ def mkDs(x):
             return mkTag("CurrentPoolDefaultedBalance")
         case ("资产池累计违约余额",) | ("cumPoolDefaultedBalance",):
             return mkTag("CumulativePoolDefaultedBalance")
+        case ("资产池累计回收额",) | ("cumPoolRecoveries",):
+            return mkTag("CumulativePoolRecoveriesBalance")
         case ("资产池累计违约率",) | ("cumPoolDefaultedRate",):
             return mkTag("CumulativePoolDefaultedRate")
         case ("债券系数",) | ("bondFactor",):
