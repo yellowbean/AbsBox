@@ -516,8 +516,8 @@ def mkAction(x):
         case ["支付利息", source, target] | ["payInt", source, target]:
             return mkTag(("PayInt", [source, target]))
         case ["支付本金", source, target, _limit] | ["payPrin", source, target, _limit]:
-            pda = mkPDA(_limit)
-            return mkTag(("PayPrinBy", [pda, source, target]))
+            limit = mkTransferLimit(_limit)
+            return mkTag(("PayPrinBy", [limit, source, target]))
         case ["支付本金", source, target] | ["payPrin", source, target]:
             return mkTag(("PayPrin", [source, target]))
         case ["支付剩余本金", source, target] | ["payPrinResidual", source, target]:
