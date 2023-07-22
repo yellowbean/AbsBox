@@ -211,7 +211,7 @@ class API:
 
     def listLibrary(self,**q):
         deal_library_url = q['deal_library']+"/list"
-        result = self._send_req(json.dumps({}), deal_library_url)
+        result = self._send_req(json.dumps(q), deal_library_url)
         console.print(f"✅[bold green]list success")
         if ('read' in q) and (q['read'] == True):
             return pd.DataFrame(result['data'],columns=result['header'])
