@@ -1,4 +1,4 @@
-import json, datetime, pickle, re, urllib3
+import json, datetime, pickle, re, urllib3, getpass
 from importlib.metadata import version
 from json.decoder import JSONDecodeError
 from dataclasses import dataclass,field
@@ -193,7 +193,13 @@ class API:
         else:
             console.print(f"❌[bold red]Failed to login")
             return None
-            
+    
+    def safeLogin(self, user, **q):
+        try:
+            pw = getpass.getpass()
+            self.loginLibrary(user, pw, **q)
+        except Exception as e:
+            console.print(f"❌[bold red]{e}")
     
     def queryLibrary(self,ks,**q):
         if not hasattr(self,"token"):
@@ -241,7 +247,6 @@ class API:
                 case _:
                     raise RuntimeError(f"Failed to match reader:{x}")
         try:
-            #_result = json.loads(result)
             ri = result['run_info']
             result = result['run_result']
             console.print(f"✅[bold green]run success with deal id={ri['deal_id']}/report num={ri['report_num']},doc_id={ri['doc_id']}")
