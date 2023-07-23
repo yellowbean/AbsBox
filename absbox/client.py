@@ -241,12 +241,13 @@ class API:
                 case _:
                     raise RuntimeError(f"Failed to match reader:{x}")
         try:
-            result = json.loads(result)
+            #_result = json.loads(result)
+            ri = result['run_info']
+            result = result['run_result']
+            console.print(f"✅[bold green]run success with deal id={ri['deal_id']}/report num={ri['report_num']},doc_id={ri['doc_id']}")
         except Exception as e:
             console.print(f"❌[bold red]message from API server:{result}")
             return None
-
-        console.print(f"✅[bold green]run success")
         try:       
             classReader = lookupReader(p['reader'])
             if read and isinstance(result,list):
