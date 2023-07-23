@@ -296,4 +296,7 @@ def _read_asset_pricing(xs, lang):
     data = [ x['contents'] for x in xs]
     return pd.DataFrame(data, columns = header)
 
- 
+def mergeStrWithDict(s:str,m:dict) -> str:
+    t = json.loads(s)
+    t = t | m 
+    return json.dumps(t)

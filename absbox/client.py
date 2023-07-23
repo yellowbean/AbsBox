@@ -11,7 +11,7 @@ from requests.exceptions import ConnectionError,ReadTimeout
 import pandas as pd
 from pyspecter import query
 
-from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header, _read_cf, _read_asset_pricing
+from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header, _read_cf, _read_asset_pricing, mergeStrWithDict
 from absbox.local.component import mkPool, mkAssumption, mkAssumption2, mkPricingAssump,mkLiqMethod,mkAssetUnion
 from absbox.local.base import *
 from absbox.validation import valReq,valAssumption
@@ -55,7 +55,7 @@ class API:
     def build_req(self, deal, assumptions=None, pricing=None) -> str:
         r = None
         _assump = None 
-        _deal = deal.json if not isinstance(deal,str) else deal
+        _deal = deal.json if hasattr(deal,"json") else deal
         _pricing = mkPricingAssump(pricing) if pricing else None
         if isinstance(assumptions, dict):
             _assump = mapValsBy(assumptions, mkAssumption2)
@@ -196,6 +196,9 @@ class API:
             
     
     def queryLibrary(self,ks,**q):
+        if not hasattr(self,"token"):
+            console.print(f"❌[bold red] No token found , please call loginLibrary() to login")
+            return 
         deal_library_url = q['deal_library']+"/query"
         d = {"bond_id": [k for k in ks] }
         q = {"read":True} | q
@@ -223,7 +226,8 @@ class API:
         read = p.get("read",True)
         pricingAssump = p.get("pricing",None)
         dealAssump = p.get("assump",None)
-        runReq = self.build_req(_id, dealAssump, pricingAssump) # {"production":p.get("production",True)}
+        prod_flag = {"production":p.get("production",True)}
+        runReq = mergeStrWithDict (self.build_req(_id, dealAssump, pricingAssump), prod_flag )
         if not hasattr(self,"token"):
             console.print(f"❌[bold red] No token found , please call loginLibrary() to login")
             return 
@@ -238,9 +242,13 @@ class API:
                     raise RuntimeError(f"Failed to match reader:{x}")
         try:
             result = json.loads(result)
-               
+        except Exception as e:
+            console.print(f"❌[bold red]message from API server:{result}")
+            return None
+
+        console.print(f"✅[bold green]run success")
+        try:       
             classReader = lookupReader(p['reader'])
-            console.print(f"✅[bold green]run success")
             if read and isinstance(result,list):
                 return classReader.read(result)
             elif read and isinstance(result, dict):
@@ -248,8 +256,8 @@ class API:
             else:
                 return result
         except Exception as e:
-            console.print(f"❌[bold red]message from API server:{result}")
             console.print(f"❌[bold red]{e}")
+            return None
 
     def _send_req(self,_req,_url,timeout=10,headers={})->dict:
         with console.status("") as status:
