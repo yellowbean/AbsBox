@@ -120,6 +120,7 @@ class SPV:
 
         output['pricing'] = readPricingResult(resp[3], 'cn')
         output['result'] = readRunSummary(resp[2], 'cn')
+        output['_deal'] = resp[0]
         return output
 
 

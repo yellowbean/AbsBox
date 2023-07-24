@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import functools
 
 from absbox import *
-from absbox.local.util import mkTag,mapListValBy,mapValsBy,renameKs2,guess_pool_flow_header
+from absbox.local.util import mkTag,mapListValBy,mapValsBy,renameKs2,guess_pool_flow_header,positionFlow
 from absbox.local.component import *
 from absbox.local.base import * 
 import pandas as pd
@@ -115,5 +115,5 @@ class Generic:
 
         output['pricing'] = readPricingResult(resp[3], 'en')
         output['result'] = readRunSummary(resp[2], 'en')
-
+        output['_deal'] = resp[0]
         return output

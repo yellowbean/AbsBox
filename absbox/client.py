@@ -1,4 +1,4 @@
-import json, datetime, pickle, re, urllib3, getpass
+import json, datetime, pickle, re, urllib3, getpass, copy
 from importlib.metadata import version
 from json.decoder import JSONDecodeError
 from dataclasses import dataclass,field
@@ -95,8 +95,7 @@ class API:
     def run(self, deal,
             assumptions=None,
             pricing=None,
-            read=True,
-            position=None):
+            read=True):
 
         # if run req is a multi-scenario run
         multi_run_flag = True if isinstance(assumptions, dict) else False
@@ -292,13 +291,3 @@ class API:
                 console.rule()
                 return None
     
-
-
-def save(deal,p:str):
-    def save_to(b):
-        with open(p,'wb') as _f:
-            pickle.dump(b,_f)
-
-    match deal:
-        case _:
-            save_to(deal)

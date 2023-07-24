@@ -1,5 +1,5 @@
 import pandas as pd
-import functools,json
+import functools,json,copy
 import logging
 import itertools,re
 from enum import Enum
@@ -300,3 +300,24 @@ def mergeStrWithDict(s:str,m:dict) -> str:
     t = json.loads(s)
     t = t | m 
     return json.dumps(t)
+
+def positionFlow(x,m:dict,facePerPaper=100):
+    _,_bflow = list(x['bonds'].items())[0]
+    bflowHeader = _bflow.columns.to_list()
+
+    def calcBondFlow(_bflow,factor):
+        bflow = copy.deepcopy(_bflow)
+        bflow[bflowHeader[0]] *= factor
+        bflow[bflowHeader[1]] *= factor
+        bflow[bflowHeader[2]] *= factor
+        bflow[bflowHeader[4]] *= factor
+        return bflow
+        
+    assert isinstance(m, dict),"Position info must be a map/dict"
+    
+    bOrignBal = {k:x['_deal']['contents']['bonds'][k]['bndOriginInfo']['originBalance'] for k,v in m.items()}
+    bPapersPerBond = {k:v/facePerPaper for k,v in bOrignBal.items()}
+    
+    bflowFactor = {k:(v/bPapersPerBond[k]) for k,v in m.items()}
+    
+    return {bn:calcBondFlow(bf,bflowFactor[bn])  for bn,bf in x['bonds'].items() if bn in m}
