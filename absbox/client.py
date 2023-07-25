@@ -187,10 +187,10 @@ class API:
         cred = {"user":user,"password":pw}
         r = self._send_req(json.dumps(cred), deal_library_url)
         if 'token' in r:
-            console.print(f"✅[bold green] login successfully,{r[msg]}")
+            console.print(f"✅[bold green] login successfully,{r['msg']}")
             self.token = r['token']
         else:
-            console.print(f"❌[bold red]Failed to login,{r[msg]}")
+            console.print(f"❌[bold red]Failed to login,{r['msg']}")
             return None
     
     def safeLogin(self, user, **q):
