@@ -190,6 +190,7 @@ class API:
             console.print(f"✅[bold green] login successfully,{r['msg']}")
             self.token = r['token']
         else:
+            delattr(self,'token')
             console.print(f"❌[bold red]Failed to login,{r['msg']}")
             return None
     
