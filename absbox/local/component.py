@@ -1300,31 +1300,17 @@ def show(r, x="full"):
             return None  # ""
 
 
-def flow_by_scenario(rs, flowpath, annotation=True, aggFunc=None, rnd=2):
+def flow_by_scenario(rs, flowpath, node="col", rtn_df=True, ax = 1, rnd=2):
     "pull flows from multiple scenario"
-    scenario_names = rs.keys()
-    locale = guess_locale(list(rs.values())[0])
-
-    def _map(y):
-        if y == 'cn':
-            return {"idx": "日期"}
-        else:
-            return {"idx": "date"}
-
-    m = _map(locale)
-    dflow = None
-    aggFM = {"max": pd.Series.max, "sum": pd.Series.sum, "min": pd.Series.min}
-
-    if aggFunc is None:
-        dflows = [query(rs, [s]+flowpath) for s in scenario_names]
+    r = None
+    if node=="col":
+        r = {k:query(v,flowpath[:-1])[flowpath[-1]] for k,v  in rs.items()}    
+    elif node=="idx":
+        r = {k:query(v,flowpath[:-1]).loc[flowpath[-1]] for k,v  in rs.items()}    
     else:
-        dflows = [query(rs, [s]+flowpath).groupby(m['idx']).aggregate(
-            aggFM.get(aggFunc, aggFunc)) for s in scenario_names]
-
-    if annotation:
-        dflows = [f.rename(f"{s}({flowpath[-1]})")
-                  for (s, f) in zip(scenario_names, dflows)]
-    try:
-        return pd.concat(dflows, axis=1).round(rnd)
-    except ValueError as e:
-        return f"need to pass function to `aggFunc` to aggregate duplication rows, options: Min/Max/Sum "
+        r = {k:query(v,flowpath) for k,v in rs.items()}
+    if rtn_df:
+        _vs = list(r.values())
+        _ks = list(r.keys())
+        r = pd.concat(_vs,keys=_ks,axis=ax) 
+    return r
