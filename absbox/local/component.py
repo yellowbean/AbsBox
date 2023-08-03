@@ -110,6 +110,8 @@ def mkFeeType(x):
             return mkTag(("FeeFlow", mkTs("BalanceCurve", fflow)))
         case {"计数费用": [p, s, amt]} | {"numFee": [p, s, amt]}:
             return mkTag(("NumFee", [mkDatePattern(p), mkDs(s), amt]))
+        case {"差额费用": [ds1, ds2]} | {"targetBalanceFee": [ds1, ds2]}:
+            return mkTag(("TargetBalanceFee", [mkDs(ds1), mkDs(ds2)]))
         case _:
             raise RuntimeError(f"Failed to match on fee type:{x}")
 
