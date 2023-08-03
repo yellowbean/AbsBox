@@ -180,6 +180,12 @@ def mkDs(x):
             return mkTag(("CurrentDueFee", fns))
         case ("已付费用", *fns) | ("lastFeePaid", *fns):
             return mkTag(("LastFeePaid", fns))
+        case ("费用支付总额",cmt,*fns) | ("feeTxnAmount",cmt,*fns):
+            return mkTag(("FeeTxnAmt",[fns, cmt]))
+        case ("债券支付总额",cmt,*bns) | ("bondTxnAmount",cmt,*bns):
+            return mkTag(("BondTxnAmt",[bns, cmt]))
+        case ("账户变动总额",cmt,*ans) | ("accountTxnAmount",cmt,*ans):
+            return mkTag(("AccTxnAmt",[ans, cmt]))
         case ("系数", ds, f) | ("factor", ds, f):
             return mkTag(("Factor", [mkDs(ds), f]))
         case ("Min", *ds):
@@ -1066,14 +1072,6 @@ def mkCollection(x):
         case _:
             raise RuntimeError(f"Failed to match collection rule {x}")
 
-
-def mkAccTxn(xs):
-    "AccTxn T.Day Balance Amount Comment"
-    if xs is None:
-        return None
-    else:
-        return [mkTag(("AccTxn", x)) for x in xs]
-
 def mk(x):
     match x:
         case ["资产", assets]:
@@ -1300,17 +1298,3 @@ def show(r, x="full"):
             return None  # ""
 
 
-def flow_by_scenario(rs, flowpath, node="col", rtn_df=True, ax = 1, rnd=2):
-    "pull flows from multiple scenario"
-    r = None
-    if node=="col":
-        r = {k:query(v,flowpath[:-1])[flowpath[-1]] for k,v  in rs.items()}    
-    elif node=="idx":
-        r = {k:query(v,flowpath[:-1]).loc[flowpath[-1]] for k,v  in rs.items()}    
-    else:
-        r = {k:query(v,flowpath) for k,v in rs.items()}
-    if rtn_df:
-        _vs = list(r.values())
-        _ks = list(r.keys())
-        r = pd.concat(_vs,keys=_ks,axis=ax) 
-    return r

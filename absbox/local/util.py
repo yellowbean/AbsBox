@@ -301,6 +301,21 @@ def mergeStrWithDict(s:str,m:dict) -> str:
     t = t | m 
     return json.dumps(t)
 
+def flow_by_scenario(rs, flowpath, node="col", rtn_df=True, ax = 1, rnd=2):
+    "pull flows from multiple scenario"
+    r = None
+    if node=="col":
+        r = {k:query(v,flowpath[:-1])[flowpath[-1]] for k,v  in rs.items()}    
+    elif node=="idx":
+        r = {k:query(v,flowpath[:-1]).loc[flowpath[-1]] for k,v  in rs.items()}    
+    else:
+        r = {k:query(v,flowpath) for k,v in rs.items()}
+    if rtn_df:
+        _vs = list(r.values())
+        _ks = list(r.keys())
+        r = pd.concat(_vs,keys=_ks,axis=ax) 
+    return r
+
 def positionFlow(x,m:dict,facePerPaper=100):
     _,_bflow = list(x['bonds'].items())[0]
     bflowHeader = _bflow.columns.to_list()
