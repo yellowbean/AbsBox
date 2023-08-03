@@ -7,10 +7,10 @@ version = "0.19.11"
 name = "absbox"
 
 dependencies = [
-    "requests ==2.27.1",
     "pandas ==1.4.3",
     "numpy ==1.23.1",
     "matplotlib ==3.5.2",
+    "requests",
     "rich",
     "pyxirr",
     "pyspecter",
