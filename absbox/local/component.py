@@ -125,6 +125,20 @@ def mkDateVector(x):
         case _:
             raise RuntimeError(f"not match found: {x}")
 
+def mkPoolSource(x):
+    match x:
+        case "利息" | "Interest" :
+            return mkTag("CollectedInterest") 
+        case "本金" | "Principal":
+            return mkTag("CollectedPrincipal") 
+        case "回收" | "Recovery" :
+            return mkTag("CollectedRecoveries") 
+        case "早偿" | "Prepayment" :
+            return mkTag("CollectedPrepayment") 
+        case "租金" | "Rental" :
+            return mkTag("CollectedRental") 
+        case _ :
+            raise RuntimeError(f"not match found: {x} :make Pool Source")
 
 def mkDs(x):
     "Making Deal Stats"
@@ -150,9 +164,9 @@ def mkDs(x):
         case ("资产池累计违约率",) | ("cumPoolDefaultedRate",):
             return mkTag("CumulativePoolDefaultedRate")
         case ("资产池累计",*i) | ("cumPoolCollection",*i):
-            return mkTag(("PoolCumCollection",i))
+            return mkTag(("PoolCumCollection", [mkPoolSource(_) for _ in i] ))
         case ("资产池当期",*i) | ("curPoolCollection",*i):
-            return mkTag(("PoolCurCollection",i))
+            return mkTag(("PoolCurCollection", [mkPoolSource(_) for _ in i]))
         case ("债券系数",) | ("bondFactor",):
             return mkTag("BondFactor")
         case ("资产池系数",) | ("poolFactor",):
