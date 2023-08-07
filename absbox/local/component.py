@@ -128,15 +128,15 @@ def mkDateVector(x):
 def mkPoolSource(x):
     match x:
         case "利息" | "Interest" :
-            return mkTag("CollectedInterest") 
+            return "CollectedInterest" 
         case "本金" | "Principal":
-            return mkTag("CollectedPrincipal") 
+            return "CollectedPrincipal" 
         case "回收" | "Recovery" :
-            return mkTag("CollectedRecoveries") 
+            return "CollectedRecoveries" 
         case "早偿" | "Prepayment" :
-            return mkTag("CollectedPrepayment") 
+            return "CollectedPrepayment" 
         case "租金" | "Rental" :
-            return mkTag("CollectedRental") 
+            return "CollectedRental" 
         case _ :
             raise RuntimeError(f"not match found: {x} :make Pool Source")
 
@@ -286,10 +286,10 @@ def mkAccInt(x):
     match x:
         case {"周期": _dp, "利率": idx, "利差": spd, "最近结息日": lsd} \
                 | {"period": _dp,  "index": idx, "spread": spd, "lastSettleDate": lsd}:
-            return mkTag(("InvestmentAccount", [idx, spd, lsd, mkDateVector(_dp)]))
+            return mkTag(("InvestmentAccount", [idx, spd, lsd, mkDatePattern(_dp)]))
         case {"周期": _dp, "利率": br, "最近结息日": lsd} \
                 | {"period": _dp, "rate": br, "lastSettleDate": lsd}:
-            return mkTag(("BankAccount", [br, lsd, mkDateVector(_dp)]))
+            return mkTag(("BankAccount", [br, lsd,mkDatePattern(_dp)]))
         case None:
             return None
         case _:
@@ -527,6 +527,8 @@ def mkAction(x):
             return mkTag(("CalcFee", feeNames))
         case ["计提利息", *bndNames] | ["calcInt", *bndNames]:
             return mkTag(("CalcBondInt", bndNames))
+        case ["计提支付费用", source, target] | ["calcAndPayFee", source, target]:
+            return mkTag(("CalcAndPayFee", [source, target]))
         case ["支付费用", source, target] | ["payFee", source, target]:
             return mkTag(("PayFee", [source, target]))
         case ["支付费用收益", source, target, _limit] | ["payFeeResidual", source, target, _limit]:
