@@ -529,16 +529,19 @@ def mkAction(x):
             return mkTag(("CalcBondInt", bndNames))
         case ["计提支付费用", source, target] | ["calcAndPayFee", source, target]:
             return mkTag(("CalcAndPayFee", [source, target]))
+        case ["支付费用", source, target, _limit] | ["payFee", source, target, _limit]:
+            limit = mkFeeCapType(_limit)
+            return mkTag(("PayFeeBy", [limit, source, target]))        
         case ["支付费用", source, target] | ["payFee", source, target]:
             return mkTag(("PayFee", [source, target]))
+        case ["支付费用限额", source, target, _limit] | ["payFeeBy", source, target, _limit]:
+            limit = mkFeeCapType(_limit)
+            return mkTag(("PayFeeBy", [limit, source, target]))
         case ["支付费用收益", source, target, _limit] | ["payFeeResidual", source, target, _limit]:
             limit = mkAccountCapType(_limit)
             return mkTag(("PayFeeResidual", [limit, source, target]))
         case ["支付费用收益", source, target] | ["payFeeResidual", source, target]:
             return mkTag(("PayFeeResidual", [None, source, target]))
-        case ["支付费用限额", source, target, _limit] | ["payFeeBy", source, target, _limit]:
-            limit = mkFeeCapType(_limit)
-            return mkTag(("PayFeeBy", [limit, source, target]))
         case ["计提支付利息", source, target] | ["accrueAndPayInt", source, target]:
             return mkTag(("AccrueAndPayInt", [source, target]))
         case ["支付利息", source, target] | ["payInt", source, target]:
@@ -942,6 +945,8 @@ def mkAssumption(x) -> dict:
         case {"RevolvingAssets": [rpool,rassumps]} | {"循环资产": [rpool,rassumps]}:
             assumps = [ mkAssumption(ra) for ra in rassumps ]
             return mkTag(("AvailableAssets",[mkRevolvingPool(rpool), assumps]))
+        case {"预计费用":[fname,curve]} | {"EstimateExpense":[fname,curve]}:
+            return mkTag(("ProjectedExpense",[fname, mkTs("BalanceCurve",curve)]))
         case _:
             raise RuntimeError(f"Failed to match {x}:Assumption")
 

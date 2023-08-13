@@ -273,23 +273,18 @@ class API:
                 r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
             except (ConnectionRefusedError, ConnectionError):
                 console.print(f"❌[bold red] Failed to talk to server {_url}")
-                console.rule()
                 return None
             except ReadTimeout:
                 console.print(f"❌[bold red] Failed to get response from server")
-                console.rule()
                 return None
             if r.status_code != 200:
                 console.print_json(_req)
-                console.rule()
                 print(">>>",r.text)
                 console.print_json(r.text)
-                console.rule()
                 return None
             try:
                 return json.loads(r.text)
             except JSONDecodeError as e:
                 console.print(e)
-                console.rule()
                 return None
     
