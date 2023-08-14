@@ -94,8 +94,8 @@ def mkFeeType(x):
         case {"百分比费率": [*desc, _rate]} | {"pctFee": [*desc, _rate]}:
             rate = mkDsRate(_rate)
             match desc:
-                case ["资产池回款", "利息"] | ["poolCollection", "interest"]:
-                    return mkTag(("PctFee", [mkTag(("PoolCollectionIncome", "CollectedInterest")), rate]))
+                case ["资产池当期", "利息"] | ["poolCurrentCollection", "interest"] | ["资产池回款", "利息"]:
+                    return mkTag(("PctFee", [mkTag(("PoolCurCollection", ["CollectedInterest"])), rate]))
                 case ["已付利息合计", *bns] | ["paidInterest", *bns]:
                     return mkTag(("PctFee", [mkTag(("LastBondIntPaid", bns)), rate]))
                 case ["已付本金合计", *bns] | ["paidPrincipal", *bns]:

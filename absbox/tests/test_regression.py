@@ -134,6 +134,8 @@ def run_deal(input_folder, pair):
                     continue
                 with open(local_bench_file,'r') as eout: # expected output 
                     local_result = json.load(eout)
+                    assert isinstance(local_result, list), f"{dinput}: local result is not list but {local_result.keys()}"
+                    assert isinstance(s_result, list), f"{dinput}: server result is not list but {s_result}"
                     assert local_result[1]==s_result[1],"Pool Flow Is not matching"
                     local_result_content = local_result[0]['contents']
                     s_result_content = s_result[0]['contents']
@@ -145,7 +147,8 @@ def run_deal(input_folder, pair):
                     if local_result_content['bonds']!=s_result_content['bonds']:
                         print("Bonds are not matching")
                         for bn,bv in local_result_content['bonds'].items():
-                            if s_result[0]['bonds'][bn]!=bv:
+                            assert 'bonds' in s_result[0]['contents'],f"No bonds in server resp, with key -> {s_result[0]['contents'].keys()}"
+                            if s_result[0]['contents']['bonds'][bn]!=bv:
                                 print(f"Bond {bn} is not matching")
                                 print(DeepDiff(s_result_content['bonds'][bn], bv))
 

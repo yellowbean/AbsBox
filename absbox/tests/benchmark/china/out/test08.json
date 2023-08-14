@@ -1035,8 +1035,10 @@
           "tag": "PctFee",
           "contents": [
             {
-              "tag": "PoolCollectionIncome",
-              "contents": "CollectedInterest"
+              "tag": "PoolCurCollection",
+              "contents": [
+                "CollectedInterest"
+              ]
             },
             {
               "tag": "Constant",
