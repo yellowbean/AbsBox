@@ -13,6 +13,7 @@ from absbox.local.util import *
 from absbox.local.component import *
 
 
+
 @dataclass
 class SPV:
     名称: str

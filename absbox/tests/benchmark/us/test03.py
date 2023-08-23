@@ -1,6 +1,6 @@
 from absbox.local.generic import Generic
 
-test03 = Generic(
+test01 = Generic(
     "If in Waterfall"
     ,{"cutoff":"2021-03-01","closing":"2021-06-15","firstPay":"2021-07-26"
      ,"payFreq":["DayOfMonth",20],"poolFreq":"MonthEnd","stated":"2030-01-01"}
@@ -37,20 +37,16 @@ test03 = Generic(
              }))
     ,(("trusteeFee",{"type":{"fixFee":30}}),)
     ,{"amortizing":[
-         ["payFee",["acc01"],['trusteeFee']]
+         ["payFee","acc01",['trusteeFee']]
          ,["accrueAndPayInt","acc01",["A1","A2"]]
          ,["If"
            ,[("monthsTillMaturity","A1"),"<",3]
            ,["payPrin","acc01",["A1","A2"]]]
          ,["payPrin","acc01",["B"]]
-         ,["payResidual","acc01","B"]]
+         ,["payPrinResidual","acc01","B"]]
       }
     ,[["CollectedInterest","acc01"]
       ,["CollectedPrincipal","acc01"]
       ,["CollectedPrepayment","acc01"]
       ,["CollectedRecoveries","acc01"]]
-    ,None
-    ,None
-    ,None
-    ,None
     )

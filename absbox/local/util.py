@@ -199,6 +199,10 @@ def guess_pool_locale(x):
         raise RuntimeError("Failed to match {x} in guess pool locale")
 
 def renameKs(m:dict,mapping,opt_key=False):
+    '''
+    rename keys in a map with from a mapping tuple passed in 
+    `opt_key` = True, allow skipping mapping tuple not exist in the map
+    '''
     for (o,n) in mapping:
         if opt_key and o not in m:
             continue
@@ -336,3 +340,11 @@ def positionFlow(x,m:dict,facePerPaper=100):
     bflowFactor = {k:(v/bPapersPerBond[k]) for k,v in m.items()}
     
     return {bn:calcBondFlow(bf,bflowFactor[bn])  for bn,bf in x['bonds'].items() if bn in m}
+
+def tryConvertTupleToDict(xs):
+    if isinstance(xs, tuple):
+        return {n:v for n,v in xs}
+    elif isinstance(xs, dict):
+        return xs
+    else:
+        raise RuntimeError(f"Failed to match <convertTupleToDict> ,either Map or Tuple but got {type(xs)}")

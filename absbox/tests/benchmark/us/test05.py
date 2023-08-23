@@ -31,7 +31,7 @@ test01 = Generic(
     ,{"amortizing":[
          ["calcInt","A1"]
          ,["liqAccrue","insuranceProvider"]
-         ,["liqSupport", "insuranceProvider","acc01"
+         ,["liqSupport", "insuranceProvider","account","acc01"
            ,{"formula":
              ("Max"
              ,("substract",("bondDueInt","A1","B"),("accountBalance","acc01"))
@@ -50,6 +50,6 @@ test01 = Generic(
       ,["CollectedPrepayment","acc02"]
       ,["CollectedRecoveries","acc02"]]
     ,{"insuranceProvider":
-         {"lineOfCredit":100,"start":"2021-06-15","fixRate":0.01
-          ,"rateAccDates":"MonthEnd","lastAccDate":"2021-06-15"}
+         {"lineOfCredit":100,"start":"2021-06-15"
+          ,"rate":{"fix":0.01}}
      })

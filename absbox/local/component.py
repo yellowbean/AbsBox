@@ -220,6 +220,10 @@ def mkDs(x):
             return mkTag(("Constant", n))
         case ("储备账户缺口", *accs) | ("reserveGap", *accs):
             return mkTag(("ReserveAccGap", accs))
+        case ("储备账户盈余", *accs) | ("reserveExcess", *accs):
+            return mkTag(("ReserveExcess", accs))
+        case ("最优先",bn,bns) | ("isMostSenior",bn,bns):
+            return mkTag(("IsMostSenior",bn,bns))
         case ("自定义", n) | ("custom", n):
             return mkTag(("UseCustomData", n))
         case ("区间内",floor,cap,s) | ("floorCap",floor,cap,s):
@@ -235,10 +239,8 @@ def mkDs(x):
         case _:
             raise RuntimeError(f"Failed to match DS/Formula: {x}")
 
-
 def mkCurve(tag,xs):
     return mkTag((tag,xs))
-
 
 def mkPre(p):
     def queryType(y):
@@ -312,10 +314,10 @@ def mkAccType(x):
             return mkTag(("PctReserve", [mkDs(ds), rate]))
         case {"目标储备金额": {"公式": ds}} | {"targetReserve": {"formula": ds}}:
             return mkTag(("PctReserve", [mkDs(ds), 1.0]))
-        case {"较高": [a, b]} | {"max": [a, b]}:
-            return mkTag(("Max", [mkAccType(a), mkAccType(b)]))
-        case {"较低": [a, b]} | {"min": [a, b]}:
-            return mkTag(("Min", [mkAccType(a), mkAccType(b)]))
+        case {"较高": _s} | {"max": _s} if isinstance(_s,list):
+            return mkTag(("Max", [mkAccType(_) for _ in _s]))
+        case {"较低": _s} | {"min": _s} if isinstance(_s,list):
+            return mkTag(("Min", [mkAccType(_) for _ in _s]))
         case {"分段": [p, a, b]} | {"When": [p, a, b]}:
             return mkTag(("Either", [mkPre(p), mkAccType(a), mkAccType(b)]))
         case None:
@@ -359,17 +361,19 @@ def mkBondType(x):
 
 def mkBondRate(x):
     match x:
-        case {"浮动": [_index, Spread, resetInterval], "日历": dc} | \
-                {"floater": [_index, Spread, resetInterval], "dayCount": dc}:
-            return mkTag(("Floater", [_index, Spread, mkDatePattern(resetInterval), dc, None, None]))
+        case {"浮动": [r, _index, Spread, resetInterval], "日历": dc} | \
+                {"floater": [r, _index, Spread, resetInterval], "dayCount": dc}:
+            return mkTag(("Floater", [r, _index, Spread, mkDatePattern(resetInterval), dc, None, None]))
         case {"浮动": [_index, Spread, resetInterval]} | {"floater": [_index, Spread, resetInterval]}:
             return mkBondRate(x | {"日历": DC.DC_ACT_365F.value, "dayCount": DC.DC_ACT_365F.value})
         case {"固定": _rate, "日历": dc} | {"fix": _rate, "dayCount": dc}:
             return mkTag(("Fix", [_rate, dc]))
         case {"固定": _rate} | {"Fixed": _rate}:
             return mkTag(("Fix", [_rate, DC.DC_ACT_365F.value]))
-        case {"调息": _rate, "幅度":spd, "调息日":dp} | {"StepUp": _rate, "Spread":spd, "When":dp}:
+        case {"调息": _rate, "幅度":spd, "调息日":dp} | {"StepUp": _rate, "Spread":spd, "When":dp} | {"StepUp": _rate, "spread":spd, "when":dp}:
             return mkTag(("StepUpFix", [_rate, DC.DC_ACT_365F.value, mkDatePattern(dp), spd ]))
+        case {"调息": _rate, "调息日":d,"调息日前":r1,"调息日后":r2} | {"StepUp": _rate, "stepUpDate":d,"before":r1,"after":r2}:
+            return mkTag(("StepUpByDate", [_rate, d, mkBondRate(r1),mkBondRate(r2) ]))
         case {"期间收益": _yield}:
             return mkTag(("InterestByYield", _yield))
         case _:
@@ -406,17 +410,6 @@ def mkLiqMethod(x):
         case _:
             raise RuntimeError(f"Failed to match {x}:mkLiqMethod")
 
-
-def mkFeeCapType(x):
-    match x:
-        case {"应计费用百分比": pct} | {"duePct": pct}:
-            return mkTag(("DuePct", pct))
-        case {"应计费用上限": amt} | {"dueCapAmt": amt}:
-            return mkTag(("DueCapAmt", amt))
-        case _:
-            raise RuntimeError(f"Failed to match {x}:mkFeeCapType")
-
-
 def mkPDA(x):
     match x:
         case {"公式": ds} | {"formula": ds}:
@@ -434,6 +427,8 @@ def mkAccountCapType(x):
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAccountCapType")
 
+def mkLimit(x):
+    return mkTransferLimit(x)
 
 def mkTransferLimit(x):
     match x:
@@ -441,14 +436,65 @@ def mkTransferLimit(x):
             return mkTag(("DuePct", pct))
         case {"金额上限": amt} | {"balCapAmt": amt}:
             return mkTag(("DueCapAmt", amt))
-        case {"公式": "ABCD"}:
-            return mkTag(("Formula", "ABCD"))
         case {"公式": formula} | {"formula": formula}:
             return mkTag(("DS", mkDs(formula)))
-        case {"PDL贷记":an} | {"clearPDL":an}:
-            return mkTag(("ClearPDL", an))
+        case {"贷记":an} | {"clearLedger":an}:
+            return mkTag(("ClearLedger", an))
+        case {"借记":an} | {"bookLedger":an}:
+            return mkTag(("BookLedger", an))
+        case {"系数":[limit,factor]} | {"multiple":[limit,factor]}:
+            return mkTag(("Multiple", [mkLimit(limit),factor]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkTransferLimit")
+        
+def mkComment(x):
+    match x:
+        case {"payInt":bns}:
+            return mkTag(("PayInt",bns))
+        case {"payYield":bn}:
+            return mkTag(("PayYield",bn))
+        case {"transfer":[a1,a2]}:
+            return mkTag(("Transfer",[a1,a2]))
+        case {"transfer":[a1,a2,limit]}:
+            return mkTag(("TransferBy",[a1,a2,limit]))
+                # = PayInt [BondName]
+                # | PayYield BondName 
+                # | PayPrin [BondName] 
+                # | PayFee FeeName
+                # | SeqPayFee [FeeName] 
+                # | PayFeeYield FeeName
+                # | Transfer AccName AccName 
+                # | TransferBy AccName AccName Limit
+                # | PoolInflow PoolSource
+                # | LiquidationProceeds
+                # | LiquidationSupport String
+                # | LiquidationDraw
+                # | LiquidationRepay
+                # | LiquidationSupportInt Balance Balance
+                # | BankInt
+                # | Empty 
+                # | Tag String
+                # | UsingDS DealStats
+                # | SwapAccure
+                # | SwapInSettle
+                # | SwapOutSettle
+                # | PurchaseAsset
+                # | TxnDirection Direction
+                # | TxnComments [TxnComment]
+
+
+def mkLiqDrawType(x):
+    match x:
+        case "账户" | "account":
+            return "LiqToAcc"
+        case "费用" | "fee":
+            return "LiqToFee"
+        case "债券利息" | "interest":
+            return "LiqToBondInt"
+        case "债券本金" | "principal":
+            return "LiqToBondPrin"
+        case _:
+            raise RuntimeError(f"Failed to match :{x}:Liquidation Draw Type")
 
 
 def mkLiqRepayType(x):
@@ -506,74 +552,116 @@ def mkRateSwap(x):
         case _:
             raise RuntimeError(f"Failed to match :{x}:Interest Swap")
 
-def mkBookLedgerType(x):
+
+def mkRateType(x):
+    match x :
+        case {"fix":r} | {"固定":r}:
+           return mkTag(("Fix",r))
+        case {"floater":(idx,spd),"rate":r,"resets":dp,**p} | \
+            {"浮动":(idx,spd),"利率":r,"重置":dp,**p}:
+            mf = getValWithKs(p,["floor"])
+            mc = getValWithKs(p,["cap"])
+            mrnd = getValWithKs(p,["rounding"])
+            return mkTag(("Floater",[idx,spd,r,mkDatePattern(dp),mf,mc,mrnd]))
+        case None:
+            return None
+        case _ :
+            raise RuntimeError(f"Failed to match :{x}: Rate Type")
+
+
+def mkBookType(x):
     match x:
         case ["PDL",defaults,ledgers]:
             return mkTag(("PDL",[mkDs(defaults)
                                  ,[[ln,mkDs(ds)] for ln,ds in ledgers]]))
+        case ["AccountDraw", ledger]:
+            return mkTag(("ByAccountDraw",ledger))
+        case ["ByFormula", ledger, ds]:
+            return mkTag(("ByDS", ledger, ds))
         case _:
-            raise RuntimeError(f"Failed to match :{x}:mkBookLedgerType")
+            raise RuntimeError(f"Failed to match :{x}:mkBookType")
 
+def mkSupport(x):
+    match x:
+        case ["suppportAccount",accName,mBookType] | ["支持账户",accName,mBookType]:
+            return mkTag(("SupportAccount",[accName,mkBookType(mBookType)]))
+        case ["suppportAccount",accName] | ["支持账户",accName]:
+            return mkTag(("SupportAccount",[accName,None]))
+        case ["suppportFacility",liqName] | ["支持机构",liqName]:
+            return mkTag(("SupportLiqFacility",liqName))
+        case ["multiSupport",*supports] | ["多重支持",*supports]:
+            return mkTag(("MultiSupport",[ mkSupport(s) for s in supports]))
+        case _:
+            raise RuntimeError(f"Failed to match :{x}:SupportType")
 
 def mkAction(x):
     match x:
+        case ["账户转移", source, target, m] | ["transfer", source, target, m]:
+            limit = getValWithKs(m,['limit',"限制"])
+            cmt = getValWithKs(m,['comment',"备注"])
+            return mkTag(("Transfer", [mkLimit(limit), source, target, mkComment(cmt)]))
         case ["账户转移", source, target] | ["transfer", source, target]:
-            return mkTag(("Transfer", [source, target]))
-        case ["按公式账户转移", _limit, source, target] | ["transferBy", _limit, source, target]:
-            return mkTag(("TransferBy", [mkTransferLimit(_limit), source, target]))
-        case ["簿记", bookLedgerType] | ["bookBy", bookLedgerType]:
-            return mkTag(("BookBy", mkBookLedgerType(bookLedgerType)))
+            return mkTag(("Transfer", [None, source, target, None]))
+        case ["簿记", bookType] | ["bookBy", bookType]:
+            return mkTag(("BookBy", mkBookType(bookType)))
         case ["计提费用", *feeNames] | ["calcFee", *feeNames]:
             return mkTag(("CalcFee", feeNames))
         case ["计提利息", *bndNames] | ["calcInt", *bndNames]:
             return mkTag(("CalcBondInt", bndNames))
+        case ["计提支付费用", source, target, m ] | ["calcAndPayFee", source, target, m]:
+            limit = getValWithKs(m,['limit',"限制"])
+            support = getValWithKs(m,['support',"支持"])
+            return mkTag(("CalcAndPayFee", [mkLimit(limit), source, target, mkSupport(support)]))
         case ["计提支付费用", source, target] | ["calcAndPayFee", source, target]:
-            return mkTag(("CalcAndPayFee", [source, target]))
-        case ["支付费用", source, target, _limit] | ["payFee", source, target, _limit]:
-            limit = mkFeeCapType(_limit)
-            return mkTag(("PayFeeBy", [limit, source, target]))        
+            return mkTag(("CalcAndPayFee", [None, source, target, None]))
+        case ["支付费用", source, target, m] | ["payFee", source, target, m]:
+            limit = getValWithKs(m,['limit',"限制"])
+            support = getValWithKs(m,['support',"支持"])
+            return mkTag(("PayFee", [mkLimit(limit), source, target, mkSupport(support)]))
         case ["支付费用", source, target] | ["payFee", source, target]:
-            return mkTag(("PayFee", [source, target]))
-        case ["支付费用限额", source, target, _limit] | ["payFeeBy", source, target, _limit]:
-            limit = mkFeeCapType(_limit)
-            return mkTag(("PayFeeBy", [limit, source, target]))
+            return mkTag(("PayFee", [None, source, target, None]))
         case ["支付费用收益", source, target, _limit] | ["payFeeResidual", source, target, _limit]:
-            limit = mkAccountCapType(_limit)
-            return mkTag(("PayFeeResidual", [limit, source, target]))
+            return mkTag(("PayFeeResidual", [ mkLimit(limit), source, target]))
         case ["支付费用收益", source, target] | ["payFeeResidual", source, target]:
-            return mkTag(("PayFeeResidual", [None, source, target]))
+            return mkTag(("PayFeeResidual", [ None, source, target]))
+        case ["计提支付利息", source, target, m] | ["accrueAndPayInt", source, target, m]:
+            limit = getValWithKs(m,['limit',"限制"])
+            support = getValWithKs(m,['support',"支持"])
+            return mkTag(("AccrueAndPayInt", [limit, source, target, support]))
         case ["计提支付利息", source, target] | ["accrueAndPayInt", source, target]:
-            return mkTag(("AccrueAndPayInt", [source, target]))
+            return mkTag(("AccrueAndPayInt", [None, source, target, None]))
+        case ["支付利息", source, target, m] | ["payInt", source, target, m]:
+            limit = getValWithKs(m,['limit',"限制"])
+            support = getValWithKs(m,['support',"支持"])
+            return mkTag(("PayInt", [limit, source, target, support]))
         case ["支付利息", source, target] | ["payInt", source, target]:
-            return mkTag(("PayInt", [source, target]))
-        case ["支付本金", source, target, _limit] | ["payPrin", source, target, _limit]:
-            limit = mkTransferLimit(_limit)
-            return mkTag(("PayPrinBy", [limit, source, target]))
+            return mkTag(("PayInt", [None, source, target, None]))
         case ["支付本金", source, target] | ["payPrin", source, target]:
-            return mkTag(("PayPrin", [source, target]))
+            return mkTag(("PayPrin", [None, source, target, None]))
+        case ["支付本金", source, target, m] | ["payPrin", source, target, m]:
+            limit = getValWithKs(m,['limit',"限制"])
+            support = getValWithKs(m,['support',"支持"])
+            return mkTag(("PayPrin", [limit, source, target, support]))
         case ["支付剩余本金", source, target] | ["payPrinResidual", source, target]:
             return mkTag(("PayPrinResidual", [source, target]))
-        case ["支付期间收益", source, target]:
-            return mkTag(("PayTillYield", [source, target]))
-        case ["支付收益", source, target, limit] | ["payResidual", source, target, limit]:
-            return mkTag(("PayResidual", [limit, source, target]))
-        case ["支付收益", source, target] | ["payResidual", source, target]:
-            return mkTag(("PayResidual", [None, source, target]))
-        case ["储备账户转移", source, target, satisfy] | ["transferReserve", source, target, satisfy]:
-            _map = {"源储备": "Source", "目标储备": "Target","Source":"Source","Target":"Target"}
-            return mkTag(("TransferReserve", [_map[satisfy], source, target]))
+        case ["支付收益", source, target, limit] | ["payIntResidual", source, target, limit]:
+            return mkTag(("PayIntResidual", [ mkLimit(limit), source, target]))
+        case ["支付收益", source, target] | ["payIntResidual", source, target]:
+            return mkTag(("PayIntResidual", [None, source, target]))
         case ["出售资产", liq, target] | ["sellAsset", liq, target]:
             return mkTag(("LiquidatePool", [mkLiqMethod(liq), target]))
-        case ["流动性支持", source, target, limit] | ["liqSupport", source, target, limit]:
-            return mkTag(("LiqSupport", [   mkTransferLimit(limit), source, target]))
-        case ["流动性支持", source, target] | ["liqSupport", source, target]:
-            return mkTag(("LiqSupport", [None, source, target]))
+        case ["流动性支持", source, liqType, target, limit] | ["liqSupport", source, liqType, target, limit]:
+            return mkTag(("LiqSupport", [ mkLimit(limit), source, mkLiqDrawType(liqType), target]))
+        case ["流动性支持", source, liqType, target] | ["liqSupport", source, liqType, target]:
+            return mkTag(("LiqSupport", [ None, source, mkLiqDrawType(liqType), target]))
         case ["流动性支持偿还", rpt, source, target] | ["liqRepay", rpt, source, target]:
             return mkTag(("LiqRepay", [None, mkLiqRepayType(rpt), source, target]))
-        case ["流动性支持偿还", source, target] | ["liqRepay",  source, target]:
-            return mkTag(("LiqRepay", [None, "bal", source, target]))
+        case ["流动性支持偿还", rpt, source, target, limit] | ["liqRepay", rpt, source, target, limit]:
+            return mkTag(("LiqRepay", [ mkLimit(limit), mkLiqRepayType(rpt), source, target]))
         case ["流动性支持报酬", source, target] | ["liqRepayResidual", source, target]:
             return mkTag(("LiqYield", [None, source, target]))
+        case ["流动性支持报酬", source, target, limit] | ["liqRepayResidual", source, target, limit]:
+            return mkTag(("LiqYield", [mkLimit(limit), source, target]))
         case ["流动性支持计提", target] | ["liqAccrue", target]:
             return mkTag(("LiqAccrue", target))
         case ["条件执行", pre, *actions] | ["If", pre, *actions]:
@@ -646,7 +734,12 @@ def mkThreshold(x):
 
 def _rateTypeDs(x):
     h = x[0]
-    if h in set(["资产池累积违约率", "cumPoolDefaultedRate", "债券系数", "bondFactor", "资产池系数", "poolFactor"]):
+    if h in set(["资产池累积违约率"
+                 , "cumPoolDefaultedRate"
+                 , "债券系数"
+                 , "bondFactor"
+                 , "资产池系数"
+                 , "poolFactor"]):
         return True
     return False
 
@@ -778,7 +871,7 @@ def mkAsset(x):
             borrowerNum1 = x[2].get("borrowerNum", None)
             return mkTag(("AdjustRateMortgage",
                           [{"originBalance": originBalance,
-                            "originRate": mkAssetRate(originRate),
+                            "originRate": mkRateType(originRate),
                             "originTerm": originTerm,
                             "period": freqMap[freq],
                             "startDate": startDate,
@@ -799,7 +892,7 @@ def mkAsset(x):
 
             return mkTag(("Mortgage", [
                 {"originBalance": originBalance,
-                 "originRate": mkAssetRate(originRate),
+                 "originRate": mkRateType(originRate),
                  "originTerm": originTerm,
                  "period": freqMap[freq],
                  "startDate": startDate,
@@ -1016,7 +1109,7 @@ def mkCustom(x):
 def mkLiqProviderType(x):
     match x:
         case {"总额度": amt} | {"total": amt}:
-            return mkTag(("FixSupport"))
+            return mkTag(("FixSupport", amt))
         case {"日期": dp, "限额": amt} | {"reset": dp, "quota": amt}:
             return mkTag(("ReplenishSupport", [mkDatePattern(dp), amt]))
         case {"公式": ds, "系数":pct} | {"formula":ds, "pct":pct}:
@@ -1026,49 +1119,38 @@ def mkLiqProviderType(x):
         case _:
             raise RuntimeError(f"Failed to match LiqProvider Type：{x}")
         
-def mkLiqProviderRate(x):
-    match x:
-        case {"fixRate":r ,"rateAccDates":rateAccDates,"lastAccDate":lastAccDate} | \
-              {"固定利率":r ,"结息日":rateAccDates,"上次结息日":lastAccDate} :
-            return mkTag(("FixRate",[mkDatePattern(rateAccDates),r,lastAccDate]))
-        case _:
-            return None
-
-def buildOptionalLiqProvider(m):
-    optionalFields = ["liqDueInt","liqDuePremium","liqRate","liqPremium","liqStmt"]
-    r = {}
-    for k in optionalFields:
-        if k in m:
-            if k in set(["liqRate","liqPremium"]):
-                r[k] = mkLiqProviderRate(m[k])
-            else:
-                r[k] = m[k]
-        else:
-            r[k] = None
-    return r
-
 def mkLiqProvider(n, x):
-    opt_fields = {"liqCredit":0,"liqDueInt":None,"liqDuePremium":None
-                 ,"liqRate":None,"liqPremiumRate":None,"liqStmt":None}
+    opt_fields = {"liqCredit":None,"liqDueInt":0,"liqDuePremium":0
+                 ,"liqRate":None,"liqPremiumRate":None,"liqStmt":None
+                 ,"liqBalance":0,"liqRateType":None,"liqPremiumRateType":None
+                 ,"liqDueIntDate":None,"liqEnds":None}
 
-    x_transformed = renameKs(x,[("已提供","liqCredit"),("应付利息","liqDueInt"),("应付费用","liqDuePremium")
-                                ,("利率","liqRate"),("费率","liqPremium"),("记录","liqStmt")]
+    x_transformed = renameKs(x,[("已提供","liqBalance"),("应付利息","liqDueInt"),("应付费用","liqDuePremium")
+                                ,("利率","liqRate"),("费率","liqPremiumRate"),("记录","liqStmt"),
+                                ]
                                 ,opt_key=True)
     r = None
     match x_transformed :
         case {"类型": "无限制", "起始日": _sd, **p} | {"type": "Unlimited", "start": _sd, **p}:
             r = {"liqName": n, "liqType": mkLiqProviderType({})
-                    ,"liqBalance": None, "liqStart": _sd
-                    ,"liqRate":mkLiqProviderRate(p)} | buildOptionalLiqProvider(p)
+                ,"liqBalance": p.get("balance",0), "liqStart": _sd
+                ,"liqRateType": mkRateType(p.get("rate",None))
+                ,"liqPremiumRateType": mkRateType(p.get("fee",None))
+                } 
         case {"类型": _sp, "额度": _ab, "起始日": _sd, **p} \
                 | {"type": _sp, "lineOfCredit": _ab, "start": _sd, **p}:
             r = {"liqName": n, "liqType": mkLiqProviderType(_sp)
-                    ,"liqBalance": _ab,  "liqStart": _sd
-                    ,"liqRate":mkLiqProviderRate(p)} | buildOptionalLiqProvider(p)
+                ,"liqBalance": _ab,  "liqStart": _sd
+                ,"liqRateType": mkRateType(p.get("rate",None))
+                ,"liqPremiumRateType": mkRateType(p.get("fee",None))
+                } 
         case {"额度": _ab, "起始日": _sd, **p} | {"lineOfCredit": _ab, "start": _sd, **p}:
-            r = {"liqName": n, "liqType": mkTag(("FixSupport"))
-                    ,"liqBalance": _ab,  "liqStart": _sd
-                    ,"liqRate":mkLiqProviderRate(p)} | buildOptionalLiqProvider(p)
+            r = {"liqName": n, "liqType": mkTag(("FixSupport",_ab))
+                ,"liqBalance": _ab,  "liqStart": _sd
+                ,"liqRateType": mkRateType(p.get("rate",None))
+                ,"liqPremiumRateType": mkRateType(p.get("fee",None))
+                } 
+        
         case _:
             raise RuntimeError(f"Failed to match LiqProvider:{x}")
 

@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib import font_manager
 from absbox.local.util import guess_locale,aggStmtByDate,consolStmtByDate
 from pyspecter import query, S
+#from itertools import reduce
 from itertools import reduce
 import numpy as np
 import logging
@@ -142,7 +143,7 @@ def plot_bs(x, excludeItems=["FeeDue","IntAccrue","Account"]):
         multiplier += 1
 
     ax.set_ylabel('Amount')
-    ax.set_title('Projected Captial Structure')
+    ax.set_title('Projected Capital Structure')
     ax.set_xticks(x + width/2, dates)
     ax.legend(loc='upper right')
     ax.set_ylim(0, max([highest_y1,highest_y2])*1.2)
