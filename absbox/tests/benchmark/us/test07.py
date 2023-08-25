@@ -91,8 +91,8 @@ BMW202301 = Generic(
     ,{"default":[
           ["transfer",'revolBuyAcc',"distAcc"]
          ,["transfer",'cashReserve',"distAcc"]
-         ,["payFee",["distAcc",'cashReserve'],["admFee"]]
-         ,["payFee",["distAcc",'cashReserve'],["serviceFee"]]
+         ,["payFee","distAcc",["admFee"],{"support":["suppportAccount",'cashReserve']}]
+         ,["payFee","distAcc",["serviceFee"],{"support":["suppportAccount",'cashReserve']}]
          ,["accrueAndPayInt","distAcc",["A"]]
          ,["accrueAndPayInt","cashReserve",["A"]]
         
@@ -100,14 +100,13 @@ BMW202301 = Generic(
         
          ,["If"
           ,[("trigger","InDistribution",0),False]  # if it was triggered 
-          ,["transferReserve","distAcc",'cashReserve',"Target"]] # trasnfer amt to cash reserver account
+          ,["transfer","distAcc",'cashReserve',{"reserve":"gap"}]] # trasnfer amt to cash reserver account
         
          ,["IfElse"  
            ,["status","Revolving"] # acitons in the revolving period
-           ,[["transferBy",{"formula":("substract",("bondBalance",),("poolBalance",))}
-                          ,"distAcc",'revolBuyAcc']
+           ,[["transfer","distAcc",'revolBuyAcc',{"formula":("substract",("bondBalance",),("poolBalance",))}]
             ,["buyAsset",["Current|Defaulted",1.0,0],"revolBuyAcc",None] # buy asset with 1:1 if asset with performing
-            ,["payResidual","distAcc","Sub"] ]
+            ,["payPrinResidual","distAcc",["Sub"]] ]
            ,[["payPrin","distAcc",["A"]] # actions if deal is in Amortizing status
             ,["payPrin","distAcc",["Sub"]]
             ,["payFeeResidual", "distAcc", "bmwFee"]]]]

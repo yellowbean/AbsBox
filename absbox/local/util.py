@@ -272,7 +272,7 @@ def uplift_m_list(l:list):
             for m in l
             for k,v in m.items()}
 
-def getValWithKs(m:dict,ks:list):
+def getValWithKs(m:dict,ks:list,defaultReturn=None):
     ''' Get first available key/value in m'''
     if isinstance(m, dict):
         for k in ks:
@@ -282,7 +282,7 @@ def getValWithKs(m:dict,ks:list):
         for k in ks:
             if hasattr(m, k):
                 return getattr(m, k)
-    return None
+    return defaultReturn
 
 def _read_cf(x, lang):
     flow_header,idx = guess_pool_flow_header(x[0],lang)

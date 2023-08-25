@@ -364,7 +364,7 @@ def mkBondRate(x):
         case {"浮动": [r, _index, Spread, resetInterval], "日历": dc} | \
                 {"floater": [r, _index, Spread, resetInterval], "dayCount": dc}:
             return mkTag(("Floater", [r, _index, Spread, mkDatePattern(resetInterval), dc, None, None]))
-        case {"浮动": [_index, Spread, resetInterval]} | {"floater": [_index, Spread, resetInterval]}:
+        case {"浮动": [r, _index, Spread, resetInterval]} | {"floater": [r, _index, Spread, resetInterval]}:
             return mkBondRate(x | {"日历": DC.DC_ACT_365F.value, "dayCount": DC.DC_ACT_365F.value})
         case {"固定": _rate, "日历": dc} | {"fix": _rate, "dayCount": dc}:
             return mkTag(("Fix", [_rate, dc]))
@@ -427,9 +427,6 @@ def mkAccountCapType(x):
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAccountCapType")
 
-def mkLimit(x):
-    return mkTransferLimit(x)
-
 def mkTransferLimit(x):
     match x:
         case {"余额百分比": pct} | {"balPct": pct}:
@@ -438,15 +435,24 @@ def mkTransferLimit(x):
             return mkTag(("DueCapAmt", amt))
         case {"公式": formula} | {"formula": formula}:
             return mkTag(("DS", mkDs(formula)))
-        case {"贷记":an} | {"clearLedger":an}:
+        case {"冲销":an} | {"clearLedger":an}:
             return mkTag(("ClearLedger", an))
-        case {"借记":an} | {"bookLedger":an}:
+        case {"簿记":an} | {"bookLedger":an}:
             return mkTag(("BookLedger", an))
         case {"系数":[limit,factor]} | {"multiple":[limit,factor]}:
             return mkTag(("Multiple", [mkLimit(limit),factor]))
+        case {"储备":"缺口"} | {"reserve":"gap"} :
+            return mkTag(("TillTarget"))
+        case {"储备":"盈余"} | {"reserve":"excess"} :
+            return mkTag(("TillSource"))
+        case None:
+            return None
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkTransferLimit")
-        
+ 
+def mkLimit(x):
+    return mkTransferLimit(x)
+       
 def mkComment(x):
     match x:
         case {"payInt":bns}:
@@ -557,13 +563,22 @@ def mkRateType(x):
     match x :
         case {"fix":r} | {"固定":r}:
            return mkTag(("Fix",r))
+        case ["fix",r] | ["固定",r]:
+           return mkTag(("Fix",r))
         case {"floater":(idx,spd),"rate":r,"resets":dp,**p} | \
             {"浮动":(idx,spd),"利率":r,"重置":dp,**p}:
             mf = getValWithKs(p,["floor"])
             mc = getValWithKs(p,["cap"])
             mrnd = getValWithKs(p,["rounding"])
             return mkTag(("Floater",[idx,spd,r,mkDatePattern(dp),mf,mc,mrnd]))
+        case ["浮动",r,{"基准":idx,"利差":spd,"重置频率":dp,**p}] | ["floater",r,{"index":idx,"spread":spd,"resets":dp,**p}]:
+            mf = getValWithKs(p,["floor"])
+            mc = getValWithKs(p,["cap"])
+            mrnd = getValWithKs(p,["rounding"])
+            __r =  mkTag(("Floater",[idx,spd,r,mkDatePattern(dp),mf,mc,mrnd]))
+            return __r
         case None:
+            print("NONE")
             return None
         case _ :
             raise RuntimeError(f"Failed to match :{x}: Rate Type")
@@ -573,7 +588,8 @@ def mkBookType(x):
     match x:
         case ["PDL",defaults,ledgers]:
             return mkTag(("PDL",[mkDs(defaults)
-                                 ,[[ln,mkDs(ds)] for ln,ds in ledgers]]))
+                                 ,[[ln,mkDs(ds)] 
+                                   for ln,ds in ledgers]]))
         case ["AccountDraw", ledger]:
             return mkTag(("ByAccountDraw",ledger))
         case ["ByFormula", ledger, ds]:
@@ -591,15 +607,17 @@ def mkSupport(x):
             return mkTag(("SupportLiqFacility",liqName))
         case ["multiSupport",*supports] | ["多重支持",*supports]:
             return mkTag(("MultiSupport",[ mkSupport(s) for s in supports]))
+        case None:
+            return None
         case _:
             raise RuntimeError(f"Failed to match :{x}:SupportType")
 
 def mkAction(x):
     match x:
         case ["账户转移", source, target, m] | ["transfer", source, target, m]:
-            limit = getValWithKs(m,['limit',"限制"])
-            cmt = getValWithKs(m,['comment',"备注"])
-            return mkTag(("Transfer", [mkLimit(limit), source, target, mkComment(cmt)]))
+            #cmt = getValWithKs(m,['comment',"备注"])
+            #return mkTag(("Transfer", [mkLimit(limit), source, target, mkComment(cmt)]))
+            return mkTag(("Transfer", [mkLimit(m), source, target, None]))
         case ["账户转移", source, target] | ["transfer", source, target]:
             return mkTag(("Transfer", [None, source, target, None]))
         case ["簿记", bookType] | ["bookBy", bookType]:
@@ -620,7 +638,7 @@ def mkAction(x):
             return mkTag(("PayFee", [mkLimit(limit), source, target, mkSupport(support)]))
         case ["支付费用", source, target] | ["payFee", source, target]:
             return mkTag(("PayFee", [None, source, target, None]))
-        case ["支付费用收益", source, target, _limit] | ["payFeeResidual", source, target, _limit]:
+        case ["支付费用收益", source, target, limit] | ["payFeeResidual", source, target, limit]:
             return mkTag(("PayFeeResidual", [ mkLimit(limit), source, target]))
         case ["支付费用收益", source, target] | ["payFeeResidual", source, target]:
             return mkTag(("PayFeeResidual", [ None, source, target]))
@@ -820,11 +838,13 @@ def mkAssetRate(x):
         case ["固定", r] | ["fix", r]:
             return mkTag(("Fix", r))
         case ["浮动", r, {"基准": idx, "利差": spd, "重置频率": p}]:
-            return mkTag(("Floater", [idx, spd, r, freqMap[p], None]))
+            _m = subMap(m,[("cap",None),("floor",None),("rounding",None)])
+            _m = applyFnToKey(_m, mkRoundingType, 'rounding')
+            return mkTag(("Floater", [idx, spd, r, mkDatePattern(p), _m['floor'], _m['cap'],_m['rounding']]))
         case ["floater", r, {"index": idx, "spread": spd, "reset": p} as m]:
             _m = subMap(m,[("cap",None),("floor",None),("rounding",None)])
             _m = applyFnToKey(_m, mkRoundingType, 'rounding')
-            return mkTag(("Floater2", [idx, spd, r, mkDatePattern(p), _m['floor'], _m['cap'],_m['rounding']]))
+            return mkTag(("Floater", [idx, spd, r, mkDatePattern(p), _m['floor'], _m['cap'],_m['rounding']]))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAssetRate")
 
@@ -907,7 +927,7 @@ def mkAsset(x):
                 | ["Loan", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
             return mkTag(("PersonalLoan", [
                 {"originBalance": originBalance,
-                 "originRate": mkAssetRate(originRate),
+                 "originRate": mkRateType(originRate),
                  "originTerm": originTerm,
                  "period": freqMap[freq],
                  "startDate": startDate,
@@ -921,7 +941,7 @@ def mkAsset(x):
                 | ["Installment", {"originBalance": originBalance, "feeRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "remainTerm": remainTerms, "status": status}]:
             return mkTag(("Installment", [
                 {"originBalance": originBalance,
-                 "originRate": mkAssetRate(originRate),
+                 "originRate": mkRateType(originRate),
                  "originTerm": originTerm,
                  "period": freqMap[freq],
                  "startDate": startDate,
@@ -1169,7 +1189,7 @@ def mkCf(x):
     if len(x) == 0:
         return None
     else:
-        return [mkTag(("MortgageFlow", _x+[0.0]*5+[None])) for _x in x]
+        return [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None])) for _x in x]
 
 
 def mkCollection(x):
