@@ -41,10 +41,10 @@ class Generic:
             "dates": parsedDates,
             "name": self.name,
             "status":mkTag((self.status)),
-            "pool": {"assets": [mkAsset(x) for x in self.pool.get('assets', [])]
+            "pool": {"assets": [mkAsset(x) for x in getValWithKs(self.pool,['assets',"清单"],defaultReturn=[])]
                      , "asOfDate": lastAssetDate
-                     , "issuanceStat": self.pool.get("issuanceStat")
-                     , "futureCf":mkCf(self.pool.get('cashflow', [])) },
+                     , "issuanceStat": getValWithKs(self.pool,["issuanceStat","统计"])
+                     , "futureCf":mkCf(getValWithKs(self.pool,['cashflow','现金流归集表','归集表'], [])) },
             "bonds": { bn: mkBnd(bn,bo) for (bn,bo) in self.bonds},
             "waterfall": mkWaterfall({},self.waterfall.copy()),  
             "fees": {fn: mkFee(fo|{"name":fn},fsDate = lastCloseDate) 

@@ -9,6 +9,7 @@ from absbox.local.base import *
 from absbox.local.china import 信贷ABS,SPV
 from absbox.local.cmp import comp_engines
 from absbox.local.generic import Generic
+from absbox.deal import mkDeal
 
 
 from importlib.metadata import version
