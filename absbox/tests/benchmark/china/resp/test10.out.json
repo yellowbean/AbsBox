@@ -675,7 +675,8 @@
                 "startDate": "2021-02-01",
                 "prinType": {
                   "tag": "Level"
-                }
+                },
+                "prepaymentPenalty": null
               },
               120,
               0.08,
@@ -700,6 +701,7 @@
               0,
               0,
               0.045,
+              null,
               null
             ]
           },
@@ -715,6 +717,7 @@
               0,
               0,
               0.045,
+              null,
               null
             ]
           },
@@ -730,6 +733,7 @@
               0,
               0,
               0.045,
+              null,
               null
             ]
           },
@@ -745,6 +749,7 @@
               0,
               0,
               0.045,
+              null,
               null
             ]
           }
@@ -759,43 +764,49 @@
           {
             "tag": "PayFee",
             "contents": [
-              [
-                "\u8d26\u623701"
-              ],
+              null,
+              "\u8d26\u623701",
               [
                 "\u4fe1\u6258\u8d39\u7528"
-              ]
+              ],
+              null
             ]
           },
           {
             "tag": "AccrueAndPayInt",
             "contents": [
+              null,
               "\u8d26\u623701",
               [
                 "A1"
-              ]
+              ],
+              null
             ]
           },
           {
             "tag": "PayPrin",
             "contents": [
+              null,
               "\u8d26\u623701",
               [
                 "A1"
-              ]
+              ],
+              null
             ]
           },
           {
             "tag": "PayPrin",
             "contents": [
+              null,
               "\u8d26\u623701",
               [
                 "B"
-              ]
+              ],
+              null
             ]
           },
           {
-            "tag": "PayResidual",
+            "tag": "PayIntResidual",
             "contents": [
               null,
               "\u8d26\u623701",
@@ -857,6 +868,7 @@
         0,
         0,
         0.045,
+        null,
         null
       ]
     },
@@ -872,6 +884,7 @@
         0,
         0,
         0.045,
+        null,
         null
       ]
     },
@@ -887,6 +900,7 @@
         0,
         0,
         0.045,
+        null,
         null
       ]
     },
@@ -902,6 +916,7 @@
         0,
         0,
         0.045,
+        null,
         null
       ]
     }

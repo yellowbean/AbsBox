@@ -74,6 +74,7 @@
         "bndInterestInfo": {
           "tag": "Floater",
           "contents": [
+            0.08,
             "LPR5Y",
             0.025,
             {
@@ -159,60 +160,67 @@
               }
             },
             "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8",
+            "LiqToAcc",
             "\u8d26\u623701"
           ]
         },
         {
           "tag": "PayFee",
           "contents": [
-            [
-              "\u8d26\u623701"
-            ],
+            null,
+            "\u8d26\u623701",
             [
               "\u589e\u503c\u7a0e"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayFee",
           "contents": [
-            [
-              "\u8d26\u623701"
-            ],
+            null,
+            "\u8d26\u623701",
             [
               "\u627f\u9500\u8d39"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "\u8d26\u623701",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "\u8d26\u623702",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "\u8d26\u623702",
             [
               "B"
-            ]
+            ],
+            null
           ]
         },
         {
-          "tag": "PayResidual",
+          "tag": "PayIntResidual",
           "contents": [
             null,
             "\u8d26\u623702",
@@ -332,12 +340,17 @@
     "triggers": null,
     "liqProvider": {
       "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8": {
-        "liqCredit": 0,
-        "liqDueInt": null,
-        "liqDuePremium": null,
+        "liqCredit": null,
+        "liqDueInt": 0,
+        "liqDuePremium": 0,
         "liqRate": null,
         "liqPremiumRate": null,
         "liqStmt": null,
+        "liqBalance": 10,
+        "liqRateType": null,
+        "liqPremiumRateType": null,
+        "liqDueIntDate": null,
+        "liqEnds": null,
         "liqName": "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8",
         "liqType": {
           "tag": "ReplenishSupport",
@@ -348,9 +361,7 @@
             10
           ]
         },
-        "liqBalance": 10,
-        "liqStart": "2021-06-15",
-        "liqPremium": null
+        "liqStart": "2021-06-15"
       }
     },
     "ledgers": null

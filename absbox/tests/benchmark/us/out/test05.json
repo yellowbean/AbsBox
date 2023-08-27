@@ -158,35 +158,42 @@
               }
             },
             "insuranceProvider",
+            "LiqToAcc",
             "acc01"
           ]
         },
         {
           "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "acc01",
             [
               "A1",
               "B"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "acc02",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "acc02",
             [
               "B"
-            ]
+            ],
+            null
           ]
         },
         {
@@ -206,11 +213,13 @@
               {
                 "tag": "AccrueAndPayInt",
                 "contents": [
+                  null,
                   "acc02",
                   [
                     "A1",
                     "B"
-                  ]
+                  ],
+                  null
                 ]
               },
               {
@@ -293,19 +302,26 @@
     "triggers": null,
     "liqProvider": {
       "insuranceProvider": {
-        "liqCredit": 0,
-        "liqDueInt": null,
-        "liqDuePremium": null,
+        "liqCredit": null,
+        "liqDueInt": 0,
+        "liqDuePremium": 0,
         "liqRate": null,
         "liqPremiumRate": null,
         "liqStmt": null,
+        "liqBalance": 100,
+        "liqRateType": {
+          "tag": "Fix",
+          "contents": 0.01
+        },
+        "liqPremiumRateType": null,
+        "liqDueIntDate": null,
+        "liqEnds": null,
         "liqName": "insuranceProvider",
         "liqType": {
-          "tag": "FixSupport"
+          "tag": "FixSupport",
+          "contents": 100
         },
-        "liqBalance": 100,
-        "liqStart": "2021-06-15",
-        "liqPremium": null
+        "liqStart": "2021-06-15"
       }
     },
     "ledgers": null

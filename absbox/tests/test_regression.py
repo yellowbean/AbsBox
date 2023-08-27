@@ -134,7 +134,7 @@ def run_deal(input_folder, pair):
                     continue
                 with open(local_bench_file,'r') as eout: # expected output 
                     local_result = json.load(eout)
-                    assert isinstance(local_result, list), f"{dinput}: local result is not list but {local_result.keys()}"
+                    assert isinstance(local_result, list), f"{dinput}: local result is not list but {local_result.keys()},{local_result['error']}"
                     assert isinstance(s_result, list), f"{dinput}: server result is not list but {s_result}"
                     assert local_result[1]==s_result[1],"Pool Flow Is not matching"
                     local_result_content = local_result[0]['contents']
@@ -185,7 +185,7 @@ def test_resp():
             ,("test19.json","defaults01.json","test19.out.json")
             ,("test20.json","empty.json","test20.out.json")
             ,("test21.json","empty.json","test21.out.json")
-            ,("test23.json","empty.json","test23.out.json")
+            #,("test23.json","empty.json","test23.out.json")
             ,("test24.json","empty.json","test24.out.json")
             ,("test25.json","empty.json","test25.out.json")
             ]

@@ -48,6 +48,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -63,6 +64,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -78,6 +80,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -93,6 +96,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -108,6 +112,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -123,6 +128,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -138,6 +144,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -153,6 +160,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -168,6 +176,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -183,6 +192,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -198,6 +208,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -213,6 +224,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -228,6 +240,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -243,6 +256,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -258,6 +272,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -273,6 +288,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -288,6 +304,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -303,6 +320,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -318,6 +336,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -333,6 +352,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -348,6 +368,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -363,6 +384,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -378,6 +400,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -393,6 +416,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -408,6 +432,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -423,6 +448,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -438,6 +464,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -453,6 +480,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -468,6 +496,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -483,6 +512,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -498,6 +528,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -513,6 +544,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -528,6 +560,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         },
@@ -543,6 +576,7 @@
             0.0,
             0.0,
             0.0,
+            null,
             null
           ]
         }
@@ -624,45 +658,50 @@
               }
             },
             "\u53d1\u8d77\u4eba",
+            "LiqToAcc",
             "\u4e00\u822c\u51c6\u5907\u91d1\u8d26\u6237"
           ]
         },
         {
           "tag": "Transfer",
           "contents": [
+            null,
             "\u8d39\u7528\u8d26\u6237",
-            "\u7ecf\u8425\u8d26\u6237"
+            "\u7ecf\u8425\u8d26\u6237",
+            null
           ]
         },
         {
           "tag": "PayFee",
           "contents": [
-            [
-              "\u7ecf\u8425\u8d26\u6237"
-            ],
+            null,
+            "\u7ecf\u8425\u8d26\u6237",
             [
               "\u589e\u503c\u7a0e"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayFee",
           "contents": [
-            [
-              "\u7ecf\u8425\u8d26\u6237"
-            ],
+            null,
+            "\u7ecf\u8425\u8d26\u6237",
             [
               "\u8d37\u6b3e\u670d\u52a1\u8d39\u7528"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "\u7ecf\u8425\u8d26\u6237",
             [
               "A"
-            ]
+            ],
+            null
           ]
         },
         {
@@ -674,75 +713,34 @@
         {
           "tag": "PayFee",
           "contents": [
-            [
-              "\u7ecf\u8425\u8d26\u6237"
-            ],
+            null,
+            "\u7ecf\u8425\u8d26\u6237",
             [
               "\u4ee3\u7406\u652f\u4ed8\u8d39\u7528\u5229\u606f"
-            ]
+            ],
+            null
           ]
         },
         {
-          "tag": "TransferReserve",
-          "contents": [
-            "Target",
-            "\u7ecf\u8425\u8d26\u6237",
-            "\u4e00\u822c\u51c6\u5907\u91d1\u8d26\u6237"
-          ]
-        },
-        {
-          "tag": "PayPrinBy",
+          "tag": "Transfer",
           "contents": [
             {
-              "tag": "DS",
-              "contents": {
-                "tag": "Min",
-                "contents": [
-                  {
-                    "tag": "CurrentBondBalanceOf",
-                    "contents": [
-                      "A"
-                    ]
-                  },
-                  {
-                    "tag": "Substract",
-                    "contents": [
-                      {
-                        "tag": "CurrentBondBalanceOf",
-                        "contents": [
-                          "A",
-                          "\u6b21\u7ea7"
-                        ]
-                      },
-                      {
-                        "tag": "Max",
-                        "contents": [
-                          {
-                            "tag": "Substract",
-                            "contents": [
-                              {
-                                "tag": "UseCustomData",
-                                "contents": "\u8d44\u4ea7\u6c60\u8c03\u6574\u540e\u4f59\u989d"
-                              },
-                              {
-                                "tag": "UseCustomData",
-                                "contents": "\u76ee\u6807\u8d85\u989d\u62c5\u4fdd\u91d1\u989d"
-                              }
-                            ]
-                          },
-                          {
-                            "tag": "Constant",
-                            "contents": 0.0
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
+              "tag": "TillTarget"
             },
             "\u7ecf\u8425\u8d26\u6237",
-            "A"
+            "\u4e00\u822c\u51c6\u5907\u91d1\u8d26\u6237",
+            null
+          ]
+        },
+        {
+          "tag": "PayPrin",
+          "contents": [
+            null,
+            "\u7ecf\u8425\u8d26\u6237",
+            [
+              "A"
+            ],
+            null
           ]
         },
         {
@@ -754,21 +752,23 @@
         {
           "tag": "PayFee",
           "contents": [
-            [
-              "\u7ecf\u8425\u8d26\u6237"
-            ],
+            null,
+            "\u7ecf\u8425\u8d26\u6237",
             [
               "\u4ee3\u7406\u652f\u4ed8\u8d39\u7528\u672c\u91d1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "\u7ecf\u8425\u8d26\u6237",
             [
               "\u6b21\u7ea7"
-            ]
+            ],
+            null
           ]
         },
         {
@@ -787,10 +787,12 @@
               {
                 "tag": "PayPrin",
                 "contents": [
+                  null,
                   "\u7ecf\u8425\u8d26\u6237",
                   [
                     "\u6b21\u7ea7"
-                  ]
+                  ],
+                  null
                 ]
               }
             ]
@@ -1101,19 +1103,22 @@
     "triggers": null,
     "liqProvider": {
       "\u53d1\u8d77\u4eba": {
-        "liqCredit": 0,
-        "liqDueInt": null,
-        "liqDuePremium": null,
+        "liqCredit": null,
+        "liqDueInt": 0,
+        "liqDuePremium": 0,
         "liqRate": null,
         "liqPremiumRate": null,
         "liqStmt": null,
+        "liqBalance": 0,
+        "liqRateType": null,
+        "liqPremiumRateType": null,
+        "liqDueIntDate": null,
+        "liqEnds": null,
         "liqName": "\u53d1\u8d77\u4eba",
         "liqType": {
           "tag": "UnLimit"
         },
-        "liqBalance": null,
-        "liqStart": "2022-09-30",
-        "liqPremium": null
+        "liqStart": "2022-09-30"
       }
     },
     "ledgers": null

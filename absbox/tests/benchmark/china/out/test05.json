@@ -100,6 +100,7 @@
         "bndInterestInfo": {
           "tag": "Floater",
           "contents": [
+            0.0131,
             "LPR5Y",
             -0.0169,
             {
@@ -135,6 +136,7 @@
         "bndInterestInfo": {
           "tag": "Floater",
           "contents": [
+            0.0209,
             "LPR5Y",
             -0.0091,
             {
@@ -193,95 +195,100 @@
         {
           "tag": "PayFee",
           "contents": [
-            [
-              "\u6536\u5165\u5206\u8d26\u6237"
-            ],
-            [
-              "\u6267\u884c\u8d39\u7528"
-            ]
-          ]
-        },
-        {
-          "tag": "PayFeeBy",
-          "contents": [
-            {
-              "tag": "DuePct",
-              "contents": 0.1
-            },
-            [
-              "\u6536\u5165\u5206\u8d26\u6237"
-            ],
-            [
-              "\u670d\u52a1\u5546\u8d39\u7528"
-            ]
-          ]
-        },
-        {
-          "tag": "AccrueAndPayInt",
-          "contents": [
+            null,
             "\u6536\u5165\u5206\u8d26\u6237",
             [
-              "A1",
-              "A2"
-            ]
+              "\u6267\u884c\u8d39\u7528"
+            ],
+            null
           ]
         },
         {
           "tag": "PayFee",
           "contents": [
-            [
-              "\u6536\u5165\u5206\u8d26\u6237"
-            ],
+            null,
+            "\u6536\u5165\u5206\u8d26\u6237",
             [
               "\u670d\u52a1\u5546\u8d39\u7528"
-            ]
+            ],
+            null
           ]
         },
         {
-          "tag": "PayTillYield",
+          "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "\u6536\u5165\u5206\u8d26\u6237",
             [
-              "\u6b21\u7ea7"
-            ]
+              "A1",
+              "A2"
+            ],
+            null
+          ]
+        },
+        {
+          "tag": "PayFee",
+          "contents": [
+            null,
+            "\u6536\u5165\u5206\u8d26\u6237",
+            [
+              "\u670d\u52a1\u5546\u8d39\u7528"
+            ],
+            null
+          ]
+        },
+        {
+          "tag": "PayIntResidual",
+          "contents": [
+            null,
+            "\u6536\u5165\u5206\u8d26\u6237",
+            "\u6b21\u7ea7"
           ]
         },
         {
           "tag": "Transfer",
           "contents": [
+            null,
             "\u6536\u5165\u5206\u8d26\u6237",
-            "\u672c\u91d1\u5206\u8d26\u6237"
+            "\u672c\u91d1\u5206\u8d26\u6237",
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "\u672c\u91d1\u5206\u8d26\u6237",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "\u672c\u91d1\u5206\u8d26\u6237",
             [
               "A2"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "\u672c\u91d1\u5206\u8d26\u6237",
             [
               "\u6b21\u7ea7"
-            ]
+            ],
+            null
           ]
         },
         {
-          "tag": "PayResidual",
+          "tag": "PayIntResidual",
           "contents": [
             null,
             "\u672c\u91d1\u5206\u8d26\u6237",

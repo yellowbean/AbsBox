@@ -40,7 +40,11 @@
                   "LPR5Y",
                   0.01,
                   0.085,
-                  "Monthly",
+                  {
+                    "tag": "MonthEnd"
+                  },
+                  null,
+                  null,
                   null
                 ]
               },
@@ -145,7 +149,7 @@
           ]
         },
         {
-          "tag": "PayResidual",
+          "tag": "PayIntResidual",
           "contents": [
             null,
             "\u8d26\u623701",
@@ -158,32 +162,38 @@
         {
           "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "\u8d26\u623701",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "\u8d26\u623701",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "\u8d26\u623701",
             [
               "B"
-            ]
+            ],
+            null
           ]
         },
         {
-          "tag": "PayResidual",
+          "tag": "PayIntResidual",
           "contents": [
             null,
             "\u8d26\u623701",

@@ -43,7 +43,7 @@ test01 = Generic(
            ,[("monthsTillMaturity","A1"),"<",3]
            ,["payPrin","acc01",["A1","A2"]]]
          ,["payPrin","acc01",["B"]]
-         ,["payPrinResidual","acc01","B"]]
+         ,["payPrinResidual","acc01",["B"]]]
       }
     ,[["CollectedInterest","acc01"]
       ,["CollectedPrincipal","acc01"]

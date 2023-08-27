@@ -117,43 +117,49 @@
         {
           "tag": "PayFee",
           "contents": [
-            [
-              "acc01"
-            ],
+            null,
+            "acc01",
             [
               "trusteeFee"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "acc01",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "acc01",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "acc01",
             [
               "B"
-            ]
+            ],
+            null
           ]
         },
         {
-          "tag": "PayResidual",
+          "tag": "PayIntResidual",
           "contents": [
             null,
             "acc01",

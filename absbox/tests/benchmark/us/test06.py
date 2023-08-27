@@ -30,7 +30,7 @@ test01 = Generic(
     ,tuple()
     ,{"amortizing":[
          ["calcInt","A1"]
-         ,["liqSupport", "insuranceProvider","acc01"
+         ,["liqSupport", "insuranceProvider","account","acc01"
            ,{"formula":
              ("Max"
              ,("substract",("bondDueInt","A1","B"),("accountBalance","acc01"))

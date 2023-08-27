@@ -142,57 +142,66 @@
         {
           "tag": "PayFee",
           "contents": [
-            [
-              "acc01"
-            ],
+            null,
+            "acc01",
             [
               "trusteeFee"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "acc01",
             [
               "A1",
               "A2"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "acc01",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "acc01",
             [
               "A2"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
+          "contents": [
+            null,
+            "acc01",
+            [
+              "B"
+            ],
+            null
+          ]
+        },
+        {
+          "tag": "PayPrinResidual",
           "contents": [
             "acc01",
             [
               "B"
             ]
-          ]
-        },
-        {
-          "tag": "PayResidual",
-          "contents": [
-            null,
-            "acc01",
-            "B"
           ]
         }
       ],
@@ -203,49 +212,56 @@
         {
           "tag": "PayFee",
           "contents": [
-            [
-              "acc01"
-            ],
+            null,
+            "acc01",
             [
               "trusteeFee"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "acc01",
             [
               "A1",
               "A2"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "acc01",
             [
               "A1",
               "A2"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
+          "contents": [
+            null,
+            "acc01",
+            [
+              "B"
+            ],
+            null
+          ]
+        },
+        {
+          "tag": "PayPrinResidual",
           "contents": [
             "acc01",
             [
               "B"
             ]
-          ]
-        },
-        {
-          "tag": "PayResidual",
-          "contents": [
-            null,
-            "acc01",
-            "B"
           ]
         }
       ]

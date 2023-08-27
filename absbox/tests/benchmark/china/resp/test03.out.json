@@ -1462,7 +1462,11 @@
                     "LPR5Y",
                     0.01,
                     0.085,
-                    "Monthly",
+                    {
+                      "tag": "MonthEnd"
+                    },
+                    null,
+                    null,
                     null
                   ]
                 },
@@ -1471,7 +1475,8 @@
                 "startDate": "2020-06-01",
                 "prinType": {
                   "tag": "Even"
-                }
+                },
+                "prepaymentPenalty": null
               },
               180,
               0.08,
@@ -1496,6 +1501,7 @@
               0,
               0,
               0.08,
+              null,
               null
             ]
           },
@@ -1511,6 +1517,7 @@
               0,
               0,
               0.08,
+              null,
               null
             ]
           },
@@ -1526,6 +1533,7 @@
               0,
               0,
               0.08,
+              null,
               null
             ]
           },
@@ -1541,6 +1549,7 @@
               0,
               0,
               0.08,
+              null,
               null
             ]
           },
@@ -1556,6 +1565,7 @@
               0,
               0,
               0.08,
+              null,
               null
             ]
           },
@@ -1571,6 +1581,7 @@
               0,
               0,
               0.08,
+              null,
               null
             ]
           },
@@ -1586,6 +1597,7 @@
               0,
               0,
               0.08,
+              null,
               null
             ]
           },
@@ -1601,6 +1613,7 @@
               0,
               0,
               0.08,
+              null,
               null
             ]
           },
@@ -1616,6 +1629,7 @@
               0,
               0,
               0.08,
+              null,
               null
             ]
           },
@@ -1631,6 +1645,7 @@
               0,
               0,
               0.08,
+              null,
               null
             ]
           }
@@ -1644,32 +1659,38 @@
           {
             "tag": "AccrueAndPayInt",
             "contents": [
+              null,
               "\u8d26\u623701",
               [
                 "A1"
-              ]
+              ],
+              null
             ]
           },
           {
             "tag": "PayPrin",
             "contents": [
+              null,
               "\u8d26\u623701",
               [
                 "A1"
-              ]
+              ],
+              null
             ]
           },
           {
             "tag": "PayPrin",
             "contents": [
+              null,
               "\u8d26\u623701",
               [
                 "B"
-              ]
+              ],
+              null
             ]
           },
           {
-            "tag": "PayResidual",
+            "tag": "PayIntResidual",
             "contents": [
               null,
               "\u8d26\u623701",
@@ -1702,14 +1723,17 @@
             "contents": [
               {
                 "tag": "DuePct",
-                "contents": 0.7
+                "contents": {
+                  "numerator": 7,
+                  "denominator": 10
+                }
               },
               "\u8d26\u623701",
               "\u670d\u52a1\u5546\u8d39\u7528"
             ]
           },
           {
-            "tag": "PayResidual",
+            "tag": "PayIntResidual",
             "contents": [
               null,
               "\u8d26\u623701",
@@ -1771,6 +1795,7 @@
         0,
         0,
         0.08,
+        null,
         null
       ]
     },
@@ -1786,6 +1811,7 @@
         0,
         0,
         0.08,
+        null,
         null
       ]
     },
@@ -1801,6 +1827,7 @@
         0,
         0,
         0.08,
+        null,
         null
       ]
     },
@@ -1816,6 +1843,7 @@
         0,
         0,
         0.08,
+        null,
         null
       ]
     },
@@ -1831,6 +1859,7 @@
         0,
         0,
         0.08,
+        null,
         null
       ]
     },
@@ -1846,6 +1875,7 @@
         0,
         0,
         0.08,
+        null,
         null
       ]
     },
@@ -1861,6 +1891,7 @@
         0,
         0,
         0.08,
+        null,
         null
       ]
     },
@@ -1876,6 +1907,7 @@
         0,
         0,
         0.08,
+        null,
         null
       ]
     },
@@ -1891,6 +1923,7 @@
         0,
         0,
         0.08,
+        null,
         null
       ]
     },
@@ -1906,6 +1939,7 @@
         0,
         0,
         0.08,
+        null,
         null
       ]
     }

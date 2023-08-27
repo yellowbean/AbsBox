@@ -140,10 +140,12 @@
         {
           "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "\u8d26\u623701",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
@@ -158,39 +160,47 @@
       ],
       "DistributionDay Amortizing": [
         {
-          "tag": "PayInt",
+          "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "\u8d26\u623701",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "\u8d26\u623701",
             [
               "B"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "\u8d26\u623701",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "\u8d26\u623701",
             [
               "B"
-            ]
+            ],
+            null
           ]
         }
       ]

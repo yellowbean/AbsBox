@@ -117,47 +117,58 @@
         {
           "tag": "Transfer",
           "contents": [
+            null,
             "\u50a8\u5907\u8d26\u6237",
-            "\u8d26\u623701"
+            "\u8d26\u623701",
+            null
           ]
         },
         {
           "tag": "AccrueAndPayInt",
           "contents": [
+            null,
             "\u8d26\u623701",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
-          "tag": "TransferReserve",
+          "tag": "Transfer",
           "contents": [
-            "Target",
+            {
+              "tag": "TillTarget"
+            },
             "\u8d26\u623701",
-            "\u50a8\u5907\u8d26\u6237"
+            "\u50a8\u5907\u8d26\u6237",
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "\u8d26\u623701",
             [
               "A1"
-            ]
+            ],
+            null
           ]
         },
         {
           "tag": "PayPrin",
           "contents": [
+            null,
             "\u8d26\u623701",
             [
               "B"
-            ]
+            ],
+            null
           ]
         },
         {
-          "tag": "PayResidual",
+          "tag": "PayIntResidual",
           "contents": [
             null,
             "\u8d26\u623701",

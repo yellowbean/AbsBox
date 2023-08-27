@@ -18,42 +18,63 @@ def valDeal(d, error, warning) -> list:
     if d['ledgers']:
         ledger_names = set(d['ledgers'].keys())
     assert w is not None ,"Waterfall is None"
+    
+    def validateAction(action):
+        rnt = ""
+        match action:
+           case {"tag":'PayFee', "contents":[_, acc, fees, _]}:
+               if not inSet([acc],acc_names):
+                   rnt += f"Account {acc} is not in deal account {acc_names};"
+               if not inSet(fees,fee_names):
+                   rnt += f"Fees {fees} is not in deal fees {fee_names};"
+           case {"tag":'CalcAndPayFee', "contents":[_, acc, fees, _]}:
+               if not inSet([acc],acc_names):
+                   rnt += f"Account {acc} is not in deal account {acc_names};"
+               if not inSet(fees,fee_names):
+                   rnt += f"Fees {fees} is not in deal fees {fee_names};"
+           case {"tag":'PayInt', "contents":[_, acc, bonds, _]} | {"tag":'AccrueAndPayInt', "contents":[_, acc, bonds, _]}:
+               if not inSet([acc],acc_names):
+                   rnt += f"Account {acc} is not in deal account {acc_names};"
+               if not inSet(bonds,bnd_names):
+                   rnt += f"Bonds {bonds} is not in deal bonds {bnd_names};"
+           case {"tag":'PayPrin', "contents":[_, acc, bonds, _]}:
+               if (not inSet([acc],acc_names)): 
+                   rnt += f"Account {acc} is not in deal account {acc_names};"
+               if (not inSet(bonds,bnd_names)):
+                   rnt += f"Bonds {bonds} is not in deal bonds {bnd_names};"
+           case {"tag":'PayPrinResidual', "contents":[acc, bonds]}:
+               if (not inSet([acc],acc_names)):
+                   rnt += f"Account {acc} is not in deal account {acc_names};"
+               if (not inSet(bonds,bnd_names)):
+                   rnt += f"Bonds {bonds} is not in deal bonds {bnd_names};"
+           case {"tag":'Transfer',"contents":[_,acc1,acc2,_]}:
+               if (not inSet([acc1,acc2],acc_names)):
+                   rnt += f"Account {acc1,acc2} is not in deal account {acc_names};"
+           case {"tag":'PayFeeResidual',"contents":[_,acc,fee]}:
+               if (not inSet([acc],acc_names)):
+                   rnt += f"Account {acc} is not in deal account {acc_names};"
+               if (not inSet([fee],fee_names)):
+                   rnt += f"Fee {fee} is not in deal fees {fee_names};"
+           case {"tag":'PayIntResidual',"contents":[_,acc,bnd_name]}:
+               if (not inSet([acc],acc_names)):
+                   rnt += f"Account {acc} is not in deal account {acc_names};"
+               if (not inSet([bnd_name],bnd_names)):
+                   rnt += f"Bond {bnd_name} is not in deal bonds {bnd_names};"
+           case {"tag":'CalcFee',"contents": fs}:
+               if (not inSet(fs,fee_names)):
+                   rnt += f"Fee {fs} is not in deal fees {fee_names};"
+           case {"tag":'CalcBondInt',"contents": bs}:
+               if (not inSet(bs,bnd_names)):
+                   rnt += f"Bond {bs} is not in deal bonds {bnd_names};"
+           case _:
+               pass
+        return rnt
+    
 
     for wn,waterfallActions in w.items():
-        for idx,(pre,action) in enumerate(waterfallActions):
-            match action:
-                case {"tag":'PayFeeBy', "contents":[_, accs, fees]}:
-                    if (not inSet(accs,acc_names)) or (not inSet(fees,fee_names)):
-                        error.append(f"{wn},{idx}")
-                case {"tag":'PayFee', "contents":[accs, fees]}:
-                    if (not inSet(accs,acc_names)) or (not inSet(fees,fee_names)):
-                        error.append(f"{wn},{idx}")     
-                case {"tag":'PayInt', "contents":[acc, bonds]}:
-                    if (not inSet([acc],acc_names)) or (not inSet(bonds,bnd_names)):
-                        error.append(f"{wn},{idx}")  
-                case {"tag":'PayPrin', "contents":[acc, bonds]}:
-                    if (not inSet([acc],acc_names)) or (not inSet(bonds,bnd_names)):
-                        error.append(f"{wn},{idx}")  
-                case {"tag":'PayPrinBy', "contents":[_, acc, bond]}:
-                    if (not inSet([acc],acc_names)) or (not inSet([bond],bnd_names)):
-                        error.append(f"{wn},{idx}")  
-                case {"tag":'PayResidual', "contents":[_, acc, bond]}:
-                    if (not inSet([acc],acc_names)) or (not inSet([bond],bnd_names)):
-                        error.append(f"{wn},{idx}")  
-                case {"tag":'Transfer',"contents":[acc1,acc2]}:
-                    if (not inSet([acc1,acc2],acc_names)):
-                        error.append(f"{wn},{idx}")
-                case {"tag":'TransferBy',"contents":[_,acc1,acc2]}:
-                    if (not inSet([acc1,acc2],acc_names)):
-                        error.append(f"{wn},{idx}")
-                case {"tag":'PayTillYield',"contents":[acc, bonds]}:
-                    if (not inSet([acc],acc_names)) or (not inSet(bonds,bnd_names)):
-                        error.append(f"{wn},{idx}")
-                case {"tag":'PayFeeResidual',"contents":[_,acc,fee]}:
-                    if (not inSet([acc],acc_names)) or (not inSet([fee],fee_names)):
-                        error.append(f"{wn},{idx}")
-                case _:
-                    pass
+        for idx,action in enumerate(waterfallActions):
+            if (vr:=validateAction(action)) != "":
+                error.append(">".join((wn,str(idx),vr)))
     
     return (error,warning)
 
