@@ -1080,7 +1080,20 @@ def mkAssumpRecovery(x):
         case _:
             raise RuntimeError(f"failed to match {x}")
 
-def mkAssumption(x):
+def mkDefaultedAssumption(x):
+    ''' '''
+    match x:
+        case ("Defaulted",r,lag,rs):
+            return mkTag(("DefaultedRecovery",[r,lag,rs]))
+        case _:
+            return mkTag(("DummyDefaultAssump"))
+
+def mkDelinqAssumption(x):
+    return mkTag(("DummyDelinqAssump"))
+
+
+def mkPerfAssumption(x):
+    "Make assumption on performing assets"
     match x:
         case ("Mortgage",md,mp,mr,mes):
             d = earlyReturnNone(mkAssumpDefault,md)
@@ -1092,8 +1105,11 @@ def mkAssumption(x):
             p = earlyReturnNone(mkAssumpPrepay,mp)
             r = earlyReturnNone(mkAssumpRecovery,mr)
             return mkTag(("MortgageAssump",[d,p,r,None]))
-        case ("Lease",gap,rent,endDate):
-            return mkTag(("LeaseAssump",[mkAssumpLeaseGap(gap),mkAssumpLeaseRent(rent),endDate,None]))
+        case ("Lease", gap, rent, endDate):
+            return mkTag(("LeaseAssump",[mkAssumpLeaseGap(gap)
+                                         ,mkAssumpLeaseRent(rent)
+                                         ,endDate
+                                         ,None]))
         case ("Loan",md,mp,mr,mes):
             d = earlyReturnNone(mkAssumpDefault,md)
             p = earlyReturnNone(mkAssumpPrepay,mp)
@@ -1104,65 +1120,20 @@ def mkAssumption(x):
             p = earlyReturnNone(mkAssumpPrepay,mp)
             r = earlyReturnNone(mkAssumpRecovery,mr)
             return mkTag(("InstallmentAssump",[d,p,r,None]))
-        case ("Defaulted",r,lag,rs):
-            return mkTag(("DefaultedRecovery",[r,lag,rs]))
         case _:
             raise RuntimeError(f"failed to match {x}")
 
-
-def mkAssumption_(x) -> dict:
-    assert isinstance(x, dict),f"An assumption should be a map/dict,but got {x}, type:{type(x)}"
+def mkAssumpType(x):
+    ''' '''
+    def mkPDF(a,b,c):
+        return [mkPerfAssumption(a),mkDelinqAssumption(b),mkDefaultedAssumption(c)]
     match x:
-        case {"CPR": cpr} if isinstance(cpr, list):
-            return mkTag(("PrepaymentVec", cpr))
-        case {"CDR": cdr} if isinstance(cdr, list):
-            return mkTag(("DefaultVec", cdr))
-        case {"CPR": cpr}:
-            return mkTag(("PrepaymentCPR", cpr))
-        case {"CPR调整": [*cprAdj, ed]} | {"CPRAdjust": [*cprAdj, ed]}:
-            return mkTag(("PrepaymentFactors", mkTs("FactorCurveClosed", [cprAdj, ed])))
-        case {"CDR": cdr}:
-            return mkTag(("DefaultCDR", cdr))
-        case {"CDR调整": [*cdrAdj, ed]} | {"CDRAdjust": [*cdrAdj, ed]}:
-            return mkTag(("DefaultFactors", mkTs("FactorCurveClosed", [cdrAdj, ed])))
-        case {"DefaultedRecovery":[r,lag,timing]} | {"已违约回收":[r,lag,timing]}:
-            ensure100(timing,"Sum of Recovery Timing")
-            return mkTag(("DefaultedRecovery",[r,lag,timing]))
-        case {"回收": (rr, rlag)} | {"Recovery": (rr, rlag)}:
-            return mkTag(("Recovery", (rr, rlag)))
-        case {"利率": [idx, rate]} if isinstance(rate, float):
-            return mkTag(("InterestRateConstant", [idx, rate]))
-        case {"Rate": [idx, rate]} if isinstance(rate, float):
-            return mkTag(("InterestRateConstant", [idx, rate]))
-        case {"利率": [idx, *rateCurve]} | {"Rate": [idx, *rateCurve]}:
-            curve = mkTag(("IRateCurve", [ [t,v] for (t,v) in rateCurve]))
-            return mkTag(("InterestRateCurve", [idx, curve]))
-        case {"清仓": opts} | {"CleanUp": opts}:
-            return mkTag(("CallWhen", [mkCallOptions(co) for co in opts]))
-        case {"停止": d} | {"StopAt": d}:
-            return mkTag(("StopRunBy", d))
-        case {"租赁截止日": d} | {"LeaseProjectEnd": d}:
-            return mkTag(("LeaseProjectionEnd", d))
-        case {"租赁年涨幅": r} | {"LeaseAnnualIncreaseRate": r} if not isinstance(r, list):
-            return mkTag(("LeaseBaseAnnualRate", r))
-        case {"租赁年涨幅": r} | {"LeaseAnnualIncreaseRate": r}:
-            return mkTag(("LeaseBaseCurve", mkTs("FloatCurve", r)))
-        case {"租赁间隔": n} | {"LeaseGapDays": n}:
-            return mkTag(("LeaseGapDays", n))
-        case {"租赁间隔表": (tbl, n)} | {"LeaseGapDaysByAmount": (tbl, n)}:
-            return mkTag(("LeaseGapDaysByAmount", [tbl, n]))
-        case {"查看":inspects} | {"Inspect":inspects}:
-            inspectVars = [ [mkDatePattern(dp),mkDs(ds)] for dp,ds in inspects ]
-            return mkTag(("InspectOn", inspectVars))
-        case {"FinancialReports": {"dates":dp} } | {"财务报表": {"日期":dp}} : 
-            return mkTag(("BuildFinancialReport", mkDatePattern(dp)))
-        case {"RevolvingAssets": [rpool,rassumps]} | {"循环资产": [rpool,rassumps]}:
-            assumps = [ mkAssumption(ra) for ra in rassumps ]
-            return mkTag(("AvailableAssets",[mkRevolvingPool(rpool), assumps]))
-        case {"预计费用":[fname,curve]} | {"EstimateExpense":[fname,curve]}:
-            return mkTag(("ProjectedExpense",[fname, mkTs("BalanceCurve",curve)]))
-        case _:
-            raise RuntimeError(f"Failed to match {x}:Assumption")
+        case ("Pool", p, d, f):
+            return mkTag(("PoolLevel",mkPDF(p,d,f)))
+        case ("ByIndex", ps):
+            return mkTag(("ByIndex",[ [idx, mkPDF(a,b,c)] for (idx,(a,b,c)) in ps ]))
+        case _ :
+            raise RuntimeError(f"failed to match {x} | mkAssumpType")
 
 def mkAssetUnion(x):
     match x[0]:
@@ -1493,6 +1464,39 @@ def readIssuance(pool):
                 "Key {k} is not in pool fields {validIssuanceFields.keys()}")
     return r
 
+def mkRateAssumption(x):
+    match x:
+        case (idx,r) if isinstance(r, list):
+            return mkTag(("RateCurve",[idx, r]))
+        case (idx,r) :
+            return mkTag(("RateFlat" ,[idx, r]))
+        case _ :
+            raise RuntimeError(f"Failed to match RateAssumption:{x}")
+
+def mkNonPerfAssumps(r, xs:list) -> dict:
+    def translate(y):
+        match y:
+            case ("stop",d):
+                return {"stopRunBy":d}
+            case ("estimateExpense",fn,ts):
+                return {"projectedExpense":(fn,ts)}
+            case ("call",opts):
+                return {"callWhen":mkCallOptions(opts)}
+            case ("revolving",rPool,rPerf):
+                return {"revolving":mkTag(("AvailableAssets",[mkRevolvingPool(rPool),rPerf]))}
+            case ("interest",ints):
+                return {"interest":[mkRateAssumption(_) for _ in ints]}
+            case ("inspect",tps):
+                return {"inspectOn":[ (mkDatePattern(dp),mkDs(ds)) for (dp,ds) in tps]}
+            case ("report",interval):
+                return {"buildFinancialReport":mkDatePattern(interval)}
+            case ("pricing",p):
+                return {"pricing":mkPricingAssump(p)}
+    match xs:
+        case []:
+            return r
+        case [x,*rest]:
+            return mkNonPerfAssumps(r.update(translate(x)),rest)
 
 def show(r, x="full"):
     ''' show cashflow of SPV during the projection '''
