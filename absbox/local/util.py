@@ -351,3 +351,12 @@ def tryConvertTupleToDict(xs):
         return xs
     else:
         raise RuntimeError(f"Failed to match <convertTupleToDict> ,either Map or Tuple but got {type(xs)}")
+
+def allKeysAreString(m:dict):
+    return all([ isinstance(_, str) for _ in m.keys()])
+
+def earlyReturnNone(fn, v):
+    if v is None:
+        return None
+    else:
+        return fn(v)

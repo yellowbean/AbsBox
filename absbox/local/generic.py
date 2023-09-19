@@ -51,10 +51,10 @@ class Generic:
                                  for (fn,fo) in self.fees},
             "accounts": {an:mkAcc(an,ao) for (an,ao) in self.accounts},
             "collects": [ mkCollection(c) for c in self.collection],
-            "rateSwap": { k:mkRateSwap(v) for k,v in self.currencySwap.items()} if self.rateSwap else None,
+            "rateSwap": { k:mkRateSwap(v) for k,v in self.rateSwap.items()} if self.rateSwap else None,
             "currencySwap":None ,
             "custom": {cn:mkCustom(co) for cn,co in self.custom.items()} if self.custom else None ,
-            "triggers": renameKs2(mapListValBy(self.trigger,mkTrigger),englishDealCycle) if self.trigger else None,
+            "triggers": renameKs2({k: {_k:mkTrigger(_v) for (_k,_v) in v.items() } for (k,v) in self.trigger.items()},englishDealCycle) if self.trigger else None,
             "liqProvider": {ln: mkLiqProvider(ln, lo | {"start":lastCloseDate} ) 
                                for ln,lo in self.liqFacility.items() } if self.liqFacility else None,
             "ledgers": {ln: mkLedger(ln, v) for ln,v in self.ledgers.items()} if self.ledgers else None

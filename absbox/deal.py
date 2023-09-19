@@ -3,6 +3,10 @@ from absbox.local.generic import *
 from absbox.local.component import * 
 from absbox.local.util import * 
 from absbox.validation import *
+import rich
+from rich.console import Console
+
+console = Console()
 
 
 def mkDeal(x:dict):
@@ -47,7 +51,7 @@ def mkDeal(x:dict):
 
     trigger = None   
     if (_t:=getValWithKs(x ,['trigger', "triggers", "事件", "触发事件"])):
-        trigger = renameKs2(_t, chinaDealCycle|englishDealCycle)
+        trigger = _t
     else:
         trigger = None
     
@@ -71,12 +75,18 @@ def mkDeal(x:dict):
         ,currencySwap
         ,trigger
         ,status
-        ,custom
+        ,None
         ,ledgers
     )
     errors,warnings = valDeal(deal.json['contents'],[],[])
 
     if len(errors)>0:
-        raise RuntimeError(f"Errors in deal:"+"\n".join(errors))
+        for e in errors:
+            console.print(f"❕[bold red]Warning in model :{e}")
+        raise RuntimeError(f"Errors in deal")
+
+    if len(warnings)>0:
+        for w in warnings:
+            console.print(f"❕[bold yellow]Warning in model :{w}")
 
     return deal

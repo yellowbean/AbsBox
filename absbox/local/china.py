@@ -56,7 +56,7 @@ class SPV:
             "rateSwap": {k:mkRateSwap(v) for k,v in self.利率对冲.items()} if self.利率对冲 else None,
             "currencySwap": None,
             "custom": {cn:mkCustom(co) for cn,co in self.自定义.items()} if self.自定义 else None,
-            "triggers": renameKs2(mapListValBy(self.触发事件,mkTrigger),chinaDealCycle) if self.触发事件 else None,
+            "triggers": renameKs2({k: {_k: mkTrigger(_v) for (_k,_v) in v.items()} for (k,v) in self.触发事件.items() },chinaDealCycle) if self.触发事件 else None,
             "liqProvider": {ln: mkLiqProvider(ln, lo | {"起始日":defaultStartDate} ) 
                                 for ln,lo in self.流动性支持.items() } if self.流动性支持 else None,
             "ledgers": {ln: mkLedger(ln, v) for ln,v in self.科目.items()} if self.科目 else None

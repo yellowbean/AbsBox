@@ -64,14 +64,15 @@ baseMap = {"资产池余额": "CurrentPoolBalance"
            , "资产池期初余额": "CurrentPoolBegBalance"
            , "资产池初始余额": "OriginalPoolBalance"
            , "初始资产池余额": "OriginalPoolBalance"
-           , "资产池当期利息": "PoolCollectionInt"
            , "债券余额": "CurrentBondBalance"
            , "债券初始余额": "OriginalBondBalance"
            , "当期已付债券利息": "LastBondIntPaid"
            , "当期已付费用": "LastFeePaid"
            , "当期未付债券利息": "CurrentDueBondInt"
            , "当期未付费用": "CurrentDueFee"}
-           
+
+rateLikeFormula = set(["bondFactor","poolFactor","cumPoolDefaultedRate","资产池累计违约率","债券系数","资产池系数"])
+intLikeFormula = set(["borrowerNumber","monthsTillMaturity"])
            
 #pool income mapping
 poolSourceMapping = {"利息回款": "CollectedInterest"

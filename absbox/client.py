@@ -52,11 +52,12 @@ class API:
         console.print(f"✅[bold green]Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
         self.session = requests.Session() 
 
-    def build_req(self, deal, assumptions=None, pricing=None) -> str:
+    def build_req(self, deal, perfAssump=None, nonPerfAssump=None) -> str:
         r = None
         _assump = None 
         _deal = deal.json if hasattr(deal,"json") else deal
-        _pricing = mkPricingAssump(pricing) if pricing else None
+        
+        _nonPerfAssump = None
         if isinstance(assumptions, dict):
             _assump = mapValsBy(assumptions, mkAssumption2)
             r = mkTag(("MultiScenarioRunReq",[_deal, _assump, _pricing]))
@@ -65,7 +66,7 @@ class API:
             r = mkTag(("SingleRunReq",[_deal, _assump, _pricing]))
         elif assumptions is None:
             r = mkTag(("SingleRunReq",[_deal, None, _pricing]))
-        return json.dumps(r , ensure_ascii=False)
+        return json.dumps(r, ensure_ascii=False)
 
     def build_pool_req(self, pool, assumptions, read=None) -> str:
         r = None
@@ -93,13 +94,13 @@ class API:
             return True,error,warning
 
     def run(self, deal,
-            assumptions=None,
-            pricing=None,
+            poolAssump=None,
+            runAssump=None,
             read=True):
 
         # if run req is a multi-scenario run
         multi_run_flag = True if isinstance(assumptions, dict) else False
-        url = f"{self.url}/runDealByScenarios"  if multi_run_flag  else f"{self.url}/runDeal"
+        url = f"{self.url}/runDealByScenarios" if multi_run_flag else f"{self.url}/runDeal"
 
         # construct request
         req = self.build_req(deal, assumptions, pricing)
@@ -107,13 +108,16 @@ class API:
         val_result, err, warn = self.validate(req)
         if not val_result:
             return val_result, err, warn
+        # branching with pricing
         if pricing is None:
-            result = self._send_req(req,url)
+            result = self._send_req(req, url)
         else:
-            result = self._send_req(req,url,timeout=30)
+            result = self._send_req(req, url, timeout=30)
+
         if result is None:
             console.print("❌[bold red]Failed to get response from run")
             return None
+        # load deal if it is a multi scenario
         if read and multi_run_flag:
             return {n:deal.read(_r) for (n,_r) in result.items()}
         elif read :
