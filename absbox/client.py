@@ -33,6 +33,7 @@ class API:
     version = VERSION_NUM.split(".")
     hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain','Accept':'*/*' ,'Accept-Encoding':'gzip'}
     session = None
+    debug = False
 
     def __post_init__(self):
         self.url = self.url.rstrip("/")
@@ -52,20 +53,26 @@ class API:
         console.print(f"✅[bold green]Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
         self.session = requests.Session() 
 
-    def build_req(self, deal, perfAssump=None, nonPerfAssump=None) -> str:
-        r = None
-        _assump = None 
-        _deal = deal.json if hasattr(deal,"json") else deal
+    def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=None) -> str:
         
-        _nonPerfAssump = None
-        if isinstance(assumptions, dict):
-            _assump = mapValsBy(assumptions, mkAssumption2)
-            r = mkTag(("MultiScenarioRunReq",[_deal, _assump, _pricing]))
-        elif isinstance(assumptions, list) :   
-            _assump = mkAssumption2(assumptions)
-            r = mkTag(("SingleRunReq",[_deal, _assump, _pricing]))
-        elif assumptions is None:
-            r = mkTag(("SingleRunReq",[_deal, None, _pricing]))
+        ''' build run deal requests: (single run, multi-scenario run, multi-struct run) '''
+
+        r = None
+        _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
+
+        match run_type:
+            case "Single" | "S":
+                _deal = deal.json if hasattr(deal,"json") else deal
+                _perfAssump = mkAssumpType(perfAssump)
+                r = mkTag(("SingleRunReq",[_deal, _perfAssump, _nonPerfAssump]))
+            case "MultiScenarios" | "MS":
+                _deal = deal.json if hasattr(deal,"json") else deal
+                mAssump = mapValsBy(mkAssumpType, perfAssump)
+                r = mkTag(("MultiScenarioRunReq",[_deal, mAssump, _nonPerfAssump]))
+            case "MultiStructs" | "MD" :
+                mDeal = {k: v.json if hasattr(v,"json") else v for k,v in deal.items() }
+                _perfAssump = mkAssumpType(perfAssump)
+                r = mkTag(("MultiDealRunReq",[mDeal, _perfAssump, _nonPerfAssump]))
         return json.dumps(r, ensure_ascii=False)
 
     def build_pool_req(self, pool, assumptions, read=None) -> str:
@@ -103,7 +110,8 @@ class API:
         url = f"{self.url}/runDealByScenarios" if multi_run_flag else f"{self.url}/runDeal"
 
         # construct request
-        req = self.build_req(deal, assumptions, pricing)
+        runType = "Single"
+        req = self.build_run_deal_req(deal, runType , poolAssump, runAssump)
         #validate deal
         val_result, err, warn = self.validate(req)
         if not val_result:
