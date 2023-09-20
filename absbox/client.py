@@ -11,7 +11,7 @@ from requests.exceptions import ConnectionError,ReadTimeout
 import pandas as pd
 from pyspecter import query
 
-from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header, _read_cf, _read_asset_pricing, mergeStrWithDict, earlyReturnNone
+from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header, _read_cf, _read_asset_pricing, mergeStrWithDict, earlyReturnNone, searchByFst
 from absbox.local.component import mkPool,mkAssumpType,mkNonPerfAssumps, mkPricingAssump,mkLiqMethod,mkAssetUnion
 from absbox.local.base import *
 from absbox.validation import valReq,valAssumption
@@ -57,6 +57,7 @@ class API:
         ''' build run deal requests: (single run, multi-scenario run, multi-struct run) '''
         r = None
         _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
+        print("NON PERF",_nonPerfAssump)
 
         match run_type:
             case "Single" | "S":
@@ -117,7 +118,7 @@ class API:
         if not val_result:
             return val_result, err, warn
         # branching with pricing
-        if runAssump is None or runAssump.get("pricing", False):
+        if runAssump is None or searchByFst(runAssump,"pricing") is None:
             result = self._send_req(req, url)
         else:
             result = self._send_req(req, url, timeout=30)

@@ -360,3 +360,12 @@ def earlyReturnNone(fn, v):
         return None
     else:
         return fn(v)
+
+def searchByFst(xs,v):
+    "search by first element in a list, return None if not found"
+    for x in xs:
+        if x[0] == v:
+            return x
+    return None
+
+

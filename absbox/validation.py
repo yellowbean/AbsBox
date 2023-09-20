@@ -118,7 +118,7 @@ def valAssumption(d, ma , error, warning) -> list:
             case _:
                 raise RuntimeError(f"Failed to match:{z}")
     
-    asset_ids = set(range(len(query(d, ['pool', 'assets']))))
+    asset_ids = set(range(len(list(query(d, ['pool', 'assets'])))))
     
     if ma is None:
         return error,warning

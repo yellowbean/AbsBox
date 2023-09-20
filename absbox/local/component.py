@@ -1085,8 +1085,9 @@ def mkDefaultedAssumption(x):
             return mkTag(("DummyDefaultAssump"))
 
 def mkDelinqAssumption(x):
-    return "DummyDelinqAssump"
-    #return mkTag(("DummyDelinqAssump"))
+    #return "DummyDelinqAssump"
+    #return mkTag("DummyDelinqAssump")
+    return []
 
 
 def mkPerfAssumption(x):
@@ -1482,9 +1483,9 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
                 return {"callWhen":mkCallOptions(opts)}
             case ("revolving",rPool,rPerf):
                 return {"revolving":mkTag(("AvailableAssets",[mkRevolvingPool(rPool),rPerf]))}
-            case ("interest",ints):
+            case ("interest",*ints):
                 return {"interest":[mkRateAssumption(_) for _ in ints]}
-            case ("inspect",tps):
+            case ("inspect",*tps):
                 return {"inspectOn":[ (mkDatePattern(dp),mkDs(ds)) for (dp,ds) in tps]}
             case ("report",interval):
                 return {"buildFinancialReport":mkDatePattern(interval)}
@@ -1496,7 +1497,7 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
         case []:
             return r
         case [x,*rest]:
-            return mkNonPerfAssumps(r.update(translate(x)),rest)
+            return mkNonPerfAssumps(r | translate(x),rest)
 
 def show(r, x="full"):
     ''' show cashflow of SPV during the projection '''

@@ -107,7 +107,6 @@ class Generic:
             output['pool']['flow'] = None
         else:
             _pool_cf_header,_ = guess_pool_flow_header(deal_content['pool']['futureCf'][0],"english")
-            print("header",_pool_cf_header)
             output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['futureCf']]
                                                   , columns=_pool_cf_header)
             pool_idx = 'Date'
