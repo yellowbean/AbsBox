@@ -11,8 +11,8 @@ from requests.exceptions import ConnectionError,ReadTimeout
 import pandas as pd
 from pyspecter import query
 
-from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header, _read_cf, _read_asset_pricing, mergeStrWithDict
-from absbox.local.component import mkPool, mkAssumption, mkAssumption2, mkPricingAssump,mkLiqMethod,mkAssetUnion
+from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header, _read_cf, _read_asset_pricing, mergeStrWithDict, earlyReturnNone
+from absbox.local.component import mkPool,mkAssumpType,mkNonPerfAssumps, mkPricingAssump,mkLiqMethod,mkAssetUnion
 from absbox.local.base import *
 from absbox.validation import valReq,valAssumption
 
@@ -53,17 +53,15 @@ class API:
         console.print(f"✅[bold green]Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
         self.session = requests.Session() 
 
-    def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=None) -> str:
-        
+    def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=[]) -> str:
         ''' build run deal requests: (single run, multi-scenario run, multi-struct run) '''
-
         r = None
         _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
 
         match run_type:
             case "Single" | "S":
                 _deal = deal.json if hasattr(deal,"json") else deal
-                _perfAssump = mkAssumpType(perfAssump)
+                _perfAssump = earlyReturnNone(mkAssumpType,perfAssump)
                 r = mkTag(("SingleRunReq",[_deal, _perfAssump, _nonPerfAssump]))
             case "MultiScenarios" | "MS":
                 _deal = deal.json if hasattr(deal,"json") else deal
@@ -73,6 +71,8 @@ class API:
                 mDeal = {k: v.json if hasattr(v,"json") else v for k,v in deal.items() }
                 _perfAssump = mkAssumpType(perfAssump)
                 r = mkTag(("MultiDealRunReq",[mDeal, _perfAssump, _nonPerfAssump]))
+            case _:
+                raise RuntimeError(f"Failed to match run type:{run_type}")
         return json.dumps(r, ensure_ascii=False)
 
     def build_pool_req(self, pool, assumptions, read=None) -> str:
@@ -106,18 +106,18 @@ class API:
             read=True):
 
         # if run req is a multi-scenario run
-        multi_run_flag = True if isinstance(assumptions, dict) else False
+        multi_run_flag = True if isinstance(poolAssump, dict) else False
         url = f"{self.url}/runDealByScenarios" if multi_run_flag else f"{self.url}/runDeal"
 
         # construct request
-        runType = "Single"
-        req = self.build_run_deal_req(deal, runType , poolAssump, runAssump)
+        runType = "MultiScenarios" if multi_run_flag else "Single"
+        req = self.build_run_deal_req(runType, deal, poolAssump, runAssump)
         #validate deal
         val_result, err, warn = self.validate(req)
         if not val_result:
             return val_result, err, warn
         # branching with pricing
-        if pricing is None:
+        if runAssump is None or runAssump.get("pricing", False):
             result = self._send_req(req, url)
         else:
             result = self._send_req(req, url, timeout=30)
@@ -127,8 +127,9 @@ class API:
             return None
         # load deal if it is a multi scenario
         if read and multi_run_flag:
-            return {n:deal.read(_r) for (n,_r) in result.items()}
-        elif read :
+            #return {n:deal.read(_r) for (n,_r) in result.items()}
+            return mapValsBy(result, deal.read)
+        elif read:
             return deal.read(result)
         else:
             return result

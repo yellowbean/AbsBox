@@ -579,10 +579,8 @@ def mkRateSwap(x):
 
 def mkRateType(x):
     match x :
-        case {"fix":r} | {"固定":r}:
-           return mkTag(("Fix",r))
-        case ["fix",r] | ["固定",r]:
-           return mkTag(("Fix",r))
+        case {"fix":r} | {"固定":r} | ["fix",r] | ["固定",r]:
+            return mkTag(("Fix",[DC.DC_ACT_365F.value, r]))
         case {"floater":(idx,spd),"rate":r,"resets":dp,**p} | \
             {"浮动":(idx,spd),"利率":r,"重置":dp,**p}:
             mf = getValWithKs(p,["floor"])
@@ -929,9 +927,7 @@ def mkAsset(x):
         case ["按揭贷款", {"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "当前利率": currentRate, "剩余期限": remainTerms, "状态": status}] | \
                 ["Mortgage", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
 
-            borrowerNum1 = x[2].get("borrowerNum", None)
-            borrowerNum2 = x[2].get("借款数量", None)
-
+            borrowerNum = getValWithKs(x[2],["borrowerNum","借款人数量"])
             return mkTag(("Mortgage", [
                 {"originBalance": originBalance,
                  "originRate": mkRateType(originRate),
@@ -943,7 +939,7 @@ def mkAsset(x):
                 currentBalance,
                 currentRate,
                 remainTerms,
-                (borrowerNum1 or borrowerNum2),
+                borrowerNum,
                 mkAssetStatus(status)]))
         case ["贷款", {"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "当前利率": currentRate, "剩余期限": remainTerms, "状态": status}] \
                 | ["Loan", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
@@ -1089,7 +1085,8 @@ def mkDefaultedAssumption(x):
             return mkTag(("DummyDefaultAssump"))
 
 def mkDelinqAssumption(x):
-    return mkTag(("DummyDelinqAssump"))
+    return "DummyDelinqAssump"
+    #return mkTag(("DummyDelinqAssump"))
 
 
 def mkPerfAssumption(x):
@@ -1127,6 +1124,7 @@ def mkAssumpType(x):
     ''' '''
     def mkPDF(a,b,c):
         return [mkPerfAssumption(a),mkDelinqAssumption(b),mkDefaultedAssumption(c)]
+    
     match x:
         case ("Pool", p, d, f):
             return mkTag(("PoolLevel",mkPDF(p,d,f)))
@@ -1493,6 +1491,8 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
             case ("pricing",p):
                 return {"pricing":mkPricingAssump(p)}
     match xs:
+        case None:
+            return {}
         case []:
             return r
         case [x,*rest]:
