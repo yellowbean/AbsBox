@@ -1,6 +1,6 @@
 from absbox.local.generic import Generic
 
-test01 = Generic(
+test06 = Generic(
     "Step Up bond"
     ,{"cutoff":"2021-03-01","closing":"2021-06-15","firstPay":"2021-07-26"
      ,"payFreq":["DayOfMonth",20],"poolFreq":"MonthEnd","stated":"2030-01-01"}
@@ -17,7 +17,8 @@ test01 = Generic(
              ,"originBalance":1000
              ,"originRate":0.07
              ,"startDate":"2020-01-03"
-             ,"rateType":{"StepUp":0.08,"Spread":0.01,"When":["After","2022-04-01","MonthEnd"]}
+             ,"rateType":{"StepUp":0.08,"Spread":0.01
+                          ,"When":["After","2022-04-01","MonthEnd"]}
              ,"bondType":{"Sequential":None}})
       ,("B",{"balance":1000
              ,"rate":0.0

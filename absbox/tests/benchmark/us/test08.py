@@ -2,9 +2,9 @@ from absbox import API
 
 asset = ["AdjustRateMortgage"
         ,{"originBalance":73_875.00
-          ,"originRate":{"floater":("USCMT1Y",0.01)
-                         ,"rate":0.04
-                         ,"resets":"YearFirst"}
+          ,"originRate":["floater",0.04,{"index":"USCMT1Y"
+                                        ,"spread":0.01
+                                        ,"reset":"YearFirst"}]
           ,"originTerm":360
           ,"freq":"Monthly","type":"Level","originDate":"1999-05-01"
           ,"arm":{"initPeriod":2,"firstCap":0.01,"periodicCap":0.01,"lifeCap":0.09}}
@@ -13,24 +13,7 @@ asset = ["AdjustRateMortgage"
           ,"remainTerm":77
           ,"status":"current"}]
 
-from absbox.local.generic import Generic
-
-asset = ["AdjustRateMortgage"
-        ,{"originBalance":73_875.00
-          ,"originRate":{"floater":("USCMT1Y",0.01)
-                         ,"rate":0.04
-                         ,"resets":"YearFirst"}
-          ,"originTerm":360
-          ,"freq":"Monthly","type":"Level","originDate":"1999-05-01"
-          ,"arm":{"initPeriod":2,"firstCap":0.01,"periodicCap":0.01,"lifeCap":0.09}}
-          ,{"currentBalance":20_788.41
-          ,"currentRate":0.0215
-          ,"remainTerm":77
-          ,"status":"current"}]
-
-from absbox.local.generic import Generic
-
-test01 = Generic(
+GNMA_36208ALG4 = Generic(
     "820146/36208ALG4/G2-Custom AR"
     ,{"collect":["2023-05-01","2023-05-31"]
         ,"pay":["2023-05-26","2023-06-28"]
@@ -44,9 +27,7 @@ test01 = Generic(
              ,"originBalance":1_553_836.00
              ,"originRate":0.07
              ,"startDate":"2020-01-03"
-             ,"rateType":{"floater": 
-                          [0.07,"USCMT1Y",0.01,"YearFirst"]
-                          ,"dayCount":"DC_30_360_US"}
+             ,"rateType":{"floater": [0.07,"USCMT1Y",0.01,"YearFirst"],"dayCount":"DC_30_360_US"}
              ,"bondType":{"Sequential":None}
              ,"lastAccrueDate":"2023-04-30"})
       ,)
@@ -67,8 +48,10 @@ test01 = Generic(
       ,"endOfCollection":[
           ["liqSupport","Ginnie_Mae","account","acc01"
               ,{"formula": 
-                ("substract",("cumPoolDefaultedBalance",)
-                            ,("liqCredit","Ginnie_Mae"))}]
+                ("floorWithZero"
+                ,("substract",("cumPoolDefaultedBalance",)
+                            ,("liqBalance","Ginnie_Mae")))}
+              ]
           ,["calcInt","A1"]]}
     ,[["CollectedInterest","acc01"]
       ,["CollectedPrincipal","acc01"]
@@ -78,22 +61,23 @@ test01 = Generic(
     ,None)
 
 
-if __name__ == '__main__':
-    
-    localAPI = API("https://absbox.org/api/dev",lang='english')
+r = localAPI.run(GNMA_36208ALG4
+                ,runAssump = [("inspect",("MonthEnd",("cumPoolDefaultedBalance",))
+                                         ,("MonthEnd",("liqBalance","Ginnie_Mae")))
+                              ,("interest",("USCMT1Y",0.0468))]
+                ,poolAssump = ("Pool"
+                              ,("Mortgage",{"CDR":0.005},None,{"Rate":0.3,"Lag":4},None)
+                              ,None
+                              ,None)
+                ,read=True)
 
-    r = localAPI.run(GNMA_36208ALG4
-                 ,assumptions = [{"Rate":["USCMT1Y",0.0468]}
-                                ,{"CDR":0.005} 
-                                ,{"Inspect":[("MonthEnd",("cumPoolDefaultedBalance",))
-                                           ,("MonthEnd",("liqCredit","Ginnie_Mae"))]}]
-                 ,read=True)
-    
-    # Inspect cumulative defaulted balance
-    r['result']['inspect']['<CumulativePoolDefaultedBalance>']
+# Inspect cumulative defaulted balance
+r['result']['inspect']['<CumulativePoolDefaultedBalance>']
 
-    # Inspect credit provided by Ginnie Mae
-    r['result']['inspect']['<LiqCredit:Ginnie_Mae>']
+# Inspect credit provided by Ginnie Mae
+r['result']['inspect']['<LiqBalance:Ginnie_Mae>']
 
-    # the cash deposited to SPV in account `acc01`
-    r['accounts']['acc01'][r['accounts']['acc01']["memo"]=="<Support:Ginnie_Mae>"]
+# the cash deposited to SPV in account `acc01`
+r['accounts']['acc01'][r['accounts']['acc01']["memo"]=="<Support:Ginnie_Mae>"]
+
+

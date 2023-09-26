@@ -60,11 +60,11 @@ test01 = Generic(
     ,None
     ,None
     ,None
-    ,{"AfterCollect":[
-        {"condition":[("cumPoolDefaultedRate",),">",0.05],
-        "effects":("newStatus","Accelerated"),
-        "status":False,
-        "curable":False} ]
-      }
+    ,{"AfterCollect":{
+        "DefaultTrigger": 
+         {"condition":[("cumPoolDefaultedRate",),">",0.05]
+          ,"effects":("newStatus","Accelerated")
+          ,"status":False
+          ,"curable":False}}}
 )
 

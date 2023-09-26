@@ -73,7 +73,9 @@ baseMap = {"资产池余额": "CurrentPoolBalance"
 
 rateLikeFormula = set(["bondFactor","poolFactor","cumPoolDefaultedRate","资产池累计违约率","债券系数","资产池系数"])
 intLikeFormula = set(["borrowerNumber","monthsTillMaturity"])
-           
+boolLikeFormula = set(["trigger","事件","isMostSenior","最优先"])
+
+
 #pool income mapping
 poolSourceMapping = {"利息回款": "CollectedInterest"
                     , "本金回款": "CollectedPrincipal"

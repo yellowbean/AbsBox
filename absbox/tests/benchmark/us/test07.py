@@ -66,7 +66,8 @@ BMW202301 = Generic(
         ,["2027-06-28",6283905.88,7070447.52,77370.71]
         ,["2027-07-28",1919297.32,4364608.56,35979.93]
         ,["2027-08-28",0,1919297.32,10964.13]
-      ]}
+      ]
+     ,"extendBy":"MonthEnd"}
       ,(("distAcc",{"balance":0})
        ,("cashReserve",{"balance":80_000_000.02
                          ,"type":{"fixReserve":80_000_000.02}})
@@ -91,22 +92,22 @@ BMW202301 = Generic(
     ,{"default":[
           ["transfer",'revolBuyAcc',"distAcc"]
          ,["transfer",'cashReserve',"distAcc"]
-         ,["payFee","distAcc",["admFee"],{"support":["suppportAccount",'cashReserve']}]
-         ,["payFee","distAcc",["serviceFee"],{"support":["suppportAccount",'cashReserve']}]
+         ,["payFee","distAcc",["admFee"],{"support":["account","cashReserve"]}]
+         ,["payFee","distAcc",["serviceFee"],{"support":["account","cashReserve"]}]
          ,["accrueAndPayInt","distAcc",["A"]]
          ,["accrueAndPayInt","cashReserve",["A"]]
         
-         ,["runTrigger",0] # update the trigger status during the waterfall
+         ,["runTrigger","ExcessTrigger"] # update the trigger status during the waterfall
         
          ,["If"
-          ,[("trigger","InDistribution",0),False]  # if it was triggered 
+          ,[("trigger","InDistribution","ExcessTrigger"),False]  # if it was triggered 
           ,["transfer","distAcc",'cashReserve',{"reserve":"gap"}]] # trasnfer amt to cash reserver account
         
          ,["IfElse"  
            ,["status","Revolving"] # acitons in the revolving period
            ,[["transfer","distAcc",'revolBuyAcc',{"formula":("substract",("bondBalance",),("poolBalance",))}]
             ,["buyAsset",["Current|Defaulted",1.0,0],"revolBuyAcc",None] # buy asset with 1:1 if asset with performing
-            ,["payPrinResidual","distAcc",["Sub"]] ]
+            ,["payIntResidual","distAcc","Sub"] ]
            ,[["payPrin","distAcc",["A"]] # actions if deal is in Amortizing status
             ,["payPrin","distAcc",["Sub"]]
             ,["payFeeResidual", "distAcc", "bmwFee"]]]]
@@ -124,19 +125,45 @@ BMW202301 = Generic(
     ,None
     ,None
     ,None
-    ,{"BeforeDistribution":[
+    ,{"BeforeDistribution":
+      {"DefTrigger":
         {"condition":["any"
                       ,[">=","2024-05-26"]
                       ,[("cumPoolDefaultedRate",),">",0.016]]
         ,"effects":("newStatus","Amortizing")
         ,"status":False
-        ,"curable":False}]
-     ,"InDistribution":[
+        ,"curable":False}}
+     ,"InDistribution":
+      {"ExcessTrigger":   
         {"condition":[("accountBalance","distAcc"),">",("bondBalance","A")]
         ,"effects":("newReserveBalance","cashReserve",{"fixReserve":0}) # if was triggered, change reserve account amount to 0
         ,"status":False
         ,"curable":False}
-     ]
+     }
      }
     ,"Revolving"  # start deal with "Revolving" status
 )
+
+#perf = ("Mortgage",{"CDR":0.15},{"CPR":0.0015},{"Rate":0.3,"Lag":4},None)
+#
+#r = localAPI.run(BMW202301,
+#                 poolAssump = ("Pool"
+#                               ,("Mortgage",{"CDR":0.15},{"CPR":0.0015},{"Rate":0.3,"Lag":4},None)
+#                               ,None
+#                               ,None)
+#                 ,runAssump = [("inspect",("MonthEnd",("bondBalance",))
+#                                         ,("MonthFirst",("poolBalance",)))
+#                              ,("interest"
+#                                ,("LPR5Y",0.05))
+#                              ,("revolving"
+#                                ,["constant"
+#                                  ,["Mortgage"
+#                                    ,{"originBalance":2200,"originRate":["fix",0.045],"originTerm":30
+#                                      ,"freq":"Monthly","type":"Level","originDate":"2021-02-01"}
+#                                      ,{"currentBalance":2200
+#                                      ,"currentRate":0.08
+#                                      ,"remainTerm":20
+#                                      ,"status":"current"}]]
+#                                ,perf)]
+#                 ,read=True)
+#r['pool']['flow']

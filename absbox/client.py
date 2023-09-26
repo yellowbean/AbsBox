@@ -12,7 +12,7 @@ import pandas as pd
 from pyspecter import query
 
 from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header, _read_cf, _read_asset_pricing, mergeStrWithDict, earlyReturnNone, searchByFst
-from absbox.local.component import mkPool,mkAssumpType,mkNonPerfAssumps, mkPricingAssump,mkLiqMethod,mkAssetUnion
+from absbox.local.component import mkPool,mkAssumpType,mkNonPerfAssumps, mkPricingAssump,mkLiqMethod,mkAssetUnion,mkRateAssumption
 from absbox.local.base import *
 from absbox.validation import valReq,valAssumption
 
@@ -31,7 +31,8 @@ class API:
     check: bool = True
     server_info = {}
     version = VERSION_NUM.split(".")
-    hdrs = {'Content-type': 'application/json', 'Accept': 'text/plain','Accept':'*/*' ,'Accept-Encoding':'gzip'}
+    hdrs = {'Content-type': 'application/json', 'Accept': '*/*'
+            , 'Accept-Encoding': 'gzip'}
     session = None
     debug = False
 
@@ -57,7 +58,6 @@ class API:
         ''' build run deal requests: (single run, multi-scenario run, multi-struct run) '''
         r = None
         _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
-        print("NON PERF",_nonPerfAssump)
 
         match run_type:
             case "Single" | "S":
@@ -76,16 +76,20 @@ class API:
                 raise RuntimeError(f"Failed to match run type:{run_type}")
         return json.dumps(r, ensure_ascii=False)
 
-    def build_pool_req(self, pool, assumptions, read=None) -> str:
+    def build_pool_req(self, pool, poolAssump, rateAssumps, read=None) -> str:
         r = None
-        if isinstance(assumptions, list):
+        if isinstance(poolAssump, tuple):
             r = mkTag(("SingleRunPoolReq"
-                      ,[mkPool(pool)
-                      ,mkAssumption2(assumptions)])) 
-        elif isinstance(assumptions, dict):
+                       ,[mkPool(pool)
+                         ,mkAssumpType(poolAssump)
+                         ,[mkRateAssumption(rateAssump) for rateAssump in rateAssumps] if rateAssumps else None]
+                        ))
+        elif isinstance(poolAssump, dict):
             r = mkTag(("MultiScenarioRunPoolReq"
-                      ,[mkPool(pool)
-                      ,mapValsBy(assumptions, mkAssumption2)])) 
+                       ,[mkPool(pool)
+                         ,mapValsBy(poolAssump, mkAssumpType)
+                         ,[mkRateAssumption(rateAssump) for rateAssump in rateAssumps] if rateAssumps else None]
+                        )) 
         else:
             raise RuntimeError("Error in build pool req")
         return json.dumps(r , ensure_ascii=False)
@@ -105,6 +109,9 @@ class API:
             poolAssump=None,
             runAssump=None,
             read=True):
+
+        assert isinstance(runAssump,list),f"runAssump must be a list ,but got {type(runAssump)}"
+
 
         # if run req is a multi-scenario run
         multi_run_flag = True if isinstance(poolAssump, dict) else False
@@ -128,67 +135,76 @@ class API:
             return None
         # load deal if it is a multi scenario
         if read and multi_run_flag:
-            #return {n:deal.read(_r) for (n,_r) in result.items()}
             return mapValsBy(result, deal.read)
         elif read:
             return deal.read(result)
         else:
             return result
 
-    def runPool(self, pool, assumptions,read=True):
+    def runPool(self, pool, poolAssump=None, rateAssump=None, read=True):
         def read_single(pool_resp):
-            flow_header,idx = guess_pool_flow_header(pool_resp[0],pool_lang)
+            (pool_flow, pool_bals) = pool_resp
+            flow_header, idx = guess_pool_flow_header(pool_flow[0],pool_lang)
             try:
-                result = pd.DataFrame([_['contents'] for _ in pool_resp] , columns=flow_header)
-            except ValueError as e:
+                result = pd.DataFrame([_['contents'] for _ in pool_flow], columns=flow_header)
+            except ValueError as _:
                 console.print(f"❌[bold red]Failed to match header:{flow_header} with {result[0]['contents']}")
+
             result = result.set_index(idx)
             result.index.rename(idx, inplace=True)
             result.sort_index(inplace=True)
-            return result
+            return (result, pool_bals)
             
-        multi_scenario = True if isinstance(assumptions, dict) else False 
+        multi_scenario = True if isinstance(poolAssump, dict) else False 
         url = f"{self.url}/runPoolByScenarios" if multi_scenario else f"{self.url}/runPool"
         pool_lang = guess_pool_locale(pool)
-        req = self.build_pool_req(pool, assumptions=assumptions)
+        req = self.build_pool_req(pool, poolAssump, rateAssump)
         result = self._send_req(req, url)
 
         if read and (not multi_scenario):
             return read_single(result)
-        elif read and multi_scenario : 
+        elif read and multi_scenario: 
             return mapValsBy(result, read_single)
         else:
             return result
     
-    def runStructs(self, deals, assumptions=None, pricing=None, read=True ):
+    def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, read=True):
         assert isinstance(deals, dict),f"Deals should be a dict but got {deals}"
         url = f"{self.url}/runMultiDeals" 
-        _assumptions = mkAssumption2(assumptions) if assumptions else None 
-        _pricing = mkPricingAssump(pricing) if pricing else None
+        _poolAssump = mkAssumpType(poolAssump) if poolAssump else None 
+        _nonPerfAssump = mkNonPerfAssumps({}, nonPoolAssump)
         req = json.dumps(mkTag(("MultiDealRunReq"
-                                ,[{k:v.json for k,v in deals.items()}
-                                  ,_assumptions
-                                  ,_pricing]))
+                                 ,[{k:v.json for k,v in deals.items()}
+                                   ,_poolAssump
+                                   ,_nonPerfAssump]))
                         ,ensure_ascii=False)
 
-        result = self._send_req(req,url)
-        if read :
-            return {k:deals[k].read(v) for k,v in result.items()}    
+        result = self._send_req(req, url)
+        if read:
+            return {k: deals[k].read(v) for k, v in result.items()}    
         else:
             return result
 
-    def runAsset(self, date, _assets, assumptions=None, pricing=None, read=True):
+    def runAsset(self, date, _assets, poolAssump=None, rateAssump=None, pricing=None, read=True):
         assert isinstance(_assets, list),f"Assets passed in must be a list"
         def readResult(x):
-            (cfs,pr) = x
-            cfs = _read_cf(cfs, self.lang)
-            pricingResult = _read_asset_pricing(pr, self.lang) if pr else None
-            return (cfs,pricingResult)
+            try:
+                ((cfs,cfBalance),pr) = x
+                cfs = _read_cf(cfs, self.lang)
+                pricingResult = _read_asset_pricing(pr, self.lang) if pr else None
+            except Exception as e:
+                print(f"Failed to read result {x}")
+            return (cfs,cfBalance,pricingResult)
         url = f"{self.url}/runAsset"
-        _assumptions = mkAssumption2(assumptions) 
-        _pricing =  mkLiqMethod(pricing) if pricing else None
-        assets = [ mkAssetUnion(_) for _ in _assets] 
-        req = json.dumps([date ,assets ,_assumptions ,_pricing]
+        _assumptions = mkAssumpType(poolAssump) if poolAssump else None
+        _pricing = mkLiqMethod(pricing) if pricing else None
+        _rate = mkRateAssumption(rateAssump) if rateAssump else None
+        assets = [ mkAssetUnion(_) for _ in _assets ]
+        req = json.dumps([date
+                          ,assets
+                          ,_assumptions
+                          ,_rate
+                          ,_pricing]
                          ,ensure_ascii=False)
         result = self._send_req(req,url)
         if read :
@@ -293,7 +309,6 @@ class API:
                 return None
             if r.status_code != 200:
                 console.print_json(_req)
-                print(">>>",r.text)
                 console.print_json(r.text)
                 return None
             try:

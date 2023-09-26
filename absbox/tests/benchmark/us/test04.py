@@ -1,13 +1,13 @@
 from absbox.local.generic import Generic
 
-test01 = Generic(
+test04 = Generic(
     "split pool income"
     ,{"cutoff":"2021-03-01","closing":"2021-06-15","firstPay":"2021-07-26"
      ,"payFreq":["DayOfMonth",20],"poolFreq":"MonthEnd","stated":"2030-01-01"}
     ,{'assets':[["Mortgage"
-        ,{"originBalance":2200,"originRate":["fix",0.045],"originTerm":30
+        ,{"originBalance":2500,"originRate":["fix",0.045],"originTerm":30
           ,"freq":"Monthly","type":"Level","originDate":"2021-02-01"}
-          ,{"currentBalance":2200
+          ,{"currentBalance":2500
           ,"currentRate":0.08
           ,"remainTerm":20
           ,"status":"current"}]]}
@@ -40,4 +40,4 @@ test01 = Generic(
       ,["CollectedPrincipal",[[0.8,"acc01"],[0.2,"acc02"]]]
       ,["CollectedPrepayment","acc01"]
       ,["CollectedRecoveries","acc01"]]
-    )
+)

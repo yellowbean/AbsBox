@@ -33,7 +33,7 @@ test01 = Generic(
          ,["accrueAndPayInt","acc01",["A1"]]
          ,["payPrin","acc01",["A1"]]
          ,["payPrin","acc01",["B"]]
-         ,["payPrinResidual","acc01",["B"]]
+         ,["payIntResidual","acc01","B"]
      ]}
     ,[["CollectedInterest","acc01"]
       ,["CollectedPrincipal","acc01"]

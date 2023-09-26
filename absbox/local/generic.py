@@ -44,7 +44,8 @@ class Generic:
             "pool": {"assets": [mkAsset(x) for x in getValWithKs(self.pool,['assets',"清单"],defaultReturn=[])]
                      , "asOfDate": lastAssetDate
                      , "issuanceStat": getValWithKs(self.pool,["issuanceStat","统计"])
-                     , "futureCf":mkCf(getValWithKs(self.pool,['cashflow','现金流归集表','归集表'], [])) },
+                     , "futureCf":mkCf(getValWithKs(self.pool,['cashflow','现金流归集表','归集表'], []))
+                     , "extendPeriods":mkDatePattern(getValWithKs(self.pool,['extendBy'],"MonthEnd"))},
             "bonds": { bn: mkBnd(bn,bo) for (bn,bo) in self.bonds},
             "waterfall": mkWaterfall({},self.waterfall.copy()),  
             "fees": {fn: mkFee(fo|{"name":fn},fsDate = lastCloseDate) 
