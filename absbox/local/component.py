@@ -396,7 +396,8 @@ def mkBondRate(x):
         case {"浮动": [r, _index, Spread, resetInterval], "日历": dc} | \
                 {"floater": [r, _index, Spread, resetInterval], "dayCount": dc}:
             return mkTag(("Floater", [r, _index, Spread, mkDatePattern(resetInterval), dc, None, None]))
-        case {"浮动": [r, _index, Spread, resetInterval]} | {"floater": [r, _index, Spread, resetInterval]}:
+        case {"浮动": [r, _index, Spread, resetInterval]} | \
+             {"floater": [r, _index, Spread, resetInterval]} :
             return mkBondRate(x | {"日历": DC.DC_ACT_365F.value, "dayCount": DC.DC_ACT_365F.value})
         case {"固定": _rate, "日历": dc} | {"fix": _rate, "dayCount": dc}:
             return mkTag(("Fix", [_rate, dc]))
@@ -413,17 +414,26 @@ def mkBondRate(x):
 
 
 def mkBnd(bn, x):
+    md = getValWithKs(x,["到期日","maturityDate"])
+    lastAccrueDate = getValWithKs(x,["计提日","lastAccrueDate"])
+    lastIntPayDate = getValWithKs(x,["付息日","lastIntPayDate"])
+    dueInt = getValWithKs(x,["应付利息","dueInt"],defaultReturn=0)
     match x:
         case {"当前余额": bndBalance, "当前利率": bndRate, "初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
              {"balance": bndBalance, "rate": bndRate, "originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
-            md = getValWithKs(x,["到期日","maturityDate"])
-            lastAccrueDate = getValWithKs(x,["计提日","lastAccrueDate"])
-            lastIntPayDate = getValWithKs(x,["付息日","lastIntPayDate"])
             return {"bndName": bn, "bndBalance": bndBalance, "bndRate": bndRate
                     , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
-                    , "bndDuePrin": 0, "bndDueInt": 0, "bndDueIntDate": lastAccrueDate
+                    , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntDate": lastAccrueDate
                     , "bndLastIntPayDate": lastIntPayDate}
+        case {"初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
+             {"originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
+            return {"bndName": bn, "bndBalance": originBalance, "bndRate": originRate
+                    , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
+                    , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
+                    , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntDate": lastAccrueDate
+                    , "bndLastIntPayDate": lastIntPayDate}
+
 
         case _:
             raise RuntimeError(f"Failed to match bond:{bn},{x}:mkBnd")
@@ -737,6 +747,8 @@ def mkStatus(x):
             return mkTag(("Amortizing"))
         case "循环" | "Revolving":
             return mkTag(("Revolving"))
+        case "RampUp":
+            return mkTag(("RampUp"))
         case "加速清偿" | "Accelerated":
             return mkTag(("DealAccelerated", None))
         case "违约" | "Defaulted":
@@ -1317,7 +1329,7 @@ def mkFee(x,fsDate=None):
 
 def mkPricingAssump(x):
     match x:
-        case {"贴现日": pricingDay, "贴现曲线": xs} | {"PVDate": pricingDay, "PVCurve": xs}:
+        case {"贴现日": pricingDay, "贴现曲线": xs} | {"date": pricingDay, "curve": xs}| {"PVDate": pricingDay, "PVCurve": xs}:
             return mkTag(("DiscountCurve", [pricingDay, mkTs("IRateCurve", xs)]))
         case {"债券": bnd_with_price, "利率曲线": rdps} | {"bonds": bnd_with_price, "curve": rdps}:
             return mkTag(("RunZSpread", [mkTs("IRateCurve", rdps), bnd_with_price]))

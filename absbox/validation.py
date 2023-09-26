@@ -67,11 +67,11 @@ def valDeal(d, error, warning) -> list:
            case {"tag":'CalcBondInt',"contents": bs}:
                if (not inSet(bs,bnd_names)):
                    rnt += f"Bond {bs} is not in deal bonds {bnd_names};"
-           case {"tag":'SwapSettle',"contents": [acc,swap_name]}:
-               if (not inSet(acc,acc_names)):
-                   rnt += f"Bond {acc} is not in deal accounts {acc_names};"
-               if (not inSet(swap_name,swap_names)):
-                   rnt += f"Bond {swap_name} is not in deal swap list {swap_names};"
+           case {"tag":'SwapSettle',"contents": [acc, swap_name]}:
+               if (not inSet([acc], acc_names)):
+                   rnt += f"Account: {acc} is not in deal accounts {acc_names};"
+               if (not inSet([swap_name],swap_names)):
+                   rnt += f"Swap: {swap_name} is not in deal swap list {swap_names};"
            case _:
                pass
         return rnt
