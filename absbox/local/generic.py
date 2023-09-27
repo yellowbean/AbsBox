@@ -40,7 +40,7 @@ class Generic:
         _r = {
             "dates": parsedDates,
             "name": self.name,
-            "status":mkTag((self.status)),
+            "status":mkStatus(self.status),
             "pool": {"assets": [mkAsset(x) for x in getValWithKs(self.pool,['assets',"清单"],defaultReturn=[])]
                      , "asOfDate": lastAssetDate
                      , "issuanceStat": getValWithKs(self.pool,["issuanceStat","统计"])

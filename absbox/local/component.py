@@ -755,8 +755,8 @@ def mkStatus(x):
             return mkTag(("DealDefaulted", None))
         case "结束" | "Ended":
             return mkTag(("Ended"))
-        case "设计" | "PreClosing":
-            return mkTag(("PreClosing"))
+        case ("设计", st) | ("PreClosing", st) | ("preclosing", st):
+            return mkTag(("PreClosing", mkStatus(st)))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkStatus")
 
@@ -764,9 +764,11 @@ def mkStatus(x):
 def readStatus(x, locale):
     m = {"en": {'amort': "Amortizing", 'def': "Defaulted", 'acc': "Accelerated", 'end': "Ended",
                 'called': "Called",
-                'pre': "PreClosing",'revol':"Revolving"}
+                'pre': "PreClosing",'revol':"Revolving"
+                ,'ramp':"RampUp"}
         , "cn": {'amort': "摊销", 'def': "违约", 'acc': "加速清偿", 'end': "结束", 'pre': "设计","revol":"循环"
-                 ,'called':"清仓回购"}}
+                 ,'called':"清仓回购"
+                 ,'ramp':"RampUp"}}
     match x:
         case {"tag": "Amortizing"}:
             return m[locale]['amort']
@@ -782,6 +784,8 @@ def readStatus(x, locale):
             return m[locale]['revol']
         case {"tag": "Called"}:
             return m[locale]['called']
+        case {"tag": "RampUp"}:
+            return m[locale]['ramp']
         case _:
             raise RuntimeError(
                 f"Failed to read deal status:{x} with locale: {locale}")
@@ -855,13 +859,13 @@ def mkWaterfall(r, x):
     _k, _v = x.popitem()
     _w_tag = None
     match _k:
-        case ("兑付日", "加速清偿") | ("amortizing", "accelerated"):
+        case ("兑付日", "加速清偿") | ("amortizing", "accelerated") | "Accelerated" :
             _w_tag = f"DistributionDay (DealAccelerated Nothing)"
-        case ("兑付日", "违约") | ("amortizing", "defaulted"):
+        case ("兑付日", "违约") | ("amortizing", "defaulted") | "Defaulted":
             _w_tag = f"DistributionDay (DealDefaulted Nothing)"
         case ("兑付日", _st) | ("amortizing", _st):
             _w_tag = f"DistributionDay {mapping.get(_st,_st)}"
-        case "兑付日" | "未违约" | "amortizing":
+        case "兑付日" | "未违约" | "amortizing" | "Amortizing":
             _w_tag = f"DistributionDay Amortizing"
         case "清仓回购" | "cleanUp":
             _w_tag = "CleanUp"
@@ -1215,7 +1219,9 @@ def mkPool(x):
                "IDeal": "IPool", "RDeal": "RPool"}
     match x:
         case {"清单": assets, "封包日": d} | {"assets": assets, "cutoffDate": d}:
-            _pool = {"assets": [mkAsset(a) for a in assets], "asOfDate": d}
+            _pool = {"assets": [mkAsset(a) for a in assets]
+                     , "asOfDate": d}
+            
             _pool_asset_type = identify_deal_type({"pool": _pool})
             return mkTag((mapping[_pool_asset_type], _pool))
         case _:
