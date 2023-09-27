@@ -107,7 +107,7 @@ class API:
 
     def run(self, deal,
             poolAssump=None,
-            runAssump=None,
+            runAssump=[],
             read=True):
 
         assert isinstance(runAssump,list),f"runAssump must be a list ,but got {type(runAssump)}"
