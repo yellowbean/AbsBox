@@ -1523,7 +1523,8 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
                 return {"interest":[mkRateAssumption(_) for _ in ints]}
             case ("inspect",*tps):
                 return {"inspectOn":[ (mkDatePattern(dp),mkDs(ds)) for (dp,ds) in tps]}
-            case ("report",interval):
+            case ("report",m):
+                interval = m['dates']
                 return {"buildFinancialReport":mkDatePattern(interval)}
             case ("pricing",p):
                 return {"pricing":mkPricingAssump(p)}
