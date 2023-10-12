@@ -137,6 +137,13 @@ def mkPoolSource(x):
             return "CollectedPrepayment" 
         case "租金" | "Rental" :
             return "CollectedRental" 
+        case "新增违约" | "Defaults" :
+            return "NewDefaults" 
+        case "新增拖欠" | "Delinquencies":
+            return "NewDelinquencies"
+        case "新增损失" | "Losses":
+            return "NewLosses"
+        
         case _ :
             raise RuntimeError(f"not match found: {x} :make Pool Source")
 
