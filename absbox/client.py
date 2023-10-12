@@ -110,8 +110,7 @@ class API:
             runAssump=[],
             read=True):
 
-        assert isinstance(runAssump, list),f"runAssump must be a list ,but got {type(runAssump)}"
-
+        #assert isinstance(runAssump, list),f"runAssump must be a list ,but got {type(runAssump)}"
 
         # if run req is a multi-scenario run
         multi_run_flag = True if isinstance(poolAssump, dict) else False
@@ -195,9 +194,11 @@ class API:
                 ((cfs,cfBalance),pr) = x
                 cfs = _read_cf(cfs, self.lang)
                 pricingResult = _read_asset_pricing(pr, self.lang) if pr else None
+                return (cfs, cfBalance, pricingResult)
             except Exception as e:
                 print(f"Failed to read result {x}")
-            return (cfs,cfBalance,pricingResult)
+                print(f"error = {e}")
+                return (None, None, None)
         url = f"{self.url}/runAsset"
         _assumptions = mkAssumpType(poolAssump) if poolAssump else None
         _pricing = mkLiqMethod(pricing) if pricing else None
@@ -209,7 +210,7 @@ class API:
                           ,_rate
                           ,_pricing]
                          ,ensure_ascii=False)
-        result = self._send_req(req,url)
+        result = self._send_req(req, url)
         if read :
             return readResult(result)
         else:

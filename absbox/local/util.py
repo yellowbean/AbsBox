@@ -292,12 +292,15 @@ def getValWithKs(m:dict,ks:list,defaultReturn=None):
     return defaultReturn
 
 def _read_cf(x, lang):
+    ''' read cashflow from a list , and set index to date'''
+    if x == []:
+        return []
     flow_header,idx = guess_pool_flow_header(x[0],lang)
     try:
         result = pd.DataFrame([_['contents'] for _ in x] , columns=flow_header)
     except ValueError as e:
         logging.error(f"Failed to match header:{flow_header} with {result[0]['contents']}")
-    result = result.set_index(idx)
+    result.set_index(idx, inplace=True)
     result.index.rename(idx, inplace=True)
     result.sort_index(inplace=True)
     return result

@@ -16,6 +16,10 @@ english_mortgage_delinq_flow_fields = ["Balance", "Principal", "Interest",  "Pre
 
 china_mortgage_flow_fields_d = ["日期"]+ china_mortgage_flow_fields
 english_mortgage_flow_fields_d = ["Date"] + english_mortgage_flow_fields
+
+china_mortgage_delinq_flow_fields_d = ["日期"]+ china_mortgage_flow_fields
+english_mortgage_delinq_flow_fields_d = ["Date"] + english_mortgage_flow_fields
+
 ## Rental
 china_rental_flow = ['待收金额','租金']
 english_rental_flow = ['Balance','Rental']
