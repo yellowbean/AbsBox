@@ -61,15 +61,15 @@ GNMA_36208ALG4 = Generic(
     ,None)
 
 
-r = localAPI.run(GNMA_36208ALG4
-                ,runAssump = [("inspect",("MonthEnd",("cumPoolDefaultedBalance",))
-                                         ,("MonthEnd",("liqBalance","Ginnie_Mae")))
-                              ,("interest",("USCMT1Y",0.0468))]
-                ,poolAssump = ("Pool"
-                              ,("Mortgage",{"CDR":0.005},None,{"Rate":0.3,"Lag":4},None)
-                              ,None
-                              ,None)
-                ,read=True)
+# r = localAPI.run(GNMA_36208ALG4
+#                 ,runAssump = [("inspect",("MonthEnd",("cumPoolDefaultedBalance",))
+#                                          ,("MonthEnd",("liqBalance","Ginnie_Mae")))
+#                               ,("interest",("USCMT1Y",0.0468))]
+#                 ,poolAssump = ("Pool"
+#                               ,("Mortgage",{"CDR":0.005},None,{"Rate":0.3,"Lag":4},None)
+#                               ,None
+#                               ,None)
+#                 ,read=True)
 
 # Inspect cumulative defaulted balance
 r['result']['inspect']['<CumulativePoolDefaultedBalance>']
