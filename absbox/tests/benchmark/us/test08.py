@@ -74,12 +74,12 @@ GNMA_36208ALG4 = Generic(
 #                 ,read=True)
 
 # Inspect cumulative defaulted balance
-r['result']['inspect']['<CumulativePoolDefaultedBalance>']
+# r['result']['inspect']['<CumulativePoolDefaultedBalance>']
 
 # Inspect credit provided by Ginnie Mae
-r['result']['inspect']['<LiqBalance:Ginnie_Mae>']
+# r['result']['inspect']['<LiqBalance:Ginnie_Mae>']
 
 # the cash deposited to SPV in account `acc01`
-r['accounts']['acc01'][r['accounts']['acc01']["memo"]=="<Support:Ginnie_Mae>"]
+# r['accounts']['acc01'][r['accounts']['acc01']["memo"]=="<Support:Ginnie_Mae>"]
 
 
