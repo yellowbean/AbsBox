@@ -3,14 +3,14 @@
         {
             "tag": "RateFlat",
             "contents": [
-                "LPR5Y",
+                "USCMT1Y",
                 0.04
             ]
         },
         {
             "tag": "RateFlat",
             "contents": [
-                "LPR1Y",
+                "USCMT5Y",
                 0.02
             ]
         }

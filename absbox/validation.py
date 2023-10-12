@@ -82,6 +82,11 @@ def valDeal(d, error, warning) -> list:
             if (vr:=validateAction(action)) != "":
                 error.append(">".join((wn,str(idx),vr)))
     
+    #if preclosing deal ,must have a preClosing status
+    if d['dates']['tag'] == 'PreClosingDates':
+        if d['status']['tag'] != 'PreClosing':
+            error.append(f"Deal Date is preClosing, but status is not PreClosing")
+
     return (error,warning)
 
 def valReq(reqSent) -> list:
@@ -89,17 +94,37 @@ def valReq(reqSent) -> list:
     warning = []
     req = json.loads(reqSent)
     match req :
-        case {"tag":"SingleRunReq","contents":[{"contents":d}, ma, mp]}:
+        case {"tag":"SingleRunReq","contents":[{"contents":d}, ma, mra]}:
             error, warning = valDeal(d, error, warning)
             error, warning = valAssumption(d, ma, error, warning)
-        case {"tag":"MultiScenarioRunReq","contents":[{"contents":d}, mam, mp]}:
+            error, warning = valNonPerfAssumption(d, mra, error, warning)
+        case {"tag":"MultiScenarioRunReq","contents":[{"contents":d}, mam, mra]}:
             error, warning = valDeal(d, error, warning)
-        case {"tag":"MultiDealRunReq","contents":[dm, ma, mp]}:
+        case {"tag":"MultiDealRunReq","contents":[dm, ma, mra]}:
             error, warning = valAssumption(ma, error, warning)
+            error, warning = valNonPerfAssumption(d, ma, error, warning)
         case _:
             raise RuntimeError(f"Failed to match request:{req}")
 
     return error, warning
+
+def valNonPerfAssumption(d, nonPerfAssump, error, warning) -> list:
+    e = []
+    w = []
+    # floater index required
+    indexRequired = set()
+    ## from bond 
+    bndIndx = set([ _['contents'][1] for _ in  query(d,['bonds',S.MVALS,S.ALL,'bndInterestInfo']) if _['tag']=='Floater'])
+    ## from asset
+    ## from account
+    ## from ir swap
+    indexSupplied = set([ _['contents'][0] for _ in nonPerfAssump['interest'] ]) if 'interest' in nonPerfAssump else set()
+    assert isinstance(indexSupplied,set),f"indexSupplied should be set but got type {type(indexSupplied)}  value: {indexSupplied}"
+    if not indexSupplied.issuperset(indexRequired):
+        e.append(f"Missing floater index:{indexRequired - indexSupplied}")
+    return error+e,warning+w
+
+
 
 def valAssumption(d, ma , error, warning) -> list:
     def _validate_single_assump(z):
@@ -119,7 +144,6 @@ def valAssumption(d, ma , error, warning) -> list:
                 raise RuntimeError(f"Failed to match:{z}")
     
     asset_ids = set(range(len(list(query(d, ['pool', 'assets'])))))
-    
     if ma is None:
         return error,warning
     else:

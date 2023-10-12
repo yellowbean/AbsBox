@@ -141,7 +141,7 @@ BMW202301 = Generic(
         ,"curable":False}
      }
      }
-    ,"Revolving"  # start deal with "Revolving" status
+    ,("PreClosing","Revolving")  # start deal with "Revolving" status
 )
 
 #perf = ("Mortgage",{"CDR":0.15},{"CPR":0.0015},{"Rate":0.3,"Lag":4},None)

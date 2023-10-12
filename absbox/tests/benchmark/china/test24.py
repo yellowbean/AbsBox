@@ -130,6 +130,8 @@ from absbox.local.china import SPV
     ,None
     ,None
     ,None
+    ,None
+    ,("设计","摊销")
 )
 
 

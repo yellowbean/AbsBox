@@ -25,7 +25,10 @@
     },
     "name": "Multiple Waterfall",
     "status": {
-      "tag": "Amortizing"
+      "tag": "PreClosing",
+      "contents": {
+        "tag": "Amortizing"
+      }
     },
     "pool": {
       "assets": [
@@ -36,7 +39,10 @@
               "originBalance": 2200,
               "originRate": {
                 "tag": "Fix",
-                "contents": 0.045
+                "contents": [
+                  "DC_ACT_365F",
+                  0.045
+                ]
               },
               "originTerm": 30,
               "period": "Monthly",
@@ -57,8 +63,13 @@
         }
       ],
       "asOfDate": "2021-03-01",
-      "issuanceStat": null,
-      "futureCf": null
+      "issuanceStat": {
+        "IssuanceBalance": 2200
+      },
+      "futureCf": null,
+      "extendPeriods": {
+        "tag": "MonthEnd"
+      }
     },
     "bonds": {
       "A1": {
@@ -323,8 +334,9 @@
     "currencySwap": null,
     "custom": null,
     "triggers": {
-      "EndCollectionWF": [
-        {
+      "EndCollectionWF": {
+        "DefaultTrigger": {
+          "trgName": "",
           "trgCondition": {
             "tag": "IfRate",
             "contents": [
@@ -345,7 +357,7 @@
           "trgStatus": false,
           "trgCurable": false
         }
-      ]
+      }
     },
     "liqProvider": null,
     "ledgers": null

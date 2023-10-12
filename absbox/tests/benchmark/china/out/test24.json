@@ -25,7 +25,10 @@
     },
     "name": "\u5fb7\u5b9d\u5929\u5143\u4e4b\u4fe12023\u5e74\u7b2c\u4e00\u671f\u4e2a\u4eba\u6c7d\u8f66\u62b5\u62bc\u8d37\u6b3e\u8d44\u4ea7\u652f\u6301\u8bc1\u5238",
     "status": {
-      "tag": "Amortizing"
+      "tag": "PreClosing",
+      "contents": {
+        "tag": "Amortizing"
+      }
     },
     "pool": {
       "assets": [],
@@ -978,7 +981,10 @@
             null
           ]
         }
-      ]
+      ],
+      "extendPeriods": {
+        "tag": "MonthEnd"
+      }
     },
     "bonds": {
       "A": {

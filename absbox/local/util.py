@@ -222,7 +222,7 @@ def subMap2(m:dict,ks:list):
 
 def mapValsBy(m:dict, f):
     ''' Given a map and apply function to every vals'''
-    assert isinstance(m, dict),"M is not a map"
+    assert isinstance(m, dict),f"M is not a map but a {type(m)},{m}"
     return {k: f(v) for k,v in m.items()}
 
 def mapListValBy(m:dict, f):
@@ -255,6 +255,10 @@ def ensure100(xs,msg=""):
 def guess_pool_flow_header(x,l):
     assert isinstance(x, dict), f"x is not a map but {x}, type:{type(x)}"
     match (x['tag'],l):
+        case ('MortgageDelinqFlow','chinese'):
+            return (china_mortgage_delinq_flow_fields_d,"日期")
+        case ('MortgageDelinqFlow','english'):
+            return (english_mortgage_delinq_flow_fields_d,"Date")
         case ('MortgageFlow','chinese'):
             return (china_mortgage_flow_fields_d,"日期")
         case ('MortgageFlow','english'):
@@ -361,11 +365,11 @@ def earlyReturnNone(fn, v):
     else:
         return fn(v)
 
-def searchByFst(xs,v):
+def searchByFst(xs,v,defaultRtn=None):
     "search by first element in a list, return None if not found"
     for x in xs:
         if x[0] == v:
             return x
-    return None
+    return defaultRtn
 
 

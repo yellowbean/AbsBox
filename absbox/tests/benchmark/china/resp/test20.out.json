@@ -38,6 +38,42 @@
             {
               "tag": "AccTxn",
               "contents": [
+                "2021-06-15",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-06-15",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-06-15",
+                0,
+                0,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-06-15",
+                0,
+                0,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
                 "2021-07-26",
                 0,
                 0,
@@ -2531,7 +2567,10 @@
                 "originBalance": 120,
                 "originRate": {
                   "tag": "Fix",
-                  "contents": 0.045
+                  "contents": [
+                    "DC_ACT_365F",
+                    0.045
+                  ]
                 },
                 "originTerm": 30,
                 "period": "Monthly",
@@ -2550,6 +2589,20 @@
           }
         ],
         "futureCf": [
+          {
+            "tag": "LoanFlow",
+            "contents": [
+              "2021-03-31",
+              120000,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
           {
             "tag": "LoanFlow",
             "contents": [
@@ -2622,7 +2675,10 @@
           }
         ],
         "asOfDate": "2021-03-31",
-        "issuanceStat": null
+        "issuanceStat": null,
+        "extendPeriods": {
+          "tag": "MonthEnd"
+        }
       },
       "waterfall": {
         "DistributionDay Amortizing": [
@@ -2721,6 +2777,20 @@
     }
   },
   [
+    {
+      "tag": "LoanFlow",
+      "contents": [
+        "2021-03-31",
+        120000,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
     {
       "tag": "LoanFlow",
       "contents": [
@@ -2823,6 +2893,21 @@
         "B",
         0,
         20
+      ]
+    },
+    {
+      "tag": "DealStatusChangeTo",
+      "contents": [
+        "2021-06-15",
+        {
+          "tag": "PreClosing",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        },
+        {
+          "tag": "Amortizing"
+        }
       ]
     }
   ],

@@ -1,0 +1,74 @@
+{"inspectOn": [
+        [
+            {"tag": "MonthEnd"
+            },
+            {"tag": "CurrentBondBalance"
+            }
+        ],
+        [
+            {"tag": "MonthFirst"
+            },
+            {"tag": "CurrentPoolBalance"
+            }
+        ]
+    ],
+ "interest": [
+        {"tag": "RateFlat", "contents": ["LPR5Y",
+                0.05
+            ]
+        }
+    ],
+ "revolving": {"tag": "AvailableAssets",
+  "contents": [
+            {"tag": "ConstantAsset",
+    "contents": [
+                    {"tag": "MO",
+      "contents": {"tag": "Mortgage",
+       "contents": [
+                                {"originBalance": 2200,
+         "originRate": {"tag": "Fix", "contents": ["DC_ACT_365F",
+                                            0.045
+                                        ]
+                                    },
+         "originTerm": 30,
+         "period": "Monthly",
+         "startDate": "2021-02-01",
+         "prinType": {"tag": "Level"
+                                    },
+         "tag": "MortgageOriginalInfo"
+                                },
+                                2200,
+                                0.08,
+                                20,
+        null,
+                                {"tag": "Current"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            {"tag": "PoolLevel",
+    "contents": [
+                    {"tag": "MortgageAssump",
+      "contents": [
+                            {"tag": "DefaultCDR", "contents": 0.15
+                            },
+                            {"tag": "PrepaymentCPR", "contents": 0.0015
+                            },
+                            {"tag": "Recovery", "contents": [
+                                    0.3,
+                                    4
+                                ]
+                            },
+       null
+                        ]
+                    },
+                    [],
+                    {"tag": "DummyDefaultAssump"
+                    }
+                ]
+            }
+        ]
+    }
+}

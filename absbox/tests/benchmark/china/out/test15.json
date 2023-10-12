@@ -580,7 +580,10 @@
             null
           ]
         }
-      ]
+      ],
+      "extendPeriods": {
+        "tag": "MonthEnd"
+      }
     },
     "bonds": {
       "A": {

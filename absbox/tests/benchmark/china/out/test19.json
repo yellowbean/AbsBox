@@ -25,7 +25,10 @@
     },
     "name": "\u57fa\u4e8e\u5206\u6bb5\u8fdd\u7ea6\u7387\u7684\u4fe1\u7528\u4e8b\u4ef6",
     "status": {
-      "tag": "Amortizing"
+      "tag": "PreClosing",
+      "contents": {
+        "tag": "Amortizing"
+      }
     },
     "pool": {
       "assets": [
@@ -36,7 +39,10 @@
               "originBalance": 120,
               "originRate": {
                 "tag": "Fix",
-                "contents": 0.0485
+                "contents": [
+                  "DC_ACT_365F",
+                  0.0485
+                ]
               },
               "originTerm": 30,
               "period": "Monthly",
@@ -60,7 +66,10 @@
       "issuanceStat": {
         "IssuanceBalance": 120.0
       },
-      "futureCf": null
+      "futureCf": null,
+      "extendPeriods": {
+        "tag": "MonthEnd"
+      }
     },
     "bonds": {
       "A1": {
@@ -230,8 +239,9 @@
     "currencySwap": null,
     "custom": null,
     "triggers": {
-      "BeginDistributionWF": [
-        {
+      "BeginDistributionWF": {
+        "\u8fdd\u7ea6\u7387\u6d4b\u8bd5": {
+          "trgName": "",
           "trgCondition": {
             "tag": "IfRateCurve",
             "contents": [
@@ -264,7 +274,7 @@
           "trgStatus": false,
           "trgCurable": false
         }
-      ]
+      }
     },
     "liqProvider": null,
     "ledgers": null

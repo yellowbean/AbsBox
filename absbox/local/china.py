@@ -46,8 +46,9 @@ class SPV:
             "status": mkStatus(self.状态),
             "pool":{"assets": [mkAsset(x) for x in self.资产池.get('清单',[])]
                 , "asOfDate": self.日期.get('封包日',None) or self.日期['归集日'][0]
-                , "issuanceStat": readIssuance(self.资产池)
-                , "futureCf":mkCf(self.资产池.get('归集表', []))},
+                , "issuanceStat": readCutoffFields(self.资产池)
+                , "futureCf":mkCf(self.资产池.get('归集表', []))
+                , "extendPeriods":mkDatePattern(self.资产池.get('extendBy',"MonthEnd"))},
             "bonds": {bn: mkBnd(bn,bo)  for (bn,bo) in self.债券 },
             "waterfall": mkWaterfall({},self.分配规则.copy()),
             "fees": {fn :mkFee(fo|{"名称":fn},fsDate=defaultStartDate) for (fn,fo) in self.费用 },

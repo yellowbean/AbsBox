@@ -1,11 +1,9 @@
 {"tag": "PoolLevel",
  "contents": [
-        {"tag": "MortgageAssump",
+        {"tag": "LoanAssump",
                "contents": [
-                {"tag": "DefaultCDR", "contents": 0.01
-                },
-                {"tag": "PrepaymentCPR", "contents": 0.1
-                },
+                null,
+                null,
                 null,
                 null
             ]

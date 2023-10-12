@@ -1,6 +1,6 @@
 from absbox.local.generic import Generic
 
-test05 = Generic(
+test01 = Generic(
     "liquidation provider with interest"
     ,{"cutoff":"2021-03-01","closing":"2021-06-15","firstPay":"2021-07-26"
      ,"payFreq":["DayOfMonth",20],"poolFreq":"MonthEnd","stated":"2030-01-01"}
@@ -50,4 +50,9 @@ test05 = Generic(
     ,{"insuranceProvider":
          {"lineOfCredit":100,"start":"2021-06-15","fixRate":0.01
           ,"rateAccDates":"MonthEnd","lastAccDate":"2021-06-15"}
-     })
+     }
+    ,None 
+    ,None 
+    ,None 
+    ,("PreClosing","Amortizing")
+     )

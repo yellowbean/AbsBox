@@ -25,7 +25,10 @@
     },
     "name": "\u672a\u6ee1\u8db3\u644a\u8fd8\u76ee\u6807\u7684\u52a0\u901f\u6e05\u507f\u4e8b\u4ef6",
     "status": {
-      "tag": "Amortizing"
+      "tag": "PreClosing",
+      "contents": {
+        "tag": "Amortizing"
+      }
     },
     "pool": {
       "assets": [
@@ -36,7 +39,10 @@
               "originBalance": 120,
               "originRate": {
                 "tag": "Fix",
-                "contents": 0.0485
+                "contents": [
+                  "DC_ACT_365F",
+                  0.0485
+                ]
               },
               "originTerm": 30,
               "period": "Monthly",
@@ -58,7 +64,10 @@
       ],
       "asOfDate": "2021-03-01",
       "issuanceStat": null,
-      "futureCf": null
+      "futureCf": null,
+      "extendPeriods": {
+        "tag": "MonthEnd"
+      }
     },
     "bonds": {
       "A1": {
@@ -249,8 +258,9 @@
     "currencySwap": null,
     "custom": null,
     "triggers": {
-      "EndDistributionWF": [
-        {
+      "EndDistributionWF": {
+        "\u76ee\u6807\u4f59\u989d\u6d4b\u8bd5": {
+          "trgName": "",
           "trgCondition": {
             "tag": "If",
             "contents": [
@@ -272,7 +282,7 @@
           "trgStatus": false,
           "trgCurable": false
         }
-      ]
+      }
     },
     "liqProvider": null,
     "ledgers": null

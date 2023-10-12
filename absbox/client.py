@@ -66,7 +66,7 @@ class API:
                 r = mkTag(("SingleRunReq",[_deal, _perfAssump, _nonPerfAssump]))
             case "MultiScenarios" | "MS":
                 _deal = deal.json if hasattr(deal,"json") else deal
-                mAssump = mapValsBy(mkAssumpType, perfAssump)
+                mAssump = mapValsBy(perfAssump, mkAssumpType)
                 r = mkTag(("MultiScenarioRunReq",[_deal, mAssump, _nonPerfAssump]))
             case "MultiStructs" | "MD" :
                 mDeal = {k: v.json if hasattr(v,"json") else v for k,v in deal.items() }
@@ -110,7 +110,7 @@ class API:
             runAssump=[],
             read=True):
 
-        assert isinstance(runAssump,list),f"runAssump must be a list ,but got {type(runAssump)}"
+        assert isinstance(runAssump, list),f"runAssump must be a list ,but got {type(runAssump)}"
 
 
         # if run req is a multi-scenario run
@@ -125,13 +125,16 @@ class API:
         if not val_result:
             return val_result, err, warn
         # branching with pricing
-        if runAssump is None or searchByFst(runAssump,"pricing") is None:
+        if runAssump is None or searchByFst(runAssump, "pricing") is None:
             result = self._send_req(req, url)
         else:
             result = self._send_req(req, url, timeout=30)
 
         if result is None:
             console.print("❌[bold red]Failed to get response from run")
+            return None
+        if 'error' in result:
+            rich.print_json(result)
             return None
         # load deal if it is a multi scenario
         if read and multi_run_flag:

@@ -25,7 +25,10 @@
     },
     "name": "BMW Auto",
     "status": {
-      "tag": "Revolving"
+      "tag": "PreClosing",
+      "contents": {
+        "tag": "Revolving"
+      }
     },
     "pool": {
       "assets": [],
@@ -978,7 +981,10 @@
             null
           ]
         }
-      ]
+      ],
+      "extendPeriods": {
+        "tag": "MonthEnd"
+      }
     },
     "bonds": {
       "A": {
@@ -1176,7 +1182,7 @@
           "tag": "RunTrigger",
           "contents": [
             "InWF",
-            0
+            "ExcessTrigger"
           ]
         },
         {
@@ -1186,10 +1192,10 @@
               "tag": "IfBool",
               "contents": [
                 {
-                  "tag": "TriggersStatusAt",
+                  "tag": "TriggersStatus",
                   "contents": [
                     "InWF",
-                    0
+                    "ExcessTrigger"
                   ]
                 },
                 false
@@ -1257,12 +1263,11 @@
                 ]
               },
               {
-                "tag": "PayPrinResidual",
+                "tag": "PayIntResidual",
                 "contents": [
+                  null,
                   "distAcc",
-                  [
-                    "Sub"
-                  ]
+                  "Sub"
                 ]
               }
             ],
@@ -1413,8 +1418,9 @@
     "currencySwap": null,
     "custom": null,
     "triggers": {
-      "BeginDistributionWF": [
-        {
+      "BeginDistributionWF": {
+        "DefTrigger": {
+          "trgName": "",
           "trgCondition": {
             "tag": "Any",
             "contents": [
@@ -1446,9 +1452,10 @@
           "trgStatus": false,
           "trgCurable": false
         }
-      ],
-      "InWF": [
-        {
+      },
+      "InWF": {
+        "ExcessTrigger": {
+          "trgName": "",
           "trgCondition": {
             "tag": "If2",
             "contents": [
@@ -1480,7 +1487,7 @@
           "trgStatus": false,
           "trgCurable": false
         }
-      ]
+      }
     },
     "liqProvider": null,
     "ledgers": null

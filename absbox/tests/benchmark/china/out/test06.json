@@ -25,7 +25,10 @@
     },
     "name": "\u5efa\u51432017\u5e74\u7b2c\u4e94\u671f\u4e2a\u4eba\u4f4f\u623f\u62b5\u62bc\u8d37\u6b3e\u8d44\u4ea7\u652f\u6301\u8bc1\u5238",
     "status": {
-      "tag": "Amortizing"
+      "tag": "PreClosing",
+      "contents": {
+        "tag": "Amortizing"
+      }
     },
     "pool": {
       "assets": [
@@ -37,6 +40,7 @@
               "originRate": {
                 "tag": "Floater",
                 "contents": [
+                  "DC_ACT_365F",
                   "LPR5Y",
                   0.01,
                   0.085,
@@ -73,6 +77,7 @@
               "originRate": {
                 "tag": "Floater",
                 "contents": [
+                  "DC_ACT_365F",
                   "LPR5Y",
                   0.01,
                   0.085,
@@ -105,7 +110,10 @@
       ],
       "asOfDate": "2022-07-26",
       "issuanceStat": null,
-      "futureCf": null
+      "futureCf": null,
+      "extendPeriods": {
+        "tag": "MonthEnd"
+      }
     },
     "bonds": {
       "A1": {

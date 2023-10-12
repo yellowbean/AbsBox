@@ -42,4 +42,6 @@ test01 = SPV(
     ,None
     ,None
     ,None
+    ,None
+    ,("设计","摊销")
 )

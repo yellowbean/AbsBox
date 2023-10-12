@@ -51,4 +51,9 @@ test01 = Generic(
     ,{"insuranceProvider":
          {"lineOfCredit":100,"start":"2021-06-15"
           ,"type":{"Reset":"MonthEnd","Formula":("bondBalance",),"Pct":0.0015}}
-     })
+     }
+    ,None
+    ,None
+    ,None
+    ,("PreClosing","Amortizing")
+     )

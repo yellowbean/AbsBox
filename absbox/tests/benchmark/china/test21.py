@@ -50,6 +50,9 @@ test01 = SPV(
       ,["回收回款","账户01"])
     ,None
     ,None
+    ,None
+    ,None
+    ,("设计","摊销")
 )
 
 Asset01Assump = [{"CPR":0.1}

@@ -10,7 +10,9 @@ test01 = Generic(
           ,{"currentBalance":2200
           ,"currentRate":0.08
           ,"remainTerm":20
-          ,"status":"current"}]]}
+          ,"status":"current"}]]
+      ,'issuanceStat':{'IssuanceBalance':2200}
+      }
     ,(("acc01",{"balance":0}),)
     ,(("A1",{"balance":500
              ,"rate":0.07
@@ -66,5 +68,6 @@ test01 = Generic(
           ,"effects":("newStatus","Accelerated")
           ,"status":False
           ,"curable":False}}}
+    ,("PreClosing","Amortizing")
 )
 

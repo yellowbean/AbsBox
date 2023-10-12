@@ -1,6 +1,6 @@
 from absbox.local.generic import Generic
 
-test03 = Generic(
+test01 = Generic(
     "If in Waterfall"
     ,{"cutoff":"2021-03-01","closing":"2021-06-15","firstPay":"2021-07-26"
      ,"payFreq":["DayOfMonth",20],"poolFreq":"MonthEnd","stated":"2030-01-01"}
@@ -49,4 +49,9 @@ test03 = Generic(
       ,["CollectedPrincipal","acc01"]
       ,["CollectedPrepayment","acc01"]
       ,["CollectedRecoveries","acc01"]]
+    ,None
+    ,None
+    ,None
+    ,None
+    ,("PreClosing","Amortizing")
     )

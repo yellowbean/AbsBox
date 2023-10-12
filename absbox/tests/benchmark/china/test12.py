@@ -485,4 +485,6 @@ JY_RMBS_2019_11 = SPV(
     ,None
     ,None
     ,None
+    ,None
+    ,("设计","摊销")
 )

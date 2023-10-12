@@ -25,7 +25,10 @@
     },
     "name": "split pool income",
     "status": {
-      "tag": "Amortizing"
+      "tag": "PreClosing",
+      "contents": {
+        "tag": "Amortizing"
+      }
     },
     "pool": {
       "assets": [
@@ -33,10 +36,13 @@
           "tag": "Mortgage",
           "contents": [
             {
-              "originBalance": 2200,
+              "originBalance": 2500,
               "originRate": {
                 "tag": "Fix",
-                "contents": 0.045
+                "contents": [
+                  "DC_ACT_365F",
+                  0.045
+                ]
               },
               "originTerm": 30,
               "period": "Monthly",
@@ -46,7 +52,7 @@
               },
               "tag": "MortgageOriginalInfo"
             },
-            2200,
+            2500,
             0.08,
             20,
             null,
@@ -58,7 +64,10 @@
       ],
       "asOfDate": "2021-03-01",
       "issuanceStat": null,
-      "futureCf": null
+      "futureCf": null,
+      "extendPeriods": {
+        "tag": "MonthEnd"
+      }
     },
     "bonds": {
       "A1": {

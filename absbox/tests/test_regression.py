@@ -98,16 +98,24 @@ def run_deal(input_folder, pair):
         logging.info(f"Using Env Server {os.environ['TEST_RUN_SERVER']}")
         test_server = os.environ['TEST_RUN_SERVER']
     else:
-        print("Using Config Server")
+        print(f"Using Config Server => {test_server}")
         logging.info(f"Using Server from Config {test_server}")
     #test_server = "https://absbox.org/api/dev" # config["test_server"] #https://deal-bench.xyz/api/run_deal2" 
     
-    for dinput, sinput, eoutput in pair:
+    for dinput, sinput, nonPinput, eoutput in pair:
         print(f"Comparing:{dinput},{sinput},{eoutput}")
         with open(os.path.join(input_req_folder,dinput), 'r') as dq:  # deal request
             with open(os.path.join(input_scen_folder,sinput), 'r') as sq: # scenario request 
                 print(f"With deal request=> {dinput}, scenario => {sinput}")
-                req = mkTag(("SingleRunReq", [json.load(dq) , json.load(sq) , None])) 
+                nonPerfInput = None
+                if nonPinput:
+                    nonPerfInput = json.load(open(os.path.join(input_scen_folder,nonPinput)))
+                    print(nonPerfInput)
+                else:
+                    nonPerfInput = {}
+                req = mkTag(("SingleRunReq", [json.load(dq) 
+                                              , json.load(sq)
+                                              , nonPerfInput])) 
                 print("build req done")
                 hdrs = {'Content-type': 'application/json', 'Accept': '*/*'}
                 try:
@@ -117,7 +125,9 @@ def run_deal(input_folder, pair):
                                           , verify=False)
                     if tresp.status_code != 200:
                         print(f"Failed to finish req:{dinput}")
-                        print(f"response=>{tresp}")
+                        print(f"response=>{tresp.status_code}")
+                        print(f"response text {tresp.text}")
+                        
                     else:
                         print(f"responds received")
                 except requests.exceptions.ConnectionError as e:
@@ -136,12 +146,17 @@ def run_deal(input_folder, pair):
                     local_result = json.load(eout)
                     assert isinstance(local_result, list), f"{dinput}: local result is not list but {local_result.keys()},{local_result['error']}"
                     assert isinstance(s_result, list), f"{dinput}: server result is not list but {s_result}"
-                    assert local_result[1]==s_result[1],"Pool Flow Is not matching"
+                    assert local_result[1]==s_result[1],f"Pool Flow Is not matching => {dinput}"
                     local_result_content = local_result[0]['contents']
                     s_result_content = s_result[0]['contents']
                     if not local_result_content['waterfall']==s_result_content['waterfall']:
-                        for (idx,(local_w,test_w)) in enumerate(zip(local_result_content['waterfall'],s_result_content['waterfall'])):
-                            assert local_w == test_w, f"diff in waterfall action {idx},local={local_w},test={test_w}"
+                        local_keys = local_result_content['waterfall'].keys()
+                        server_keys = s_result_content['waterfall'].keys()
+                        assert local_keys == server_keys,f"Keys are not matched, local keys:{local_keys},server keys:{server_keys}"
+                        commonKeys = local_result_content['waterfall'].keys()
+                        # for (idx,(local_w,test_w)) in enumerate(zip(local_result_content['waterfall'],s_result_content['waterfall'])):
+                        for (idx,actionName) in commonKeys:
+                            assert local_result_content['waterfall'][actionName] == s_result_content['waterfall'][actionName], f"diff in waterfall action {actionName},local={local_result_content['waterfall'][actionName]},test={s_result_content['waterfall'][actionName]}"
 
                         #assert False,f"diff in waterfall: {diff(local_result_content['waterfall'],s_result_content['waterfall'])}"
                     if local_result_content['bonds']!=s_result_content['bonds']:
@@ -164,42 +179,42 @@ def run_deal(input_folder, pair):
 
 
 def test_resp():
-    pair = [("test01.json","empty.json","test01.out.json")
-            ,("test02.json","empty.json","test02.out.json")
-            ,("test03.json","empty.json","test03.out.json")
-            ,("test04.json","empty.json","test04.out.json")
-            ,("test05.json","empty.json","test05.out.json")
-            ,("test06.json","empty.json","test06.out.json")
-            ,("test07.json","empty.json","test07.out.json")
-            ,("test08.json","empty.json","test08.out.json")
-            ,("test09.json","empty.json","test09.out.json")
-            ,("test10.json","empty.json","test10.out.json")
-            ,("test11.json","rates.json","test11.out.json")
-            ,("test12.json","empty.json","test12.out.json")
-            ,("test13.json","empty.json","test13.out.json")
-            ,("test14.json","empty.json","test14.out.json")
-            ,("test15.json","empty.json","test15.out.json")
-            ,("test16.json","empty.json","test16.out.json")
-            ,("test17.json","empty.json","test17.out.json")
-            ,("test18.json","empty.json","test18.out.json")
-            ,("test19.json","defaults01.json","test19.out.json")
-            ,("test20.json","empty.json","test20.out.json")
-            ,("test21.json","empty.json","test21.out.json")
+    pair = [("test01.json","mortgage_empty.json",None,"test01.out.json")
+            ,("test02.json","mortgage_empty.json",None,"test02.out.json")
+            ,("test03.json","mortgage_empty.json","rates.json","test03.out.json")
+            ,("test04.json","mortgage_empty.json","rates.json","test04.out.json")
+            ,("test05.json","mortgage_empty.json","rates.json","test05.out.json")
+            ,("test06.json","mortgage_empty.json","rates.json","test06.out.json")
+            ,("test07.json","mortgage_empty.json",None,"test07.out.json")
+            ,("test08.json","mortgage_empty.json",None,"test08.out.json")
+            ,("test09.json","mortgage_empty.json",None,"test09.out.json")
+            ,("test10.json","mortgage_empty.json",None,"test10.out.json")
+            ,("test11.json","mortgage_empty.json","rates.json","test11.out.json")
+            ,("test12.json","mortgage_empty.json","rates.json","test12.out.json")
+            ,("test13.json","mortgage_empty.json",None,"test13.out.json")
+            ,("test14.json","mortgage_empty.json","rates.json","test14.out.json")
+            ,("test15.json","mortgage_empty.json",None,"test15.out.json")
+            ,("test16.json","mortgage_empty.json",None,"test16.out.json")
+            ,("test17.json","mortgage_empty.json",None,"test17.out.json")
+            ,("test18.json","mortgage_empty.json",None,"test18.out.json")
+            ,("test19.json","mortgage_empty.json",None,"test19.out.json")
+            ,("test20.json","loan_empty.json",None,"test20.out.json")
+            ,("test21.json","mortgage_empty.json",None,"test21.out.json")
             #,("test23.json","empty.json","test23.out.json")
-            ,("test24.json","empty.json","test24.out.json")
-            ,("test25.json","empty.json","test25.out.json")
+            ,("test24.json","mortgage_empty.json","bmwRevolving.json","test24.out.json")
+            ,("test25.json","mortgage_empty.json",None,"test25.out.json")
             ]
     print(">>>> Runing China Bench Files")
     run_deal(china_folder, pair)
     
     print(">>>> Runing US Bench Files")
-    pair = [("test01.json","empty.json","test01.out.json")
-            ,("test02.json","empty.json","test02.out.json")
-            ,("test03.json","empty.json","test03.out.json")
-            ,("test04.json","empty.json","test04.out.json")
-            ,("test05.json","empty.json","test05.out.json")
-            ,("test06.json","empty.json","test06.out.json")
-            ,("test07.json","empty.json","test07.out.json")
+    pair = [("test01.json","empty.json",None,"test01.out.json")
+            ,("test02.json","empty.json",None,"test02.out.json")
+            ,("test03.json","empty.json",None,"test03.out.json")
+            ,("test04.json","empty.json",None,"test04.out.json")
+            ,("test05.json","empty.json",None,"test05.out.json")
+            ,("test06.json","empty.json",None,"test06.out.json")
+            ,("test07.json","empty.json","bmwRevolving.json","test07.out.json")
             ]
     run_deal(us_folder, pair)
 

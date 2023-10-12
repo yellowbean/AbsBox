@@ -1,7 +1,7 @@
 from absbox.local.generic import Generic
 
 test01 = Generic(
-    "TEST01"
+    "deal 01"
     ,{"cutoff":"2021-03-01","closing":"2021-06-15","firstPay":"2021-07-26"
      ,"payFreq":["DayOfMonth",20],"poolFreq":"MonthEnd","stated":"2030-01-01"}
     ,{'assets':[["Mortgage"
@@ -40,4 +40,8 @@ test01 = Generic(
       ,["CollectedPrepayment","acc01"]
       ,["CollectedRecoveries","acc01"]]
     ,None
-    ,None)
+    ,None
+    ,None
+    ,None
+    ,("PreClosing", "Amortizing")
+    )

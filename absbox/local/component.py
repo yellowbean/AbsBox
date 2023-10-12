@@ -401,7 +401,7 @@ def mkBondRate(x):
             return mkBondRate(x | {"日历": DC.DC_ACT_365F.value, "dayCount": DC.DC_ACT_365F.value})
         case {"固定": _rate, "日历": dc} | {"fix": _rate, "dayCount": dc}:
             return mkTag(("Fix", [_rate, dc]))
-        case {"固定": _rate} | {"Fixed": _rate}:
+        case {"固定": _rate} | {"Fixed": _rate} | {"fix": _rate}:
             return mkTag(("Fix", [_rate, DC.DC_ACT_365F.value]))
         case {"调息": _rate, "幅度":spd, "调息日":dp} | {"StepUp": _rate, "Spread":spd, "When":dp} | {"StepUp": _rate, "spread":spd, "when":dp}:
             return mkTag(("StepUpFix", [_rate, DC.DC_ACT_365F.value, mkDatePattern(dp), spd ]))
@@ -1301,7 +1301,7 @@ def mkCf(x):
     if len(x) == 0:
         return None
     else:
-        return [mkTag(("MortgageFlow", _x+[0.0]*6+[None,None])) for _x in x]
+        return [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None])) for _x in x]
 
 
 def mkCollection(x):
@@ -1497,11 +1497,10 @@ def readCutoffFields(pool):
 
     r = {}
     for k, v in pool[_map[lang_flag]].items():
-        if k in validIssuanceFields:
-            r[validIssuanceFields[k]] = v
+        if k in validCutoffFields:
+            r[validCutoffFields[k]] = v
         else:
-            logging.warning(
-                "Key {k} is not in pool fields {validIssuanceFields.keys()}")
+            logging.warning(f"Key {k} is not in pool fields {validIssuanceFields.keys()}")
     return r
 
 def mkRateAssumption(x):
@@ -1523,8 +1522,7 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
             case ("call",*opts):
                 return {"callWhen":[mkCallOptions(opt) for opt in opts]}
             case ("revolving",rPool,rPerf):
-                return {"revolving":mkTag(("AvailableAssets"
-                                          ,[mkRevolvingPool(rPool),[mkPerfAssumption(rPerf),[],mkTag(("DummyDefaultAssump"))]]))}
+                return {"revolving":mkTag(("AvailableAssets", [mkRevolvingPool(rPool), mkAssumpType(rPerf)]))}
             case ("interest",*ints):
                 return {"interest":[mkRateAssumption(_) for _ in ints]}
             case ("inspect",*tps):

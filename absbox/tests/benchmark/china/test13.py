@@ -54,7 +54,7 @@ test01 = SPV(
     ,None
     ,None
     ,None
-    ,"摊销"
+    ,("设计","摊销")
     ,None
     ,{"MyLedger":{"余额":0,"记录":None}}
 )

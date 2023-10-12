@@ -25,7 +25,10 @@
     },
     "name": "\u5de5\u5143\u4e50\u5c452021\u5e74\u7b2c\u4e03\u671f",
     "status": {
-      "tag": "Amortizing"
+      "tag": "PreClosing",
+      "contents": {
+        "tag": "Amortizing"
+      }
     },
     "pool": {
       "assets": [
@@ -36,7 +39,10 @@
               "originBalance": 9961626400,
               "originRate": {
                 "tag": "Fix",
-                "contents": 0.0485
+                "contents": [
+                  "DC_ACT_365F",
+                  0.0485
+                ]
               },
               "originTerm": 218,
               "period": "Monthly",
@@ -62,7 +68,10 @@
               "originBalance": 3309774500.0,
               "originRate": {
                 "tag": "Fix",
-                "contents": 0.0485
+                "contents": [
+                  "DC_ACT_365F",
+                  0.0485
+                ]
               },
               "originTerm": 218,
               "period": "Monthly",
@@ -84,7 +93,10 @@
       ],
       "asOfDate": "2021-03-01",
       "issuanceStat": null,
-      "futureCf": null
+      "futureCf": null,
+      "extendPeriods": {
+        "tag": "MonthEnd"
+      }
     },
     "bonds": {
       "A1": {

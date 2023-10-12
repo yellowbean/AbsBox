@@ -80,7 +80,10 @@ deal_data = ["租金类ABS案例"
     ,(["租金回款","账户01"],)
     ,None
     ,None
-    ,None]
+    ,None
+    ,None
+    ,("设计","摊销")
+    ]
 
 
 from absbox.local.china import SPV

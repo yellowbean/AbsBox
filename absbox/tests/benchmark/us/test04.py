@@ -1,6 +1,6 @@
 from absbox.local.generic import Generic
 
-test04 = Generic(
+test01 = Generic(
     "split pool income"
     ,{"cutoff":"2021-03-01","closing":"2021-06-15","firstPay":"2021-07-26"
      ,"payFreq":["DayOfMonth",20],"poolFreq":"MonthEnd","stated":"2030-01-01"}
@@ -40,4 +40,9 @@ test04 = Generic(
       ,["CollectedPrincipal",[[0.8,"acc01"],[0.2,"acc02"]]]
       ,["CollectedPrepayment","acc01"]
       ,["CollectedRecoveries","acc01"]]
+    ,None
+    ,None
+    ,None
+    ,None
+    ,("PreClosing","Amortizing")
 )

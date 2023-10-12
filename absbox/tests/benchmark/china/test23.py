@@ -277,4 +277,6 @@ JY_RMBS_2019_1 = SPV(
     ,None
     ,None
     ,None
+    ,None
+    ,"摊销"
 )

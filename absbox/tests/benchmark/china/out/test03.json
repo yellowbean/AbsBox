@@ -25,7 +25,10 @@
     },
     "name": "Split the residual",
     "status": {
-      "tag": "Amortizing"
+      "tag": "PreClosing",
+      "contents": {
+        "tag": "Amortizing"
+      }
     },
     "pool": {
       "assets": [
@@ -37,6 +40,7 @@
               "originRate": {
                 "tag": "Floater",
                 "contents": [
+                  "DC_ACT_365F",
                   "LPR5Y",
                   0.01,
                   0.085,
@@ -68,7 +72,10 @@
       ],
       "asOfDate": "2021-03-01",
       "issuanceStat": null,
-      "futureCf": null
+      "futureCf": null,
+      "extendPeriods": {
+        "tag": "MonthEnd"
+      }
     },
     "bonds": {
       "A1": {

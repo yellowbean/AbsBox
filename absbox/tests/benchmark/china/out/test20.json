@@ -25,7 +25,10 @@
     },
     "name": "Loan Level ",
     "status": {
-      "tag": "Amortizing"
+      "tag": "PreClosing",
+      "contents": {
+        "tag": "Amortizing"
+      }
     },
     "pool": {
       "assets": [
@@ -36,7 +39,10 @@
               "originBalance": 120,
               "originRate": {
                 "tag": "Fix",
-                "contents": 0.045
+                "contents": [
+                  "DC_ACT_365F",
+                  0.045
+                ]
               },
               "originTerm": 30,
               "period": "Monthly",
@@ -57,7 +63,10 @@
       ],
       "asOfDate": "2021-03-31",
       "issuanceStat": null,
-      "futureCf": null
+      "futureCf": null,
+      "extendPeriods": {
+        "tag": "MonthEnd"
+      }
     },
     "bonds": {
       "A1": {

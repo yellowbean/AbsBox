@@ -2212,7 +2212,10 @@
             null
           ]
         }
-      ]
+      ],
+      "extendPeriods": {
+        "tag": "MonthEnd"
+      }
     },
     "bonds": {
       "\u4f18\u5148\u7ea7": {
