@@ -1131,13 +1131,13 @@ def mkPerfAssumption(x):
     def mkExtraStress(y):
         return None  #TODO
     match x:
-        case ("Mortgage",md,mp,mr,mes):
-            d = earlyReturnNone(mkAssumpDefault,md)
-            p = earlyReturnNone(mkAssumpPrepay,mp)
-            r = earlyReturnNone(mkAssumpRecovery,mr)
-            return mkTag(("MortgageAssump",[d,p,r,None]))
         case ("Mortgage","Delinq",md,mp,mr,mes):
             d = earlyReturnNone(mkAssumpDelinq,md)
+            p = earlyReturnNone(mkAssumpPrepay,mp)
+            r = earlyReturnNone(mkAssumpRecovery,mr)
+            return mkTag(("MortgageDeqAssump",[d,p,r,None]))
+        case ("Mortgage",md,mp,mr,mes):
+            d = earlyReturnNone(mkAssumpDefault,md)
             p = earlyReturnNone(mkAssumpPrepay,mp)
             r = earlyReturnNone(mkAssumpRecovery,mr)
             return mkTag(("MortgageAssump",[d,p,r,None]))
