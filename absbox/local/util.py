@@ -44,6 +44,15 @@ def allList(xs):
 def mkTs(n, vs):
     return mkTag((n, vs))
 
+
+mkRatioTs = functools.partial(mkTs, "RatioCurve")
+
+mkRateTs = functools.partial(mkTs, "RateCurve")
+
+mkBalTs = functools.partial(mkTs, "BalanceCurve")
+
+mkFloatTs = functools.partial(mkTs, "FloatCurve")
+
 def unify(xs, ns):
     "union dataframes by stacking up with names provided"
     index_name = xs[0].index.name
@@ -279,17 +288,24 @@ def uplift_m_list(l:list):
             for m in l
             for k,v in m.items()}
 
-def getValWithKs(m:dict,ks:list,defaultReturn=None):
-    ''' Get first available key/value in m'''
+def getValWithKs(m:dict, ks:list
+                 ,defaultReturn=None
+                 ,mapping=None):
+    ''' Get first available key/value in m, with optional mapping function to result if found '''
+    r = defaultReturn
     if isinstance(m, dict):
         for k in ks:
             if k in m:
-                return m[k]
-    else:
+                r = m[k]
+                break
+    else: # object instead of dict
         for k in ks:
             if hasattr(m, k):
-                return getattr(m, k)
-    return defaultReturn
+                r = getattr(m, k)
+                break
+    if mapping is not None:
+        return mapping(r)
+    return r
 
 def _read_cf(x, lang):
     ''' read cashflow from a list , and set index to date'''

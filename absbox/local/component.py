@@ -1,4 +1,7 @@
-from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100, mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey, earlyReturnNone
+from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100
+from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey
+from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs
+
 from absbox.local.base import *
 from enum import Enum
 import itertools
@@ -1070,6 +1073,7 @@ def mkCallOptions(x):
             raise RuntimeError(f"Failed to match {x}:mkCallOptions")
 
 def mkAssumpDefault(x):
+    ''' New default assumption for performing assets '''
     match x:
         case {"CDR":r} if isinstance(r,list):
             return mkTag(("DefaultVec",r))
@@ -1079,6 +1083,7 @@ def mkAssumpDefault(x):
             raise RuntimeError(f"failed to match {x}")
 
 def mkAssumpPrepay(x):
+    ''' New prepayment assumption for performing assets '''
     match x:
        case {"CPR":r} if isinstance(r,list):
            return mkTag(("PrepaymentVec",r))
@@ -1088,6 +1093,7 @@ def mkAssumpPrepay(x):
            raise RuntimeError(f"failed to match {x}")
 
 def mkAssumpDelinq(x):
+    ''' New delinquency assumption for performing assets '''
     match x:
         case {"DelinqCDR":cdr,"Lag":lag,"DefaultPct":pct}:
             return mkTag(("DelinqCDR",[cdr,(lag,pct)]))
@@ -1113,6 +1119,7 @@ def mkAssumpLeaseRent(x):
             raise RuntimeError(f"failed to match {x}")
 
 def mkAssumpRecovery(x):
+    ''' recovery assumption for defaults from performing assets '''
     match x:
         case {"Rate":r,"Lag":lag}:
             return mkTag(("Recovery",[r,lag]))
@@ -1120,7 +1127,7 @@ def mkAssumpRecovery(x):
             raise RuntimeError(f"failed to match {x}")
 
 def mkDefaultedAssumption(x):
-    ''' '''
+    ''' default assumption for defaulted assets'''
     match x:
         case ("Defaulted",r,lag,rs):
             return mkTag(("DefaultedRecovery",[r,lag,rs]))
@@ -1136,18 +1143,32 @@ def mkDelinqAssumption(x):
 def mkPerfAssumption(x):
     "Make assumption on performing assets"
     def mkExtraStress(y):
-        return None  #TODO
+        ''' make extra stress for mortgage/loans '''
+        if y is None:
+            return None
+        ## ppy/default time-based stress
+        defaultFactor = getValWithKs(y,['defaultFactor',"违约因子"],mapping=mkFloatTs)
+        prepayFactor = getValWithKs(y,['prepayFactor',"早偿因子"],mapping=mkFloatTs)
+        ## haircuts
+        mkHaircut = lambda xs : [ (mkPoolSource(ps),r)  for (ps,r) in xs]
+        haircuts = getValWithKs(y,['haircuts','haircut',"折扣"],mapping=mkHaircut)
+
+        return {
+            "defaultFactors":defaultFactor,
+            "prepaymentFactors":prepayFactor,
+            "poolHairCut": haircuts
+        }
     match x:
         case ("Mortgage","Delinq",md,mp,mr,mes):
             d = earlyReturnNone(mkAssumpDelinq,md)
             p = earlyReturnNone(mkAssumpPrepay,mp)
             r = earlyReturnNone(mkAssumpRecovery,mr)
-            return mkTag(("MortgageDeqAssump",[d,p,r,None]))
+            return mkTag(("MortgageDeqAssump",[d,p,r,mkExtraStress(mes)]))
         case ("Mortgage",md,mp,mr,mes):
             d = earlyReturnNone(mkAssumpDefault,md)
             p = earlyReturnNone(mkAssumpPrepay,mp)
             r = earlyReturnNone(mkAssumpRecovery,mr)
-            return mkTag(("MortgageAssump",[d,p,r,None]))
+            return mkTag(("MortgageAssump",[d,p,r,mkExtraStress(mes)]))
         case ("Lease", gap, rent, endDate):
             return mkTag(("LeaseAssump",[mkAssumpLeaseGap(gap)
                                          ,mkAssumpLeaseRent(rent)
@@ -1157,7 +1178,7 @@ def mkPerfAssumption(x):
             d = earlyReturnNone(mkAssumpDefault,md)
             p = earlyReturnNone(mkAssumpPrepay,mp)
             r = earlyReturnNone(mkAssumpRecovery,mr)
-            return mkTag(("LoanAssump",[d,p,r,None]))
+            return mkTag(("LoanAssump",[d,p,r,mkExtraStress(mes)]))
         case ("Installment",md,mp,mr,mes):
             d = earlyReturnNone(mkAssumpDefault,md)
             p = earlyReturnNone(mkAssumpPrepay,mp)
@@ -1194,6 +1215,8 @@ def mkAssetUnion(x):
             raise RuntimeError(f"Failed to match AssetUnion {x}")
 
 def mkRevolvingPool(x):
+    assert isinstance(x, list), f"Revolving Pool Assumption should be a list, but got {x}"
+    'intpu with list, return revolving pool'
     match x:
         case ["constant",*asts]|["固定",*asts]:
             return mkTag(("ConstantAsset",[ mkAssetUnion(_) for _ in asts]))
