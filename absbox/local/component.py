@@ -415,8 +415,9 @@ def mkBondRate(x):
             return mkTag(("Fix", [_rate, DC.DC_ACT_365F.value]))
         case {"调息": _rate, "幅度":spd, "调息日":dp} | {"StepUp": _rate, "Spread":spd, "When":dp} | {"StepUp": _rate, "spread":spd, "when":dp}:
             return mkTag(("StepUpFix", [_rate, DC.DC_ACT_365F.value, mkDatePattern(dp), spd ]))
-        case {"调息": _rate, "调息日":d,"调息日前":r1,"调息日后":r2} | {"StepUp": _rate, "stepUpDate":d,"before":r1,"after":r2}:
-            return mkTag(("StepUpByDate", [_rate, d, mkBondRate(r1),mkBondRate(r2) ]))
+        case {"调息": _rate, "条件":p,"true":r1,"false":r2} | \
+             {"StepUp": _rate, "condition":p, "true":r1,"false":r2}:
+            return mkTag(("StepUpPre", [_rate, mkPre(p), mkBondRate(r1), mkBondRate(r2) ]))
         case {"期间收益": _yield}:
             return mkTag(("InterestByYield", _yield))
         case _:
