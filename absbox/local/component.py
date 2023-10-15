@@ -746,8 +746,8 @@ def mkAction(x):
         case ["更新事件", trgName] | ["runTrigger", trgName]:
             dealCycleM = chinaDealCycle | englishDealCycle
             return mkTag(("RunTrigger", ["InWF",trgName]))
-        case ["查看",*ds] | ["inspect",*ds]:
-            return mkTag(("WatchVal",[None,[mkDs(_) for _ in ds]]))
+        case ["查看", comment, *ds] | ["inspect", comment, *ds]:
+            return mkTag(("WatchVal",[comment, [mkDs(_) for _ in ds] ]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkAction")
 
@@ -1406,6 +1406,7 @@ def readRunSummary(x, locale) -> dict:
                      for _ in x if _['tag'] in set(['BondOutstanding', 'BondOutstandingInt'])]
     _fmap = {"cn": {'BondOutstanding': "本金违约", "BondOutstandingInt": "利息违约"}
             ,"en": {'BondOutstanding': "Balance Defaults", "BondOutstandingInt": "Interest Defaults"}}
+    ## Build bond summary
     bndNames = set([y[0] for y in bond_defaults])
     bndSummary = pd.DataFrame(columns=bndStatus[locale], index=list(bndNames))
     for bn, amt_type, amt, begBal in bond_defaults:
@@ -1416,7 +1417,7 @@ def readRunSummary(x, locale) -> dict:
         bndSummary[bndStatus[locale][1]]
 
     r['bonds'] = bndSummary
-
+    ## Build status change logs
     dealStatusLog = {'cn': ["日期", "旧状态", "新状态"], 'en': ["Date", "From", "To"]}
     status_change_logs = [(_['contents'][0], readStatus(_['contents'][1], locale), readStatus(_['contents'][2], locale))
                           for _ in x if _['tag'] in set(['DealStatusChangeTo'])]
@@ -1430,12 +1431,22 @@ def readRunSummary(x, locale) -> dict:
         df.set_index("Date",inplace=True)
         return df
     inspect_vars = filter_by_tags(x, ["InspectBal","InspectBool","InspectRate"])
-    inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),c['contents'][2]) for c in inspect_vars ]
-                              ,columns = ["Date","DealStats","Value"])
-    grped_inspect_df = inspect_df.groupby("DealStats")
+    if inspect_vars:
+        inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),c['contents'][2]) for c in inspect_vars ]
+                                ,columns = ["Date","DealStats","Value"])
+        grped_inspect_df = inspect_df.groupby("DealStats")
 
-    r['inspect'] = {readTagStr(k):uplift_ds(v) for k,v in grped_inspect_df}
-    
+        r['inspect'] = {readTagStr(k):uplift_ds(v) for k,v in grped_inspect_df}
+
+    # inspect variables during waterfall
+    waterfall_inspect_vars = filter_by_tags(x, ["InspectWaterfall"])
+    if waterfall_inspect_vars:
+        waterfall_inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),ds,dsv) 
+                                                        for c in waterfall_inspect_vars
+                                                         for (ds,dsv) in zip(c['contents'][2],c['contents'][3]) ]
+                                            ,columns = ["Date","Comment","DealStats","Value"])
+        r['waterfallInspect'] = waterfall_inspect_df
+
     # build financial reports
     def mapItem(z):
         match z:
