@@ -666,6 +666,7 @@ def mkSupport(x):
             raise RuntimeError(f"Failed to match :{x}:SupportType")
 
 def mkAction(x):
+    ''' make waterfall actions '''
     match x:
         case ["账户转移", source, target, m] | ["transfer", source, target, m]:
             return mkTag(("Transfer", [mkLimit(m), source, target, None]))
