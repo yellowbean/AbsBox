@@ -1440,6 +1440,7 @@ def readRunSummary(x, locale) -> dict:
         r['inspect'] = {readTagStr(k):uplift_ds(v) for k,v in grped_inspect_df}
 
     # inspect variables during waterfall
+    r['waterfallInspect'] = None
     waterfall_inspect_vars = filter_by_tags(x, ["InspectWaterfall"])
     if waterfall_inspect_vars:
         waterfall_inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),ds,dsv) 
@@ -1447,6 +1448,14 @@ def readRunSummary(x, locale) -> dict:
                                                          for (ds,dsv) in zip(c['contents'][2],c['contents'][3]) ]
                                             ,columns = ["Date","Comment","DealStats","Value"])
         r['waterfallInspect'] = waterfall_inspect_df
+    
+    # extract errors and warnings
+    error_warning_logs = filter_by_tags(x, ["ErrorMsg","WarningMsg"])
+    r['logs'] = None
+    if error_warning_logs:
+        errorLogs = [ ["Error",c['contents']] for c in error_warning_logs if c['tag']=="ErrorMsg"]
+        warningLogs = [ ["Warning",c['contents']] for c in error_warning_logs if c['tag']=="WarningMsg"]
+        r['logs'] = pd.DataFrame(data = errorLogs+warningLogs ,columns = ["Type","Comment"])
 
     # build financial reports
     def mapItem(z):

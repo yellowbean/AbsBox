@@ -108,7 +108,8 @@ class API:
     def run(self, deal,
             poolAssump=None,
             runAssump=[],
-            read=True):
+            read=True,
+            preCheck=True):
 
         #assert isinstance(runAssump, list),f"runAssump must be a list ,but got {type(runAssump)}"
 
@@ -120,9 +121,10 @@ class API:
         runType = "MultiScenarios" if multi_run_flag else "Single"
         req = self.build_run_deal_req(runType, deal, poolAssump, runAssump)
         #validate deal
-        val_result, err, warn = self.validate(req)
-        if not val_result:
-            return val_result, err, warn
+        if preCheck:
+            val_result, err, warn = self.validate(req)
+            if not val_result:
+                return val_result, err, warn
         # branching with pricing
         if runAssump is None or searchByFst(runAssump, "pricing") is None:
             result = self._send_req(req, url)

@@ -9,7 +9,7 @@ from rich.console import Console
 console = Console()
 
 
-def mkDeal(x:dict):
+def mkDeal(x:dict,preCheck=True):
     name = getValWithKs(x, ['name', "名称", "comment", '备注'], defaultReturn="")
     
     dates = getValWithKs(x, ['dates', "date", "日期"])
@@ -78,7 +78,10 @@ def mkDeal(x:dict):
         ,None
         ,ledgers
     )
-    errors,warnings = valDeal(deal.json['contents'],[],[])
+    
+    errors, warnings = ([], [])
+    if preCheck:
+        errors, warnings = valDeal(deal.json['contents'], [], [])
 
     if len(errors)>0:
         for e in errors:
