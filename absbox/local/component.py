@@ -928,6 +928,10 @@ def mkAmortPlan(x) -> dict:
             return mkTag("I_P")
         case "等本等费" | "F_P" | "f_p":
             return mkTag("F_P")
+        case ("计划还款",ts,Dp) | ("Schedule",ts,Dp):
+            return mkTag(("ScheduleRepayment",[mkTs("RatioCurve",ts),mkDatePattern(Dp)]))
+        case ("计划还款",ts) | ("Schedule",ts):
+            return mkTag(("ScheduleRepayment",[mkTs("RatioCurve",ts),None]))
         case _:
             raise RuntimeError(f"Failed to match AmortPlan {x}:mkAmortPlan")
 

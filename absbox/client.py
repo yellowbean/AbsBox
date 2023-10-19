@@ -204,13 +204,9 @@ class API:
         url = f"{self.url}/runAsset"
         _assumptions = mkAssumpType(poolAssump) if poolAssump else None
         _pricing = mkLiqMethod(pricing) if pricing else None
-        _rate = mkRateAssumption(rateAssump) if rateAssump else None
+        _rate = [mkRateAssumption(_) for _ in rateAssump ] if rateAssump else None
         assets = [ mkAssetUnion(_) for _ in _assets ]
-        req = json.dumps([date
-                          ,assets
-                          ,_assumptions
-                          ,_rate
-                          ,_pricing]
+        req = json.dumps([date,assets,_assumptions,_rate,_pricing]
                          ,ensure_ascii=False)
         result = self._send_req(req, url)
         if read :
