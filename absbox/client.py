@@ -137,6 +137,13 @@ class API:
         if 'error' in result:
             rich.print_json(result)
             return None
+        
+        #print out errors
+        rawErrorMsg = [ f"❌[bold red]{_['contents']}" for _ in result[2] if _['tag'] == "ErrorMsg"]
+        if rawErrorMsg:
+            rich.print("Error Message from server:\n")
+            rich.print("\n".join(rawErrorMsg))
+
         # load deal if it is a multi scenario
         if read and multi_run_flag:
             return mapValsBy(result, deal.read)
@@ -148,11 +155,15 @@ class API:
     def runPool(self, pool, poolAssump=None, rateAssump=None, read=True):
         def read_single(pool_resp):
             (pool_flow, pool_bals) = pool_resp
-            flow_header, idx = guess_pool_flow_header(pool_flow[0],pool_lang)
+            flow_header, idx, expandFlag = guess_pool_flow_header(pool_flow[0],pool_lang)
             try:
-                result = pd.DataFrame([_['contents'] for _ in pool_flow], columns=flow_header)
-            except ValueError as _:
+                if not expandFlag:
+                    result = pd.DataFrame([_['contents'] for _ in pool_flow], columns=flow_header)
+                else:
+                    result = pd.DataFrame([_['contents'][-1]+_['contents'][-1] for _ in pool_flow], columns=flow_header)
+            except ValueError as e:
                 console.print(f"❌[bold red]Failed to match header:{flow_header} with {result[0]['contents']}")
+                console.print(f"error:{e}")
 
             result = result.set_index(idx)
             result.index.rename(idx, inplace=True)

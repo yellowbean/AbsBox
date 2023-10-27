@@ -139,14 +139,16 @@ def run_deal(input_folder, pair):
                     #break
                 local_bench_file = os.path.join(input_resp_folder,eoutput)
                 if not os.path.exists(local_bench_file):
+                    print(f"writing to new resp for {local_bench_file}")
                     with open(local_bench_file,'w') as wof: # write output file
                         json.dump(s_result,wof,indent=2)
                     continue
                 with open(local_bench_file,'r') as eout: # expected output 
+                    print(f"reading resp for {local_bench_file}")
                     local_result = json.load(eout)
                     assert isinstance(local_result, list), f"{dinput}: local result is not list but {local_result.keys()},{local_result['error']}"
                     assert isinstance(s_result, list), f"{dinput}: server result is not list but {s_result}"
-                    assert local_result[1]==s_result[1],f"Pool Flow Is not matching => {dinput}"
+                    assert local_result[1]==s_result[1],f"Pool Flow Is not matching => {dinput},deal name => {local_result['contents']['name']}"
                     local_result_content = local_result[0]['contents']
                     s_result_content = s_result[0]['contents']
                     if not local_result_content['waterfall']==s_result_content['waterfall']:

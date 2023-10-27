@@ -2,14 +2,16 @@
   "tag": "MDeal",
   "contents": {
     "dates": {
-      "tag": "PreClosingDates",
+      "tag": "CurrentDates",
       "contents": [
-        "2022-07-26",
-        "2022-07-26",
+        [
+          "2022-06-30",
+          "2022-07-26"
+        ],
         null,
         "2060-12-01",
         [
-          "2022-07-26",
+          "2022-07-31",
           {
             "tag": "MonthEnd"
           }
@@ -25,10 +27,7 @@
     },
     "name": "\u5efa\u51432017\u5e74\u7b2c\u4e94\u671f\u4e2a\u4eba\u4f4f\u623f\u62b5\u62bc\u8d37\u6b3e\u8d44\u4ea7\u652f\u6301\u8bc1\u5238",
     "status": {
-      "tag": "PreClosing",
-      "contents": {
-        "tag": "Amortizing"
-      }
+      "tag": "Amortizing"
     },
     "pool": {
       "assets": [
@@ -52,12 +51,13 @@
                   null
                 ]
               },
-              "originTerm": 30,
+              "originTerm": 209,
               "period": "Monthly",
-              "startDate": "2020-06-01",
+              "startDate": "2013-04-28",
               "prinType": {
                 "tag": "Even"
               },
+              "prepaymentPenalty": null,
               "tag": "MortgageOriginalInfo"
             },
             2261042196.13,
@@ -68,48 +68,13 @@
               "tag": "Current"
             }
           ]
-        },
-        {
-          "tag": "Mortgage",
-          "contents": [
-            {
-              "originBalance": 0,
-              "originRate": {
-                "tag": "Floater",
-                "contents": [
-                  "DC_ACT_365F",
-                  "LPR5Y",
-                  0.01,
-                  0.085,
-                  {
-                    "tag": "MonthEnd"
-                  },
-                  null,
-                  null,
-                  null
-                ]
-              },
-              "originTerm": 30,
-              "period": "Monthly",
-              "startDate": "2020-06-01",
-              "prinType": {
-                "tag": "Even"
-              },
-              "tag": "MortgageOriginalInfo"
-            },
-            81403764.08,
-            0.0444,
-            106,
-            null,
-            {
-              "tag": "Defaulted",
-              "contents": null
-            }
-          ]
         }
       ],
-      "asOfDate": "2022-07-26",
-      "issuanceStat": null,
+      "asOfDate": "2022-06-30",
+      "issuanceStat": {
+        "IssuanceBalance": 7573626700,
+        "HistoryDefaults": 81403764.08
+      },
       "futureCf": null,
       "extendPeriods": {
         "tag": "MonthEnd"
@@ -413,7 +378,7 @@
             }
           ]
         },
-        "feeStart": "2022-07-26",
+        "feeStart": "2022-06-30",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
@@ -433,7 +398,7 @@
             }
           ]
         },
-        "feeStart": "2022-07-26",
+        "feeStart": "2022-06-30",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
@@ -450,7 +415,7 @@
             60000
           ]
         },
-        "feeStart": "2022-07-26",
+        "feeStart": "2022-06-30",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,

@@ -50,6 +50,7 @@
               "prinType": {
                 "tag": "Level"
               },
+              "prepaymentPenalty": null,
               "tag": "MortgageOriginalInfo"
             },
             1200,

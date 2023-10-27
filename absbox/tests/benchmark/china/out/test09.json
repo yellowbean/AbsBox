@@ -50,6 +50,7 @@
               "prinType": {
                 "tag": "Even"
               },
+              "prepaymentPenalty": null,
               "tag": "MortgageOriginalInfo"
             },
             160,
