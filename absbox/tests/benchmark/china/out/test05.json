@@ -50,6 +50,7 @@
               "prinType": {
                 "tag": "Level"
               },
+              "prepaymentPenalty": null,
               "tag": "MortgageOriginalInfo"
             },
             7596981800,
@@ -79,6 +80,7 @@
               "prinType": {
                 "tag": "Even"
               },
+              "prepaymentPenalty": null,
               "tag": "MortgageOriginalInfo"
             },
             2397902000.0,

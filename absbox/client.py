@@ -108,7 +108,8 @@ class API:
     def run(self, deal,
             poolAssump=None,
             runAssump=[],
-            read=True):
+            read=True,
+            preCheck=True):
 
         #assert isinstance(runAssump, list),f"runAssump must be a list ,but got {type(runAssump)}"
 
@@ -120,9 +121,10 @@ class API:
         runType = "MultiScenarios" if multi_run_flag else "Single"
         req = self.build_run_deal_req(runType, deal, poolAssump, runAssump)
         #validate deal
-        val_result, err, warn = self.validate(req)
-        if not val_result:
-            return val_result, err, warn
+        if preCheck:
+            val_result, err, warn = self.validate(req)
+            if not val_result:
+                return val_result, err, warn
         # branching with pricing
         if runAssump is None or searchByFst(runAssump, "pricing") is None:
             result = self._send_req(req, url)
@@ -135,6 +137,13 @@ class API:
         if 'error' in result:
             rich.print_json(result)
             return None
+        
+        #print out errors
+        rawErrorMsg = [ f"❌[bold red]{_['contents']}" for _ in result[2] if _['tag'] == "ErrorMsg"]
+        if rawErrorMsg:
+            rich.print("Error Message from server:\n")
+            rich.print("\n".join(rawErrorMsg))
+
         # load deal if it is a multi scenario
         if read and multi_run_flag:
             return mapValsBy(result, deal.read)
@@ -146,11 +155,15 @@ class API:
     def runPool(self, pool, poolAssump=None, rateAssump=None, read=True):
         def read_single(pool_resp):
             (pool_flow, pool_bals) = pool_resp
-            flow_header, idx = guess_pool_flow_header(pool_flow[0],pool_lang)
+            flow_header, idx, expandFlag = guess_pool_flow_header(pool_flow[0],pool_lang)
             try:
-                result = pd.DataFrame([_['contents'] for _ in pool_flow], columns=flow_header)
-            except ValueError as _:
+                if not expandFlag:
+                    result = pd.DataFrame([_['contents'] for _ in pool_flow], columns=flow_header)
+                else:
+                    result = pd.DataFrame([_['contents'][-1]+_['contents'][-1] for _ in pool_flow], columns=flow_header)
+            except ValueError as e:
                 console.print(f"❌[bold red]Failed to match header:{flow_header} with {result[0]['contents']}")
+                console.print(f"error:{e}")
 
             result = result.set_index(idx)
             result.index.rename(idx, inplace=True)
@@ -202,13 +215,9 @@ class API:
         url = f"{self.url}/runAsset"
         _assumptions = mkAssumpType(poolAssump) if poolAssump else None
         _pricing = mkLiqMethod(pricing) if pricing else None
-        _rate = mkRateAssumption(rateAssump) if rateAssump else None
+        _rate = [mkRateAssumption(_) for _ in rateAssump ] if rateAssump else None
         assets = [ mkAssetUnion(_) for _ in _assets ]
-        req = json.dumps([date
-                          ,assets
-                          ,_assumptions
-                          ,_rate
-                          ,_pricing]
+        req = json.dumps([date,assets,_assumptions,_rate,_pricing]
                          ,ensure_ascii=False)
         result = self._send_req(req, url)
         if read :

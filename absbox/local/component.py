@@ -12,6 +12,7 @@ import pandas as pd
 from pyspecter import query, S
 
 def mkLiq(x):
+    ''' make pricing method '''
     match x:
         case {"正常余额折价": cf, "违约余额折价": df}:
             return mkTag(("BalanceFactor", [cf, df]))
@@ -25,6 +26,7 @@ def mkLiq(x):
             raise RuntimeError(f"Failed to match {x} in Liquidation Method")
 
 def mkDatePattern(x):
+    ''' make date pattern '''
     match x:
         case ["每月", _d]:
             return mkTag((datePattern["每月"], _d))
@@ -926,6 +928,10 @@ def mkAmortPlan(x) -> dict:
             return mkTag("I_P")
         case "等本等费" | "F_P" | "f_p":
             return mkTag("F_P")
+        case ("计划还款",ts,Dp) | ("Schedule",ts,Dp):
+            return mkTag(("ScheduleRepayment",[mkTs("RatioCurve",ts),mkDatePattern(Dp)]))
+        case ("计划还款",ts) | ("Schedule",ts):
+            return mkTag(("ScheduleRepayment",[mkTs("RatioCurve",ts),None]))
         case _:
             raise RuntimeError(f"Failed to match AmortPlan {x}:mkAmortPlan")
 
@@ -951,44 +957,66 @@ def mkAssetStatus(x):
         case _:
             raise RuntimeError(f"Failed to match asset statuts {x}:mkAssetStatus")
 
+def mkPrepayPenalty(x):
+    if x is None:
+        return None
+    match x:
+        case {"byTerm":[term,rate1,rate2]} | {"按期限":[term,rate1,rate2]}:
+            return mkTag(("ByTerm",[term,rate1,rate2]))
+        case {"fixAmount":[bal,term]} | {"固定金额":[bal,term]}:
+            return mkTag(("FixAmount",[bal,term]))
+        case {"fixAmount":[bal]} | {"固定金额":[bal]}:
+            return mkTag(("FixAmount",[bal,None]))
+        case {"fixPct":[pct,term]} | {"固定比例":[pct,term]}:
+            return mkTag(("FixPct",[pct,term]))
+        case {"fixPct":[pct]} | {"固定比例":[pct]}:
+            return mkTag(("FixPct",[pct,None]))
+        case {"sliding":[pct,step]} | {"滑动":[pct,step]}:
+            return mkTag(("Sliding",[pct, step]))
+        case {"stepDown":ps} | {"阶梯":[ps]}:
+            return mkTag(("StepDown",ps))
+        case _ :
+            raise RuntimeError(f"Failed to match {x}:mkPrepayPenalty")
+
 
 def mkAsset(x):
     match x:
         case ["AdjustRateMortgage", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate, "arm": arm}
              , {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
-            borrowerNum1 = x[2].get("borrowerNum", None)
-            return mkTag(("AdjustRateMortgage",
-                          [{"originBalance": originBalance,
-                            "originRate": mkRateType(originRate),
-                            "originTerm": originTerm,
-                            "period": freqMap[freq],
-                            "startDate": startDate,
-                            "prinType": mkAmortPlan(_type)
-                            } | mkTag("MortgageOriginalInfo"),
-                            mkArm(arm),
-                            currentBalance,
-                            currentRate,
-                            remainTerms,
-                            borrowerNum1,
-                            mkAssetStatus(status)]
-            )) 
+            borrowerNum = x[2].get("borrowerNum", None)
+            prepayPenalty = getValWithKs(x[1],["prepayPenalty","早偿罚息"])
+            return mkTag(("AdjustRateMortgage", [{"originBalance": originBalance,
+                                                "originRate": mkRateType(originRate),
+                                                "originTerm": originTerm,
+                                                "period": freqMap[freq],
+                                                "startDate": startDate,
+                                                "prinType": mkAmortPlan(_type),
+                                                "prepaymentPenalty": mkPrepayPenalty(prepayPenalty)
+                                                } | mkTag("MortgageOriginalInfo"),
+                                                mkArm(arm),
+                                                currentBalance,
+                                                currentRate,
+                                                remainTerms,
+                                                borrowerNum,
+                                                mkAssetStatus(status)])) 
         case ["按揭贷款", {"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "当前利率": currentRate, "剩余期限": remainTerms, "状态": status}] | \
                 ["Mortgage", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
 
             borrowerNum = getValWithKs(x[2],["borrowerNum","借款人数量"])
-            return mkTag(("Mortgage", [
-                {"originBalance": originBalance,
-                 "originRate": mkRateType(originRate),
-                 "originTerm": originTerm,
-                 "period": freqMap[freq],
-                 "startDate": startDate,
-                 "prinType": mkAmortPlan(_type)
-                 } | mkTag("MortgageOriginalInfo"),
-                currentBalance,
-                currentRate,
-                remainTerms,
-                borrowerNum,
-                mkAssetStatus(status)]))
+            prepayPenalty = getValWithKs(x[1],["prepayPenalty","早偿罚息"])
+            return mkTag(("Mortgage", [ {"originBalance": originBalance,
+                                        "originRate": mkRateType(originRate),
+                                        "originTerm": originTerm,
+                                        "period": freqMap[freq],
+                                        "startDate": startDate,
+                                        "prinType": mkAmortPlan(_type),
+                                        "prepaymentPenalty": mkPrepayPenalty(prepayPenalty)
+                                        } | mkTag("MortgageOriginalInfo"),
+                                        currentBalance,
+                                        currentRate,
+                                        remainTerms,
+                                        borrowerNum,
+                                        mkAssetStatus(status)]))
         case ["贷款", {"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "当前利率": currentRate, "剩余期限": remainTerms, "状态": status}] \
                 | ["Loan", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
             return mkTag(("PersonalLoan", [
@@ -1440,6 +1468,7 @@ def readRunSummary(x, locale) -> dict:
         r['inspect'] = {readTagStr(k):uplift_ds(v) for k,v in grped_inspect_df}
 
     # inspect variables during waterfall
+    r['waterfallInspect'] = None
     waterfall_inspect_vars = filter_by_tags(x, ["InspectWaterfall"])
     if waterfall_inspect_vars:
         waterfall_inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),ds,dsv) 
@@ -1447,6 +1476,14 @@ def readRunSummary(x, locale) -> dict:
                                                          for (ds,dsv) in zip(c['contents'][2],c['contents'][3]) ]
                                             ,columns = ["Date","Comment","DealStats","Value"])
         r['waterfallInspect'] = waterfall_inspect_df
+    
+    # extract errors and warnings
+    error_warning_logs = filter_by_tags(x, ["ErrorMsg","WarningMsg"])
+    r['logs'] = None
+    if error_warning_logs:
+        errorLogs = [ ["Error",c['contents']] for c in error_warning_logs if c['tag']=="ErrorMsg"]
+        warningLogs = [ ["Warning",c['contents']] for c in error_warning_logs if c['tag']=="WarningMsg"]
+        r['logs'] = pd.DataFrame(data = errorLogs+warningLogs ,columns = ["Type","Comment"])
 
     # build financial reports
     def mapItem(z):
