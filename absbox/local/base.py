@@ -6,6 +6,10 @@ china_bond_cashflow = ["本金","利息","本息合计"]
 english_bondflow_fields = ["date", "balance", "interest", "principal", "rate", "cash", "memo"]
 english_bondflow_fields_s = ["balance", "interest", "principal", "rate", "cash", "memo"]
 
+# Cumulative
+china_cumStats = ["累计还款","累计早偿","累计拖欠","累计违约","累计回收","累计损失"]
+english_cumStats = ["CumPrincipal","CumPrepay","CumDelinq","CumDefault","CumRecovery","CumLoss"]
+
 # Pool
 ## mortgage
 china_mortgage_flow_fields = ["余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失金额", "利率", "债务人数量","早偿手续费"]

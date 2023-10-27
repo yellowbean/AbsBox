@@ -113,12 +113,20 @@ class SPV:
         output['agg_accounts'] = aggAccs(output['accounts'],'cn')
 
         output['pool'] = {}
-        _pool_cf_header,_ = guess_pool_flow_header(deal_content['pool']['futureCf'][0],"chinese")
-        output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['futureCf']]
-                                              , columns=_pool_cf_header)
-        pool_idx = "日期"
-        output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)
-        output['pool']['flow'].index.rename(pool_idx, inplace=True)
+        if deal_content['pool']['futureCf'] is None:
+            output['pool']['flow'] = None
+        else:
+            _pool_cf_header,_,expandFlag = guess_pool_flow_header(deal_content['pool']['futureCf'][0],"chinese")
+            if not expandFlag:
+                output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['futureCf']]
+                                                      , columns=_pool_cf_header)
+            else:
+                output['pool']['flow'] = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[None]*6) for _ in deal_content['pool']['futureCf']]
+                                                      , columns=_pool_cf_header)                
+            
+            pool_idx = "日期"
+            output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)
+            output['pool']['flow'].index.rename(pool_idx, inplace=True)
 
         output['pricing'] = readPricingResult(resp[3], 'cn')
         output['result'] = readRunSummary(resp[2], 'cn')

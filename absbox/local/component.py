@@ -944,7 +944,7 @@ def mkArm(x):
             cap = x.get("lifeCap",None)
             return mkTag(("ARM",[ip,fc,pc,cap,floor]))
         case _:
-            raise RuntimeError(f"Failed to match AmortPlan {x}:mkArm")
+            raise RuntimeError(f"Failed to match ARM  {x}:mkArm")
 
 def mkAssetStatus(x):
     match x:
@@ -1109,6 +1109,8 @@ def mkAssumpDefault(x):
             return mkTag(("DefaultVec",r))
         case {"CDR":r} :
             return mkTag(("DefaultCDR",r))
+        case {"ByAmount":(bal,rs)} :
+            return mkTag(("DefaultByAmt",(bal,rs)))
         case _ :
             raise RuntimeError(f"failed to match {x}")
 
@@ -1153,6 +1155,8 @@ def mkAssumpRecovery(x):
     match x:
         case {"Rate":r,"Lag":lag}:
             return mkTag(("Recovery",[r,lag]))
+        case {"Rate":r,"Timing":ts}:
+            return mkTag(("RecoveryTiming",[r,ts]))
         case _:
             raise RuntimeError(f"failed to match {x}")
 
@@ -1361,7 +1365,7 @@ def mkCf(x):
     if len(x) == 0:
         return None
     else:
-        return [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None])) for _x in x]
+        return [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None,None])) for _x in x]
 
 
 def mkCollection(x):
@@ -1571,8 +1575,11 @@ def readCutoffFields(pool):
         return None
 
     validCutoffFields = {
-        "资产池规模": "IssuanceBalance",
-        "IssuanceBalance": "IssuanceBalance"
+        "资产池规模": "IssuanceBalance"
+        ,"IssuanceBalance": "IssuanceBalance"
+        ,"CumulativeDefaults":"HistoryDefaults"
+        ,"累计违约余额":"HistoryDefaults"
+
     }
 
     r = {}
@@ -1580,7 +1587,7 @@ def readCutoffFields(pool):
         if k in validCutoffFields:
             r[validCutoffFields[k]] = v
         else:
-            logging.warning(f"Key {k} is not in pool fields {validIssuanceFields.keys()}")
+            logging.warning(f"Key {k} is not in pool fields {validCutoffFields.keys()}")
     return r
 
 def mkRateAssumption(x):
