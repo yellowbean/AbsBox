@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import functools
 
 from absbox import *
-from absbox.local.util import mkTag,mapListValBy,mapValsBy,renameKs2,guess_pool_flow_header,positionFlow
+from absbox.local.util import mkTag,mapListValBy,mapValsBy,renameKs2,guess_pool_flow_header,positionFlow,mapNone
 from absbox.local.component import *
 from absbox.local.base import * 
 import pandas as pd
@@ -104,12 +104,17 @@ class Generic:
         output['agg_accounts'] = aggAccs(output['accounts'], 'en')
 
         output['pool'] = {}
+        
         if deal_content['pool']['futureCf'] is None:
             output['pool']['flow'] = None
         else:
-            _pool_cf_header,_ = guess_pool_flow_header(deal_content['pool']['futureCf'][0],"english")
-            output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['futureCf']]
-                                                  , columns=_pool_cf_header)
+            _pool_cf_header,_,expandFlag = guess_pool_flow_header(deal_content['pool']['futureCf'][0],"english")
+            if not expandFlag:
+                output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['futureCf']]
+                                                      , columns=_pool_cf_header)
+            else:
+                output['pool']['flow'] = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[None]*6) for _ in deal_content['pool']['futureCf']]
+                                                      , columns=_pool_cf_header)
             pool_idx = 'Date'
             output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)
             output['pool']['flow'].index.rename(pool_idx, inplace=True)

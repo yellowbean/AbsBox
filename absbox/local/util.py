@@ -10,6 +10,13 @@ from pyxirr import xirr,xnpv
 
 from absbox.local.base import *
 
+def mapNone(x,v):
+    if x is None:
+        return v
+    else:
+        return x
+
+
 def flat(xss) -> list:
     return reduce(lambda xs, ys: xs + ys, xss)
 
@@ -263,23 +270,35 @@ def ensure100(xs,msg=""):
 
 def guess_pool_flow_header(x,l):
     assert isinstance(x, dict), f"x is not a map but {x}, type:{type(x)}"
-    match (x['tag'],l):
-        case ('MortgageDelinqFlow','chinese'):
-            return (china_mortgage_delinq_flow_fields_d,"日期")
-        case ('MortgageDelinqFlow','english'):
-            return (english_mortgage_delinq_flow_fields_d,"Date")
-        case ('MortgageFlow','chinese'):
-            return (china_mortgage_flow_fields_d,"日期")
-        case ('MortgageFlow','english'):
-            return (english_mortgage_flow_fields_d,"Date")
-        case ('LoanFlow','chinese'):
-            return (china_loan_flow_d,"日期")
-        case ('LoanFlow','english'):
-            return (english_loan_flow_d,"Date")
-        case ('LeaseFlow','chinese'):
-            return (china_rental_flow_d,"日期")
-        case ('LeaseFlow','english'):
-            return (english_rental_flow_d,"Date")
+    match (x['tag'],len(x['contents']),l):
+        case ('MortgageDelinqFlow',12,'chinese'):
+            return (china_mortgage_delinq_flow_fields_d,"日期",False)
+        case ('MortgageDelinqFlow',13,'chinese'):
+            return (china_mortgage_delinq_flow_fields_d+china_cumStats,"日期",True)
+        case ('MortgageDelinqFlow',12,'english'):
+            return (english_mortgage_delinq_flow_fields_d,"Date",False)
+        case ('MortgageDelinqFlow',13,'english'):
+            return (english_mortgage_delinq_flow_fields_d+english_cumStats,"Date",True)
+        case ('MortgageFlow',11,'chinese'):
+            return (china_mortgage_flow_fields_d,"日期",False)
+        case ('MortgageFlow',12,'chinese'):
+            return (china_mortgage_flow_fields_d+china_cumStats,"日期",True)
+        case ('MortgageFlow',11,'english'):
+            return (english_mortgage_flow_fields_d,"Date",False)
+        case ('MortgageFlow',12,'english'):
+            return (english_mortgage_flow_fields_d+english_cumStats, "Date", True)
+        case ('LoanFlow',9,'chinese'):
+            return (china_loan_flow_d,"日期",False)
+        case ('LoanFlow',10,'chinese'):
+            return (china_loan_flow_d+china_cumStats,"日期",True)
+        case ('LoanFlow',9,'english'):
+            return (english_loan_flow_d,"Date",False)
+        case ('LoanFlow',10,'english'):
+            return (english_loan_flow_d+english_cumStats,"Date",True)
+        case ('LeaseFlow',3,'chinese'):
+            return (china_rental_flow_d,"日期",False)
+        case ('LeaseFlow',3,'english'):
+            return (english_rental_flow_d,"Date",False)
         case _:
             raise RuntimeError(f"Failed to match pool header with {x['tag']}{l}")
 
@@ -311,9 +330,12 @@ def _read_cf(x, lang):
     ''' read cashflow from a list , and set index to date'''
     if x == []:
         return []
-    flow_header,idx = guess_pool_flow_header(x[0],lang)
+    flow_header,idx,expandFlag = guess_pool_flow_header(x[0],lang)
     try:
-        result = pd.DataFrame([_['contents'] for _ in x] , columns=flow_header)
+        if not expandFlag:
+            result = pd.DataFrame([_['contents'] for _ in x] , columns=flow_header)
+        else:
+            result = pd.DataFrame([_['contents'][:-1]+_['contents'][-1] for _ in x] , columns=flow_header)
     except ValueError as e:
         logging.error(f"Failed to match header:{flow_header} with {result[0]['contents']}")
     result.set_index(idx, inplace=True)
