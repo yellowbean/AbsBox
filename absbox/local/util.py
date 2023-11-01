@@ -263,28 +263,28 @@ def renameKs2(m:dict,kmapping):
     assert isinstance(m, dict), "M is not a map"
     assert isinstance(kmapping, dict), f"Mapping is not a map: {kmapping}"
     assert set(m.keys()).issubset(set(kmapping.keys())), f"{m.keys()} not in {kmapping.keys()}"
-    return {kmapping[k]:v for k, v in m.items()}
+    return {kmapping[k]: v for k, v in m.items()}
 
 def ensure100(xs,msg=""):
-    assert sum(xs)==1.0,f"Doesn't not sum up 100%: {msg}"
+    assert sum(xs)==1.0, f"Doesn't not sum up 100%: {msg}"
 
-def guess_pool_flow_header(x,l):
+def guess_pool_flow_header(x, l):
     assert isinstance(x, dict), f"x is not a map but {x}, type:{type(x)}"
-    match (x['tag'],len(x['contents']),l):
-        case ('MortgageDelinqFlow',12,'chinese'):
-            return (china_mortgage_delinq_flow_fields_d,"日期",False)
-        case ('MortgageDelinqFlow',13,'chinese'):
-            return (china_mortgage_delinq_flow_fields_d+china_cumStats,"日期",True)
-        case ('MortgageDelinqFlow',12,'english'):
-            return (english_mortgage_delinq_flow_fields_d,"Date",False)
-        case ('MortgageDelinqFlow',13,'english'):
-            return (english_mortgage_delinq_flow_fields_d+english_cumStats,"Date",True)
-        case ('MortgageFlow',11,'chinese'):
-            return (china_mortgage_flow_fields_d,"日期",False)
-        case ('MortgageFlow',12,'chinese'):
-            return (china_mortgage_flow_fields_d+china_cumStats,"日期",True)
-        case ('MortgageFlow',11,'english'):
-            return (english_mortgage_flow_fields_d,"Date",False)
+    match (x['tag'], len(x['contents']), l):
+        case ('MortgageDelinqFlow', 12, 'chinese'):
+            return (china_mortgage_delinq_flow_fields_d, "日期", False)
+        case ('MortgageDelinqFlow', 13, 'chinese'):
+            return (china_mortgage_delinq_flow_fields_d+china_cumStats, "日期", True)
+        case ('MortgageDelinqFlow', 12, 'english'):
+            return (english_mortgage_delinq_flow_fields_d, "Date", False)
+        case ('MortgageDelinqFlow', 13, 'english'):
+            return (english_mortgage_delinq_flow_fields_d+english_cumStats, "Date", True)
+        case ('MortgageFlow', 11, 'chinese'):
+            return (china_mortgage_flow_fields_d, "日期", False)
+        case ('MortgageFlow', 12, 'chinese'):
+            return (china_mortgage_flow_fields_d+china_cumStats, "日期", True)
+        case ('MortgageFlow', 11, 'english'):
+            return (english_mortgage_flow_fields_d, "Date", False)
         case ('MortgageFlow',12,'english'):
             return (english_mortgage_flow_fields_d+english_cumStats, "Date", True)
         case ('LoanFlow',9,'chinese'):
@@ -299,6 +299,10 @@ def guess_pool_flow_header(x,l):
             return (china_rental_flow_d,"日期",False)
         case ('LeaseFlow',3,'english'):
             return (english_rental_flow_d,"Date",False)
+        case ('FixedFlow',6,'chinese'):
+            return (china_fixed_flow_d,"日期",False)
+        case ('FixedFlow',6,'english'):
+            return (english_fixed_flow_d,"Date",False)
         case _:
             raise RuntimeError(f"Failed to match pool header with {x['tag']}{l}")
 
@@ -337,7 +341,9 @@ def _read_cf(x, lang):
         else:
             result = pd.DataFrame([_['contents'][:-1]+_['contents'][-1] for _ in x] , columns=flow_header)
     except ValueError as e:
+        print(e)
         logging.error(f"Failed to match header:{flow_header} with {result[0]['contents']}")
+        return False
     result.set_index(idx, inplace=True)
     result.index.rename(idx, inplace=True)
     result.sort_index(inplace=True)

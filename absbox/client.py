@@ -139,7 +139,13 @@ class API:
             return None
         
         #print out errors
-        rawErrorMsg = [ f"❌[bold red]{_['contents']}" for _ in result[2] if _['tag'] == "ErrorMsg"]
+        rawErrorMsg = []
+        if multi_run_flag:
+            _x = {k: [ f"❌[bold red]{_['contents']}" for _ in v[2] if _['tag'] == "ErrorMsg"] for k,v in result.items() }
+            rawErrorMsg =  [ b for a in _x.values() for b in a ]
+        else:
+            rawErrorMsg = [ f"❌[bold red]{_['contents']}" for _ in result[2] if _['tag'] == "ErrorMsg"]
+        
         if rawErrorMsg:
             rich.print("Error Message from server:\n")
             rich.print("\n".join(rawErrorMsg))
@@ -200,11 +206,13 @@ class API:
         else:
             return result
 
-    def runAsset(self, date, _assets, poolAssump=None, rateAssump=None, pricing=None, read=True):
-        assert isinstance(_assets, list),f"Assets passed in must be a list"
+    def runAsset(self, date, _assets, poolAssump=None, rateAssump=None
+                 , pricing=None, read=True):
+        assert isinstance(_assets, list), f"Assets passed in must be a list"
+        
         def readResult(x):
             try:
-                ((cfs,cfBalance),pr) = x
+                ((cfs, cfBalance), pr) = x
                 cfs = _read_cf(cfs, self.lang)
                 pricingResult = _read_asset_pricing(pr, self.lang) if pr else None
                 return (cfs, cfBalance, pricingResult)
@@ -215,12 +223,12 @@ class API:
         url = f"{self.url}/runAsset"
         _assumptions = mkAssumpType(poolAssump) if poolAssump else None
         _pricing = mkLiqMethod(pricing) if pricing else None
-        _rate = [mkRateAssumption(_) for _ in rateAssump ] if rateAssump else None
-        assets = [ mkAssetUnion(_) for _ in _assets ]
-        req = json.dumps([date,assets,_assumptions,_rate,_pricing]
-                         ,ensure_ascii=False)
+        _rate = [mkRateAssumption(_) for _ in rateAssump] if rateAssump else None
+        assets = [mkAssetUnion(_) for _ in _assets]
+        req = json.dumps([date, assets, _assumptions, _rate, _pricing]
+                         , ensure_ascii=False)
         result = self._send_req(req, url)
-        if read :
+        if read:
             return readResult(result)
         else:
             return result

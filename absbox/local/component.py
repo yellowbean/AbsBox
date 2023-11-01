@@ -699,24 +699,25 @@ def mkAction(x):
         case ["计提支付利息", source, target, m] | ["accrueAndPayInt", source, target, m]:
             limit = getValWithKs(m,['limit',"限制"])
             support = getValWithKs(m,['support',"支持"])
-            return mkTag(("AccrueAndPayInt", [limit, source, target, support]))
+            return mkTag(("AccrueAndPayInt", [mkLimit(limit), source, target, support]))
         case ["计提支付利息", source, target] | ["accrueAndPayInt", source, target]:
             return mkTag(("AccrueAndPayInt", [None, source, target, None]))
         case ["支付利息", source, target, m] | ["payInt", source, target, m]:
             limit = getValWithKs(m,['limit',"限制"])
             support = getValWithKs(m,['support',"支持"])
-            return mkTag(("PayInt", [limit, source, target, support]))
+            return mkTag(("PayInt", [mkLimit(limit), source, target, support]))
         case ["支付利息", source, target] | ["payInt", source, target]:
             return mkTag(("PayInt", [None, source, target, None]))
-        case ["支付本金", source, target] | ["payPrin", source, target]:
-            return mkTag(("PayPrin", [None, source, target, None]))
         case ["支付本金", source, target, m] | ["payPrin", source, target, m]:
             limit = getValWithKs(m,['limit',"限制"])
             support = getValWithKs(m,['support',"支持"])
-            return mkTag(("PayPrin", [limit, source, target, support]))
+            return mkTag(("PayPrin", [mkLimit(limit), source, target, support]))
+        case ["支付本金", source, target] | ["payPrin", source, target]:
+            return mkTag(("PayPrin", [None, source, target, None]))
         case ["支付剩余本金", source, target] | ["payPrinResidual", source, target]:
             return mkTag(("PayPrinResidual", [source, target]))
-        case ["支付收益", source, target, limit] | ["payIntResidual", source, target, limit]:
+        case ["支付收益", source, target, m] | ["payIntResidual", source, target, m]:
+            limit = getValWithKs(m,['limit',"限制"])
             return mkTag(("PayIntResidual", [ mkLimit(limit), source, target]))
         case ["支付收益", source, target] | ["payIntResidual", source, target]:
             return mkTag(("PayIntResidual", [None, source, target]))
@@ -978,6 +979,23 @@ def mkPrepayPenalty(x):
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkPrepayPenalty")
 
+def mkAccRule(x):
+    match x:
+        case "直线" | "Straight" :
+            return "StraightLine"
+        case "余额递减" | "DecliningBalance" :
+            return "DecliningBalance"
+        case _ :
+            raise RuntimeError(f"Failed to match {x}:mkAccRule")
+
+def mkCapacity(x):
+    match x: 
+        case ("固定",c) | ("Fixed",c) :
+            return mkTag(("FixedCapacity",c))
+        case ("按年限",cs) | ("ByTerm",cs) :
+            return mkTag(("CapacityByTerm",cs))
+        case _ :
+            raise RuntimeError(f"Failed to match {x}:mkCapacity")
 
 def mkAsset(x):
     match x:
@@ -1059,6 +1077,15 @@ def mkAsset(x):
                 dailyRatePlan = mkTag(
                     ("ByRateCurve", [mkDatePattern(accDp), rate]))
             return mkTag(("StepUpLease", [{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp), "originRental": dailyRate} | mkTag("LeaseInfo"), dailyRatePlan, 0, remainTerms, mkAssetStatus(status)]))
+        case ["固定资产",{"起始日":sd,"初始余额":ob,"初始期限":ot,"残值":rb,"周期":p,"摊销":ar,"产能":cap}
+                      ,{"余额":bal,"剩余期限":rt}] \
+             |["FixedAsset",{"start":sd,"originBalance":ob,"originTerm":ot,"residual":rb,"period":p,"amortize":ar
+                             ,"capacity":cap}
+                           ,{"balance":bal,"remainTerm":rt}]:
+            return mkTag(("FixedAsset",[{"startDate":sd,"originBalance":ob,"originTerm":ot,"residualBalance":rb
+                                         ,"period":freqMap[p],"accRule":mkAccRule(ar)
+                                         ,"capacity":mkCapacity(cap)} | mkTag("FixedAssetInfo")
+                                        ,bal,rt]))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 
@@ -1079,6 +1106,8 @@ def identify_deal_type(x):
             return "RDeal"
         case {"pool": {"assets": [{'tag': 'StepUpLease'}, *rest]}}:
             return "RDeal"
+        case {"pool": {"assets": [{'tag': 'FixedAsset'}, *rest]}}:
+            return "FDeal"
         case _:
             raise RuntimeError(f"Failed to identify deal type {x}")
 
@@ -1218,6 +1247,9 @@ def mkPerfAssumption(x):
             p = earlyReturnNone(mkAssumpPrepay,mp)
             r = earlyReturnNone(mkAssumpRecovery,mr)
             return mkTag(("InstallmentAssump",[d,p,r,None]))
+        case ("Fixed",utilCurve,priceCurve):
+            return mkTag(("FixedAssetAssump",[mkTs("RatioCurve",utilCurve)
+                                              ,mkTs("BalanceCurve",priceCurve)]))
         case _:
             raise RuntimeError(f"failed to match {x}")
 
@@ -1245,6 +1277,8 @@ def mkAssetUnion(x):
             return mkTag(("IL",mkAsset(x)))
         case "租赁" | "Lease" : 
             return mkTag(("LS",mkAsset(x)))
+        case "固定资产" | "FixedAsset" : 
+            return mkTag(("FA",mkAsset(x)))
         case _:
             raise RuntimeError(f"Failed to match AssetUnion {x}")
 

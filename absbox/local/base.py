@@ -35,6 +35,13 @@ english_loan_flow = ["Balance", "Principal", "Interest", "Prepayment", "Default"
 china_loan_flow_d = ["日期"] + china_loan_flow
 english_loan_flow_d = ["Date"] + english_loan_flow
 
+## Fixed flow 
+china_fixed_flow = ["余额", "折旧", "累计折旧", "单元", "现金"]
+english_fixed_flow = ["Balance", "Depreciation", "CumuDepreciation", "Unit", "Cash"]
+china_fixed_flow_d = ["日期"] + china_fixed_flow
+english_fixed_flow_d = ["Date"] + english_fixed_flow
+
+
 # Fee 
 china_fee_flow_fields_d = ["日期", "余额", "支付", "剩余支付", "备注"]
 english_fee_flow_fields_d = ["date", "balance", "payment", "due", "memo"]
@@ -49,8 +56,8 @@ china_liq_flow_fields_d = ["日期", "限额", "变动额", "已提供", "利息
 english_liq_flow_fields_d = ["date", "balance", "change", "used", "int", "premium", "memo"]
 
 # Rate Swap 
-china_rs_flow_fields_d = ["日期", "面额", "变动额", "支付","收取","净额","备注"]
-english_rs_flow_fields_d = ["date", "balance", "amount", "pay","receive","due","memo"]
+china_rs_flow_fields_d = ["日期", "面额", "变动额", "支付", "收取", "净额", "备注"]
+english_rs_flow_fields_d = ["date", "balance", "amount", "pay", "receive", "due", "memo"]
 
 # Ledger
 china_ledger_flow_fields_d = ["日期", "余额", "变动额", "备注"]
@@ -94,11 +101,13 @@ poolSourceMapping = {"利息回款": "CollectedInterest"
                     , "早偿回款": "CollectedPrepayment"
                     , "回收回款": "CollectedRecoveries"
                     , "租金回款": "CollectedRental"
+                    , "现金": "CollectedRental"
                     , "CollectedInterest": "CollectedInterest"
                     , "CollectedPrincipal": "CollectedPrincipal"
                     , "CollectedPrepayment": "CollectedPrepayment"
                     , "CollectedRecoveries": "CollectedRecoveries"
                     , "CollectedRental": "CollectedRental"
+                    , "CollectedCash": "CollectedCash"
                      }
 
 op_map = {
