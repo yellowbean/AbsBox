@@ -1078,14 +1078,14 @@ def mkAsset(x):
                     ("ByRateCurve", [mkDatePattern(accDp), rate]))
             return mkTag(("StepUpLease", [{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp), "originRental": dailyRate} | mkTag("LeaseInfo"), dailyRatePlan, 0, remainTerms, mkAssetStatus(status)]))
         case ["固定资产",{"起始日":sd,"初始余额":ob,"初始期限":ot,"残值":rb,"周期":p,"摊销":ar,"产能":cap}
-                      ,{"余额":bal,"剩余期限":rt}] \
+                      ,{"剩余期限":rt}] \
              |["FixedAsset",{"start":sd,"originBalance":ob,"originTerm":ot,"residual":rb,"period":p,"amortize":ar
                              ,"capacity":cap}
-                           ,{"balance":bal,"remainTerm":rt}]:
+                           ,{"remainTerm":rt}]:
             return mkTag(("FixedAsset",[{"startDate":sd,"originBalance":ob,"originTerm":ot,"residualBalance":rb
                                          ,"period":freqMap[p],"accRule":mkAccRule(ar)
                                          ,"capacity":mkCapacity(cap)} | mkTag("FixedAssetInfo")
-                                        ,bal,rt]))
+                                        ,rt]))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 
