@@ -66,6 +66,7 @@ def getStartDate(x):
             return (lastCollected,pp)
 
 def mkDate(x):
+    ''' make date component for deal '''
     match x:
         case {"封包日": a, "起息日": b, "首次兑付日": c, "法定到期日": d, "收款频率": pf, "付款频率": bf} | \
              {"cutoff": a, "closing": b, "firstPay": c, "stated": d, "poolFreq": pf, "payFreq": bf}:
@@ -132,16 +133,18 @@ def mkDateVector(x):
 
 def mkPoolSource(x):
     match x:
-        case "利息" | "Interest" :
+        case "利息" | "Interest" | "利息回款" | "CollectedInterest" :
             return "CollectedInterest" 
-        case "本金" | "Principal":
+        case "本金" | "Principal" | "本金回款" | "CollectedPrincipal":
             return "CollectedPrincipal" 
-        case "回收" | "Recovery" :
+        case "回收" | "Recovery" | "回收回款" | "CollectedRecoveries" :
             return "CollectedRecoveries" 
-        case "早偿" | "Prepayment" :
+        case "早偿" | "Prepayment" | "早偿回款" | "CollectedPrepayment":
             return "CollectedPrepayment" 
-        case "租金" | "Rental" :
+        case "租金" | "Rental" | "租金回款" | "CollectedRental":
             return "CollectedRental" 
+        case "现金" | "Cash" | "现金回款" | "CollectedCash":
+            return "CollectedCash" 
         case "新增违约" | "Defaults" :
             return "NewDefaults" 
         case "新增拖欠" | "Delinquencies":
@@ -1405,9 +1408,9 @@ def mkCf(x):
 def mkCollection(x):
     match x :
         case [s,acc] if isinstance(acc, str):
-            return mkTag(("Collect",[poolSourceMapping[s],acc]))
+            return mkTag(("Collect",[mkPoolSource(s),acc]))
         case [s,pcts] if isinstance(pcts, list):
-            return mkTag(("CollectByPct" ,[poolSourceMapping[s] ,pcts]))
+            return mkTag(("CollectByPct" ,[mkPoolSource(s) ,pcts]))
         case _:
             raise RuntimeError(f"Failed to match collection rule {x}")
 

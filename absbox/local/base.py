@@ -95,20 +95,6 @@ intLikeFormula = set(["borrowerNumber","monthsTillMaturity"])
 boolLikeFormula = set(["trigger","事件","isMostSenior","最优先"])
 
 
-#pool income mapping
-poolSourceMapping = {"利息回款": "CollectedInterest"
-                    , "本金回款": "CollectedPrincipal"
-                    , "早偿回款": "CollectedPrepayment"
-                    , "回收回款": "CollectedRecoveries"
-                    , "租金回款": "CollectedRental"
-                    , "现金": "CollectedRental"
-                    , "CollectedInterest": "CollectedInterest"
-                    , "CollectedPrincipal": "CollectedPrincipal"
-                    , "CollectedPrepayment": "CollectedPrepayment"
-                    , "CollectedRecoveries": "CollectedRecoveries"
-                    , "CollectedRental": "CollectedRental"
-                    , "CollectedCash": "CollectedCash"
-                     }
 
 op_map = {
     ">":"G"
