@@ -155,6 +155,7 @@ def mkPoolSource(x):
         case _ :
             raise RuntimeError(f"not match found: {x} :make Pool Source")
 
+@functools.lru_cache(maxsize=128)
 def mkDs(x):
     "Making Deal Stats"
     match x:
@@ -1656,6 +1657,8 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
                 return {"buildFinancialReport":mkDatePattern(interval)}
             case ("pricing",p):
                 return {"pricing":mkPricingAssump(p)}
+            case ("fireTrigger",scheduleFired):
+                return {"fireTrigger":[ (dt,dealCycleMap[cyc],tn) for (dt,cyc,tn) in scheduleFired]}
     match xs:
         case None:
             return {}
