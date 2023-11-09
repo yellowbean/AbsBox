@@ -2,7 +2,8 @@ from dataclasses import dataclass
 import functools
 
 from absbox import *
-from absbox.local.util import mkTag,mapListValBy,mapValsBy,renameKs2,guess_pool_flow_header,positionFlow,mapNone
+from absbox.local.util import mkTag,mapListValBy,mapValsBy,renameKs2\
+                              ,guess_pool_flow_header,positionFlow,mapNone
 from absbox.local.component import *
 from absbox.local.base import * 
 import pandas as pd

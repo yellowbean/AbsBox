@@ -643,20 +643,20 @@ def mkRateType(x):
             raise RuntimeError(f"Failed to match :{x}: Rate Type")
 
 
-def mkBookType(x):
+def mkBookType(x:list):
     match x:
-        case ["PDL",defaults,ledgers]:
+        case ["PDL", defaults, ledgers] | ["pdl", defaults, ledgers]:
             return mkTag(("PDL",[mkDs(defaults)
                                  ,[[ln,mkDs(ds)] 
                                    for ln,ds in ledgers]]))
-        case ["AccountDraw", ledger]:
-            return mkTag(("ByAccountDraw",ledger))
-        case ["ByFormula", ledger, ds]:
-            return mkTag(("ByDS", ledger, ds))
+        #case ["AccountDraw", ledger] | ['accountDraw', ledger]:
+        #    return mkTag(("ByAccountDraw",ledger))
+        case ["ByFormula", ledger, dr, ds] | ['formula',ledger, dr, ds]:
+            return mkTag(("ByDS", [ledger, dr, mkDs(ds)]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkBookType")
 
-def mkSupport(x):
+def mkSupport(x:list):
     match x:
         case ["account",accName,mBookType] | ["suppportAccount",accName,mBookType] | ["支持账户",accName,mBookType]:
             return mkTag(("SupportAccount",[accName,mkBookType(mBookType)]))
@@ -671,7 +671,7 @@ def mkSupport(x):
         case _:
             raise RuntimeError(f"Failed to match :{x}:SupportType")
 
-def mkAction(x):
+def mkAction(x:list):
     ''' make waterfall actions '''
     match x:
         case ["账户转移", source, target, m] | ["transfer", source, target, m]:
@@ -760,7 +760,7 @@ def mkAction(x):
             raise RuntimeError(f"Failed to match :{x}:mkAction")
 
 
-def mkStatus(x):
+def mkStatus(x:tuple|str):
     match x:
         case "摊销" | "Amortizing":
             return mkTag(("Amortizing"))
@@ -835,7 +835,7 @@ def _rateTypeDs(x):
     return False
 
 
-def mkTrigger(x):
+def mkTrigger(x:dict):
     match x:
         case {"condition":p,"effects":e,"status":st,"curable":c} | {"条件":p,"效果":e,"状态":st,"重置":c}:
             triggerName = getValWithKs(x,["name","名称"],defaultReturn="")
@@ -1393,11 +1393,13 @@ def mkLiqProvider(n, x):
 
 def mkLedger(n, x):
     match x:
+        case {"balance":bal} | {"余额":bal}:
+            return {"ledgName":n,"ledgBalance":bal,"ledgStmt":None}
         case {"balance":bal,"txn":_tx} | {"余额":bal,"记录":_tx}:
             tx = mkAccTxn(_tx)
             return {"ledgName":n,"ledgBalance":bal,"ledgStmt":tx}
         case _:
-            raise RuntimeError(f"Failed to match Ledger:{x}")
+            raise RuntimeError(f"Failed to match Ledger:{n},{x}")
 
 def mkCf(x):
     if len(x) == 0:
@@ -1410,7 +1412,7 @@ def mkCollection(x):
     match x :
         case [s,acc] if isinstance(acc, str):
             return mkTag(("Collect",[mkPoolSource(s),acc]))
-        case [s,pcts] if isinstance(pcts, list):
+        case [s,*pcts] if isinstance(pcts, list):
             return mkTag(("CollectByPct" ,[mkPoolSource(s) ,pcts]))
         case _:
             raise RuntimeError(f"Failed to match collection rule {x}")

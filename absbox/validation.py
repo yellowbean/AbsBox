@@ -87,7 +87,7 @@ def valDeal(d, error, warning) -> list:
         if d['status']['tag'] != 'PreClosing':
             error.append(f"Deal Date is preClosing, but status is not PreClosing")
 
-    return (error,warning)
+    return (error, warning)
 
 def valReq(reqSent) -> list:
     error = []

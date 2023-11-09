@@ -226,15 +226,15 @@ def renameKs(m:dict,mapping,opt_key=False):
         del m[o]
     return m
 
-def subMap(m:dict,ks:list):
+def subMap(m:dict, ks:list):
     ''' get a map subset by keys,if keys not found, supplied with default value '''
     return {k:m.get(k,defaultVal) for (k,defaultVal) in ks}
 
-def subMap2(m:dict,ks:list):
-    fieldNames = [ fName for (fName,fTargetName,fDefaultValue) in ks]
-    _m = {k:m.get(k,defaultVal) for (k,_,defaultVal) in ks}
-    _mapping = [ _[:2] for _ in ks ]
-    return renameKs(_m,_mapping)
+def subMap2(m:dict, ks:list):
+    #fieldNames = [ fName for (fName, fTargetName, fDefaultValue) in ks]
+    _m = {k: m.get(k, defaultVal) for (k, _, defaultVal) in ks}
+    _mapping = [_[:2] for _ in ks]
+    return renameKs(_m, _mapping)
 
 def mapValsBy(m:dict, f):
     ''' Given a map and apply function to every vals'''
@@ -247,25 +247,25 @@ def mapListValBy(m:dict, f):
     return {k: [f(_v) for _v in v] for k,v in m.items()}
 
 def applyFnToKey(m:dict, f, k, applyNone=False):
-    assert isinstance(m, dict),f"{m} is not a map"
+    assert isinstance(m, dict), f"{m} is not a map"
     assert k in m, f"{k} is not in map {m}"
-    match (m[k],applyNone):
-        case (None,True):
+    match (m[k], applyNone):
+        case (None, True):
             m[k] = f(m[k])
-        case (None,False):
+        case (None, False):
             pass
         case (_, _):
             m[k] = f(m[k])
     return m
 
-def renameKs2(m:dict,kmapping):
+def renameKs2(m:dict, kmapping):
     ''' Given a map, rename ks from a key-mapping '''
     assert isinstance(m, dict), "M is not a map"
     assert isinstance(kmapping, dict), f"Mapping is not a map: {kmapping}"
     assert set(m.keys()).issubset(set(kmapping.keys())), f"{m.keys()} not in {kmapping.keys()}"
     return {kmapping[k]: v for k, v in m.items()}
 
-def ensure100(xs,msg=""):
+def ensure100(xs, msg=""):
     assert sum(xs)==1.0, f"Doesn't not sum up 100%: {msg}"
 
 def guess_pool_flow_header(x, l):
