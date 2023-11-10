@@ -486,7 +486,7 @@ def mkAccountCapType(x):
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAccountCapType")
 
-def mkLimit(x):
+def mkLimit(x:dict):
     match x:
        case {"余额百分比": pct} | {"balPct": pct}:
            return mkTag(("DuePct", pct))
@@ -750,7 +750,9 @@ def mkAction(x:list):
         case ["条件执行2", pre, actions1, actions2] | ["IfElse", pre, actions1, actions2]:
             return mkTag(("ActionWithPre2", [mkPre(pre), [mkAction(a) for a in actions1], [mkAction(a) for a in actions2]] ))
         case ["购买资产", liq, source, _limit] | ["buyAsset", liq, source, _limit]:
-            return mkTag(("BuyAsset", [_limit, mkLiqMethod(liq), source]))
+            return mkTag(("BuyAsset", [mkLimit(_limit), mkLiqMethod(liq), source]))
+        case ["购买资产", liq, source] | ["buyAsset", liq, source]:
+            return mkTag(("BuyAsset", [None, mkLiqMethod(liq), source]))
         case ["更新事件", trgName] | ["runTrigger", trgName]:
             dealCycleM = chinaDealCycle | englishDealCycle
             return mkTag(("RunTrigger", ["InWF",trgName]))
