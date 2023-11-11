@@ -284,8 +284,6 @@ def mkDs(x):
             return mkTag(("Abs", mkDs(ds)))
         case ("avg", *ds) | ("平均", *ds):
             return mkTag(("Avg", [mkDs(_) for _ in ds]))
-        case legacy if (legacy in baseMap.keys()):
-            return mkDs((legacy,))
         case _:
             raise RuntimeError(f"Failed to match DS/Formula: {x}")
 
