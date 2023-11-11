@@ -102,7 +102,7 @@ class Generic:
                           for f, v in output['fees'].items()}
 
         # aggregate accounts
-        output['agg_accounts'] = aggAccs(output['accounts'], 'en')
+        output['agg_accounts'] = aggAccs(output['accounts'], 'english')
 
         output['pool'] = {}
         

@@ -110,7 +110,7 @@ class SPV:
                           for f, v in output['fees'].items()}
 
         # aggregate accounts
-        output['agg_accounts'] = aggAccs(output['accounts'],'cn')
+        output['agg_accounts'] = aggAccs(output['accounts'],'chinese')
 
         output['pool'] = {}
         if deal_content['pool']['futureCf'] is None:

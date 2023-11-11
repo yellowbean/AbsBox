@@ -94,8 +94,6 @@ rateLikeFormula = set(["bondFactor","poolFactor","cumPoolDefaultedRate","资产�
 intLikeFormula = set(["borrowerNumber","monthsTillMaturity"])
 boolLikeFormula = set(["trigger","事件","isMostSenior","最优先"])
 
-
-
 op_map = {
     ">":"G"
     ,">=":"GE"
@@ -126,4 +124,10 @@ dealCycleMap = chinaDealCycle | englishDealCycle
 assetPricingHeader = {
     "chinese":["估值","WAL","Duration","Convexity","AccruedInterest"]
     ,"english":["Pricing","WAL","Duration","Convexity","AccruedInterest"]
+}
+
+#account fields
+accountHeader = {
+    "chinese": {"idx": "日期", "change": "变动额", "bal": ("期初余额", '余额', "期末余额")}
+    ,"english": {"idx": "date", "change": "change", "bal": ("begin balance", 'balance', "end balance")}
 }

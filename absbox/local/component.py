@@ -1580,12 +1580,7 @@ def readRunSummary(x, locale) -> dict:
 
 
 def aggAccs(x, locale):
-    _header = {
-        "cn": {"idx": "日期", "change": "变动额", "bal": ("期初余额", '余额', "期末余额")}
-        ,"en": {"idx": "date", "change": "change", "bal": ("begin balance", 'balance', "end balance")}
-    }
-
-    header = _header[locale]
+    header = accountHeader[locale]
     agg_acc = {}
     for k, v in x.items():
         acc_by_date = v.groupby(header["idx"])
