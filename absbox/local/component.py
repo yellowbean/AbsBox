@@ -199,9 +199,9 @@ def mkDs(x):
             return mkTag("BondFactor")
         case ("资产池系数",) | ("poolFactor",):
             return mkTag("PoolFactor")
-        case ("债券利率",bn) | ("bondRate",bn):
+        case ("债券利率", bn) | ("bondRate", bn):
             return mkTag(("BondRate", bn))
-        case ("债券加权利率",*bn) | ("bondWaRate",*bn):
+        case ("债券加权利率", *bn) | ("bondWaRate", *bn):
             return mkTag(("BondWaRate", bn))
         case ("资产池利率",) | ("poolWaRate",):
             return mkTag("PoolWaRate")
@@ -1118,19 +1118,21 @@ def identify_deal_type(x):
 
 def mkCallOptions(x):
     match x:
-        case {"资产池余额": bal} | {"poolBalance": bal}:
+        case {"资产池余额": bal} | {"poolBalance": bal} |("poolBalance", bal) :
             return mkTag(("PoolBalance", bal))
-        case {"债券余额": bal} | {"bondBalance": bal}:
+        case {"债券余额": bal} | {"bondBalance": bal} | ("bondBalance", bal):
             return mkTag(("BondBalance", bal))
-        case {"资产池余额剩余比率": factor} | {"poolFactor": factor}:
+        case {"资产池余额剩余比率": factor} | {"poolFactor": factor} | ("poolFactor", factor):
             return mkTag(("PoolFactor", factor))
-        case {"债券余额剩余比率": factor} | {"bondFactor": factor}:
+        case {"债券余额剩余比率": factor} | {"bondFactor": factor} | ("bondFactor", factor):
             return mkTag(("BondFactor", factor))
-        case {"指定日之后": d} | {"afterDate": d}:
+        case {"指定日之后": d} | {"afterDate": d} | ("afterDate", d):
             return mkTag(("AfterDate", d))
-        case {"任意满足": xs} | {"or": xs}:
+        case ("判断", p) | ("条件",p) | ("if",p) | ("condition",p):
+            return mkTag(("Pre", mkPre(p)))
+        case {"任意满足": xs} | {"or": xs} | ("any", *xs) | ("or", *xs):
             return mkTag(("Or", [mkCallOptions(_x) for _x in xs]))
-        case {"全部满足": xs} | {"and": xs}:
+        case {"全部满足": xs} | {"and": xs} | ("all", *xs) | ("all", *xs):
             return mkTag(("And", [mkCallOptions(_x) for _x in xs]))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkCallOptions")
