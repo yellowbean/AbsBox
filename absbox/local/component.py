@@ -417,15 +417,19 @@ def mkBondRate(x):
             return mkTag(("Fix", [_rate, dc]))
         case {"固定": _rate} | {"Fixed": _rate} | {"fix": _rate}:
             return mkTag(("Fix", [_rate, DC.DC_ACT_365F.value]))
-        case {"调息": _rate, "幅度":spd, "调息日":dp} | {"StepUp": _rate, "Spread":spd, "When":dp} | {"StepUp": _rate, "spread":spd, "when":dp}:
-            return mkTag(("StepUpFix", [_rate, DC.DC_ACT_365F.value, mkDatePattern(dp), spd ]))
-        case {"调息": _rate, "条件":p,"true":r1,"false":r2} | \
-             {"StepUp": _rate, "condition":p, "true":r1,"false":r2}:
-            return mkTag(("StepUpPre", [_rate, mkPre(p), mkBondRate(r1), mkBondRate(r2) ]))
         case {"期间收益": _yield}:
             return mkTag(("InterestByYield", _yield))
         case _:
             raise RuntimeError(f"Failed to match bond rate type:{x}")
+        
+def mkStepUp(x):
+    match x:
+        case ("ladder",d,spd,dp):
+            return mkTag(("PassDateLadderSpread",[d,spd,mkDatePattern(dp)]))
+        case ("once",d,spd):
+            return mkTag(("PassDateSpread",[d,spd]))
+        case _:
+            raise RuntimeError(f"Failed to match bond step up type:{x}")
 
 
 def mkBnd(bn, x):
@@ -433,20 +437,21 @@ def mkBnd(bn, x):
     lastAccrueDate = getValWithKs(x,["计提日","lastAccrueDate"])
     lastIntPayDate = getValWithKs(x,["付息日","lastIntPayDate"])
     dueInt = getValWithKs(x,["应付利息","dueInt"],defaultReturn=0)
+    mSt = earlyReturnNone(mkStepUp, getValWithKs(x,["调息","stepUp"],defaultReturn=None))
     match x:
         case {"当前余额": bndBalance, "当前利率": bndRate, "初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
              {"balance": bndBalance, "rate": bndRate, "originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
             return {"bndName": bn, "bndBalance": bndBalance, "bndRate": bndRate
                     , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
-                    , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntDate": lastAccrueDate
+                    , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
                     , "bndLastIntPayDate": lastIntPayDate}
         case {"初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
              {"originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
             return {"bndName": bn, "bndBalance": originBalance, "bndRate": originRate
                     , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
-                    , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntDate": lastAccrueDate
+                    , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
                     , "bndLastIntPayDate": lastIntPayDate}
 
 
