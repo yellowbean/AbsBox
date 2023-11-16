@@ -432,7 +432,7 @@ def allKeysAreString(m: dict):
     return all([isinstance(_, str) for _ in m.keys()])
 
 
-def earlyReturnNone(fn, v):
+def earlyReturnNone(fn: callable, v):
     if v is None:
         return None
     else:

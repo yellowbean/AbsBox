@@ -715,6 +715,12 @@ def mkAction(x:list):
             return mkTag(("PayInt", [mkLimit(limit), source, target, support]))
         case ["支付利息", source, target] | ["payInt", source, target]:
             return mkTag(("PayInt", [None, source, target, None]))
+        case ["顺序支付本金", source, target, m] | ["payPrinBySeq", source, target, m]:
+            limit = getValWithKs(m,['limit',"限制"])
+            support = getValWithKs(m,['support',"支持"])
+            return mkTag(("PayPrinBySeq", [mkLimit(limit), source, target, support]))
+        case ["顺序支付本金", source, target] | ["payPrinBySeq", source, target]:
+            return mkTag(("PayPrinBySeq", [None, source, target, None]))
         case ["支付本金", source, target, m] | ["payPrin", source, target, m]:
             limit = getValWithKs(m,['limit',"限制"])
             support = getValWithKs(m,['support',"支持"])
