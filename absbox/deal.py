@@ -70,12 +70,12 @@ def mkDeal(x:dict,preCheck=True):
         ,collection
         ,liqFacility
         ,rateSwap
-        ,rateCap
         ,currencySwap
         ,trigger
         ,status
         ,None
         ,ledgers
+        ,rateCap
     )
     
     errors, warnings = ([], [])

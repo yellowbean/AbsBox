@@ -625,15 +625,14 @@ def mkRateSwap(x):
 def mkRateCap(x):
     match x:
         case {"index": index, "strike": strike, "base": base, "start": sd
-              , "end": ed, "settleDates": dp, "balance": bal, "rate": r, **p}:
+              , "end": ed, "settleDates": dp, "rate": r, **p}:
             return {"rcIndex": index,
-                    "rcStrikeRate": mkTs(strike),
+                    "rcStrikeRate": mkTs("IRateCurve", strike),
                     "rcNotional": mkRsBase(base),
                     "rcStartDate": sd,
                     "rcSettleDates": mkDatePattern(dp),
                     "rcEndDate": ed,
                     "rcReceivingRate": r,
-                    "rcRefBalance": bal,
                     "rcLastStlDate": p.get("lastSettleDate", None),
                     "rcNetCash": p.get("netcash", 0),
                     "rcStmt": p.get("stmt", None)
