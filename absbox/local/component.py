@@ -463,7 +463,7 @@ def mkLiqMethod(x):
     match x:
         case ["正常|违约", a, b] | ["Current|Defaulted", a, b]:
             return mkTag(("BalanceFactor", [a, b]))
-        case ["正常|拖欠|违约", a, b, c] | ["Cuurent|Delinquent|Defaulted", a, b, c]:
+        case ["正常|拖欠|违约", a, b, c] | ["Current|Delinquent|Defaulted", a, b, c]:
             return mkTag(("BalanceFactor2", [a, b, c]))
         case ["贴现|违约", a, b] | ["PV|Defaulted", a, b]:
             return mkTag(("PV", [a, b]))
