@@ -45,15 +45,13 @@ def mkDeal(x:dict,preCheck=True):
                                   ,"cashAdvance", "liquidity", "流动性支持"
                                   , "流动性提供方", "增信方", "担保"], defaultReturn=None)
     
-    rateSwap = getValWithKs(x, ['rateSwap', "IRSwap", "利率互换"])
+    rateSwap = getValWithKs(x, ['rateSwap','rateSwaps', "IRSwap", "利率互换"])
+    
+    rateCap = getValWithKs(x, ['rateCap',"rateCaps", "IRCap", "利率上限互换"])
     
     currencySwap = None  #TODO 
 
-    trigger = None   
-    if (_t:=getValWithKs(x ,['trigger', "triggers", "事件", "触发事件"])):
-        trigger = _t
-    else:
-        trigger = None
+    trigger = getValWithKs(x, ['trigger', "triggers", "事件", "触发事件"], defaultReturn=None)
     
     status = getValWithKs(x, ['status', 'stage', "状态", "阶段"], defaultReturn="Amortizing")
     
@@ -72,6 +70,7 @@ def mkDeal(x:dict,preCheck=True):
         ,collection
         ,liqFacility
         ,rateSwap
+        ,rateCap
         ,currencySwap
         ,trigger
         ,status

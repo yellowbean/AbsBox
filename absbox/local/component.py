@@ -594,32 +594,53 @@ def mkRateSwapType(pr, rr):
 
 def mkRsBase(x):
     match x:
-        case {"fix":bal} | {"fixed":bal} | {"固定":bal}:
-            return mkTag(("Fixed",bal))
+        case {"fix": bal} | {"fixed": bal} | {"固定": bal}:
+            return mkTag(("Fixed", bal))
         case {"formula": ds} | {"公式": ds}:
-            return mkTag(("Base",mkDs(ds)))
+            return mkTag(("Base", mkDs(ds)))
         case {"schedule": tbl} | {"计划": tbl}:
-            return mkTag(("Schedule",tbl))
+            return mkTs("Balance", tbl)
         case _:
             raise RuntimeError(f"Failed to match :{x}:Interest Swap Base")
 
 
 def mkRateSwap(x):
     match x:
-        case {"settleDates":stl_dates,"pair":pair ,"base":base,"start":sd,"balance":bal,**p}:
-            return {"rsType":mkRateSwapType(*pair),
-                    "rsSettleDates":mkDatePattern(stl_dates),
-                    "rsNotional":mkRsBase(base),
-                    "rsStartDate":sd,
-                    "rsPayingRate":p.get("payRate",0),
-                    "rsReceivingRate":p.get("receiveRate",0),
-                    "rsRefBalance":bal,
-                    "rsLastStlDate":p.get("lastSettleDate",None),
-                    "rsNetCash":p.get("netcash",0),
-                    "rsStmt":p.get("stmt",None)
+        case {"settleDates": stl_dates, "pair": pair, "base": base
+              ,"start": sd, "balance": bal, **p}:
+            return {"rsType": mkRateSwapType(*pair),
+                    "rsSettleDates": mkDatePattern(stl_dates),
+                    "rsNotional": mkRsBase(base),
+                    "rsStartDate": sd,
+                    "rsPayingRate": p.get("payRate", 0),
+                    "rsReceivingRate": p.get("receiveRate", 0),
+                    "rsRefBalance": bal,
+                    "rsLastStlDate": p.get("lastSettleDate", None),
+                    "rsNetCash": p.get("netcash", 0),
+                    "rsStmt": p.get("stmt", None)
                     }
         case _:
             raise RuntimeError(f"Failed to match :{x}:Interest Swap")
+
+def mkRateCap(x):
+    match x:
+        case {"index": index, "strike": strike, "base": base, "start": sd
+              , "end": ed, "settleDates": dp, "balance": bal, "rate": r, **p}:
+            return {"rcIndex": index,
+                    "rcStrikeRate": mkTs(strike),
+                    "rcNotional": mkRsBase(base),
+                    "rcStartDate": sd,
+                    "rcSettleDates": mkDatePattern(dp),
+                    "rcEndDate": ed,
+                    "rcReceivingRate": r,
+                    "rcRefBalance": bal,
+                    "rcLastStlDate": p.get("lastSettleDate", None),
+                    "rcNetCash": p.get("netcash", 0),
+                    "rcStmt": p.get("stmt", None)
+                    }
+        case _:
+            raise RuntimeError(f"Failed to match :{x}:Interest Cap")
+
 
 
 def mkRateType(x):
@@ -750,9 +771,12 @@ def mkAction(x:list):
             return mkTag(("LiqYield", [mkLimit(limit), source, target]))
         case ["流动性支持计提", target] | ["liqAccrue", target]:
             return mkTag(("LiqAccrue", target))
-        ## Swap
+        ## Rate Swap
         case ["结算", acc, swapName] | ["settleSwap", acc, swapName]:
             return mkTag(("SwapSettle", [acc, swapName]))
+        ## Rate Cap
+        case ["利率结算", acc, capName]| ["settleCap", acc, capName]:
+            return mkTag(("CollectRateCap", [acc, capName]))
         
         case ["条件执行", pre, *actions] | ["If", pre, *actions]:
             return mkTag(("ActionWithPre", [mkPre(pre), [mkAction(a) for a in actions] ] ))

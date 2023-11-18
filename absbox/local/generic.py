@@ -27,6 +27,7 @@ class Generic:
     status:str = "Amortizing"
     custom: dict = None
     ledgers:dict = None
+    rateCap:dict = None
 
     @property
     def json(self):
@@ -54,6 +55,7 @@ class Generic:
             "accounts": {an:mkAcc(an,ao) for (an,ao) in self.accounts},
             "collects": [ mkCollection(c) for c in self.collection],
             "rateSwap": { k:mkRateSwap(v) for k,v in self.rateSwap.items()} if self.rateSwap else None,
+            "rateCap": { k:mkRateCap(v) for k,v in self.rateCap.items()} if self.rateCap else None,
             "currencySwap":None ,
             "custom": {cn:mkCustom(co) for cn,co in self.custom.items()} if self.custom else None ,
             "triggers": renameKs2({k: {_k:mkTrigger(_v) for (_k,_v) in v.items() } for (k,v) in self.trigger.items()},englishDealCycle) if self.trigger else None,

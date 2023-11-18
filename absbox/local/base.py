@@ -76,17 +76,11 @@ datePattern = {"月末": "MonthEnd", "季度末": "QuarterEnd", "年末": "YearE
 
 freqMap = {"每月": "Monthly", "每季度": "Quarterly", "每半年": "SemiAnnually", "每年": "Annually", "Monthly": "Monthly", "Quarterly": "Quarterly", "SemiAnnually": "SemiAnnually", "Annually": "Annually", "monthly": "Monthly", "quarterly": "Quarterly", "semiAnnually": "SemiAnnually", "annually": "Annually" }
 
-rateLikeFormula = set(["bondFactor","poolFactor","cumPoolDefaultedRate","资产池累计违约率","债券系数","资产池系数"])
-intLikeFormula = set(["borrowerNumber","monthsTillMaturity"])
-boolLikeFormula = set(["trigger","事件","isMostSenior","最优先"])
+rateLikeFormula = set(["bondFactor", "poolFactor", "cumPoolDefaultedRate", "资产池累计违约率", "债券系数", "资产池系数"])
+intLikeFormula = set(["borrowerNumber", "monthsTillMaturity"])
+boolLikeFormula = set(["trigger", "事件", "isMostSenior", "最优先"])
 
-op_map = {
-    ">":"G"
-    ,">=":"GE"
-    ,"<":"L"
-    ,"<=":"LE"
-    ,"=":"E"
-}
+op_map = {">":"G", ">=":"GE", "<":"L", "<=":"LE", "=":"E"}
 
 #Deal Cycle
 chinaDealCycle = {"回收后":"EndCollection"
