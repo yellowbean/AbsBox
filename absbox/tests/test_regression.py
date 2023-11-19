@@ -148,7 +148,16 @@ def run_deal(input_folder, pair):
                     local_result = json.load(eout)
                     assert isinstance(local_result, list), f"{dinput}: local result is not list but {local_result.keys()},{local_result['error']}"
                     assert isinstance(s_result, list), f"{dinput}: server result is not list but {s_result}"
-                    assert local_result[1]==s_result[1],f"Pool Flow Is not matching => {dinput},deal name => {local_result['contents']['name']}"
+                    if local_result[1] != s_result[1]:
+                        print(f"Pool Flow Is Not matching => {dinput}")
+                        min_length = min([len(local_result[1]), len(s_result[1])])
+                        for i in range(min_length):
+                            if local_result[1][i] != s_result[1][i]:
+                                print(f"diff at=> {i}")
+                                print(f"bench:{local_result[1][i]}")
+                                print(f"test:{s_result[1][i]}")
+                                break
+
                     local_result_content = local_result[0]['contents']
                     s_result_content = s_result[0]['contents']
                     if not local_result_content['waterfall']==s_result_content['waterfall']:

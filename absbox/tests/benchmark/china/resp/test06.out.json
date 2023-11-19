@@ -18415,6 +18415,7 @@
               null
             ]
           },
+          "bndStepUp": null,
           "bndBalance": 0,
           "bndRate": 0.052,
           "bndDuePrin": 0,
@@ -18456,6 +18457,7 @@
               null
             ]
           },
+          "bndStepUp": null,
           "bndBalance": 0,
           "bndRate": 0.052,
           "bndDuePrin": 0,
@@ -18497,6 +18499,7 @@
               null
             ]
           },
+          "bndStepUp": null,
           "bndBalance": 0,
           "bndRate": 0.06,
           "bndDuePrin": 0,
@@ -19323,6 +19326,7 @@
               "DC_ACT_365F"
             ]
           },
+          "bndStepUp": null,
           "bndBalance": 207090775.39,
           "bndRate": 0,
           "bndDuePrin": 207090775.39,
@@ -23448,6 +23452,7 @@
       "call": null,
       "liqProvider": null,
       "rateSwap": null,
+      "rateCap": null,
       "currencySwap": null,
       "custom": null,
       "triggers": null,

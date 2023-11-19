@@ -187,13 +187,13 @@ def mkDs(x):
             return mkTag("CumulativePoolDefaultedRate")
         case ("资产池累计违约率",n) | ("cumPoolDefaultedRate",n):
             return mkTag(("CumulativePoolDefaultedRateTill",n))
-        case ("资产池累计",*i) | ("cumPoolCollection",*i):
-            return mkTag(("PoolCumCollection", [mkPoolSource(_) for _ in i] ))
-        case ("资产池累计至",idx,*i) | ("cumPoolCollectionTill",idx,*i):
+        case ("资产池累计", *i) | ("cumPoolCollection", *i):
+            return mkTag(("PoolCumCollection", [mkPoolSource(_) for _ in i]))
+        case ("资产池累计至", idx, *i) | ("cumPoolCollectionTill", idx, *i):
             return mkTag(("PoolCumCollectionTill", [idx, [mkPoolSource(_) for _ in i]] ))
-        case ("资产池当期",*i) | ("curPoolCollection",*i):
+        case ("资产池当期", *i) | ("curPoolCollection", *i):
             return mkTag(("PoolCurCollection", [mkPoolSource(_) for _ in i]))
-        case ("资产池当期至",idx,*i) | ("curPoolCollectionStats",idx,*i):
+        case ("资产池当期至", idx, *i) | ("curPoolCollectionStats", idx, *i):
             return mkTag(("PoolCurCollectionStats", [idx, [mkPoolSource(_) for _ in i]]))
         case ("债券系数",) | ("bondFactor",):
             return mkTag("BondFactor")

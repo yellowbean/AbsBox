@@ -70,6 +70,7 @@
               "DC_ACT_365F"
             ]
           },
+          "bndStepUp": null,
           "bndBalance": 1000,
           "bndRate": 0.08,
           "bndDuePrin": 0,
@@ -100,6 +101,7 @@
               "DC_ACT_365F"
             ]
           },
+          "bndStepUp": null,
           "bndBalance": 500,
           "bndRate": 0.05,
           "bndDuePrin": 0,
@@ -320,6 +322,7 @@
         }
       },
       "rateSwap": null,
+      "rateCap": null,
       "currencySwap": null,
       "custom": null,
       "triggers": null,

@@ -8939,6 +8939,42 @@
             {
               "tag": "AccTxn",
               "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
                 "2022-01-26",
                 0,
                 0,
@@ -34900,6 +34936,7 @@
               "DC_ACT_365F"
             ]
           },
+          "bndStepUp": null,
           "bndBalance": 0,
           "bndRate": 0.07,
           "bndDuePrin": 0,
@@ -35321,6 +35358,7 @@
               "DC_ACT_365F"
             ]
           },
+          "bndStepUp": null,
           "bndBalance": 13.5,
           "bndRate": 0,
           "bndDuePrin": 13.5,
@@ -42481,6 +42519,30 @@
           {
             "tag": "MortgageFlow",
             "contents": [
+              "2021-12-31",
+              120,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0.08,
+              null,
+              null,
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
               "2022-01-31",
               112.9,
               5.94,
@@ -43065,6 +43127,7 @@
       "call": null,
       "liqProvider": null,
       "rateSwap": null,
+      "rateCap": null,
       "currencySwap": null,
       "custom": null,
       "triggers": null,
@@ -43088,6 +43151,30 @@
         null,
         null,
         null
+      ]
+    },
+    {
+      "tag": "MortgageFlow",
+      "contents": [
+        "2021-12-31",
+        120,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.08,
+        null,
+        null,
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
       ]
     },
     {

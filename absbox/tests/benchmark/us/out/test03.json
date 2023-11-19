@@ -94,6 +94,7 @@
         "bndDuePrin": 0,
         "bndDueInt": 0,
         "bndDueIntDate": null,
+        "bndStepUp": null,
         "bndLastIntPayDate": null
       },
       "A2": {
@@ -119,6 +120,7 @@
         "bndDuePrin": 0,
         "bndDueInt": 0,
         "bndDueIntDate": null,
+        "bndStepUp": null,
         "bndLastIntPayDate": null
       },
       "B": {
@@ -144,6 +146,7 @@
         "bndDuePrin": 0,
         "bndDueInt": 0,
         "bndDueIntDate": null,
+        "bndStepUp": null,
         "bndLastIntPayDate": null
       }
     },
@@ -277,6 +280,7 @@
       }
     ],
     "rateSwap": null,
+    "rateCap": null,
     "currencySwap": null,
     "custom": null,
     "triggers": null,

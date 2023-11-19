@@ -155,6 +155,15 @@
             {
               "tag": "AccTxn",
               "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<PoolInflow:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
                 "2022-01-20",
                 8.86,
                 8.86,
@@ -851,6 +860,33 @@
                 0,
                 0,
                 "<PayPrin:B>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<PoolInflow:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<PoolInflow:CollectedPrincipal>"
               ]
             },
             {
@@ -1797,6 +1833,7 @@
               "DC_ACT_365F"
             ]
           },
+          "bndStepUp": null,
           "bndBalance": 0,
           "bndRate": 0.08,
           "bndDuePrin": 0,
@@ -2174,7 +2211,10 @@
                 0,
                 0.08,
                 0.19,
-                "<PayInt:A1>"
+                [
+                  "<PayInt:A1>",
+                  "<PayPrin:A1>"
+                ]
               ]
             },
             {
@@ -2186,7 +2226,10 @@
                 0,
                 0.08,
                 0.09,
-                "<PayInt:A1>"
+                [
+                  "<PayInt:A1>",
+                  "<PayPrin:A1>"
+                ]
               ]
             },
             {
@@ -2198,7 +2241,10 @@
                 0,
                 0.08,
                 0.04,
-                "<PayInt:A1>"
+                [
+                  "<PayInt:A1>",
+                  "<PayPrin:A1>"
+                ]
               ]
             }
           ]
@@ -2224,6 +2270,7 @@
               "DC_ACT_365F"
             ]
           },
+          "bndStepUp": null,
           "bndBalance": 310.02,
           "bndRate": 0.05,
           "bndDuePrin": 310.02,
@@ -2689,6 +2736,30 @@
               null,
               null,
               null
+            ]
+          },
+          {
+            "tag": "MortgageFlow",
+            "contents": [
+              "2021-12-31",
+              1200,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0.08,
+              null,
+              null,
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
             ]
           },
           {
@@ -3693,6 +3764,7 @@
         }
       },
       "rateSwap": null,
+      "rateCap": null,
       "currencySwap": null,
       "custom": null,
       "triggers": null,
@@ -3716,6 +3788,30 @@
         null,
         null,
         null
+      ]
+    },
+    {
+      "tag": "MortgageFlow",
+      "contents": [
+        "2021-12-31",
+        1200,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.08,
+        null,
+        null,
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
       ]
     },
     {

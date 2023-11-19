@@ -2377,6 +2377,7 @@
         "bndDuePrin": 0,
         "bndDueInt": 0,
         "bndDueIntDate": null,
+        "bndStepUp": null,
         "bndLastIntPayDate": null
       },
       "\u6b21\u7ea7": {
@@ -2402,6 +2403,7 @@
         "bndDuePrin": 0,
         "bndDueInt": 0,
         "bndDueIntDate": null,
+        "bndStepUp": null,
         "bndLastIntPayDate": null
       }
     },
@@ -2710,7 +2712,7 @@
       "ABCD": {
         "ledgName": "ABCD",
         "ledgBalance": 0,
-        "ledgStmt": []
+        "ledgStmt": null
       }
     }
   }
