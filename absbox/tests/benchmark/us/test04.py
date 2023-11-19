@@ -36,8 +36,8 @@ test01 = Generic(
          ,["payIntResidual","acc01","B"]
      ]}
     ,[
-      ["CollectedInterest",[[0.8,"acc01"],[0.2,"acc02"]]]
-      ,["CollectedPrincipal",[[0.8,"acc01"],[0.2,"acc02"]]]
+      ["CollectedInterest",[0.8,"acc01"],[0.2,"acc02"]]
+      ,["CollectedPrincipal",[0.8,"acc01"],[0.2,"acc02"]]
       ,["CollectedPrepayment","acc01"]
       ,["CollectedRecoveries","acc01"]]
     ,None

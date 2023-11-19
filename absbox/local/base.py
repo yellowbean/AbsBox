@@ -13,7 +13,7 @@ english_cumStats = ["CumPrincipal","CumPrepay","CumDelinq","CumDefault","CumReco
 # Pool
 ## mortgage
 china_mortgage_flow_fields = ["余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失金额", "利率", "债务人数量","早偿手续费"]
-english_mortgage_flow_fields = ["Balance", "Principal", "Interest",  "Prepayment", "Default", "Recovery", "Loss", "WAC","BorrowerNum","PrepayPenalty"]
+english_mortgage_flow_fields = ["Balance", "Principal", "Interest", "Prepayment", "Default", "Recovery", "Loss", "WAC","BorrowerNum","PrepayPenalty"]
 
 china_mortgage_delinq_flow_fields = ["余额", "本金", "利息", "早偿金额", "拖欠金额", "违约金额", "回收金额", "损失金额", "利率", "债务人数量","早偿手续费"]
 english_mortgage_delinq_flow_fields = ["Balance", "Principal", "Interest", "Prepayment", "Delinquency", "Default", "Recovery", "Loss", "WAC","BorrowerNum","PrepayPenalty"]
