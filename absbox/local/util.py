@@ -420,8 +420,9 @@ def positionFlow(x, m: dict, facePerPaper=100):
 
 
 def tryConvertTupleToDict(xs):
+    "build a dictionary from a tuple"
     if isinstance(xs, tuple):
-        return {n:v for n, v in xs}
+        return {n: v for n, v in xs}
     elif isinstance(xs, dict):
         return xs
     else:
@@ -433,6 +434,7 @@ def allKeysAreString(m: dict):
 
 
 def earlyReturnNone(fn: callable, v):
+    "return None if passed in a None, otherwise apply fn and return"
     if v is None:
         return None
     else:
