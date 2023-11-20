@@ -26,8 +26,9 @@ def mkTag(x) -> dict:
         case (tagName):
             return {"tag": tagName}
 
-def readTagStr(x:str):
-    _x = json.loads(x.replace("'","\""))
+def readTagStr(x:str) -> str:
+    #print("tag",type(x),x)
+    _x = json.loads(x.replace("'","\"").replace("True","true").replace("False","false"))
     match _x:
         case {"tag":_t,"contents":_c} if isinstance(_c, list):
             _cs = [str(_) for _ in _c]

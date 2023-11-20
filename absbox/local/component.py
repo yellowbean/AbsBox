@@ -89,14 +89,14 @@ def mkDate(x):
 
 def mkDsRate(x):
     if isinstance(x,float):
-        return mkDs(("constant",x))
+        return mkDs(("constant", x))
     else:
         return mkDs(x)
 
 def mkFeeType(x):
     match x:
         case {"年化费率": [base, rate]} | {"annualPctFee": [base, rate]}:
-            return mkTag(("AnnualRateFee", [mkDs(base) ,mkDsRate(rate)]))
+            return mkTag(("AnnualRateFee", [mkDs(base), mkDsRate(rate)]))
         case {"百分比费率": [*desc, _rate]} | {"pctFee": [*desc, _rate]}:
             rate = mkDsRate(_rate)
             match desc:
@@ -226,16 +226,15 @@ def mkDs(x):
         case ("流动性额度", *liqName) | ("liqCredit", *liqName):
             return mkTag(("LiqCredit", liqName))
         case ("rateCapNet",n):
-            return mkTag(("RateCapNet",n))
+            return mkTag(("RateCapNet", n))
         case ("rateSwapNet",n):
-            return mkTag(("RateSwapNet",n))
+            return mkTag(("RateSwapNet", n))
         case ("债务人数量",) | ("borrowerNumber",):
             return mkTag(("CurrentPoolBorrowerNum"))
         case ("事件", loc, idx) | ("trigger", loc, idx):
-            dealCycleM = chinaDealCycle | englishDealCycle
-            if not loc in dealCycleM:
-                raise RuntimeError(f" {loc} not in map {dealCycleM}")
-            return mkTag(("TriggersStatus", [dealCycleM[loc], idx]))
+            if not loc in dealCycleMap:
+                raise RuntimeError(f" {loc} not in map {dealCycleMap}")
+            return mkTag(("TriggersStatus", [dealCycleMap[loc], idx]))
         case ("阶段", st) | ("status", st):
             return mkTag(("IsDealStatus", mkStatus(st)))
         case ("待付费用", *fns) | ("feeDue", *fns):
@@ -248,7 +247,7 @@ def mkDs(x):
             return mkTag(("BondTxnAmt", [bns, cmt]))
         case ("账户变动总额", cmt, *ans) | ("accountTxnAmount", cmt, *ans):
             return mkTag(("AccTxnAmt", [ans, cmt]))
-        case ("系数", ds, f) | ("factor", ds, f) | ("*", ds, f) if isinstance(f,float):
+        case ("系数", ds, f) | ("factor", ds, f) | ("*", ds, f) if isinstance(f, float):
             return mkTag(("Factor", [mkDs(ds), f]))
         case ("Min", *ds) | ("min", *ds):
             return mkTag(("Min", [mkDs(s) for s in ds]))
@@ -258,7 +257,7 @@ def mkDs(x):
             return mkTag(("Sum", [mkDs(_ds) for _ds in ds]))
         case ("差额", *ds) | ("substract", *ds) | ("subtract", *ds) | ("-", *ds):
             return mkTag(("Substract", [mkDs(_ds) for _ds in ds]))
-        case ("常数", n) | ("constant", n)| ("const", n):
+        case ("常数", n) | ("constant", n) | ("const", n):
             return mkTag(("Constant", n))
         case ("储备账户缺口", *accs) | ("reserveGap", *accs):
             return mkTag(("ReserveAccGap", accs))
@@ -267,11 +266,11 @@ def mkDs(x):
         case ("最优先", bn, bns) | ("isMostSenior", bn, bns):
             return mkTag(("IsMostSenior", bn, bns))
         case ("比率测试", ds, op, r) | ("rateTest", ds, op, r):
-            return mkTag(("TestRate", ds, op, r))
+            return mkTag(("TestRate", [mkDs(ds), op_map[op], r]))
         case ("所有测试", b, *ds) | ("allTest", b, *ds):
-            return mkTag(("TestAll", [b]+[mkDs(_) for _ in ds]))
+            return mkTag(("TestAll", [b, [mkDs(_) for _ in ds]]))
         case ("任一测试", b, *ds) | ("anyTest", b, *ds):
-            return mkTag(("TestAny", [b]+[mkDs(_) for _ in ds]))
+            return mkTag(("TestAny", [b, [mkDs(_) for _ in ds]]))
         case ("自定义", n) | ("custom", n):
             return mkTag(("UseCustomData", n))
         case ("区间内", floor, cap, s) | ("floorCap", floor, cap, s):
@@ -291,8 +290,8 @@ def mkDs(x):
         case _:
             raise RuntimeError(f"Failed to match DS/Formula: {x}")
 
-def mkCurve(tag,xs):
-    return mkTag((tag,xs))
+def mkCurve(tag, xs):
+    return mkTag((tag, xs))
 
 def mkPre(p):
     def queryType(y):
@@ -318,18 +317,18 @@ def mkPre(p):
         case [ds, "=", 0]:
             return mkTag(("IfZero", mkDs(ds)))
         case [ds, b] | [ds, b] if isinstance(b, bool):
-            return mkTag(("IfBool",[mkDs(ds), b]))
+            return mkTag(("IfBool", [mkDs(ds), b]))
         case [ds1, op, ds2] if (isinstance(ds1, tuple) and isinstance(ds2, tuple)):
             q = queryType(ds1)
             return mkTag((f"{q}2", [op_map[op], mkDs(ds1), mkDs(ds2)]))
         case [ds, op, curve] if isinstance(curve, list):
             q = queryType(ds)
-            return mkTag((f"{q}Curve", [op_map[op], mkDs(ds), mkCurve("ThresholdCurve",curve)]))
+            return mkTag((f"{q}Curve", [op_map[op], mkDs(ds), mkCurve("ThresholdCurve", curve)]))
         case [ds, op, n]:
             q = queryType(ds)
             return mkTag((q, [op_map[op], mkDs(ds), n]))
         case [op, _d]:
-            return mkTag(("IfDate",[op_map[op], _d]))
+            return mkTag(("IfDate", [op_map[op], _d]))
         case _:
             raise RuntimeError(f"Failed to match on Pre: {p}")
 
@@ -341,7 +340,7 @@ def mkAccInt(x):
             return mkTag(("InvestmentAccount", [idx, spd, lsd, mkDatePattern(_dp)]))
         case {"周期": _dp, "利率": br, "最近结息日": lsd} \
                 | {"period": _dp, "rate": br, "lastSettleDate": lsd}:
-            return mkTag(("BankAccount", [br, lsd,mkDatePattern(_dp)]))
+            return mkTag(("BankAccount", [br, lsd, mkDatePattern(_dp)]))
         case None:
             return None
         case _:
@@ -364,9 +363,9 @@ def mkAccType(x):
             return mkTag(("PctReserve", [mkDs(ds), rate]))
         case {"目标储备金额": {"公式": ds}} | {"targetReserve": {"formula": ds}}:
             return mkTag(("PctReserve", [mkDs(ds), 1.0]))
-        case {"较高": _s} | {"max": _s} if isinstance(_s,list):
+        case {"较高": _s} | {"max": _s} if isinstance(_s, list):
             return mkTag(("Max", [mkAccType(_) for _ in _s]))
-        case {"较低": _s} | {"min": _s} if isinstance(_s,list):
+        case {"较低": _s} | {"min": _s} if isinstance(_s, list):
             return mkTag(("Min", [mkAccType(_) for _ in _s]))
         case {"分段": [p, a, b]} | {"When": [p, a, b]}:
             return mkTag(("Either", [mkPre(p), mkAccType(a), mkAccType(b)]))
@@ -674,8 +673,8 @@ def mkBookType(x:list):
     match x:
         case ["PDL", defaults, ledgers] | ["pdl", defaults, ledgers]:
             return mkTag(("PDL",[mkDs(defaults)
-                                 ,[[ln,mkDs(ds)] 
-                                   for ln,ds in ledgers]]))
+                                 ,[[ln, mkDs(ds)] 
+                                   for ln, ds in ledgers]]))
         #case ["AccountDraw", ledger] | ['accountDraw', ledger]:
         #    return mkTag(("ByAccountDraw",ledger))
         case ["ByFormula", ledger, dr, ds] | ['formula',ledger, dr, ds]:
@@ -685,14 +684,14 @@ def mkBookType(x:list):
 
 def mkSupport(x:list):
     match x:
-        case ["account",accName,mBookType] | ["suppportAccount",accName,mBookType] | ["支持账户",accName,mBookType]:
-            return mkTag(("SupportAccount",[accName,mkBookType(mBookType)]))
-        case ["account",accName] | ["suppportAccount",accName] | ["支持账户",accName]:
-            return mkTag(("SupportAccount",[accName,None]))
-        case ["facility",liqName] | ["suppportFacility",liqName] | ["支持机构",liqName]:
-            return mkTag(("SupportLiqFacility",liqName))
-        case ["support",*supports] | ["multiSupport",*supports] | ["多重支持",*supports]:
-            return mkTag(("MultiSupport",[ mkSupport(s) for s in supports]))
+        case ["account", accName, mBookType] | ["suppportAccount", accName, mBookType] | ["支持账户", accName, mBookType]:
+            return mkTag(("SupportAccount",[accName, mkBookType(mBookType)]))
+        case ["account", accName] | ["suppportAccount", accName] | ["支持账户", accName]:
+            return mkTag(("SupportAccount",[accName, None]))
+        case ["facility", liqName] | ["suppportFacility", liqName] | ["支持机构", liqName]:
+            return mkTag(("SupportLiqFacility", liqName))
+        case ["support", *supports] | ["multiSupport", *supports] | ["多重支持", *supports]:
+            return mkTag(("MultiSupport", [mkSupport(s) for s in supports]))
         case None:
             return None
         case _:
@@ -790,10 +789,9 @@ def mkAction(x:list):
         case ["购买资产", liq, source] | ["buyAsset", liq, source]:
             return mkTag(("BuyAsset", [None, mkLiqMethod(liq), source]))
         case ["更新事件", trgName] | ["runTrigger", trgName]:
-            dealCycleM = chinaDealCycle | englishDealCycle
             return mkTag(("RunTrigger", ["InWF",trgName]))
         case ["查看", comment, *ds] | ["inspect", comment, *ds]:
-            return mkTag(("WatchVal",[comment, [mkDs(_) for _ in ds] ]))
+            return mkTag(("WatchVal", [comment, [mkDs(_) for _ in ds]]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkAction")
 
@@ -939,10 +937,10 @@ def mkWaterfall(r, x):
 
 def mkRoundingType(x):
     match x:
-        case ["floor",r]:
-            return mkTag(("RoundFloor",r))
-        case ["ceiling",r]:
-            return mkTag(("RoundCeil",r))
+        case ["floor", r]:
+            return mkTag(("RoundFloor", r))
+        case ["ceiling", r]:
+            return mkTag(("RoundCeil", r))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkRoundingType")
 
@@ -951,11 +949,11 @@ def mkAssetRate(x):
         case ["固定", r] | ["fix", r]:
             return mkTag(("Fix", r))
         case ["浮动", r, {"基准": idx, "利差": spd, "重置频率": p}]:
-            _m = subMap(m,[("cap",None),("floor",None),("rounding",None)])
+            _m = subMap(m, [("cap", None),( "floor", None),("rounding", None)])
             _m = applyFnToKey(_m, mkRoundingType, 'rounding')
             return mkTag(("Floater", [idx, spd, r, mkDatePattern(p), _m['floor'], _m['cap'],_m['rounding']]))
         case ["floater", r, {"index": idx, "spread": spd, "reset": p} as m]:
-            _m = subMap(m,[("cap",None),("floor",None),("rounding",None)])
+            _m = subMap(m, [("cap", None), ("floor", None), ("rounding", None)])
             _m = applyFnToKey(_m, mkRoundingType, 'rounding')
             return mkTag(("Floater", [idx, spd, r, mkDatePattern(p), _m['floor'], _m['cap'],_m['rounding']]))
         case _:
@@ -971,32 +969,32 @@ def mkAmortPlan(x) -> dict:
             return mkTag("I_P")
         case "等本等费" | "F_P" | "f_p":
             return mkTag("F_P")
-        case ("计划还款",ts,Dp) | ("Schedule",ts,Dp):
-            return mkTag(("ScheduleRepayment",[mkTs("RatioCurve",ts),mkDatePattern(Dp)]))
-        case ("计划还款",ts) | ("Schedule",ts):
-            return mkTag(("ScheduleRepayment",[mkTs("RatioCurve",ts),None]))
+        case ("计划还款", ts, Dp) | ("Schedule", ts, Dp):
+            return mkTag(("ScheduleRepayment", [mkTs("RatioCurve", ts), mkDatePattern(Dp)]))
+        case ("计划还款", ts) | ("Schedule", ts):
+            return mkTag(("ScheduleRepayment", [mkTs("RatioCurve", ts), None]))
         case _:
             raise RuntimeError(f"Failed to match AmortPlan {x}:mkAmortPlan")
 
 def mkArm(x):
     match x:
-        case {"initPeriod":ip}:
-            fc = x.get("firstCap",None)
-            pc = x.get("periodicCap",None)
-            floor = x.get("lifeFloor",None)
-            cap = x.get("lifeCap",None)
-            return mkTag(("ARM",[ip,fc,pc,cap,floor]))
+        case {"initPeriod": ip}:
+            fc = x.get("firstCap", None)
+            pc = x.get("periodicCap", None)
+            floor = x.get("lifeFloor", None)
+            cap = x.get("lifeCap", None)
+            return mkTag(("ARM", [ip, fc, pc, cap, floor]))
         case _:
             raise RuntimeError(f"Failed to match ARM  {x}:mkArm")
 
 def mkAssetStatus(x):
     match x:
-        case "正常"|"Current"|"current":
+        case "正常" | "Current" | "current":
             return mkTag(("Current"))
-        case "违约"|"Defaulted"|"defaulted":
+        case "违约" | "Defaulted" | "defaulted":
             return mkTag(("Defaulted",None))
-        case ("违约",d) |("Defaulted",d)|("defaulted",d):
-            return mkTag(("Defaulted",d))
+        case ("违约", d) | ("Defaulted", d) | ("defaulted", d):
+            return mkTag(("Defaulted", d))
         case _:
             raise RuntimeError(f"Failed to match asset statuts {x}:mkAssetStatus")
 
@@ -1004,20 +1002,20 @@ def mkPrepayPenalty(x):
     if x is None:
         return None
     match x:
-        case {"byTerm":[term,rate1,rate2]} | {"按期限":[term,rate1,rate2]}:
-            return mkTag(("ByTerm",[term,rate1,rate2]))
-        case {"fixAmount":[bal,term]} | {"固定金额":[bal,term]}:
-            return mkTag(("FixAmount",[bal,term]))
-        case {"fixAmount":[bal]} | {"固定金额":[bal]}:
-            return mkTag(("FixAmount",[bal,None]))
-        case {"fixPct":[pct,term]} | {"固定比例":[pct,term]}:
-            return mkTag(("FixPct",[pct,term]))
-        case {"fixPct":[pct]} | {"固定比例":[pct]}:
-            return mkTag(("FixPct",[pct,None]))
-        case {"sliding":[pct,step]} | {"滑动":[pct,step]}:
-            return mkTag(("Sliding",[pct, step]))
-        case {"stepDown":ps} | {"阶梯":[ps]}:
-            return mkTag(("StepDown",ps))
+        case {"byTerm": [term, rate1, rate2]} | {"按期限": [term, rate1, rate2]}:
+            return mkTag(("ByTerm", [term, rate1, rate2]))
+        case {"fixAmount": [bal, term]} | {"固定金额": [bal, term]}:
+            return mkTag(("FixAmount", [bal, term]))
+        case {"fixAmount": [bal]} | {"固定金额": [bal]}:
+            return mkTag(("FixAmount", [bal, None]))
+        case {"fixPct": [pct, term]} | {"固定比例": [pct, term]}:
+            return mkTag(("FixPct", [pct, term]))
+        case {"fixPct": [pct]} | {"固定比例": [pct]}:
+            return mkTag(("FixPct", [pct, None]))
+        case {"sliding": [pct, step]} | {"滑动":[ pct, step]}:
+            return mkTag(("Sliding", [pct, step]))
+        case {"stepDown": ps} | {"阶梯": [ps]}:
+            return mkTag(("StepDown", ps))
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkPrepayPenalty")
 
@@ -1032,10 +1030,10 @@ def mkAccRule(x):
 
 def mkCapacity(x):
     match x: 
-        case ("固定",c) | ("Fixed",c) :
-            return mkTag(("FixedCapacity",c))
-        case ("按年限",cs) | ("ByTerm",cs) :
-            return mkTag(("CapacityByTerm",cs))
+        case ("固定", c) | ("Fixed", c):
+            return mkTag(("FixedCapacity", c))
+        case ("按年限", cs) | ("ByTerm", cs):
+            return mkTag(("CapacityByTerm", cs))
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkCapacity")
 
