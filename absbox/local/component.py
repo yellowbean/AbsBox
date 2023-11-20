@@ -244,17 +244,17 @@ def mkDs(x):
             return mkTag(("BondTxnAmt", [bns, cmt]))
         case ("账户变动总额", cmt, *ans) | ("accountTxnAmount", cmt, *ans):
             return mkTag(("AccTxnAmt", [ans, cmt]))
-        case ("系数", ds, f) | ("factor", ds, f) if isinstance(f,float):
+        case ("系数", ds, f) | ("factor", ds, f) | ("*", ds, f) if isinstance(f,float):
             return mkTag(("Factor", [mkDs(ds), f]))
         case ("Min", *ds) | ("min", *ds):
             return mkTag(("Min", [mkDs(s) for s in ds]))
         case ("Max", *ds) | ("max", *ds):
             return mkTag(("Max", [mkDs(s) for s in ds]))
-        case ("合计", *ds) | ("sum", *ds):
+        case ("合计", *ds) | ("sum", *ds) | ("+", *ds):
             return mkTag(("Sum", [mkDs(_ds) for _ds in ds]))
-        case ("差额", *ds) | ("substract", *ds):
+        case ("差额", *ds) | ("substract", *ds) | ("subtract", *ds) | ("-", *ds):
             return mkTag(("Substract", [mkDs(_ds) for _ds in ds]))
-        case ("常数", n) | ("constant", n):
+        case ("常数", n) | ("constant", n)| ("const", n):
             return mkTag(("Constant", n))
         case ("储备账户缺口", *accs) | ("reserveGap", *accs):
             return mkTag(("ReserveAccGap", accs))
