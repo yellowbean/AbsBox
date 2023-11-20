@@ -225,6 +225,10 @@ def mkDs(x):
             return mkTag(("LiqBalance", liqName))
         case ("流动性额度", *liqName) | ("liqCredit", *liqName):
             return mkTag(("LiqCredit", liqName))
+        case ("rateCapNet",n):
+            return mkTag(("RateCapNet",n))
+        case ("rateSwapNet",n):
+            return mkTag(("RateSwapNet",n))
         case ("债务人数量",) | ("borrowerNumber",):
             return mkTag(("CurrentPoolBorrowerNum"))
         case ("事件", loc, idx) | ("trigger", loc, idx):
