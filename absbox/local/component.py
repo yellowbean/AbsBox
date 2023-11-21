@@ -422,6 +422,10 @@ def mkBondRate(x):
             return mkTag(("Fix", [_rate, DC.DC_ACT_365F.value]))
         case {"期间收益": _yield}:
             return mkTag(("InterestByYield", _yield))
+        case ("上限", cap, br) | ("cap", cap, br):
+            return mkTag(("CapRate", [mkBondRate(br), cap]))
+        case ("下限", floor, br) | ("floor", floor, br):
+            return mkTag(("FloorRate", [mkBondRate(br), floor]))
         case _:
             raise RuntimeError(f"Failed to match bond rate type:{x}")
         
