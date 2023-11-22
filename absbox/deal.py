@@ -92,3 +92,5 @@ def mkDeal(x:dict,preCheck=True):
             console.print(f"❕[bold yellow]Warning in model :{w}")
 
     return deal
+
+
