@@ -265,6 +265,8 @@ def mkDs(x):
             return mkTag(("ReserveExcess", accs))
         case ("最优先", bn, bns) | ("isMostSenior", bn, bns):
             return mkTag(("IsMostSenior", bn, bns))
+        case ("清偿完毕", *bns) | ("isPaidOff", *bns):
+            return mkTag(("IsPaidOff", bns))
         case ("比率测试", ds, op, r) | ("rateTest", ds, op, r):
             return mkTag(("TestRate", [mkDs(ds), op_map[op], r]))
         case ("所有测试", b, *ds) | ("allTest", b, *ds):
