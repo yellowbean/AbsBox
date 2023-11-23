@@ -681,9 +681,9 @@ def mkBookType(x:list):
             return mkTag(("PDL",[mkDs(defaults)
                                  ,[[ln, mkDs(ds)] 
                                    for ln, ds in ledgers]]))
-        #case ["AccountDraw", ledger] | ['accountDraw', ledger]:
-        #    return mkTag(("ByAccountDraw",ledger))
-        case ["ByFormula", ledger, dr, ds] | ['formula',ledger, dr, ds]:
+        case ["AccountDraw", ledger] | ['accountDraw', ledger]:
+            return mkTag(("ByAccountDraw", ledger))
+        case ["ByFormula", ledger, dr, ds] | ['formula', ledger, dr, ds]:
             return mkTag(("ByDS", [ledger, dr, mkDs(ds)]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkBookType")
@@ -723,8 +723,8 @@ def mkAction(x:list):
         case ["计提支付费用", source, target] | ["calcAndPayFee", source, target]:
             return mkTag(("CalcAndPayFee", [None, source, target, None]))
         case ["支付费用", source, target, m] | ["payFee", source, target, m]:
-            limit = getValWithKs(m,['limit',"限制"])
-            support = getValWithKs(m,['support',"支持"])
+            limit = getValWithKs(m, ['limit', "限制"])
+            support = getValWithKs(m, ['support', "支持"])
             return mkTag(("PayFee", [mkLimit(limit), source, target, mkSupport(support)]))
         case ["支付费用", source, target] | ["payFee", source, target]:
             return mkTag(("PayFee", [None, source, target, None]))
@@ -733,33 +733,45 @@ def mkAction(x:list):
         case ["支付费用收益", source, target] | ["payFeeResidual", source, target]:
             return mkTag(("PayFeeResidual", [ None, source, target]))
         case ["计提支付利息", source, target, m] | ["accrueAndPayInt", source, target, m]:
-            limit = getValWithKs(m,['limit',"限制"])
-            support = getValWithKs(m,['support',"支持"])
+            limit = getValWithKs(m, ['limit', "限制"])
+            support = getValWithKs(m, ['support', "支持"])
             return mkTag(("AccrueAndPayInt", [mkLimit(limit), source, target, support]))
+        case ["顺序计提支付利息", source, target, m] | ["accrueAndPayIntBySeq", source, target, m]:
+            limit = getValWithKs(m, ['limit', "限制"])
+            support = getValWithKs(m, ['support', "支持"])
+            return mkTag(("AccrueAndPayIntBySeq", [mkLimit(limit), source, target, support]))
         case ["计提支付利息", source, target] | ["accrueAndPayInt", source, target]:
             return mkTag(("AccrueAndPayInt", [None, source, target, None]))
+        case ["顺序计提支付利息", source, target] | ["accrueAndPayIntBySeq", source, target]:
+            return mkTag(("AccrueAndPayIntBySeq", [None, source, target, None]))
         case ["支付利息", source, target, m] | ["payInt", source, target, m]:
-            limit = getValWithKs(m,['limit',"限制"])
-            support = getValWithKs(m,['support',"支持"])
+            limit = getValWithKs(m, ['limit', "限制"])
+            support = getValWithKs(m, ['support', "支持"])
             return mkTag(("PayInt", [mkLimit(limit), source, target, support]))
+        case ["顺序支付利息", source, target, m] | ["payIntBySeq", source, target, m]:
+            limit = getValWithKs(m, ['limit', "限制"])
+            support = getValWithKs(m, ['support', "支持"])
+            return mkTag(("PayIntBySeq", [mkLimit(limit), source, target, support]))
         case ["支付利息", source, target] | ["payInt", source, target]:
             return mkTag(("PayInt", [None, source, target, None]))
+        case ["顺序支付利息", source, target] | ["payIntBySeq", source, target]:
+            return mkTag(("PayIntBySeq", [None, source, target, None]))
         case ["顺序支付本金", source, target, m] | ["payPrinBySeq", source, target, m]:
-            limit = getValWithKs(m,['limit',"限制"])
-            support = getValWithKs(m,['support',"支持"])
+            limit = getValWithKs(m, ['limit', "限制"])
+            support = getValWithKs(m, ['support', "支持"])
             return mkTag(("PayPrinBySeq", [mkLimit(limit), source, target, support]))
         case ["顺序支付本金", source, target] | ["payPrinBySeq", source, target]:
             return mkTag(("PayPrinBySeq", [None, source, target, None]))
         case ["支付本金", source, target, m] | ["payPrin", source, target, m]:
-            limit = getValWithKs(m,['limit',"限制"])
-            support = getValWithKs(m,['support',"支持"])
+            limit = getValWithKs(m, ['limit', "限制"])
+            support = getValWithKs(m, ['support', "支持"])
             return mkTag(("PayPrin", [mkLimit(limit), source, target, support]))
         case ["支付本金", source, target] | ["payPrin", source, target]:
             return mkTag(("PayPrin", [None, source, target, None]))
         case ["支付剩余本金", source, target] | ["payPrinResidual", source, target]:
             return mkTag(("PayPrinResidual", [source, target]))
         case ["支付收益", source, target, m] | ["payIntResidual", source, target, m]:
-            limit = getValWithKs(m,['limit',"限制"])
+            limit = getValWithKs(m, ['limit', "限制"])
             return mkTag(("PayIntResidual", [ mkLimit(limit), source, target]))
         case ["支付收益", source, target] | ["payIntResidual", source, target]:
             return mkTag(("PayIntResidual", [None, source, target]))
