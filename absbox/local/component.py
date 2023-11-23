@@ -705,6 +705,11 @@ def mkSupport(x:list):
 
 def mkAction(x:list):
     ''' make waterfall actions '''
+    def mkMod(y:dict)->tuple:
+        limit = getValWithKs(y, ['limit', "限制"], mapping=mkLimit)
+        support = getValWithKs(y, ['support', "支持"], mapping=mkSupport)
+        return (limit, support)
+        
     match x:
         case ["账户转移", source, target, m] | ["transfer", source, target, m]:
             return mkTag(("Transfer", [mkLimit(m), source, target, None]))
@@ -716,16 +721,14 @@ def mkAction(x:list):
             return mkTag(("CalcFee", feeNames))
         case ["计提利息", *bndNames] | ["calcInt", *bndNames]:
             return mkTag(("CalcBondInt", bndNames))
-        case ["计提支付费用", source, target, m ] | ["calcAndPayFee", source, target, m]:
-            limit = getValWithKs(m,['limit',"限制"])
-            support = getValWithKs(m,['support',"支持"])
-            return mkTag(("CalcAndPayFee", [mkLimit(limit), source, target, mkSupport(support)]))
+        case ["计提支付费用", source, target, m] | ["calcAndPayFee", source, target, m]:
+            (l, s) = mkMod(m)
+            return mkTag(("CalcAndPayFee", [l, source, target, s]))
         case ["计提支付费用", source, target] | ["calcAndPayFee", source, target]:
             return mkTag(("CalcAndPayFee", [None, source, target, None]))
         case ["支付费用", source, target, m] | ["payFee", source, target, m]:
-            limit = getValWithKs(m, ['limit', "限制"])
-            support = getValWithKs(m, ['support', "支持"])
-            return mkTag(("PayFee", [mkLimit(limit), source, target, mkSupport(support)]))
+            (l, s) = mkMod(m)
+            return mkTag(("PayFee", [l, source, target, s]))
         case ["支付费用", source, target] | ["payFee", source, target]:
             return mkTag(("PayFee", [None, source, target, None]))
         case ["支付费用收益", source, target, limit] | ["payFeeResidual", source, target, limit]:
@@ -733,58 +736,52 @@ def mkAction(x:list):
         case ["支付费用收益", source, target] | ["payFeeResidual", source, target]:
             return mkTag(("PayFeeResidual", [ None, source, target]))
         case ["计提支付利息", source, target, m] | ["accrueAndPayInt", source, target, m]:
-            limit = getValWithKs(m, ['limit', "限制"])
-            support = getValWithKs(m, ['support', "支持"])
-            return mkTag(("AccrueAndPayInt", [mkLimit(limit), source, target, support]))
+            (l, s) = mkMod(m)
+            return mkTag(("AccrueAndPayInt", [l, source, target, s]))
         case ["顺序计提支付利息", source, target, m] | ["accrueAndPayIntBySeq", source, target, m]:
-            limit = getValWithKs(m, ['limit', "限制"])
-            support = getValWithKs(m, ['support', "支持"])
-            return mkTag(("AccrueAndPayIntBySeq", [mkLimit(limit), source, target, support]))
+            (l, s) = mkMod(m)
+            return mkTag(("AccrueAndPayIntBySeq", [l , source, target, s]))
         case ["计提支付利息", source, target] | ["accrueAndPayInt", source, target]:
             return mkTag(("AccrueAndPayInt", [None, source, target, None]))
         case ["顺序计提支付利息", source, target] | ["accrueAndPayIntBySeq", source, target]:
             return mkTag(("AccrueAndPayIntBySeq", [None, source, target, None]))
         case ["支付利息", source, target, m] | ["payInt", source, target, m]:
-            limit = getValWithKs(m, ['limit', "限制"])
-            support = getValWithKs(m, ['support', "支持"])
-            return mkTag(("PayInt", [mkLimit(limit), source, target, support]))
+            (l, s) = mkMod(m)
+            return mkTag(("PayInt", [l, source, target, s]))
         case ["顺序支付利息", source, target, m] | ["payIntBySeq", source, target, m]:
-            limit = getValWithKs(m, ['limit', "限制"])
-            support = getValWithKs(m, ['support', "支持"])
-            return mkTag(("PayIntBySeq", [mkLimit(limit), source, target, support]))
+            (l, s) = mkMod(m)
+            return mkTag(("PayIntBySeq", [l, source, target, s]))
         case ["支付利息", source, target] | ["payInt", source, target]:
             return mkTag(("PayInt", [None, source, target, None]))
         case ["顺序支付利息", source, target] | ["payIntBySeq", source, target]:
             return mkTag(("PayIntBySeq", [None, source, target, None]))
         case ["顺序支付本金", source, target, m] | ["payPrinBySeq", source, target, m]:
-            limit = getValWithKs(m, ['limit', "限制"])
-            support = getValWithKs(m, ['support', "支持"])
-            return mkTag(("PayPrinBySeq", [mkLimit(limit), source, target, support]))
+            (l, s) = mkMod(m)
+            return mkTag(("PayPrinBySeq", [l, source, target, s]))
         case ["顺序支付本金", source, target] | ["payPrinBySeq", source, target]:
             return mkTag(("PayPrinBySeq", [None, source, target, None]))
         case ["支付本金", source, target, m] | ["payPrin", source, target, m]:
-            limit = getValWithKs(m, ['limit', "限制"])
-            support = getValWithKs(m, ['support', "支持"])
-            return mkTag(("PayPrin", [mkLimit(limit), source, target, support]))
+            (l, s) = mkMod(m)
+            return mkTag(("PayPrin", [l, source, target, s]))
         case ["支付本金", source, target] | ["payPrin", source, target]:
             return mkTag(("PayPrin", [None, source, target, None]))
         case ["支付剩余本金", source, target] | ["payPrinResidual", source, target]:
             return mkTag(("PayPrinResidual", [source, target]))
         case ["支付收益", source, target, m] | ["payIntResidual", source, target, m]:
-            limit = getValWithKs(m, ['limit', "限制"])
-            return mkTag(("PayIntResidual", [ mkLimit(limit), source, target]))
+            (l, s) = mkMod(m)
+            return mkTag(("PayIntResidual", [l, source, target]))
         case ["支付收益", source, target] | ["payIntResidual", source, target]:
             return mkTag(("PayIntResidual", [None, source, target]))
         case ["出售资产", liq, target] | ["sellAsset", liq, target]:
             return mkTag(("LiquidatePool", [mkLiqMethod(liq), target]))
         case ["流动性支持", source, liqType, target, limit] | ["liqSupport", source, liqType, target, limit]:
-            return mkTag(("LiqSupport", [ mkLimit(limit), source, mkLiqDrawType(liqType), target]))
+            return mkTag(("LiqSupport", [mkLimit(limit), source, mkLiqDrawType(liqType), target]))
         case ["流动性支持", source, liqType, target] | ["liqSupport", source, liqType, target]:
-            return mkTag(("LiqSupport", [ None, source, mkLiqDrawType(liqType), target]))
+            return mkTag(("LiqSupport", [None, source, mkLiqDrawType(liqType), target]))
         case ["流动性支持偿还", rpt, source, target] | ["liqRepay", rpt, source, target]:
             return mkTag(("LiqRepay", [None, mkLiqRepayType(rpt), source, target]))
         case ["流动性支持偿还", rpt, source, target, limit] | ["liqRepay", rpt, source, target, limit]:
-            return mkTag(("LiqRepay", [ mkLimit(limit), mkLiqRepayType(rpt), source, target]))
+            return mkTag(("LiqRepay", [mkLimit(limit), mkLiqRepayType(rpt), source, target]))
         case ["流动性支持报酬", source, target] | ["liqRepayResidual", source, target]:
             return mkTag(("LiqYield", [None, source, target]))
         case ["流动性支持报酬", source, target, limit] | ["liqRepayResidual", source, target, limit]:

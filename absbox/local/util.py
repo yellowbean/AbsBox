@@ -10,7 +10,7 @@ from pyxirr import xirr,xnpv
 
 from absbox.local.base import *
 
-def mapNone(x,v):
+def mapNone(x, v):
     if x is None:
         return v
     else:
@@ -19,7 +19,7 @@ def mapNone(x,v):
 def flat(xss) -> list:
     return reduce(lambda xs, ys: xs + ys, xss)
 
-def mkTag(x) -> dict:
+def mkTag(x:tuple) -> dict:
     match x:
         case (tagName, tagValue):
             return {"tag": tagName, "contents": tagValue}
@@ -160,11 +160,11 @@ def npv(_flow, **p):
             raise RuntimeError("Failed to match", cols, idx_name)
 
 
-def update_deal(d,i,c):
+def update_deal(d, i, c):
     "A patch function to update a deal data component list in immuntable way"
     _d = d.copy()
     _d.pop(i)
-    _d.insert(i,c)
+    _d.insert(i, c)
     return _d
 
 
@@ -228,7 +228,7 @@ def renameKs(m:dict, mapping, opt_key=False):
     rename keys in a map with from a mapping tuple passed in 
     `opt_key` = True, allow skipping mapping tuple not exist in the map
     '''
-    for (o,n) in mapping:
+    for (o, n) in mapping:
         if opt_key and o not in m:
             continue
         m[n] = m[o]
@@ -238,7 +238,7 @@ def renameKs(m:dict, mapping, opt_key=False):
 
 def subMap(m:dict, ks:list):
     ''' get a map subset by keys,if keys not found, supplied with default value '''
-    return {k:m.get(k,defaultVal) for (k,defaultVal) in ks}
+    return {k:m.get(k, defaultVal) for (k, defaultVal) in ks}
 
 
 def subMap2(m:dict, ks:list):
@@ -345,7 +345,7 @@ def getValWithKs(m:dict, ks:list
             if hasattr(m, k):
                 r = getattr(m, k)
                 break
-    if mapping is not None:
+    if (r is not None) and (mapping is not None):
         return mapping(r)
     return r
 
@@ -354,7 +354,7 @@ def _read_cf(x, lang):
     ''' read cashflow from a list , and set index to date'''
     if x == []:
         return []
-    flow_header, idx, expandFlag = guess_pool_flow_header(x[0],lang)
+    flow_header, idx, expandFlag = guess_pool_flow_header(x[0], lang)
     try:
         if not expandFlag:
             result = pd.DataFrame([_['contents'] for _ in x], columns=flow_header)
