@@ -726,6 +726,11 @@ def mkAction(x:list):
             return mkTag(("CalcAndPayFee", [l, source, target, s]))
         case ["计提支付费用", source, target] | ["calcAndPayFee", source, target]:
             return mkTag(("CalcAndPayFee", [None, source, target, None]))
+        case ["顺序支付费用", source, target, m] | ["payFeeBySeq", source, target, m]:
+            (l, s) = mkMod(m)
+            return mkTag(("PayFeeBySeq", [l, source, target, s]))
+        case ["顺序支付费用", source, target] | ["payFeeBySeq", source, target]:
+            return mkTag(("PayFeeBySeq", [None, source, target, None]))
         case ["支付费用", source, target, m] | ["payFee", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("PayFee", [l, source, target, s]))
