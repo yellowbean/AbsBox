@@ -698,6 +698,8 @@ def mkSupport(x:list):
             return mkTag(("SupportLiqFacility", liqName))
         case ["support", *supports] | ["multiSupport", *supports] | ["多重支持", *supports]:
             return mkTag(("MultiSupport", [mkSupport(s) for s in supports]))
+        case ["withCondition", pre, s] | ["条件支持", pre, s]:
+            return mkTag(("WithCondition", [mkPre(pre), mkSupport(s)]))
         case None:
             return None
         case _:
