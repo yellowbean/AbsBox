@@ -916,6 +916,8 @@ def mkTriggerEffect(x):
             return mkTag(("ChangeReserveBalance",[accName, mkAccType(newReserve)]))
         case ["结果", *efs] | ["Effects", *efs]:
             return mkTag(("TriggerEffects", [mkTriggerEffect(e) for e in efs]))
+        case None:
+            return mkTag(("DoNothing"))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkTriggerEffect")
 
