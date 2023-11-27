@@ -6,9 +6,9 @@ from enum import Enum
 import numpy as np
 import dataclasses
 from functools import reduce
-from pyxirr import xirr,xnpv
-
 from absbox.local.base import *
+from pyspecter import query
+
 
 def mapNone(x, v):
     if x is None:
@@ -16,39 +16,46 @@ def mapNone(x, v):
     else:
         return x
 
+
 def flat(xss) -> list:
     return reduce(lambda xs, ys: xs + ys, xss)
 
-def mkTag(x:tuple) -> dict:
+
+def mkTag(x: tuple) -> dict:
     match x:
         case (tagName, tagValue):
             return {"tag": tagName, "contents": tagValue}
         case (tagName):
             return {"tag": tagName}
 
-def readTagStr(x:str) -> str:
-    #print("tag",type(x),x)
-    _x = json.loads(x.replace("'","\"").replace("True","true").replace("False","false"))
+
+def readTagStr(x: str) -> str:
+    _x = json.loads(x.replace("'", "\"").replace("True", "true").replace("False", "false"))
     match _x:
-        case {"tag":_t,"contents":_c} if isinstance(_c, list):
+        case {"tag": _t, "contents": _c} if isinstance(_c, list):
             _cs = [str(_) for _ in _c]
             return f"<{_t}:{','.join(_cs)}>"
-        case {"tag": _t }:
+        case {"tag": _t}:
             return f"<{_t}>"
         case _ :
             return f"<{_x}>"
 
-def readTag(x:dict):
+
+def readTag(x: dict):
     return f"<{x['tag']}:{','.join(x['contents'])}>"
+
 
 def isDate(x):
     return re.match(r"\d{4}\-\d{2}\-\d{2}",x)
 
+
 def allList(xs):
     return all([ isinstance(x,list)  for x in xs])
 
+
 def mkTs(n, vs):
     return mkTag((n, vs))
+
 
 mkRatioTs = functools.partial(mkTs, "RatioCurve")
 
@@ -57,6 +64,7 @@ mkRateTs = functools.partial(mkTs, "RateCurve")
 mkBalTs = functools.partial(mkTs, "BalanceCurve")
 
 mkFloatTs = functools.partial(mkTs, "FloatCurve")
+
 
 def unify(xs, ns):
     "union dataframes by stacking up with names provided"
@@ -70,6 +78,7 @@ def unify(xs, ns):
                         , dfs)
     return r.sort_index()
 
+
 def unifyTs(xs):
     "unify time-series alike dataframe"
     _index_set = set([x.index.name for x in xs])
@@ -82,82 +91,27 @@ def unifyTs(xs):
     
     return r.sort_index()
 
+
 def consolStmtByDate(s):
     return s.groupby("日期").last()
 
+
 def aggStmtByDate(s):
     return s.groupby("日期").sum()
+
 
 def aggCFby(_df, interval, cols):
     df = _df.copy()
     idx = None
     dummy_col = '_index'
     df[dummy_col] = df.index
-    _mapping = {"月份":"M"
-               ,"Month":"M"
-               ,"M":"M"
-               ,"month":"M"}
+    _mapping = {"月份": "M", "Month": "M", "M": "M", "month": "M"}
     if df.index.name == "日期":
         idx = "日期"
     else:
         idx = "date"
     df[dummy_col]=pd.to_datetime(df[dummy_col]).dt.to_period(_mapping[interval])
-    return df.groupby([dummy_col])[cols].sum().rename_axis(idx)#.drop(columns=[dummy_col])
-
-
-def irr(flow,init):
-    def extract_cash_col(_cols):
-        if _cols == china_bondflow_fields_s:
-            return flow['本息合计']
-        elif _cols == english_bondflow_fields_s: 
-            return flow['cash']
-        else:
-            raise RuntimeError("Failed to match", _cols)
-
-    cols = flow.columns.to_list()
-    dates = flow.index.to_list()
-    amounts = extract_cash_col(cols).to_list()
-        
-    assert init is not None, f"inti:{init} shouldn't be None"
-    invest_date, invest_amount = init
-    dates = [invest_date]+dates
-    amounts = [invest_amount]+amounts
-    
-    return xirr(np.array(dates), np.array(amounts))
-
-
-def sum_fields_to_field(_df, cols, col):
-    df = _df.copy()
-    df[col] = df[cols].sum(axis=1)
-    return df
-
-
-def npv(_flow, **p):
-    flow = _flow.copy()
-    cols = flow.columns.to_list()
-    idx_name = flow.index.name
-    init_date, _init_amt = p['init']
-    init_amt = _init_amt if _init_amt != 0.00 else 0.0001
-
-    def _pv(_af):
-        af = flow[_af]
-        return xnpv(p['rate']
-                    , [init_date] + flow.index.to_list()
-                    , [-1 * init_amt] + af.to_list())
-    match (cols, idx_name):
-        case (china_rental_flow, "日期"):
-            return _pv("租金")
-        case (english_rental_flow, "Date"):
-            return _pv("Rental")
-        case (english_mortgage_flow_fields,"Date"):
-            sum_fields_to_field(flow, ["Principal", "Interest", "Prepayment", "Recovery"], "Cash")
-            return _pv("Cash")
-        case (china_bondflow_fields, "日期"):
-            return _pv("本息合计")
-        case (english_bondflow_fields, "Date"):
-            return _pv("cash")
-        case _:
-            raise RuntimeError("Failed to match", cols, idx_name)
+    return df.groupby([dummy_col])[cols].sum().rename_axis(idx)
 
 
 def update_deal(d, i, c):
@@ -168,9 +122,8 @@ def update_deal(d, i, c):
     return _d
 
 
-def mkDealsBy(d, m:dict)->dict:
-    return { k:dataclasses.replace(d, **v) 
-                for k,v in m.items()} 
+def mkDealsBy(d, m: dict)->dict:
+    return {k: dataclasses.replace(d, **v) for k, v in m.items()} 
 
 
 class DC(Enum):  # TODO need to check with HS code
@@ -187,12 +140,12 @@ class DC(Enum):  # TODO need to check with HS code
     DC_30_360_US = "DC_30_360_US"
 
 
-def str2date(x:str):
+def str2date(x: str):
     return datetime.strptime(x, '%Y-%m-%d').date()
 
 
-def normDate(x:str):
-    if len(x)==8:
+def normDate(x: str):
+    if len(x) == 8:
         return f"{x[:4]}-{x[4:6]}-{x[6:8]}"
 
 
@@ -203,7 +156,7 @@ def daysBetween(sd,ed):
 def guess_locale(x):
     accs = x['accounts']
 
-    assert len(accs)>0,"Failed to identify via deal accounts result"
+    assert len(accs) > 0, "Failed to identify via deal accounts result"
 
     acc_cols = set(list(accs.values())[0].columns.to_list())
     locale = None
@@ -236,31 +189,31 @@ def renameKs(m:dict, mapping, opt_key=False):
     return m
 
 
-def subMap(m:dict, ks:list):
+def subMap(m: dict, ks: list):
     ''' get a map subset by keys,if keys not found, supplied with default value '''
-    return {k:m.get(k, defaultVal) for (k, defaultVal) in ks}
+    return {k: m.get(k, defaultVal) for (k, defaultVal) in ks}
 
 
-def subMap2(m:dict, ks:list):
+def subMap2(m: dict, ks: list):
     #fieldNames = [ fName for (fName, fTargetName, fDefaultValue) in ks]
     _m = {k: m.get(k, defaultVal) for (k, _, defaultVal) in ks}
     _mapping = [_[:2] for _ in ks]
     return renameKs(_m, _mapping)
 
 
-def mapValsBy(m:dict, f):
+def mapValsBy(m: dict, f):
     ''' Given a map and apply function to every vals'''
-    assert isinstance(m, dict),f"M is not a map but a {type(m)},{m}"
-    return {k: f(v) for k,v in m.items()}
+    assert isinstance(m, dict), f"M is not a map but a {type(m)}, {m}"
+    return {k: f(v) for k, v in m.items()}
 
 
-def mapListValBy(m:dict, f):
+def mapListValBy(m: dict, f):
     ''' Given a map, whose vals are list,  apply function to every element in each list of each val'''
-    assert isinstance(m, dict),"M is not a map"
+    assert isinstance(m, dict), "M is not a map"
     return {k: [f(_v) for _v in v] for k,v in m.items()}
 
 
-def applyFnToKey(m:dict, f, k, applyNone=False):
+def applyFnToKey(m: dict, f, k, applyNone=False):
     assert isinstance(m, dict), f"{m} is not a map"
     assert k in m, f"{k} is not in map {m}"
     match (m[k], applyNone):
@@ -302,37 +255,33 @@ def guess_pool_flow_header(x, l):
             return (china_mortgage_flow_fields_d+china_cumStats, "日期", True)
         case ('MortgageFlow', 11, 'english'):
             return (english_mortgage_flow_fields_d, "Date", False)
-        case ('MortgageFlow',12,'english'):
+        case ('MortgageFlow', 12, 'english'):
             return (english_mortgage_flow_fields_d+english_cumStats, "Date", True)
-        case ('LoanFlow',9,'chinese'):
-            return (china_loan_flow_d,"日期",False)
-        case ('LoanFlow',10,'chinese'):
-            return (china_loan_flow_d+china_cumStats,"日期",True)
-        case ('LoanFlow',9,'english'):
-            return (english_loan_flow_d,"Date",False)
-        case ('LoanFlow',10,'english'):
-            return (english_loan_flow_d+english_cumStats,"Date",True)
-        case ('LeaseFlow',3,'chinese'):
-            return (china_rental_flow_d,"日期",False)
-        case ('LeaseFlow',3,'english'):
-            return (english_rental_flow_d,"Date",False)
-        case ('FixedFlow',6,'chinese'):
-            return (china_fixed_flow_d,"日期",False)
-        case ('FixedFlow',6,'english'):
-            return (english_fixed_flow_d,"Date",False)
+        case ('LoanFlow', 9, 'chinese'):
+            return (china_loan_flow_d, "日期", False)
+        case ('LoanFlow', 10, 'chinese'):
+            return (china_loan_flow_d+china_cumStats, "日期", True)
+        case ('LoanFlow', 9, 'english'):
+            return (english_loan_flow_d, "Date", False)
+        case ('LoanFlow', 10, 'english'):
+            return (english_loan_flow_d+english_cumStats, "Date", True)
+        case ('LeaseFlow', 3, 'chinese'):
+            return (china_rental_flow_d, "日期", False)
+        case ('LeaseFlow', 3, 'english'):
+            return (english_rental_flow_d, "Date", False)
+        case ('FixedFlow', 6, 'chinese'):
+            return (china_fixed_flow_d, "日期", False)
+        case ('FixedFlow', 6, 'english'):
+            return (english_fixed_flow_d, "Date", False)
         case _:
             raise RuntimeError(f"Failed to match pool header with {x['tag']}{l}")
 
 
-def uplift_m_list(l:list):
-    return {k:v
-            for m in l
-            for k,v in m.items()}
+def uplift_m_list(l: list):
+    return {k: v for m in l for k, v in m.items()}
 
 
-def getValWithKs(m:dict, ks:list
-                 ,defaultReturn=None
-                 ,mapping=None):
+def getValWithKs(m: dict, ks: list, defaultReturn=None, mapping=None):
     ''' Get first available key/value in m, with optional mapping function to result if found '''
     r = defaultReturn
     if isinstance(m, dict):
@@ -340,7 +289,7 @@ def getValWithKs(m:dict, ks:list
             if k in m:
                 r = m[k]
                 break
-    else: # object instead of dict
+    else:  # object instead of dict
         for k in ks:
             if hasattr(m, k):
                 r = getattr(m, k)
@@ -359,7 +308,7 @@ def _read_cf(x, lang):
         if not expandFlag:
             result = pd.DataFrame([_['contents'] for _ in x], columns=flow_header)
         else:
-            result = pd.DataFrame([_['contents'][:-1]+_['contents'][-1] for _ in x] , columns=flow_header)
+            result = pd.DataFrame([_['contents'][:-1]+_['contents'][-1] for _ in x], columns=flow_header)
     except ValueError as e:
         print(e)
         logging.error(f"Failed to match header:{flow_header} with {result[0]['contents']}")
@@ -386,7 +335,7 @@ def flow_by_scenario(rs, flowpath, node="col", rtn_df=True, ax=1, rnd=2):
     "pull flows from multiple scenario"
     r = None
     if node == "col":
-        r = {k: query(v, flowpath[:-1])[flowpath[-1]] for k, v  in rs.items()}    
+        r = {k: query(v, flowpath[:-1])[flowpath[-1]] for k, v in rs.items()}    
     elif node == "idx":
         r = {k: query(v, flowpath[:-1]).loc[flowpath[-1]] for k, v in rs.items()}    
     else:
@@ -412,11 +361,9 @@ def positionFlow(x, m: dict, facePerPaper=100):
         
     assert isinstance(m, dict), "Position info must be a map/dict"
     
-    bOrignBal = {k: x['_deal']['contents']['bonds'][k]['bndOriginInfo']['originBalance'] for k,v in m.items()}
+    bOrignBal = {k: x['_deal']['contents']['bonds'][k]['bndOriginInfo']['originBalance'] for k, v in m.items()}
     bPapersPerBond = {k: v/facePerPaper for k, v in bOrignBal.items()}
-    
     bflowFactor = {k: (v/bPapersPerBond[k]) for k, v in m.items()}
-    
     return {bn: calcBondFlow(bf, bflowFactor[bn]) for bn, bf in x['bonds'].items() if bn in m}
 
 
@@ -448,5 +395,3 @@ def searchByFst(xs, v, defaultRtn=None):
         if x[0] == v:
             return x
     return defaultRtn
-
-

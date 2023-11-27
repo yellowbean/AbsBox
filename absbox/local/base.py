@@ -7,8 +7,8 @@ english_bondflow_fields = ["date", "balance", "interest", "principal", "rate", "
 english_bondflow_fields_s = ["balance", "interest", "principal", "rate", "cash", "memo"]
 
 # Cumulative
-china_cumStats = ["累计还款","累计早偿","累计拖欠","累计违约","累计回收","累计损失"]
-english_cumStats = ["CumPrincipal","CumPrepay","CumDelinq","CumDefault","CumRecovery","CumLoss"]
+china_cumStats = ["累计还款", "累计早偿", "累计拖欠", "累计违约", "累计回收", "累计损失"]
+english_cumStats = ["CumPrincipal", "CumPrepay", "CumDelinq", "CumDefault", "CumRecovery", "CumLoss"]
 
 # Pool
 ## mortgage
@@ -63,10 +63,6 @@ english_rs_flow_fields_d = ["date", "balance", "amount", "pay", "receive", "due"
 china_ledger_flow_fields_d = ["日期", "余额", "变动额", "备注"]
 english_ledger_flow_fields_d = ["date", "balance", "amount", "comment"]
 
-# Index
-
-
-
 # deal status
 
 
@@ -108,3 +104,13 @@ accountHeader = {
     "chinese": {"idx": "日期", "change": "变动额", "bal": ("期初余额", '余额', "期末余额")}
     ,"english": {"idx": "date", "change": "change", "bal": ("begin balance", 'balance', "end balance")}
 }
+
+
+validCutoffFields = {
+    "资产池规模": "IssuanceBalance"
+    ,"IssuanceBalance": "IssuanceBalance"
+    ,"CumulativeDefaults":"HistoryDefaults"
+    ,"累计违约余额":"HistoryDefaults"
+}
+
+dealStatusLog = {'cn': ["日期", "旧状态", "新状态"], 'en': ["Date", "From", "To"]}

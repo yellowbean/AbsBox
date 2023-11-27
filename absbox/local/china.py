@@ -1,6 +1,6 @@
 import logging, os, re, itertools
 import requests, shutil, json
-from dataclasses import dataclass,field
+from dataclasses import dataclass, field
 import functools, pickle, collections
 import pandas as pd
 import numpy as np
@@ -116,7 +116,7 @@ class SPV:
         if deal_content['pool']['futureCf'] is None:
             output['pool']['flow'] = None
         else:
-            _pool_cf_header,_,expandFlag = guess_pool_flow_header(deal_content['pool']['futureCf'][0],"chinese")
+            _pool_cf_header, _, expandFlag = guess_pool_flow_header(deal_content['pool']['futureCf'][0], "chinese")
             if not expandFlag:
                 output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['futureCf']]
                                                       , columns=_pool_cf_header)
