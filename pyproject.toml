@@ -9,7 +9,7 @@ name = "absbox"
 dependencies = [
     "pandas ==1.4.3",
     "numpy ==1.23.1",
-    "matplotlib ==3.5.2",
+    "matplotlib",
     "requests",
     "rich",
     "pyxirr",

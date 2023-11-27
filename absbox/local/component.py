@@ -682,7 +682,7 @@ def mkRateType(x):
             raise RuntimeError(f"Failed to match :{x}: Rate Type")
 
 
-def mkBookType(x:list):
+def mkBookType(x: list):
     match x:
         case ["PDL", defaults, ledgers] | ["pdl", defaults, ledgers]:
             return mkTag(("PDL",[mkDs(defaults)
@@ -812,7 +812,7 @@ def mkAction(x:list):
             return mkTag(("CollectRateCap", [acc, capName]))
         
         case ["条件执行", pre, *actions] | ["If", pre, *actions]:
-            return mkTag(("ActionWithPre", [mkPre(pre), [mkAction(a) for a in actions] ] ))
+            return mkTag(("ActionWithPre", [mkPre(pre), [mkAction(a) for a in actions]]))
         case ["条件执行2", pre, actions1, actions2] | ["IfElse", pre, actions1, actions2]:
             return mkTag(("ActionWithPre2", [mkPre(pre), [mkAction(a) for a in actions1], [mkAction(a) for a in actions2]] ))
         case ["购买资产", liq, source, _limit] | ["buyAsset", liq, source, _limit]:
@@ -827,7 +827,7 @@ def mkAction(x:list):
             raise RuntimeError(f"Failed to match :{x}:mkAction")
 
 
-def mkStatus(x:tuple|str):
+def mkStatus(x: tuple|str):
     match x:
         case "摊销" | "Amortizing":
             return mkTag(("Amortizing"))
@@ -847,14 +847,8 @@ def mkStatus(x:tuple|str):
             raise RuntimeError(f"Failed to match :{x}:mkStatus")
 
 
-def readStatus(x, locale):
-    m = {"en": {'amort': "Amortizing", 'def': "Defaulted", 'acc': "Accelerated", 'end': "Ended",
-                'called': "Called",
-                'pre': "PreClosing",'revol':"Revolving"
-                ,'ramp':"RampUp"}
-        , "cn": {'amort': "摊销", 'def': "违约", 'acc': "加速清偿", 'end': "结束", 'pre': "设计","revol":"循环"
-                 ,'called':"清仓回购"
-                 ,'ramp':"RampUp"}}
+def readStatus(x: dict, locale: str):
+    m = dealStatusMap
     match x:
         case {"tag": "Amortizing"}:
             return m[locale]['amort']
@@ -903,10 +897,10 @@ def _rateTypeDs(x):
     return False
 
 
-def mkTrigger(x:dict):
+def mkTrigger(x: dict):
     match x:
-        case {"condition":p,"effects":e,"status":st,"curable":c} | {"条件":p,"效果":e,"状态":st,"重置":c}:
-            triggerName = getValWithKs(x,["name","名称"],defaultReturn="")
+        case {"condition":p, "effects":e, "status":st, "curable":c} | {"条件":p, "效果":e, "状态":st, "重置":c}:
+            triggerName = getValWithKs(x,["name", "名称"],defaultReturn="")
             return {"trgName":triggerName
                     ,"trgCondition":mkPre(p)
                     ,"trgEffects":mkTriggerEffect(e)
@@ -924,8 +918,8 @@ def mkTriggerEffect(x):
             return mkTag(("DoAccrueFee", fn))
         case ["新增事件", trg] | ["newTrigger", trg]: # not implementd in Hastructure
             return mkTag(("AddTrigger", mkTrigger(trg)))
-        case ["新储备目标",accName,newReserve] | ["newReserveBalance",accName,newReserve]:
-            return mkTag(("ChangeReserveBalance",[accName, mkAccType(newReserve)]))
+        case ["新储备目标", accName, newReserve] | ["newReserveBalance", accName, newReserve]:
+            return mkTag(("ChangeReserveBalance", [accName, mkAccType(newReserve)]))
         case ["结果", *efs] | ["Effects", *efs]:
             return mkTag(("TriggerEffects", [mkTriggerEffect(e) for e in efs]))
         case None:
@@ -953,7 +947,7 @@ def mkWaterfall(r, x):
         case ("兑付日", "违约") | ("amortizing", "defaulted") | "Defaulted":
             _w_tag = f"DistributionDay (DealDefaulted Nothing)"
         case ("兑付日", _st) | ("amortizing", _st):
-            _w_tag = f"DistributionDay {mapping.get(_st,_st)}"
+            _w_tag = f"DistributionDay {mapping.get(_st, _st)}"
         case "兑付日" | "未违约" | "amortizing" | "Amortizing":
             _w_tag = f"DistributionDay Amortizing"
         case "清仓回购" | "cleanUp":
@@ -982,14 +976,14 @@ def mkAssetRate(x):
     match x:
         case ["固定", r] | ["fix", r]:
             return mkTag(("Fix", r))
-        case ["浮动", r, {"基准": idx, "利差": spd, "重置频率": p}]:
-            _m = subMap(m, [("cap", None),( "floor", None),("rounding", None)])
+        case ["浮动", r, {"基准": idx, "利差": spd, "重置频率": p} as m]:
+            _m = subMap(m, [("cap", None), ("floor", None), ("rounding", None)])
             _m = applyFnToKey(_m, mkRoundingType, 'rounding')
-            return mkTag(("Floater", [idx, spd, r, mkDatePattern(p), _m['floor'], _m['cap'],_m['rounding']]))
+            return mkTag(("Floater", [idx, spd, r, mkDatePattern(p), _m['floor'], _m['cap'], _m['rounding']]))
         case ["floater", r, {"index": idx, "spread": spd, "reset": p} as m]:
             _m = subMap(m, [("cap", None), ("floor", None), ("rounding", None)])
             _m = applyFnToKey(_m, mkRoundingType, 'rounding')
-            return mkTag(("Floater", [idx, spd, r, mkDatePattern(p), _m['floor'], _m['cap'],_m['rounding']]))
+            return mkTag(("Floater", [idx, spd, r, mkDatePattern(p), _m['floor'], _m['cap'], _m['rounding']]))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAssetRate")
 
@@ -1037,6 +1031,7 @@ def mkAssetStatus(x):
 
 
 def mkPrepayPenalty(x):
+    """ Build Prepayment Penalty Setting """
     if x is None:
         return None
     match x:
@@ -1197,7 +1192,7 @@ def identify_deal_type(x):
 def mkCallOptions(x):
     ''' Build call options '''
     match x:
-        case {"资产池余额": bal} | {"poolBalance": bal} |("poolBalance", bal) :
+        case {"资产池余额": bal} | {"poolBalance": bal} | ("poolBalance", bal):
             return mkTag(("PoolBalance", bal))
         case {"债券余额": bal} | {"bondBalance": bal} | ("bondBalance", bal):
             return mkTag(("BondBalance", bal))
@@ -1220,12 +1215,12 @@ def mkCallOptions(x):
 def mkAssumpDefault(x):
     ''' New default assumption for performing assets '''
     match x:
-        case {"CDR":r} if isinstance(r,list):
-            return mkTag(("DefaultVec",r))
-        case {"CDR":r} :
-            return mkTag(("DefaultCDR",r))
-        case {"ByAmount":(bal,rs)} :
-            return mkTag(("DefaultByAmt",(bal,rs)))
+        case {"CDR": r} if isinstance(r, list):
+            return mkTag(("DefaultVec", r))
+        case {"CDR": r}:
+            return mkTag(("DefaultCDR", r))
+        case {"ByAmount": (bal, rs)}:
+            return mkTag(("DefaultByAmt", (bal, rs)))
         case _ :
             raise RuntimeError(f"failed to match {x}")
 
@@ -1233,19 +1228,19 @@ def mkAssumpDefault(x):
 def mkAssumpPrepay(x):
     ''' New prepayment assumption for performing assets '''
     match x:
-       case {"CPR":r} if isinstance(r,list):
-           return mkTag(("PrepaymentVec",r))
-       case {"CPR":r} :
-           return mkTag(("PrepaymentCPR",r))
-       case _ :
-           raise RuntimeError(f"failed to match {x}")
+        case {"CPR": r} if isinstance(r, list):
+            return mkTag(("PrepaymentVec", r))
+        case {"CPR": r}:
+            return mkTag(("PrepaymentCPR", r))
+        case _ :
+            raise RuntimeError(f"failed to match {x}")
 
 
 def mkAssumpDelinq(x):
     ''' New delinquency assumption for performing assets '''
     match x:
-        case {"DelinqCDR":cdr,"Lag":lag,"DefaultPct":pct}:
-            return mkTag(("DelinqCDR",[cdr,(lag,pct)]))
+        case {"DelinqCDR": cdr, "Lag": lag, "DefaultPct": pct}:
+            return mkTag(("DelinqCDR", [cdr, (lag, pct)]))
         case _:
             raise RuntimeError(f"failed to match {x}")
 
@@ -1347,9 +1342,11 @@ def mkPerfAssumption(x):
             raise RuntimeError(f"failed to match {x}")
 
 
-def mkPDF(a,b,c):
+def mkPDF(a, b, c):
     ''' make assumps asset with 3 status: performing/delinq/defaulted '''
-    return [mkPerfAssumption(a),mkDelinqAssumption(b),mkDefaultedAssumption(c)]
+    return [mkPerfAssumption(a)
+            ,mkDelinqAssumption(b)
+            ,mkDefaultedAssumption(c)]
 
 
 def mkAssumpType(x):
@@ -1366,15 +1363,15 @@ def mkAssumpType(x):
 def mkAssetUnion(x):
     match x[0]:
         case "AdjustRateMortgage" | "Mortgage" | "按揭贷款" :
-            return mkTag(("MO",mkAsset(x)))
+            return mkTag(("MO", mkAsset(x)))
         case "贷款" | "Loan" : 
-            return mkTag(("LO",mkAsset(x)))
+            return mkTag(("LO", mkAsset(x)))
         case "分期" | "Installment" : 
-            return mkTag(("IL",mkAsset(x)))
+            return mkTag(("IL", mkAsset(x)))
         case "租赁" | "Lease" : 
-            return mkTag(("LS",mkAsset(x)))
+            return mkTag(("LS", mkAsset(x)))
         case "固定资产" | "FixedAsset" : 
-            return mkTag(("FA",mkAsset(x)))
+            return mkTag(("FA", mkAsset(x)))
         case _:
             raise RuntimeError(f"Failed to match AssetUnion {x}")
 
@@ -1410,7 +1407,7 @@ def mkAssumption2(x) -> dict:
             raise RuntimeError(f"Failed to match {x}:mkAssumption2, type:{type(x)}")
 
 
-def mkPool(x):
+def mkPool(x: dict):
     mapping = {"LDeal": "LPool", "MDeal": "MPool",
                "IDeal": "IPool", "RDeal": "RPool", "FDeal":"FPool"}
     match x:
@@ -1424,7 +1421,7 @@ def mkPool(x):
             raise RuntimeError(f"Failed to match {x}:mkPool")
 
 
-def mkCustom(x):
+def mkCustom(x: dict):
     match x:
         case {"常量": n} | {"Constant": n}:
             return mkTag(("CustomConstant", n))
@@ -1448,7 +1445,7 @@ def mkLiqProviderType(x):
             raise RuntimeError(f"Failed to match LiqProvider Type：{x}")
         
 
-def mkLiqProvider(n, x):
+def mkLiqProvider(n: str, x: dict):
     opt_fields = {"liqCredit":None,"liqDueInt":0,"liqDuePremium":0
                  ,"liqRate":None,"liqPremiumRate":None,"liqStmt":None
                  ,"liqBalance":0,"liqRateType":None,"liqPremiumRateType":None
@@ -1485,7 +1482,8 @@ def mkLiqProvider(n, x):
     if r is not None:
        return opt_fields | r 
 
-def mkLedger(n, x):
+def mkLedger(n: str, x: dict):
+    ''' Build ledger '''
     match x:
         case {"balance":bal} | {"余额":bal}:
             return {"ledgName":n,"ledgBalance":bal,"ledgStmt":None}
@@ -1495,7 +1493,7 @@ def mkLedger(n, x):
             raise RuntimeError(f"Failed to match Ledger:{n},{x}")
 
 
-def mkCf(x):
+def mkCf(x:list):
     """ Make project cashflow ( Mortgage Only ) """
     if len(x) == 0:
         return None
@@ -1506,10 +1504,10 @@ def mkCf(x):
 def mkCollection(x):
     """ Build collection rules """
     match x :
-        case [s,acc] if isinstance(acc, str):
-            return mkTag(("Collect",[mkPoolSource(s),acc]))
-        case [s,*pcts] if isinstance(pcts, list):
-            return mkTag(("CollectByPct" ,[mkPoolSource(s) ,pcts]))
+        case [s, acc] if isinstance(acc, str):
+            return mkTag(("Collect",[mkPoolSource(s), acc]))
+        case [s, *pcts] if isinstance(pcts, list):
+            return mkTag(("CollectByPct" ,[mkPoolSource(s), pcts]))
         case _:
             raise RuntimeError(f"Failed to match collection rule {x}")
 

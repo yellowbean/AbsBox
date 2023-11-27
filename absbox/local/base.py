@@ -76,7 +76,7 @@ rateLikeFormula = set(["bondFactor", "poolFactor", "cumPoolDefaultedRate", "资�
 intLikeFormula = set(["borrowerNumber", "monthsTillMaturity"])
 boolLikeFormula = set(["trigger", "事件", "isMostSenior", "最优先","isPaidOff","清偿完毕","rateTest","allTest","anyTest","比率测试","任一测试","所有测试"])
 
-op_map = {">":"G", ">=":"GE", "<":"L", "<=":"LE", "=":"E"}
+op_map = {">": "G", ">=": "GE", "<": "L", "<=": "LE", "=": "E"}
 
 #Deal Cycle
 chinaDealCycle = {"回收后":"EndCollection"
@@ -95,8 +95,8 @@ dealCycleMap = chinaDealCycle | englishDealCycle
 
 #Asset pricing 
 assetPricingHeader = {
-    "chinese":["估值","WAL","Duration","Convexity","AccruedInterest"]
-    ,"english":["Pricing","WAL","Duration","Convexity","AccruedInterest"]
+    "chinese":["估值", "WAL", "Duration", "Convexity", "AccruedInterest"]
+    ,"english":["Pricing", "WAL", "Duration", "Convexity", "AccruedInterest"]
 }
 
 #account fields
@@ -114,3 +114,11 @@ validCutoffFields = {
 }
 
 dealStatusLog = {'cn': ["日期", "旧状态", "新状态"], 'en': ["Date", "From", "To"]}
+
+dealStatusMap = {"en": {'amort': "Amortizing", 'def': "Defaulted", 'acc': "Accelerated", 'end': "Ended",
+                        'called': "Called",
+                        'pre': "PreClosing",'revol':"Revolving"
+                        ,'ramp':"RampUp"}
+                , "cn": {'amort': "摊销", 'def': "违约", 'acc': "加速清偿", 'end': "结束", 'pre': "设计","revol":"循环"
+                        ,'called':"清仓回购"
+                        ,'ramp':"RampUp"}}
