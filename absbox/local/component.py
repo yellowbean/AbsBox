@@ -1,6 +1,6 @@
 from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100
 from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey
-from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs
+from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl
 
 from absbox.local.base import *
 from enum import Enum
@@ -113,6 +113,10 @@ def mkFeeType(x):
             return mkTag(("NumFee", [mkDatePattern(p), mkDs(s), amt]))
         case {"差额费用": [ds1, ds2]} | {"targetBalanceFee": [ds1, ds2]}:
             return mkTag(("TargetBalanceFee", [mkDs(ds1), mkDs(ds2)]))
+        case {"回款期间费用": amt} | {"byPeriod": amt}:
+            return mkTag(("ByCollectPeriod", amt))
+        case {"分段费用": [dp, ds, tbl]} | {"byTable": [dp, ds, tbl]}:
+            return mkTag(("AmtByTbl", [mkDatePattern(dp), mkDs(ds), mkTbl("ThresholdTable", tbl)]))
         case _:
             raise RuntimeError(f"Failed to match on fee type:{x}")
 
