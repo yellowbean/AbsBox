@@ -184,8 +184,8 @@ def mkDs(x):
             return mkTag("CumulativePoolRecoveriesBalance")
         case ("资产池累计违约率",) | ("cumPoolDefaultedRate",):
             return mkTag("CumulativePoolDefaultedRate")
-        case ("资产池累计违约率",n) | ("cumPoolDefaultedRate",n):
-            return mkTag(("CumulativePoolDefaultedRateTill",n))
+        case ("资产池累计违约率", n) | ("cumPoolDefaultedRate", n):
+            return mkTag(("CumulativePoolDefaultedRateTill", n))
         case ("资产池累计", *i) | ("cumPoolCollection", *i):
             return mkTag(("PoolCumCollection", [mkPoolSource(_) for _ in i]))
         case ("资产池累计至", idx, *i) | ("cumPoolCollectionTill", idx, *i):
@@ -230,6 +230,8 @@ def mkDs(x):
             return mkTag(("RateSwapNet", n))
         case ("债务人数量",) | ("borrowerNumber",):
             return mkTag(("CurrentPoolBorrowerNum"))
+        case ("期数",) | ("periodNum",):
+            return mkTag(("ProjCollectPeriodNum"))
         case ("事件", loc, idx) | ("trigger", loc, idx):
             if not loc in dealCycleMap:
                 raise RuntimeError(f" {loc} not in map {dealCycleMap}")
@@ -812,9 +814,8 @@ def mkAction(x:list):
         case ["结算", acc, swapName] | ["settleSwap", acc, swapName]:
             return mkTag(("SwapSettle", [acc, swapName]))
         ## Rate Cap
-        case ["利率结算", acc, capName]| ["settleCap", acc, capName]:
+        case ["利率结算", acc, capName] | ["settleCap", acc, capName]:
             return mkTag(("CollectRateCap", [acc, capName]))
-        
         case ["条件执行", pre, *actions] | ["If", pre, *actions]:
             return mkTag(("ActionWithPre", [mkPre(pre), [mkAction(a) for a in actions]]))
         case ["条件执行2", pre, actions1, actions2] | ["IfElse", pre, actions1, actions2]:
@@ -1596,7 +1597,7 @@ def readRunSummary(x, locale) -> dict:
         df.rename(columns={"Value":ds_name},inplace=True)
         df.set_index("Date",inplace=True)
         return df
-    inspect_vars = filter_by_tags(x, ["InspectBal", "InspectBool", "InspectRate"])
+    inspect_vars = filter_by_tags(x, ["InspectBal", "InspectBool", "InspectRate","InspectInt"])
     if inspect_vars:
         inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),c['contents'][2]) for c in inspect_vars ]
                                 ,columns = ["Date","DealStats","Value"])

@@ -286,7 +286,7 @@ class API:
         if not hasattr(self, "token"):
             console.print(f"❌[bold red] No token found , please call loginLibrary() to login")
             return 
-        result = self._send_req(runReq, deal_library_url, headers={"Authorization":f"Bearer {self.token}"})
+        result = self._send_req(runReq, deal_library_url, headers={"Authorization": f"Bearer {self.token}"})
         
         def lookupReader(x):
             match x:
