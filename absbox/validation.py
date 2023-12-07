@@ -96,12 +96,10 @@ def valReq(reqSent) -> list:
     match req :
         case {"tag":"SingleRunReq","contents":[{"contents":d}, ma, mra]}:
             error, warning = valDeal(d, error, warning)
-            error, warning = valAssumption(d, ma, error, warning)
             error, warning = valNonPerfAssumption(d, mra, error, warning)
         case {"tag":"MultiScenarioRunReq","contents":[{"contents":d}, mam, mra]}:
             error, warning = valDeal(d, error, warning)
         case {"tag":"MultiDealRunReq","contents":[dm, ma, mra]}:
-            error, warning = valAssumption(ma, error, warning)
             error, warning = valNonPerfAssumption(d, ma, error, warning)
         case _:
             raise RuntimeError(f"Failed to match request:{req}")
@@ -124,28 +122,3 @@ def valNonPerfAssumption(d, nonPerfAssump, error, warning) -> list:
         e.append(f"Missing floater index:{indexRequired - indexSupplied}")
     return error+e,warning+w
 
-
-
-def valAssumption(d, ma , error, warning) -> list:
-    def _validate_single_assump(z):
-        match z:
-            case {'tag': 'PoolLevel'}:
-                return [],[]
-            case {'tag': 'ByIndex', 'contents':[assumps, _]}:
-                _e = []
-                _w = []
-                _ids = set(flat([ assump[0] for assump in assumps ]))
-                if not _ids.issubset(asset_ids):
-                    _e.append(f"Not Valid Asset ID:{_ids - asset_ids}")
-                if len(missing_asset_id := asset_ids - _ids) > 0:
-                    _w.append(f"Missing Asset to set assumption:{missing_asset_id}")            
-                return _e,_w
-            case _:
-                raise RuntimeError(f"Failed to match:{z}")
-    
-    asset_ids = set(range(len(list(query(d, ['pool', 'assets'])))))
-    if ma is None:
-        return error,warning
-    else:
-        e,w = _validate_single_assump(ma)
-        return error+e,warning+w

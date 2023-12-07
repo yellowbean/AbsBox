@@ -25,8 +25,8 @@ china_mortgage_delinq_flow_fields_d = ["日期"] + china_mortgage_delinq_flow_fi
 english_mortgage_delinq_flow_fields_d = ["Date"] + english_mortgage_delinq_flow_fields
 
 ## Rental
-china_rental_flow = ['待收金额','租金']
-english_rental_flow = ['Balance','Rental']
+china_rental_flow = ['待收金额', '租金']
+english_rental_flow = ['Balance', 'Rental']
 china_rental_flow_d = ["日期"] + china_rental_flow
 english_rental_flow_d = ["Date"] + english_rental_flow
 ## Loan flow
@@ -122,3 +122,5 @@ dealStatusMap = {"en": {'amort': "Amortizing", 'def': "Defaulted", 'acc': "Accel
                 , "cn": {'amort': "摊销", 'def': "违约", 'acc': "加速清偿", 'end': "结束", 'pre': "设计","revol":"循环"
                         ,'called':"清仓回购"
                         ,'ramp':"RampUp"}}
+
+cfIndexMap = {'cn':"日期",'en':"Date","english":"Date","chinese":"日期"}

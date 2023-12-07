@@ -1,6 +1,6 @@
 from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100
 from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey
-from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl
+from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
 
 from absbox.local.base import *
 from enum import Enum
@@ -102,7 +102,7 @@ def mkFeeType(x):
                 case ["已付本金合计", *bns] | ["paidPrincipal", *bns]:
                     return mkTag(("PctFee", [mkTag(("LastBondPrinPaid", bns)), rate]))
                 case _:
-                    raise RuntimeError(f"Failed to match on 百分比费率：{desc,rate}")
+                    raise RuntimeError(f"Failed to match on 百分比费率：{desc, rate}")
         case {"固定费用": amt} | {"fixFee": amt}:
             return mkTag(("FixFee", amt))
         case {"周期费用": [p, amt]} | {"recurFee": [p, amt]}:
@@ -116,7 +116,7 @@ def mkFeeType(x):
         case {"回款期间费用": amt} | {"byPeriod": amt}:
             return mkTag(("ByCollectPeriod", amt))
         case {"分段费用": [dp, ds, tbl]} | {"byTable": [dp, ds, tbl]}:
-            return mkTag(("AmtByTbl", [mkDatePattern(dp), mkDs(ds), mkTbl("ThresholdTable", tbl)]))
+            return mkTag(("AmtByTbl", [mkDatePattern(dp), mkDs(ds), tbl]))
         case _:
             raise RuntimeError(f"Failed to match on fee type:{x}")
 
@@ -144,13 +144,12 @@ def mkPoolSource(x):
             return "CollectedRental" 
         case "现金" | "Cash" | "现金回款" | "CollectedCash":
             return "CollectedCash"
-        case "新增违约" | "Defaults" :
-            return "NewDefaults" 
+        case "新增违约" | "Defaults":
+            return "NewDefaults"
         case "新增拖欠" | "Delinquencies":
             return "NewDelinquencies"
         case "新增损失" | "Losses":
             return "NewLosses"
-        
         case _ :
             raise RuntimeError(f"not match found: {x} :make Pool Source")
 
@@ -166,43 +165,79 @@ def mkDs(x):
             return mkTag("OriginalBondBalance")
         case ("到期月份", bn) | ("monthsTillMaturity", bn):
             return mkTag(("MonthsTillMaturity", bn))
-        case ("资产池余额",) | ("poolBalance",):
-            return mkTag("CurrentPoolBalance")
-        case ("资产池期初余额",) | ("poolBegBalance",):
-            return mkTag("CurrentPoolBegBalance")
-        case ("初始资产池余额",) | ("originalPoolBalance",):
-            return mkTag("OriginalPoolBalance")
-        case ("资产池违约余额",) | ("currentPoolDefaultedBalance",):
-            return mkTag("CurrentPoolDefaultedBalance")
-        case ("资产池累计损失余额",) | ("cumPoolNetLoss",):
-            return mkTag("CumulativeNetLoss")
-        case ("资产池累计损失率",) | ("cumPoolNetLossRate",):
-            return mkTag("CumulativeNetLossRatio")
-        case ("资产池累计违约余额",) | ("cumPoolDefaultedBalance",):
-            return mkTag("CumulativePoolDefaultedBalance")
-        case ("资产池累计回收额",) | ("cumPoolRecoveries",):
-            return mkTag("CumulativePoolRecoveriesBalance")
-        case ("资产池累计违约率",) | ("cumPoolDefaultedRate",):
-            return mkTag("CumulativePoolDefaultedRate")
-        case ("资产池累计违约率", n) | ("cumPoolDefaultedRate", n):
-            return mkTag(("CumulativePoolDefaultedRateTill", n))
-        case ("资产池累计", *i) | ("cumPoolCollection", *i):
-            return mkTag(("PoolCumCollection", [mkPoolSource(_) for _ in i]))
-        case ("资产池累计至", idx, *i) | ("cumPoolCollectionTill", idx, *i):
-            return mkTag(("PoolCumCollectionTill", [idx, [mkPoolSource(_) for _ in i]] ))
-        case ("资产池当期", *i) | ("curPoolCollection", *i):
-            return mkTag(("PoolCurCollection", [mkPoolSource(_) for _ in i]))
-        case ("资产池当期至", idx, *i) | ("curPoolCollectionStats", idx, *i):
-            return mkTag(("PoolCurCollectionStats", [idx, [mkPoolSource(_) for _ in i]]))
+        case ("资产池余额", *pNames) | ("poolBalance", *pNames):
+            if pNames:
+                return mkTag(("CurrentPoolBalance", [mkPid(p) for p in pNames]))
+            return mkTag(("CurrentPoolBalance",None))
+        case ("资产池期初余额", *pNames) | ("poolBegBalance", *pNames):
+            if pNames:
+                return mkTag(("CurrentPoolBegBalance", [mkPid(p) for p in pNames]))
+            return mkTag(("CurrentPoolBegBalance"),None)
+        case ("初始资产池余额", *pNames) | ("originalPoolBalance", *pNames):
+            if pNames:
+                return mkTag(("OriginalPoolBalance", [mkPid(p) for p in pNames]))
+            return mkTag(("OriginalPoolBalance",None))
+        case ("资产池违约余额", *pNames) | ("currentPoolDefaultedBalance", *pNames): #DEPRECATE
+            if pNames:
+                return mkTag(("CurrentPoolDefaultedBalance", [mkPid(p) for p in pNames]))
+            return mkTag(("CurrentPoolDefaultedBalance", None))
+        case ("资产池累计违约余额",*pNames) | ("cumPoolDefaultedBalance",*pNames): #DEPRECATE
+            if pNames:
+                return mkTag(("CumulativePoolDefaultedBalance",[mkPid(p) for p in pNames]))
+            return mkTag(("CumulativePoolDefaultedBalance", None))
+        case ("资产池累计违约率",*pNames) | ("cumPoolDefaultedRate",*pNames):  # DEPRECATE
+            if pNames:
+                return mkTag(("CumulativePoolDefaultedRate", [ mkPid(p) for p in pNames]))
+            return mkTag(("CumulativePoolDefaultedRate", None))
+        case ("资产池累计违约率", n, *pNames) | ("cumPoolDefaultedRate", n, *pNames): # DEPRECATE
+            if pNames:
+                return mkTag(("CumulativePoolDefaultedRateTill", [n,[mkPid(p) for p in pNames]]))
+            return mkTag(("CumulativePoolDefaultedRateTill", [n,None]))
+        case ("资产池累计损失余额",*pNames) | ("cumPoolNetLoss",*pNames): # DEPRECATE
+            if pNames:
+                return mkTag(("CumulativeNetLoss", [mkPid(p) for p in pNames]))
+            return mkTag(("CumulativeNetLoss", None))
+        case ("资产池累计损失率",*pNames) | ("cumPoolNetLossRate",*pNames): # DEPRECATE
+            if pNames:
+                return mkTag(("CumulativeNetLossRatio", [mkPid(p) for p in pNames]))
+            return mkTag(("CumulativeNetLossRatio", None))
+        case ("资产池累计回收额",*pNames) | ("cumPoolRecoveries", *pNames): # DEPRECATE
+            if pNames:
+                return mkTag(("CumulativePoolRecoveriesBalance",[mkPid(p) for p in pNames]))
+            return mkTag(("CumulativePoolRecoveriesBalance",None))
+        case ("资产池累计", pNames, *i) | ("cumPoolCollection", pNames, *i):
+            if pNames:
+                return mkTag(("PoolCumCollection", [[mkPoolSource(_) for _ in i]
+                                                    ,[mkPid(p) for p in pNames]]))
+            return mkTag(("PoolCumCollection", [[mkPoolSource(_) for _ in i],None]))
+        case ("资产池累计至", pNames, idx, *i) | ("cumPoolCollectionTill", pNames, idx, *i):
+            if pNames:
+                return mkTag(("PoolCumCollectionTill", [idx, [mkPoolSource(_) for _ in i]
+                                                        ,[mkPid(p) for p in pNames]] ))
+            return mkTag(("PoolCumCollectionTill", [idx, [mkPoolSource(_) for _ in i], None] ))
+        case ("资产池当期", pNames, *i) | ("curPoolCollection", pNames, *i):
+            if pNames:
+                return mkTag(("PoolCurCollection", [[mkPoolSource(_) for _ in i]
+                                                    ,[mkPid(p) for p in pNames]]))
+            return mkTag(("PoolCurCollection", [[mkPoolSource(_) for _ in i],None]))
+        case ("资产池当期至", pNames, idx, *i) | ("curPoolCollectionStats", pNames, idx, *i):
+            if pNames:
+                return mkTag(("PoolCurCollectionStats", [idx, [mkPoolSource(_) for _ in i]
+                                                         ,[mkPid(p) for p in pNames]]))
+            return mkTag(("PoolCurCollectionStats", [idx, [mkPoolSource(_) for _ in i], None]))
         case ("债券系数",) | ("bondFactor",):
             return mkTag("BondFactor")
-        case ("资产池系数",) | ("poolFactor",):
+        case ("资产池系数", *pNames) | ("poolFactor", *pNames):
+            if pNames:
+                return mkTag(("PoolFactor", [mkPid(p) for p in pNames]))
             return mkTag("PoolFactor")
         case ("债券利率", bn) | ("bondRate", bn):
             return mkTag(("BondRate", bn))
         case ("债券加权利率", *bn) | ("bondWaRate", *bn):
             return mkTag(("BondWaRate", bn))
-        case ("资产池利率",) | ("poolWaRate",):
+        case ("资产池利率", *pNames) | ("poolWaRate", *pNames):
+            if pNames:
+                return mkTag(("PoolWaRate", [mkPid(p) for p in pNames]))
             return mkTag("PoolWaRate")
         case ("所有账户余额",) | ("accountBalance"):
             return mkTag("AllAccBalance")
@@ -213,7 +248,7 @@ def mkDs(x):
         case ("账簿发生额", lns, cmt) | ("ledgerTxnAmount", lns, cmt):
             return mkTag(("LedgerTxnAmt", [lns, mkComment(cmt)]))
         case ("账簿发生额", lns) | ("ledgerTxnAmount", lns):
-            return mkTag(("LedgerTxnAmt", [lns,None]))
+            return mkTag(("LedgerTxnAmt", [lns, None]))
         case ("债券待付利息", *bnds) | ("bondDueInt", *bnds):
             return mkTag(("CurrentDueBondInt", bnds))
         case ("债券已付利息", *bnds) | ("lastBondIntPaid", *bnds):
@@ -224,11 +259,13 @@ def mkDs(x):
             return mkTag(("LiqBalance", liqName))
         case ("流动性额度", *liqName) | ("liqCredit", *liqName):
             return mkTag(("LiqCredit", liqName))
-        case ("rateCapNet",n):
+        case ("rateCapNet", n):
             return mkTag(("RateCapNet", n))
-        case ("rateSwapNet",n):
+        case ("rateSwapNet", n):
             return mkTag(("RateSwapNet", n))
-        case ("债务人数量",) | ("borrowerNumber",):
+        case ("债务人数量", *pNames) | ("borrowerNumber", *pNames):
+            if pNames:
+                return mkTag(("CurrentPoolBorrowerNum", [mkPid(p) for p in pNames]))
             return mkTag(("CurrentPoolBorrowerNum"))
         case ("期数",) | ("periodNum",):
             return mkTag(("ProjCollectPeriodNum"))
@@ -313,9 +350,9 @@ def mkPre(p):
     match p:
         case ["状态", _st] | ["status", _st]:
             return mkTag(("IfDealStatus", mkStatus(_st)))
-        case ["同时满足", *_p] | ["all", *_p]:
+        case ["同时满足", *_p] | ["同时", *_p] | ["all", *_p]:
             return mkTag(("All", [mkPre(p) for p in _p]))
-        case ["任一满足", *_p] | ["any", *_p]:
+        case ["任一满足", *_p] | ["任一", *_p] | ["any", *_p]:
             return mkTag(("Any", [mkPre(p) for p in _p]))
         case [ds, "=", 0]:
             return mkTag(("IfZero", mkDs(ds)))
@@ -736,8 +773,10 @@ def mkAction(x:list):
             return mkTag(("BookBy", mkBookType(bookType)))
         case ["计提费用", *feeNames] | ["calcFee", *feeNames]:
             return mkTag(("CalcFee", feeNames))
+        case ["特殊计提利息", (mbal, mrate), bndName] | ["calcIntBy", (mbal, mrate), bndName]:
+            return mkTag(("CalcBondInt", [[bndName], mkDs(mbal), mkDsRate(mrate)]))
         case ["计提利息", *bndNames] | ["calcInt", *bndNames]:
-            return mkTag(("CalcBondInt", bndNames))
+            return mkTag(("CalcBondInt", [bndNames, None, None]))
         case ["计提支付费用", source, target, m] | ["calcAndPayFee", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("CalcAndPayFee", [l, source, target, s]))
@@ -754,15 +793,15 @@ def mkAction(x:list):
         case ["支付费用", source, target] | ["payFee", source, target]:
             return mkTag(("PayFee", [None, source, target, None]))
         case ["支付费用收益", source, target, limit] | ["payFeeResidual", source, target, limit]:
-            return mkTag(("PayFeeResidual", [ mkLimit(limit), source, target]))
+            return mkTag(("PayFeeResidual", [mkLimit(limit), source, target]))
         case ["支付费用收益", source, target] | ["payFeeResidual", source, target]:
-            return mkTag(("PayFeeResidual", [ None, source, target]))
+            return mkTag(("PayFeeResidual", [None, source, target]))
         case ["计提支付利息", source, target, m] | ["accrueAndPayInt", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("AccrueAndPayInt", [l, source, target, s]))
         case ["顺序计提支付利息", source, target, m] | ["accrueAndPayIntBySeq", source, target, m]:
             (l, s) = mkMod(m)
-            return mkTag(("AccrueAndPayIntBySeq", [l , source, target, s]))
+            return mkTag(("AccrueAndPayIntBySeq", [l, source, target, s]))
         case ["计提支付利息", source, target] | ["accrueAndPayInt", source, target]:
             return mkTag(("AccrueAndPayInt", [None, source, target, None]))
         case ["顺序计提支付利息", source, target] | ["accrueAndPayIntBySeq", source, target]:
@@ -1170,28 +1209,34 @@ def mkAsset(x):
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 
-
+##TODO fix mixed asset type here
 def identify_deal_type(x):
     """ identify deal type from 1st asset in asset list  """
-    match x:
-        case {"pool": {"assets": [{'tag': 'PersonalLoan'}, *rest]}}:
+    y = None
+    if query(x, ["pool","tag"])=='SoloPool':
+        y = x["pool"]['contents']
+    else:
+        #print(list(x["pool"]['contents'].values())[0])
+        y = list(x["pool"]['contents'].values())[0] # fix mixed asset type here
+    match y:
+        case {"assets": [{'tag': 'PersonalLoan'}, *rest]}:
             return "LDeal"
-        case {"pool": {"assets": [{'tag': 'Mortgage'}, *rest]}}:
+        case {"assets": [{'tag': 'Mortgage'}, *rest]}:
             return "MDeal"
-        case {"pool": {"assets": [{'tag': 'AdjustRateMortgage'}, *rest]}}:
+        case {"assets": [{'tag': 'AdjustRateMortgage'}, *rest]}:
             return "MDeal"
-        case {"pool": {"assets": [], "futureCf": cfs}} if cfs[0]['tag'] == 'MortgageFlow':
+        case {"assets": [], "futureCf": cfs} if cfs[0]['tag'] == 'MortgageFlow':
             return "MDeal"
-        case {"pool": {"assets": [{'tag': 'Installment'}, *rest]}}:
+        case {"assets": [{'tag': 'Installment'}, *rest]}:
             return "IDeal"
-        case {"pool": {"assets": [{'tag': 'Lease'}, *rest]}} | {"pool": {"assets": [{'tag': 'RegularLease'}, *rest]}}:
+        case {"assets": [{'tag': 'Lease'}, *rest]} | {"assets": [{'tag': 'RegularLease'}, *rest]}:
             return "RDeal"
-        case {"pool": {"assets": [{'tag': 'StepUpLease'}, *rest]}}:
+        case {"assets": [{'tag': 'StepUpLease'}, *rest]}:
             return "RDeal"
-        case {"pool": {"assets": [{'tag': 'FixedAsset'}, *rest]}}:
+        case {"assets": [{'tag': 'FixedAsset'}, *rest]}:
             return "FDeal"
         case _:
-            raise RuntimeError(f"Failed to identify deal type {x}")
+            raise RuntimeError(f"Failed to identify deal type {y}")
 
 
 def mkCallOptions(x):
@@ -1395,7 +1440,7 @@ def mkRevolvingPool(x):
 
 def mkAssumpList(xs):
     assert isinstance(xs, list), f"Assumption should be a list, but got {xs}"
-    return [ mkAssumption(x) for x in xs ]
+    return [mkAssumption(x) for x in xs]
 
 
 def mkAssumption2(x) -> dict:
@@ -1410,6 +1455,31 @@ def mkAssumption2(x) -> dict:
             return mkTag(("PoolLevel", []))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAssumption2, type:{type(x)}")
+
+#   ,getValWithKs(self.pool,['assets',"清单"],defaultReturn=[])
+#   ,getValWithKs(self.pool,["issuanceStat","统计"])
+#   ,getValWithKs(self.pool,['cashflow','现金流归集表','归集表'], [])
+#   ,getValWithKs(self.pool,['extendBy'],"MonthEnd")
+
+def mkPoolType(assetDate, x) -> dict:
+    if 'assets' in x:
+        return mkTag(("SoloPool" ,mkPoolComp(assetDate, x)))
+    else:
+        #print(x.keys())
+        return mkTag(("MultiPool" ,{f"PoolName:{k}":mkPoolComp(assetDate,v) for (k,v) in x.items()}))
+
+
+# def mkPoolComp(asOfDate,assetList=[],issuanceStat=None,cf=[],extPeriods="MonthEnd") -> dict:
+def mkPoolComp(asOfDate, x) -> dict:
+    #   ,getValWithKs(self.pool,['assets',"清单"],defaultReturn=[])
+    #   ,getValWithKs(self.pool,["issuanceStat","统计"])
+    #   ,getValWithKs(self.pool,['cashflow','现金流归集表','归集表'], [])
+    #   ,getValWithKs(self.pool,['extendBy'],"MonthEnd")
+    return {"assets": [mkAsset(y) for y in getValWithKs(x, ['assets',"清单"],defaultReturn=[])]
+            , "asOfDate": asOfDate
+            , "issuanceStat": getValWithKs(x,["issuanceStat","统计"])
+            , "futureCf":mkCf(getValWithKs(x,['cashflow','现金流归集表','归集表'], []))
+            , "extendPeriods":mkDatePattern(getValWithKs(x,['extendBy'],"MonthEnd"))}
 
 
 def mkPool(x: dict):
@@ -1505,14 +1575,21 @@ def mkCf(x:list):
     else:
         return [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None,None])) for _x in x]
 
+def mkPid(x):
+    match x:
+        case None:
+            return None
+        case x if isinstance(x,str):
+            return mkTag((f"PoolName",x))
+
 
 def mkCollection(x):
     """ Build collection rules """
     match x :
-        case [s, acc] if isinstance(acc, str):
-            return mkTag(("Collect",[mkPoolSource(s), acc]))
-        case [s, *pcts] if isinstance(pcts, list):
-            return mkTag(("CollectByPct" ,[mkPoolSource(s), pcts]))
+        case [mPid, s, acc] if isinstance(acc, str):
+            return mkTag(("Collect",[mkPid(mPid), mkPoolSource(s), acc]))
+        case [mPid, s, *pcts] if isinstance(pcts, list):
+            return mkTag(("CollectByPct" ,[mkPid(mPid), mkPoolSource(s), pcts]))
         case _:
             raise RuntimeError(f"Failed to match collection rule {x}")
 
@@ -1558,6 +1635,18 @@ def readPricingResult(x, locale) -> dict:
 
     return pd.DataFrame.from_dict({k: v['contents'] for k, v in x.items()}, orient='index', columns=h[locale]).sort_index()
 
+def readPoolCf(x, lang='english'):
+    r = None
+    _pool_cf_header,_,expandFlag = guess_pool_flow_header(x[0], lang)
+    if not expandFlag:
+        r = pd.DataFrame([_['contents'] for _ in x], columns=_pool_cf_header)
+    else:
+        r = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[None]*6) for _ in x]
+                                                , columns=_pool_cf_header)
+    pool_idx = cfIndexMap[lang]
+    r = r.set_index(pool_idx)
+    r.index.rename(pool_idx, inplace=True)    
+    return r
 
 def readRunSummary(x, locale) -> dict:
     def filter_by_tags(xs, tags):

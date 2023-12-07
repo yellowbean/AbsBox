@@ -60,6 +60,7 @@ def mkTs(n, vs):
 def mkTbl(n, vs):
     return mkTag((n, vs))
 
+
 mkRatioTs = functools.partial(mkTs, "RatioCurve")
 
 mkRateTs = functools.partial(mkTs, "RateCurve")

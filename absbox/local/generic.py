@@ -43,11 +43,8 @@ class Generic:
             "dates": parsedDates,
             "name": self.name,
             "status":mkStatus(self.status),
-            "pool": {"assets": [mkAsset(x) for x in getValWithKs(self.pool,['assets',"清单"],defaultReturn=[])]
-                     , "asOfDate": lastAssetDate
-                     , "issuanceStat": getValWithKs(self.pool,["issuanceStat","统计"])
-                     , "futureCf":mkCf(getValWithKs(self.pool,['cashflow','现金流归集表','归集表'], []))
-                     , "extendPeriods":mkDatePattern(getValWithKs(self.pool,['extendBy'],"MonthEnd"))},
+            "pool":mkPoolType(lastAssetDate, self.pool),
+            #"pool":None, 
             "bonds": {bn: mkBnd(bn, bo) for (bn, bo) in self.bonds},
             "waterfall": mkWaterfall({},self.waterfall.copy()),  
             "fees": {fn: mkFee(fo|{"name":fn},fsDate = lastCloseDate) 
@@ -57,7 +54,7 @@ class Generic:
             "rateSwap": {k: mkRateSwap(v) for k, v in self.rateSwap.items()} if self.rateSwap else None,
             "rateCap": {k:mkRateCap(v) for k, v in self.rateCap.items()} if self.rateCap else None,
             "currencySwap":None ,
-            "custom": {cn: mkCustom(co) for cn,co in self.custom.items()} if self.custom else None ,
+            "custom": {cn: mkCustom(co) for cn,co in self.custom.items()} if self.custom else None,
             "triggers": renameKs2({k: {_k: mkTrigger(_v) for (_k,_v) in v.items() } for (k, v) in self.trigger.items()},englishDealCycle) if self.trigger else None,
             "liqProvider": {ln: mkLiqProvider(ln, lo | {"start":lastCloseDate} ) 
                                for ln,lo in self.liqFacility.items() } if self.liqFacility else None,
@@ -109,19 +106,14 @@ class Generic:
 
         output['pool'] = {}
         
-        if deal_content['pool']['futureCf'] is None:
-            output['pool']['flow'] = None
-        else:
-            _pool_cf_header,_,expandFlag = guess_pool_flow_header(deal_content['pool']['futureCf'][0],"english")
-            if not expandFlag:
-                output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['futureCf']]
-                                                      , columns=_pool_cf_header)
+        if deal_content['pool']['tag']=='SoloPool':
+            if deal_content['pool']['contents']['futureCf'] is None:
+                output['pool']['flow'] = None
             else:
-                output['pool']['flow'] = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[None]*6) for _ in deal_content['pool']['futureCf']]
-                                                      , columns=_pool_cf_header)
-            pool_idx = 'Date'
-            output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)
-            output['pool']['flow'].index.rename(pool_idx, inplace=True)
+                output['pool']['flow'] = readPoolCf(deal_content['pool']['contents']['futureCf']['contents'])
+        elif deal_content['pool']['tag']=='MultiPool':
+            poolMap = deal_content['pool']['contents']
+            output['pool']['flow'] = {k: readPoolCf(v['futureCf']['contents']) for (k,v) in poolMap.items() }
 
         output['pricing'] = readPricingResult(resp[3], 'en')
         output['result'] = readRunSummary(resp[2], 'en')

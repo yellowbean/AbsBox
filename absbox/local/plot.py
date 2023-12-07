@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
-from absbox.local.util import guess_locale,aggStmtByDate,consolStmtByDate
-from pyspecter import query, S
+from absbox.local.util import guess_locale, aggStmtByDate, consolStmtByDate
+from pyspecter import query
 #from itertools import reduce
 from functools import reduce
 import numpy as np
+import pandas as pd
 import logging
 
 dmap = {
@@ -18,7 +19,7 @@ dmap = {
 
 
 def init_plot_fonts():
-    define_list = ['Source Han Serif CN','Microsoft Yahei','STXihei']
+    define_list = ['Source Han Serif CN', 'Microsoft Yahei', 'STXihei']
     support_list = font_manager.findSystemFonts(fontpaths=None, fontext='ttf')
     font_p = font_manager.FontProperties()
     try:
@@ -34,12 +35,13 @@ def init_plot_fonts():
 
 font_p = init_plot_fonts()
 
+
 def plot_bond(rs, bnd, flow='本息合计'):
     """Plot bonds across scenarios"""
     plt.figure(figsize=(12,8))
-    _alpha =  0.8
+    _alpha = 0.8
     locale = guess_locale(list(rs.values())[0])
-    for idx,s in enumerate(rs):
+    for idx, s in enumerate(rs):
         plt.step(s['bonds'][bnd].index,s['bonds'][bnd][[flow]], alpha=_alpha, linewidth=5, label=f"{dmap[locale]['scenario']}-{idx}")
 
     plt.legend(loc='upper left', prop=font_p)
@@ -52,6 +54,7 @@ def plot_bond(rs, bnd, flow='本息合计'):
     current_values = plt.gca().get_yticks()
     plt.gca().set_yticklabels(['{:.0f}(w)'.format(x/10000) for x in current_values])
     return plt
+
 
 def plot_bonds(r, bnds:list, flow='本息合计'):
     "Plot bond flows with in a single run"
@@ -75,6 +78,7 @@ def plot_bonds(r, bnds:list, flow='本息合计'):
     current_values = plt.gca().get_yticks()
     plt.gca().set_yticklabels(['{:.0f}(w)'.format(x/10000) for x in current_values])
     return plt
+
 
 def plot_by_scenario(rs, flowtype, flowpath):
     "Plot with multiple scenario"
@@ -103,23 +107,24 @@ def plot_by_scenario(rs, flowtype, flowpath):
     plt.axis('tight')
     plt.xticks(ticks=x,labels=x_labels,rotation=30)
 
+
 def plot_bs(x, excludeItems=["FeeDue","IntAccrue","Account"]):
     dates = x.index.to_list() 
 
     liabilityItems = x['liability'].to_dict(orient='list')
     assetItems = x['asset'].to_dict(orient='list')
     
-    highest_y1 = max([ max(v) for k,v in liabilityItems.items()])
-    highest_y2 = max([ max(v) for k,v in assetItems.items()])
+    highest_y1 = max([max(v) for k, v in liabilityItems.items()])
+    highest_y2 = max([max(v) for k, v in assetItems.items()])
     
     if "FeeDue" in set(excludeItems):
-        liabilityItems = {k:v for (k,v) in liabilityItems.items() if (not k.startswith("Fee Due:"))}
+        liabilityItems = {k: v for (k, v) in liabilityItems.items() if (not k.startswith("Fee Due:"))}
 
     if "IntAccrue" in set(excludeItems):
-        liabilityItems = {k:v for (k,v) in liabilityItems.items() if (not k.startswith("Accured Int:")) }
+        liabilityItems = {k: v for (k, v) in liabilityItems.items() if (not k.startswith("Accured Int:")) }
    
     if "Account" in set(excludeItems):
-        assetItems = {k:v for (k,v) in assetItems.items()  if k not in excludeItems }
+        assetItems = {k: v for (k, v) in assetItems.items() if k not in excludeItems }
 
     balanceItems = {
         'Asset': assetItems,
@@ -135,16 +140,30 @@ def plot_bs(x, excludeItems=["FeeDue","IntAccrue","Account"]):
     for assetClass, assetBreakdown in balanceItems.items():
         offset = width * multiplier
         bottom = np.zeros(len(dates))
-        for (breakdownsK,breakdowns) in assetBreakdown.items():
+        for (breakdownsK, breakdowns) in assetBreakdown.items():
             rects = ax.bar(x + offset, breakdowns, width, label=breakdownsK, bottom=bottom)
             bottom += breakdowns
 
-            ax.bar_label(rects, padding=1,label_type="center")
+            ax.bar_label(rects, padding=1, label_type="center")
         multiplier += 1
 
     ax.set_ylabel('Amount')
     ax.set_title('Projected Capital Structure')
     ax.set_xticks(x + width/2, dates)
     ax.legend(loc='upper right')
-    ax.set_ylim(0, max([highest_y1,highest_y2])*1.2)
+    ax.set_ylim(0, max([highest_y1, highest_y2])*1.2)
     plt.show()
+
+
+def plot_oc(bsReport: pd.DataFrame, bnds: list):
+    assert isinstance(bsReport, pd.DataFrame), "input report is not a dataframe"
+    assert isinstance(bnds, list), "input bond name is not a list"
+    
+    return None
+
+
+def plot_bs2(r, **kw):
+    dealStatusFlag = []
+    triggerStatusFlag = []
+
+    return None
