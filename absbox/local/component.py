@@ -1,5 +1,5 @@
 from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100
-from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey
+from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
 
 from absbox.local.base import *
@@ -774,7 +774,9 @@ def mkAction(x:list):
         case ["计提费用", *feeNames] | ["calcFee", *feeNames]:
             return mkTag(("CalcFee", feeNames))
         case ["特殊计提利息", (mbal, mrate), bndName] | ["calcIntBy", (mbal, mrate), bndName]:
-            return mkTag(("CalcBondInt", [[bndName], mkDs(mbal), mkDsRate(mrate)]))
+            return mkTag(("CalcBondInt", [[bndName]
+                                          , earlyReturnNone(mkDs, mbal)
+                                          , earlyReturnNone(mkDsRate,mrate)]))
         case ["计提利息", *bndNames] | ["calcInt", *bndNames]:
             return mkTag(("CalcBondInt", [bndNames, None, None]))
         case ["计提支付费用", source, target, m] | ["calcAndPayFee", source, target, m]:
@@ -1209,15 +1211,16 @@ def mkAsset(x):
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 
-##TODO fix mixed asset type here
 def identify_deal_type(x):
     """ identify deal type from 1st asset in asset list  """
     y = None
     if query(x, ["pool","tag"])=='SoloPool':
         y = x["pool"]['contents']
-    else:
+    elif x["pool"]['tag']=='MultiPool':
         #print(list(x["pool"]['contents'].values())[0])
-        y = list(x["pool"]['contents'].values())[0] # fix mixed asset type here
+        assetTags = flat(query(x,["pool","contents",S.MVALS,S.ALL,"assets",S.ALL,"tag"]))
+        if len(set(assetTags))>1:
+            return "UDeal"
     match y:
         case {"assets": [{'tag': 'PersonalLoan'}, *rest]}:
             return "LDeal"
@@ -1406,6 +1409,8 @@ def mkAssumpType(x):
             return mkTag(("PoolLevel",mkPDF(p, d, f)))
         case ("ByIndex", *ps):
             return mkTag(("ByIndex",[ [idx, mkPDF(a,b,c)] for (idx,(a,b,c)) in ps ]))
+        case ("ByName", assumpMap):
+            return mkTag(("ByName",{f"PoolName:{k}":mkPDF(*v) for k,v in assumpMap.items()}))
         case _ :
             raise RuntimeError(f"failed to match {x} | mkAssumpType")
 
@@ -1461,21 +1466,20 @@ def mkAssumption2(x) -> dict:
 #   ,getValWithKs(self.pool,['cashflow','现金流归集表','归集表'], [])
 #   ,getValWithKs(self.pool,['extendBy'],"MonthEnd")
 
-def mkPoolType(assetDate, x) -> dict:
+def mkPoolType(assetDate, x, mixedFlag) -> dict:
     if 'assets' in x:
-        return mkTag(("SoloPool" ,mkPoolComp(assetDate, x)))
+        return mkTag(("SoloPool" ,mkPoolComp(assetDate, x, False)))
     else:
-        #print(x.keys())
-        return mkTag(("MultiPool" ,{f"PoolName:{k}":mkPoolComp(assetDate,v) for (k,v) in x.items()}))
+        return mkTag(("MultiPool" ,{f"PoolName:{k}":mkPoolComp(assetDate,v,mixedFlag) for (k,v) in x.items()}))
 
 
-# def mkPoolComp(asOfDate,assetList=[],issuanceStat=None,cf=[],extPeriods="MonthEnd") -> dict:
-def mkPoolComp(asOfDate, x) -> dict:
+def mkPoolComp(asOfDate, x, mixFlag) -> dict:
+    assetFactory = mkAsset if (not mixFlag) else mkAssetUnion
     #   ,getValWithKs(self.pool,['assets',"清单"],defaultReturn=[])
     #   ,getValWithKs(self.pool,["issuanceStat","统计"])
     #   ,getValWithKs(self.pool,['cashflow','现金流归集表','归集表'], [])
     #   ,getValWithKs(self.pool,['extendBy'],"MonthEnd")
-    return {"assets": [mkAsset(y) for y in getValWithKs(x, ['assets',"清单"],defaultReturn=[])]
+    return {"assets": [assetFactory(y) for y in getValWithKs(x, ['assets',"清单"],defaultReturn=[])]
             , "asOfDate": asOfDate
             , "issuanceStat": getValWithKs(x,["issuanceStat","统计"])
             , "futureCf":mkCf(getValWithKs(x,['cashflow','现金流归集表','归集表'], []))
@@ -1586,10 +1590,14 @@ def mkPid(x):
 def mkCollection(x):
     """ Build collection rules """
     match x :
-        case [mPid, s, acc] if isinstance(acc, str):
-            return mkTag(("Collect",[mkPid(mPid), mkPoolSource(s), acc]))
-        case [mPid, s, *pcts] if isinstance(pcts, list):
-            return mkTag(("CollectByPct" ,[mkPid(mPid), mkPoolSource(s), pcts]))
+        case [None, s, acc] if isinstance(acc, str):
+            return mkTag(("Collect",[None, mkPoolSource(s), acc]))
+        case [None, s, *pcts] if isinstance(pcts, list):
+            return mkTag(("CollectByPct" ,[None, mkPoolSource(s), pcts]))
+        case [mPids, s, acc] if isinstance(acc, str):
+            return mkTag(("Collect",[[mkPid(p) for p in mPids], mkPoolSource(s), acc]))
+        case [mPids, s, *pcts] if isinstance(pcts, list):
+            return mkTag(("CollectByPct" ,[[mkPid(p) for p in mPids], mkPoolSource(s), pcts]))
         case _:
             raise RuntimeError(f"Failed to match collection rule {x}")
 

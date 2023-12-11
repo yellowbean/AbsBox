@@ -8,7 +8,7 @@ from absbox.local.component import *
 from absbox.local.base import * 
 import pandas as pd
 import collections
-
+from absbox.deal import isMixedDeal
 
 @dataclass
 class Generic:
@@ -36,6 +36,7 @@ class Generic:
         distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
         parsedDates = mkDate(self.dates)
         (lastAssetDate,lastCloseDate) = getStartDate(self.dates)
+        mixedAssetFlag = isMixedDeal(self.pool)
         """
         get the json formatted string
         """
@@ -43,8 +44,7 @@ class Generic:
             "dates": parsedDates,
             "name": self.name,
             "status":mkStatus(self.status),
-            "pool":mkPoolType(lastAssetDate, self.pool),
-            #"pool":None, 
+            "pool":mkPoolType(lastAssetDate, self.pool, mixedAssetFlag),
             "bonds": {bn: mkBnd(bn, bo) for (bn, bo) in self.bonds},
             "waterfall": mkWaterfall({},self.waterfall.copy()),  
             "fees": {fn: mkFee(fo|{"name":fn},fsDate = lastCloseDate) 

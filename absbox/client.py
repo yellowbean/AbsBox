@@ -17,7 +17,6 @@ from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy,
 from absbox.local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkPricingAssump, mkLiqMethod\
                                    , mkAssetUnion, mkRateAssumption
 from absbox.local.base import *
-from absbox.validation import valReq, valAssumption
 
 from absbox.local.china import SPV
 from absbox.local.generic import Generic
@@ -92,17 +91,6 @@ class API:
             raise RuntimeError("Error in build pool req")
         return json.dumps(r , ensure_ascii=False)
 
-    def validate(self, _r) -> list:
-        # validatin waterfall
-        error, warning = valReq(_r)
-        if warning:
-            console.print(f"❕[bold yellow]Warning in model :{warning}")
-        if len(error) > 0:
-            console.print(f"❌[bold red]Error in model :{error}")
-            return False, error, warning
-        else:
-            return True, error, warning
-
     def run(self, deal,
             poolAssump=None,
             runAssump=[],
@@ -118,11 +106,6 @@ class API:
         # construct request
         runType = "MultiScenarios" if multi_run_flag else "Single"
         req = self.build_run_deal_req(runType, deal, poolAssump, runAssump)
-        #validate deal
-        if preCheck:
-            val_result, err, warn = self.validate(req)
-            if not val_result:
-                return val_result, err, warn
         # branching with pricing
         if runAssump is None or searchByFst(runAssump, "pricing") is None:
             result = self._send_req(req, url)
@@ -131,6 +114,7 @@ class API:
 
         if result is None:
             console.print("❌[bold red]Failed to get response from run")
+            console.print_json(req)
             return None
         if 'error' in result:
             rich.print_json(result)
