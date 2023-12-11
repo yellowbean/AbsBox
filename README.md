@@ -17,6 +17,17 @@ a structured finance cashflow engine wrapper for structured credit professionals
 * English -> https://absbox-doc.readthedocs.io
 * Chinese -> https://absbox.readthedocs.io
 
+## Planning
+
+#### 2023-12-02
+Next major release will include:
+* Resec Deal , a pool asset can be a bond of another SPV
+* Mixed asset type in single SPV support. i.e a SPV may have `Mortgage` as well as `Loan` in same time
+* Multiple pool, a SPV have multiple Pool with name
+  * Stress by Pool via Name
+  * Formula based on sub pools 
+
+
 ## Goal
 * Structuring
   * Given easy way to create different pool assets/deal capital structure and waterfall, user can tell how key variables(service fee/bond WAL/bond cashflow etc) changes in different structure of transaction.
