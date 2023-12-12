@@ -5,6 +5,19 @@ build-backend = "setuptools.build_meta"
 [project]
 version = "0.23.3"
 name = "absbox"
+description = "an analytical library for cashflow modeling on ABS/MBS products"
+readme = "README.md"
+
+authors = [
+  {email = "always.zhang@gmail.com"},
+  {name = "xiaoyu, zhang"}
+]
+
+[project.urls]
+homepage = "https://absbox.org"
+documentation = "https://absbox-doc.readthedocs.io/en/latest/"
+repository = "https://github.com/yellowbean/absBox/"
+
 
 dependencies = [
     "pandas ==1.4.3",
