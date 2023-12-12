@@ -7,10 +7,20 @@ version = "0.23.3"
 name = "absbox"
 description = "an analytical library for cashflow modeling on ABS/MBS products"
 readme = "README.md"
-
+requires-python = ">=3.10"
+license = {file="LICENSE"}
 authors = [
   {email = "always.zhang@gmail.com"},
   {name = "xiaoyu, zhang"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta"
+    ,"Environment :: Console"
+    ,"Intended Audience :: Developers"
+    ,"Intended Audience :: Financial and Insurance Industry"
+    ,"Topic :: Software Development :: Build Tools"
+    ,"Topic :: Software Development :: Libraries"
+    ,"License :: OSI Approved :: MIT License"
 ]
 
 dependencies = [
