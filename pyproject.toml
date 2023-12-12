@@ -13,12 +13,6 @@ authors = [
   {name = "xiaoyu, zhang"}
 ]
 
-[project.urls]
-homepage = "https://absbox.org"
-documentation = "https://absbox-doc.readthedocs.io/en/latest/"
-repository = "https://github.com/yellowbean/absBox/"
-
-
 dependencies = [
     "pandas ==1.4.3",
     "numpy ==1.23.1",
@@ -29,6 +23,14 @@ dependencies = [
     "pyspecter",
     "graphviz"
 ]
+
+[project.urls]
+homepage = "https://absbox.org"
+documentation = "https://absbox-doc.readthedocs.io/en/latest/"
+repository = "https://github.com/yellowbean/AbsBox/"
+
+
+
 
 [tool.pytest.ini_options]
 minversion = "6.0"
