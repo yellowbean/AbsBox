@@ -30,54 +30,54 @@
       "tag": "Amortizing"
     },
     "pool": {
-      "assets": [
-        {
-          "tag": "Mortgage",
-          "contents": [
-            {
-              "originBalance": 120,
-              "originRate": {
-                "tag": "Floater",
-                "contents": [
-                  "DC_ACT_365F",
-                  "LPR5Y",
-                  0.01,
-                  0.085,
-                  {
-                    "tag": "MonthEnd"
-                  },
-                  null,
-                  null,
-                  null
-                ]
+      "tag": "SoloPool",
+      "contents": {
+        "assets": [
+          {
+            "tag": "Mortgage",
+            "contents": [
+              {
+                "originBalance": 120,
+                "originRate": {
+                  "tag": "Floater",
+                  "contents": [
+                    "DC_ACT_365F",
+                    "LPR5Y",
+                    0.01,
+                    0.085,
+                    {
+                      "tag": "MonthEnd"
+                    },
+                    null,
+                    null,
+                    null
+                  ]
+                },
+                "originTerm": 209,
+                "period": "Monthly",
+                "startDate": "2013-04-28",
+                "prinType": {
+                  "tag": "Even"
+                },
+                "prepaymentPenalty": null,
+                "tag": "MortgageOriginalInfo"
               },
-              "originTerm": 209,
-              "period": "Monthly",
-              "startDate": "2013-04-28",
-              "prinType": {
-                "tag": "Even"
-              },
-              "prepaymentPenalty": null,
-              "tag": "MortgageOriginalInfo"
-            },
-            2261042196.13,
-            0.0444,
-            106,
-            null,
-            {
-              "tag": "Current"
-            }
-          ]
+              2261042196.13,
+              0.0444,
+              106,
+              null,
+              {
+                "tag": "Current"
+              }
+            ]
+          }
+        ],
+        "asOfDate": "2022-06-30",
+        "issuanceStat": null,
+        "futureCf": null,
+        "extendPeriods": {
+          "tag": "MonthEnd"
         }
-      ],
-      "asOfDate": "2022-06-30",
-      "issuanceStat": {
-        "IssuanceBalance": 7573626700,
-        "HistoryDefaults": 81403764.08
-      },
-      "futureCf": null,
-      "extendPeriods": {
-        "tag": "MonthEnd"
       }
     },
     "bonds": {
@@ -368,17 +368,31 @@
       "\u589e\u503c\u7a0e": {
         "feeName": "\u589e\u503c\u7a0e",
         "feeType": {
-          "tag": "PctFee",
+          "tag": "TargetBalanceFee",
           "contents": [
             {
-              "tag": "PoolCurCollection",
+              "tag": "Factor",
               "contents": [
-                "CollectedInterest"
+                {
+                  "tag": "PoolCumCollection",
+                  "contents": [
+                    [
+                      "CollectedInterest"
+                    ],
+                    null
+                  ]
+                },
+                0.0326
               ]
             },
             {
-              "tag": "Constant",
-              "contents": 0.0326
+              "tag": "FeeTxnAmt",
+              "contents": [
+                [
+                  "\u589e\u503c\u7a0e"
+                ],
+                null
+              ]
             }
           ]
         },
@@ -394,7 +408,8 @@
           "tag": "AnnualRateFee",
           "contents": [
             {
-              "tag": "CurrentPoolBalance"
+              "tag": "CurrentPoolBalance",
+              "contents": null
             },
             {
               "tag": "Constant",
@@ -446,6 +461,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedInterest",
           "\u6536\u5165\u5206\u8d26\u6237"
         ]
@@ -453,6 +469,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedPrincipal",
           "\u672c\u91d1\u5206\u8d26\u6237"
         ]
@@ -460,6 +477,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedPrepayment",
           "\u672c\u91d1\u5206\u8d26\u6237"
         ]
@@ -467,6 +485,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedRecoveries",
           "\u672c\u91d1\u5206\u8d26\u6237"
         ]

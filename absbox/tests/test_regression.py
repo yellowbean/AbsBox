@@ -4,7 +4,7 @@ import importlib
 import pprint as pp
 
 from absbox import API
-from absbox.local.china import show,信贷ABS
+from absbox.local.china import 信贷ABS
 from absbox.local.util import mkTag
 import requests
 import pandas as pd
@@ -44,28 +44,28 @@ def read_test_cases():
     return r
 
 
-def translate(d,folder,o):
+def translate(d, folder, o):
     print(f"Translating>>{d}>>{o}")
-    benchfile =  os.path.join(this_file,"benchmark",folder,"out",o)
+    benchfile = os.path.join(this_file, "benchmark", folder, "out", o)
     if not os.path.exists(benchfile) or os.stat(benchfile).st_size < 10 :
         print(f"Skipping:{benchfile}")
-        with open(benchfile,'w',encoding='utf8') as newbench:
+        with open(benchfile, 'w', encoding='utf8') as newbench:
             try:
                 print(f"Writing new bench out case -> size {len(d.json)}")
             except Exception as e:
                 print(f"Error in build deal json:{e}")
             assert d.json is not None, f"None: Failed to generate Deal JSON file:{d.json}"
             assert d.json != "", f"Empty: Failed to generate Deal JSON file:{d.json}"
-            json.dump(d.json,newbench,indent=2)
+            json.dump(d.json, newbench, indent=2)
         logging.info(f"Create new case for {o}")
     else:
-        with open(benchfile ,'r') as ofile:
+        with open(benchfile, 'r') as ofile:
             try:
                 benchmark_out = json.load(ofile)
                 if d.json != benchmark_out:
                     print(f"Failed with benchmark file:{benchfile} ")
-                    diff_result = DeepDiff(d.json,benchmark_out)
-                    pp.pprint(diff_result,indent=2)
+                    diff_result = DeepDiff(d.json, benchmark_out)
+                    pp.pprint(diff_result, indent=2)
                     assert d.json == benchmark_out, f"testing fail on {o}"
                 else:
                     return True
@@ -76,16 +76,9 @@ def translate(d,folder,o):
 def test_translate():
     cases = read_test_cases()
 
-    for case,v in cases.items():
-        output_folder,test_py,deal_obj = case.split(",")
-        translate(v, output_folder, test_py.replace(".py",".json"))
-
-   # case_out = os.path.join(china_folder, "out")
-   # pair = cn.translate_pair
-   # translate(pair, case_out)
-   # case_out = os.path.join(us_folder, "out")
-   # pair = us.translate_pair
-   # translate(pair, case_out)
+    for case, v in cases.items():
+        output_folder, test_py, deal_obj = case.split(",")
+        translate(v, output_folder, test_py.replace(".py", ".json"))
 
 def run_deal(input_folder, pair):
     input_req_folder = os.path.join(input_folder,"out")
@@ -104,12 +97,12 @@ def run_deal(input_folder, pair):
     
     for dinput, sinput, nonPinput, eoutput in pair:
         print(f"Comparing:{dinput},{sinput},{eoutput}")
-        with open(os.path.join(input_req_folder,dinput), 'r') as dq:  # deal request
-            with open(os.path.join(input_scen_folder,sinput), 'r') as sq: # scenario request 
+        with open(os.path.join(input_req_folder, dinput), 'r') as dq:  # deal request
+            with open(os.path.join(input_scen_folder, sinput), 'r') as sq: # scenario request 
                 print(f"With deal request=> {dinput}, scenario => {sinput}")
                 nonPerfInput = None
                 if nonPinput:
-                    nonPerfInput = json.load(open(os.path.join(input_scen_folder,nonPinput)))
+                    nonPerfInput = json.load(open(os.path.join(input_scen_folder, nonPinput)))
                     print(nonPerfInput)
                 else:
                     nonPerfInput = {}
@@ -124,14 +117,12 @@ def run_deal(input_folder, pair):
                                           , headers=hdrs
                                           , verify=False)
                     if tresp.status_code != 200:
-                        print(f"Failed to finish req:{dinput}")
-                        print(f"response=>{tresp.status_code}")
+                        print(f"Failed to finish req:{dinput} with code {tresp.status_code}")
                         print(f"response text {tresp.text}")
-                        
                     else:
                         print(f"responds received")
                 except requests.exceptions.ConnectionError as e:
-                    print(f"Failed to get resp from {dinput}")
+                    print(f"Failed to get resp from {dinput} ,url: {test_server}")
                 try:
                     s_result = json.loads(tresp.text)
                 except JSONDecodeError as e:
@@ -146,7 +137,7 @@ def run_deal(input_folder, pair):
                 with open(local_bench_file,'r') as eout: # expected output 
                     print(f"reading resp for {local_bench_file}")
                     local_result = json.load(eout)
-                    assert isinstance(local_result, list), f"{dinput}: local result is not list but {local_result.keys()},{local_result['error']}"
+                    assert isinstance(local_result, list), f"{dinput}: local result is not list but {local_result.keys()},{local_result['error']},{req}"
                     assert isinstance(s_result, list), f"{dinput}: server result is not list but {s_result}"
                     if local_result[1] != s_result[1]:
                         print(f"Pool Flow Is Not matching => {dinput}")

@@ -28,21 +28,21 @@ def mkLiq(x):
 def mkDatePattern(x):
     ''' make date pattern '''
     match x:
-        case ("DayOfMonth", _d) | ["DayOfMonth", _d] | ["每月", _d] | ("每月", _d):
+        case ["DayOfMonth", _d] | ["每月", _d] | ("每月", _d):
             return mkTag(("DayOfMonth", _d))
-        case ("MonthDayOfYear", _m, _d) | ["MonthDayOfYear", _m, _d] | ["每年", _m, _d] | ("每年", _m, _d):
-            return mkTag(("MonthDayOfYear", _m, _d))
-        case ("CustomDate", *_ds) | ["CustomDate", *_ds]:
+        case ["MonthDayOfYear", _m, _d] | ["每年", _m, _d] | ("每年", _m, _d):
+            return mkTag(("MonthDayOfYear",[_m, _d]))
+        case ["CustomDate", *_ds]:
             return mkTag(("CustomDate", _ds))
-        case ("EveryNMonth", d, n) | ["EveryNMonth", d, n]:
+        case ["EveryNMonth", d, n]:
             return mkTag(("EveryNMonth", [d, n]))
-        case ("All", *_dps) | ["AllDatePattern", *_dps]:
+        case ["All", *_dps] | ["AllDatePattern", *_dps]:
             return mkTag(("AllDatePattern", [mkDatePattern(_) for _ in _dps]))
-        case ("After", _d, dp) | ["After", _d, dp] | ["之后", _d, dp]:
+        case ["After", _d, dp] | ["之后", _d, dp]:
             return mkTag(("StartsExclusive", [_d, mkDatePattern(dp) ]))
-        case ("Exclude", _d, _dps) | ["ExcludeDatePattern", _d, _dps] | ["排除", _d, _dps]:
+        case ["Exclude", _d, _dps] | ["ExcludeDatePattern", _d, _dps] | ["排除", _d, _dps]:
             return mkTag(("Exclude", [mkDatePattern(_d), [mkDatePattern(_) for _ in _dps]]))
-        case ("Offset", _dp, n) | ["OffsetDateDattern", _dp, n] | ["平移", _dp, n]:
+        case ["Offset", _dp, n] | ["OffsetDateDattern", _dp, n] | ["平移", _dp, n]:
             return mkTag(("OffsetBy", [mkDatePattern(_dp), n]))
         case _x if (_x in datePattern.values()):
             return mkTag((_x))
@@ -56,9 +56,14 @@ def getStartDate(x):
         case {"封包日": a, "起息日": b, "首次兑付日": c, "法定到期日": d, "收款频率": pf, "付款频率": bf} | \
              {"cutoff": a, "closing": b, "firstPay": c, "stated": d, "poolFreq": pf, "payFreq": bf}:
             return (a, b)
+        case {"封包日": a, "回款日": d, "分配日": c, "起息日":b} | \
+             {"cutoff": a, "closing": b, "payDays": c, "collectDays": d}:
+            return (a, b)
         case {"归集日": (lastCollected, nextCollect), "兑付日": (pp, np), "法定到期日": c, "收款频率": pf, "付款频率": bf} | \
              {"collect": (lastCollected, nextCollect), "pay": (pp, np), "stated": c, "poolFreq": pf, "payFreq": bf}:
             return (lastCollected, pp)
+        case _:
+            raise RuntimeError(f"Failed to get Start Date from {x}")
 
 def mkDate(x):
     ''' make date component for deal '''
@@ -209,7 +214,7 @@ def mkDs(x):
             if pNames:
                 return mkTag(("PoolCumCollection", [[mkPoolSource(_) for _ in i]
                                                     ,[mkPid(p) for p in pNames]]))
-            return mkTag(("PoolCumCollection", [[mkPoolSource(_) for _ in i],None]))
+            return mkTag(("PoolCumCollection", [[mkPoolSource(_) for _ in i], None]))
         case ("资产池累计至", pNames, idx, *i) | ("cumPoolCollectionTill", pNames, idx, *i):
             if pNames:
                 return mkTag(("PoolCumCollectionTill", [idx, [mkPoolSource(_) for _ in i]
@@ -217,9 +222,12 @@ def mkDs(x):
             return mkTag(("PoolCumCollectionTill", [idx, [mkPoolSource(_) for _ in i], None] ))
         case ("资产池当期", pNames, *i) | ("curPoolCollection", pNames, *i):
             if pNames:
+                print("pool cmu >>> ",pNames)
                 return mkTag(("PoolCurCollection", [[mkPoolSource(_) for _ in i]
                                                     ,[mkPid(p) for p in pNames]]))
-            return mkTag(("PoolCurCollection", [[mkPoolSource(_) for _ in i],None]))
+            print("pool cmu >>> None")
+            return mkTag(("PoolCurCollection", [[mkPoolSource(_) for _ in i]
+                                                , None]))
         case ("资产池当期至", pNames, idx, *i) | ("curPoolCollectionStats", pNames, idx, *i):
             if pNames:
                 return mkTag(("PoolCurCollectionStats", [idx, [mkPoolSource(_) for _ in i]
@@ -1221,6 +1229,8 @@ def identify_deal_type(x):
         assetTags = flat(query(x,["pool","contents",S.MVALS,S.ALL,"assets",S.ALL,"tag"]))
         if len(set(assetTags))>1:
             return "UDeal"
+    else:
+        raise RuntimeError(f"Failed to match pool type {x['pool']['tag']}")
     match y:
         case {"assets": [{'tag': 'PersonalLoan'}, *rest]}:
             return "LDeal"
@@ -1239,6 +1249,7 @@ def identify_deal_type(x):
         case {"assets": [{'tag': 'FixedAsset'}, *rest]}:
             return "FDeal"
         case _:
+            print(">>>",x['pool'])
             raise RuntimeError(f"Failed to identify deal type {y}")
 
 
@@ -1461,13 +1472,9 @@ def mkAssumption2(x) -> dict:
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAssumption2, type:{type(x)}")
 
-#   ,getValWithKs(self.pool,['assets',"清单"],defaultReturn=[])
-#   ,getValWithKs(self.pool,["issuanceStat","统计"])
-#   ,getValWithKs(self.pool,['cashflow','现金流归集表','归集表'], [])
-#   ,getValWithKs(self.pool,['extendBy'],"MonthEnd")
 
 def mkPoolType(assetDate, x, mixedFlag) -> dict:
-    if 'assets' in x:
+    if 'assets' in x or "清单" in x or "归集表" in x:
         return mkTag(("SoloPool" ,mkPoolComp(assetDate, x, False)))
     else:
         return mkTag(("MultiPool" ,{f"PoolName:{k}":mkPoolComp(assetDate,v,mixedFlag) for (k,v) in x.items()}))
@@ -1475,15 +1482,12 @@ def mkPoolType(assetDate, x, mixedFlag) -> dict:
 
 def mkPoolComp(asOfDate, x, mixFlag) -> dict:
     assetFactory = mkAsset if (not mixFlag) else mkAssetUnion
-    #   ,getValWithKs(self.pool,['assets',"清单"],defaultReturn=[])
-    #   ,getValWithKs(self.pool,["issuanceStat","统计"])
-    #   ,getValWithKs(self.pool,['cashflow','现金流归集表','归集表'], [])
-    #   ,getValWithKs(self.pool,['extendBy'],"MonthEnd")
-    return {"assets": [assetFactory(y) for y in getValWithKs(x, ['assets',"清单"],defaultReturn=[])]
-            , "asOfDate": asOfDate
-            , "issuanceStat": getValWithKs(x,["issuanceStat","统计"])
-            , "futureCf":mkCf(getValWithKs(x,['cashflow','现金流归集表','归集表'], []))
-            , "extendPeriods":mkDatePattern(getValWithKs(x,['extendBy'],"MonthEnd"))}
+    r = {"assets": [assetFactory(y) for y in getValWithKs(x, ['assets',"清单"],defaultReturn=[])]
+        , "asOfDate": asOfDate
+        , "issuanceStat": getValWithKs(x,["issuanceStat","统计"])
+        , "futureCf":mkCf(getValWithKs(x,['cashflow','现金流归集表','归集表'], []))
+        , "extendPeriods":mkDatePattern(getValWithKs(x,['extendBy'],"MonthEnd"))}
+    return r
 
 
 def mkPool(x: dict):
@@ -1590,6 +1594,10 @@ def mkPid(x):
 def mkCollection(x):
     """ Build collection rules """
     match x :
+        case [s, acc] if isinstance(acc, str) and isinstance(s, str):
+            return mkTag(("Collect",[None, mkPoolSource(s), acc]))
+        case [s, *pcts] if isinstance(pcts, list) and isinstance(s, str):
+            return mkTag(("CollectByPct" ,[None, mkPoolSource(s), pcts]))
         case [None, s, acc] if isinstance(acc, str):
             return mkTag(("Collect",[None, mkPoolSource(s), acc]))
         case [None, s, *pcts] if isinstance(pcts, list):

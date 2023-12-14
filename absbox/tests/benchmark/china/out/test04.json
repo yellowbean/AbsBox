@@ -31,43 +31,46 @@
       }
     },
     "pool": {
-      "assets": [
-        {
-          "tag": "Mortgage",
-          "contents": [
-            {
-              "originBalance": 18000000000,
-              "originRate": {
-                "tag": "Fix",
-                "contents": [
-                  "DC_ACT_365F",
-                  0.0485
-                ]
+      "tag": "SoloPool",
+      "contents": {
+        "assets": [
+          {
+            "tag": "Mortgage",
+            "contents": [
+              {
+                "originBalance": 18000000000,
+                "originRate": {
+                  "tag": "Fix",
+                  "contents": [
+                    "DC_ACT_365F",
+                    0.0485
+                  ]
+                },
+                "originTerm": 180,
+                "period": "Monthly",
+                "startDate": "2020-06-01",
+                "prinType": {
+                  "tag": "Level"
+                },
+                "prepaymentPenalty": null,
+                "tag": "MortgageOriginalInfo"
               },
-              "originTerm": 180,
-              "period": "Monthly",
-              "startDate": "2020-06-01",
-              "prinType": {
-                "tag": "Level"
-              },
-              "prepaymentPenalty": null,
-              "tag": "MortgageOriginalInfo"
-            },
-            17000000000,
-            0.04,
-            180,
-            null,
-            {
-              "tag": "Current"
-            }
-          ]
+              17000000000,
+              0.04,
+              180,
+              null,
+              {
+                "tag": "Current"
+              }
+            ]
+          }
+        ],
+        "asOfDate": "2022-10-02",
+        "issuanceStat": null,
+        "futureCf": null,
+        "extendPeriods": {
+          "tag": "MonthEnd"
         }
-      ],
-      "asOfDate": "2022-10-02",
-      "issuanceStat": null,
-      "futureCf": null,
-      "extendPeriods": {
-        "tag": "MonthEnd"
       }
     },
     "bonds": {
@@ -321,17 +324,31 @@
       "\u589e\u503c\u7a0e": {
         "feeName": "\u589e\u503c\u7a0e",
         "feeType": {
-          "tag": "PctFee",
+          "tag": "TargetBalanceFee",
           "contents": [
             {
-              "tag": "PoolCurCollection",
+              "tag": "Factor",
               "contents": [
-                "CollectedInterest"
+                {
+                  "tag": "PoolCumCollection",
+                  "contents": [
+                    [
+                      "CollectedInterest"
+                    ],
+                    null
+                  ]
+                },
+                0.0326
               ]
             },
             {
-              "tag": "Constant",
-              "contents": 0.0325
+              "tag": "FeeTxnAmt",
+              "contents": [
+                [
+                  "\u589e\u503c\u7a0e"
+                ],
+                null
+              ]
             }
           ]
         },
@@ -347,7 +364,8 @@
           "tag": "AnnualRateFee",
           "contents": [
             {
-              "tag": "CurrentPoolBalance"
+              "tag": "CurrentPoolBalance",
+              "contents": null
             },
             {
               "tag": "Constant",
@@ -396,6 +414,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedInterest",
           "\u6536\u5165\u5206\u8d26\u6237"
         ]
@@ -403,6 +422,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedPrincipal",
           "\u672c\u91d1\u5206\u8d26\u6237"
         ]
@@ -410,6 +430,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedPrepayment",
           "\u672c\u91d1\u5206\u8d26\u6237"
         ]
@@ -417,6 +438,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedRecoveries",
           "\u672c\u91d1\u5206\u8d26\u6237"
         ]

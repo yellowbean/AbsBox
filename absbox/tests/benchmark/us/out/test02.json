@@ -31,45 +31,48 @@
       }
     },
     "pool": {
-      "assets": [
-        {
-          "tag": "Mortgage",
-          "contents": [
-            {
-              "originBalance": 2200,
-              "originRate": {
-                "tag": "Fix",
-                "contents": [
-                  "DC_ACT_365F",
-                  0.045
-                ]
+      "tag": "SoloPool",
+      "contents": {
+        "assets": [
+          {
+            "tag": "Mortgage",
+            "contents": [
+              {
+                "originBalance": 2200,
+                "originRate": {
+                  "tag": "Fix",
+                  "contents": [
+                    "DC_ACT_365F",
+                    0.045
+                  ]
+                },
+                "originTerm": 30,
+                "period": "Monthly",
+                "startDate": "2021-02-01",
+                "prinType": {
+                  "tag": "Level"
+                },
+                "prepaymentPenalty": null,
+                "tag": "MortgageOriginalInfo"
               },
-              "originTerm": 30,
-              "period": "Monthly",
-              "startDate": "2021-02-01",
-              "prinType": {
-                "tag": "Level"
-              },
-              "prepaymentPenalty": null,
-              "tag": "MortgageOriginalInfo"
-            },
-            2200,
-            0.08,
-            20,
-            null,
-            {
-              "tag": "Current"
-            }
-          ]
+              2200,
+              0.08,
+              20,
+              null,
+              {
+                "tag": "Current"
+              }
+            ]
+          }
+        ],
+        "asOfDate": "2021-03-01",
+        "issuanceStat": {
+          "IssuanceBalance": 2200
+        },
+        "futureCf": null,
+        "extendPeriods": {
+          "tag": "MonthEnd"
         }
-      ],
-      "asOfDate": "2021-03-01",
-      "issuanceStat": {
-        "IssuanceBalance": 2200
-      },
-      "futureCf": null,
-      "extendPeriods": {
-        "tag": "MonthEnd"
       }
     },
     "bonds": {
@@ -308,6 +311,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedInterest",
           "acc01"
         ]
@@ -315,6 +319,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedPrincipal",
           "acc01"
         ]
@@ -322,6 +327,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedPrepayment",
           "acc01"
         ]
@@ -329,6 +335,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedRecoveries",
           "acc01"
         ]
@@ -347,7 +354,8 @@
             "contents": [
               "G",
               {
-                "tag": "CumulativePoolDefaultedRate"
+                "tag": "CumulativePoolDefaultedRate",
+                "contents": null
               },
               0.05
             ]

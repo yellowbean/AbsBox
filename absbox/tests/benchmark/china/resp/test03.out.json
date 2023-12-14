@@ -41,7 +41,7 @@
                 "2021-10-15",
                 0,
                 0,
-                "<PoolInflow:CollectedRecoveries>"
+                "<Pool:CollectedRecoveries>"
               ]
             },
             {
@@ -50,7 +50,7 @@
                 "2021-10-15",
                 0,
                 0,
-                "<PoolInflow:CollectedPrepayment>"
+                "<Pool:CollectedPrepayment>"
               ]
             },
             {
@@ -59,7 +59,7 @@
                 "2021-10-15",
                 0,
                 0,
-                "<PoolInflow:CollectedPrincipal>"
+                "<Pool:CollectedPrincipal>"
               ]
             },
             {
@@ -68,7 +68,43 @@
                 "2021-10-15",
                 0,
                 0,
-                "<PoolInflow:CollectedInterest>"
+                "<Pool:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-31",
+                0,
+                0,
+                "<Pool:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-31",
+                0,
+                0,
+                "<Pool:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-31",
+                0,
+                0,
+                "<Pool:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-10-31",
+                0,
+                0,
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -110,6 +146,42 @@
             {
               "tag": "AccTxn",
               "contents": [
+                "2021-11-30",
+                0,
+                0,
+                "<Pool:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-11-30",
+                0,
+                0,
+                "<Pool:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-11-30",
+                0,
+                0,
+                "<Pool:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-11-30",
+                0,
+                0,
+                "<Pool:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
                 "2021-12-26",
                 0,
                 0,
@@ -146,6 +218,42 @@
             {
               "tag": "AccTxn",
               "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<Pool:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<Pool:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<Pool:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2021-12-31",
+                0,
+                0,
+                "<Pool:CollectedInterest>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
                 "2022-01-26",
                 0,
                 0,
@@ -177,6 +285,42 @@
                 0,
                 0,
                 "<PayYield:B>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-31",
+                0,
+                0,
+                "<Pool:CollectedRecoveries>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-31",
+                0,
+                0,
+                "<Pool:CollectedPrepayment>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-31",
+                0,
+                0,
+                "<Pool:CollectedPrincipal>"
+              ]
+            },
+            {
+              "tag": "AccTxn",
+              "contents": [
+                "2022-01-31",
+                0,
+                0,
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -221,7 +365,7 @@
                 "2022-02-28",
                 0,
                 0,
-                "<PoolInflow:CollectedRecoveries>"
+                "<Pool:CollectedRecoveries>"
               ]
             },
             {
@@ -230,7 +374,7 @@
                 "2022-02-28",
                 0,
                 0,
-                "<PoolInflow:CollectedPrepayment>"
+                "<Pool:CollectedPrepayment>"
               ]
             },
             {
@@ -239,7 +383,7 @@
                 "2022-02-28",
                 0,
                 0,
-                "<PoolInflow:CollectedPrincipal>"
+                "<Pool:CollectedPrincipal>"
               ]
             },
             {
@@ -248,7 +392,7 @@
                 "2022-02-28",
                 0,
                 0,
-                "<PoolInflow:CollectedInterest>"
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -293,7 +437,7 @@
                 "2022-03-31",
                 0,
                 0,
-                "<PoolInflow:CollectedRecoveries>"
+                "<Pool:CollectedRecoveries>"
               ]
             },
             {
@@ -302,7 +446,7 @@
                 "2022-03-31",
                 1.44,
                 1.44,
-                "<PoolInflow:CollectedPrepayment>"
+                "<Pool:CollectedPrepayment>"
               ]
             },
             {
@@ -311,7 +455,7 @@
                 "2022-03-31",
                 19.28,
                 17.84,
-                "<PoolInflow:CollectedPrincipal>"
+                "<Pool:CollectedPrincipal>"
               ]
             },
             {
@@ -320,7 +464,7 @@
                 "2022-03-31",
                 20.46,
                 1.18,
-                "<PoolInflow:CollectedInterest>"
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -365,7 +509,7 @@
                 "2022-04-30",
                 0,
                 0,
-                "<PoolInflow:CollectedRecoveries>"
+                "<Pool:CollectedRecoveries>"
               ]
             },
             {
@@ -374,7 +518,7 @@
                 "2022-04-30",
                 1.42,
                 1.42,
-                "<PoolInflow:CollectedPrepayment>"
+                "<Pool:CollectedPrepayment>"
               ]
             },
             {
@@ -383,7 +527,7 @@
                 "2022-04-30",
                 19.09,
                 17.67,
-                "<PoolInflow:CollectedPrincipal>"
+                "<Pool:CollectedPrincipal>"
               ]
             },
             {
@@ -392,7 +536,7 @@
                 "2022-04-30",
                 19.75,
                 0.66,
-                "<PoolInflow:CollectedInterest>"
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -437,7 +581,7 @@
                 "2022-05-31",
                 0,
                 0,
-                "<PoolInflow:CollectedRecoveries>"
+                "<Pool:CollectedRecoveries>"
               ]
             },
             {
@@ -446,7 +590,7 @@
                 "2022-05-31",
                 1.21,
                 1.21,
-                "<PoolInflow:CollectedPrepayment>"
+                "<Pool:CollectedPrepayment>"
               ]
             },
             {
@@ -455,7 +599,7 @@
                 "2022-05-31",
                 18.71,
                 17.5,
-                "<PoolInflow:CollectedPrincipal>"
+                "<Pool:CollectedPrincipal>"
               ]
             },
             {
@@ -464,7 +608,7 @@
                 "2022-05-31",
                 19.29,
                 0.58,
-                "<PoolInflow:CollectedInterest>"
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -509,7 +653,7 @@
                 "2022-06-30",
                 0,
                 0,
-                "<PoolInflow:CollectedRecoveries>"
+                "<Pool:CollectedRecoveries>"
               ]
             },
             {
@@ -518,7 +662,7 @@
                 "2022-06-30",
                 1.09,
                 1.09,
-                "<PoolInflow:CollectedPrepayment>"
+                "<Pool:CollectedPrepayment>"
               ]
             },
             {
@@ -527,7 +671,7 @@
                 "2022-06-30",
                 18.42,
                 17.33,
-                "<PoolInflow:CollectedPrincipal>"
+                "<Pool:CollectedPrincipal>"
               ]
             },
             {
@@ -536,7 +680,7 @@
                 "2022-06-30",
                 18.92,
                 0.5,
-                "<PoolInflow:CollectedInterest>"
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -581,7 +725,7 @@
                 "2022-07-31",
                 0,
                 0,
-                "<PoolInflow:CollectedRecoveries>"
+                "<Pool:CollectedRecoveries>"
               ]
             },
             {
@@ -590,7 +734,7 @@
                 "2022-07-31",
                 0.89,
                 0.89,
-                "<PoolInflow:CollectedPrepayment>"
+                "<Pool:CollectedPrepayment>"
               ]
             },
             {
@@ -599,7 +743,7 @@
                 "2022-07-31",
                 18.06,
                 17.17,
-                "<PoolInflow:CollectedPrincipal>"
+                "<Pool:CollectedPrincipal>"
               ]
             },
             {
@@ -608,7 +752,7 @@
                 "2022-07-31",
                 18.48,
                 0.42,
-                "<PoolInflow:CollectedInterest>"
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -653,7 +797,7 @@
                 "2022-08-31",
                 0,
                 0,
-                "<PoolInflow:CollectedRecoveries>"
+                "<Pool:CollectedRecoveries>"
               ]
             },
             {
@@ -662,7 +806,7 @@
                 "2022-08-31",
                 0.76,
                 0.76,
-                "<PoolInflow:CollectedPrepayment>"
+                "<Pool:CollectedPrepayment>"
               ]
             },
             {
@@ -671,7 +815,7 @@
                 "2022-08-31",
                 17.77,
                 17.01,
-                "<PoolInflow:CollectedPrincipal>"
+                "<Pool:CollectedPrincipal>"
               ]
             },
             {
@@ -680,7 +824,7 @@
                 "2022-08-31",
                 18.12,
                 0.35,
-                "<PoolInflow:CollectedInterest>"
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -725,7 +869,7 @@
                 "2022-09-30",
                 0,
                 0,
-                "<PoolInflow:CollectedRecoveries>"
+                "<Pool:CollectedRecoveries>"
               ]
             },
             {
@@ -734,7 +878,7 @@
                 "2022-09-30",
                 0.6,
                 0.6,
-                "<PoolInflow:CollectedPrepayment>"
+                "<Pool:CollectedPrepayment>"
               ]
             },
             {
@@ -743,7 +887,7 @@
                 "2022-09-30",
                 17.45,
                 16.85,
-                "<PoolInflow:CollectedPrincipal>"
+                "<Pool:CollectedPrincipal>"
               ]
             },
             {
@@ -752,7 +896,7 @@
                 "2022-09-30",
                 17.73,
                 0.28,
-                "<PoolInflow:CollectedInterest>"
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -797,7 +941,7 @@
                 "2022-10-31",
                 0,
                 0,
-                "<PoolInflow:CollectedRecoveries>"
+                "<Pool:CollectedRecoveries>"
               ]
             },
             {
@@ -806,7 +950,7 @@
                 "2022-10-31",
                 0.43,
                 0.43,
-                "<PoolInflow:CollectedPrepayment>"
+                "<Pool:CollectedPrepayment>"
               ]
             },
             {
@@ -815,7 +959,7 @@
                 "2022-10-31",
                 17.12,
                 16.69,
-                "<PoolInflow:CollectedPrincipal>"
+                "<Pool:CollectedPrincipal>"
               ]
             },
             {
@@ -824,7 +968,7 @@
                 "2022-10-31",
                 17.32,
                 0.2,
-                "<PoolInflow:CollectedInterest>"
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -869,7 +1013,7 @@
                 "2022-11-30",
                 0,
                 0,
-                "<PoolInflow:CollectedRecoveries>"
+                "<Pool:CollectedRecoveries>"
               ]
             },
             {
@@ -878,7 +1022,7 @@
                 "2022-11-30",
                 0.29,
                 0.29,
-                "<PoolInflow:CollectedPrepayment>"
+                "<Pool:CollectedPrepayment>"
               ]
             },
             {
@@ -887,7 +1031,7 @@
                 "2022-11-30",
                 16.83,
                 16.54,
-                "<PoolInflow:CollectedPrincipal>"
+                "<Pool:CollectedPrincipal>"
               ]
             },
             {
@@ -896,7 +1040,7 @@
                 "2022-11-30",
                 16.96,
                 0.13,
-                "<PoolInflow:CollectedInterest>"
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -941,7 +1085,7 @@
                 "2022-12-31",
                 0,
                 0,
-                "<PoolInflow:CollectedRecoveries>"
+                "<Pool:CollectedRecoveries>"
               ]
             },
             {
@@ -950,7 +1094,7 @@
                 "2022-12-31",
                 0.14,
                 0.14,
-                "<PoolInflow:CollectedPrepayment>"
+                "<Pool:CollectedPrepayment>"
               ]
             },
             {
@@ -959,7 +1103,7 @@
                 "2022-12-31",
                 16.53,
                 16.39,
-                "<PoolInflow:CollectedPrincipal>"
+                "<Pool:CollectedPrincipal>"
               ]
             },
             {
@@ -968,7 +1112,7 @@
                 "2022-12-31",
                 16.59,
                 0.06,
-                "<PoolInflow:CollectedInterest>"
+                "<Pool:CollectedInterest>"
               ]
             },
             {
@@ -1523,335 +1667,409 @@
         }
       },
       "pool": {
-        "assets": [
-          {
-            "tag": "Mortgage",
+        "tag": "SoloPool",
+        "contents": {
+          "assets": [
+            {
+              "tag": "Mortgage",
+              "contents": [
+                {
+                  "tag": "MortgageOriginalInfo",
+                  "originBalance": 120,
+                  "originRate": {
+                    "tag": "Floater",
+                    "contents": [
+                      "DC_ACT_365F",
+                      "LPR5Y",
+                      0.01,
+                      0.085,
+                      {
+                        "tag": "MonthEnd"
+                      },
+                      null,
+                      null,
+                      null
+                    ]
+                  },
+                  "originTerm": 30,
+                  "period": "Monthly",
+                  "startDate": "2020-06-01",
+                  "prinType": {
+                    "tag": "Even"
+                  },
+                  "prepaymentPenalty": null
+                },
+                180,
+                0.08,
+                10,
+                null,
+                {
+                  "tag": "Current"
+                }
+              ]
+            }
+          ],
+          "futureCf": {
+            "tag": "CashFlowFrame",
             "contents": [
               {
-                "tag": "MortgageOriginalInfo",
-                "originBalance": 120,
-                "originRate": {
-                  "tag": "Floater",
-                  "contents": [
-                    "DC_ACT_365F",
-                    "LPR5Y",
-                    0.01,
-                    0.085,
-                    {
-                      "tag": "MonthEnd"
-                    },
-                    null,
-                    null,
-                    null
-                  ]
-                },
-                "originTerm": 30,
-                "period": "Monthly",
-                "startDate": "2020-06-01",
-                "prinType": {
-                  "tag": "Even"
-                },
-                "prepaymentPenalty": null
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2021-10-15",
+                  180,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  null,
+                  null,
+                  null
+                ]
               },
-              180,
-              0.08,
-              10,
-              null,
               {
-                "tag": "Current"
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2021-10-31",
+                  180,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  null,
+                  null,
+                  null
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2021-11-30",
+                  180,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  null,
+                  null,
+                  null
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2021-12-31",
+                  180,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  null,
+                  null,
+                  null
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2022-01-31",
+                  180,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  null,
+                  null,
+                  null
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2022-02-28",
+                  180,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0.08,
+                  null,
+                  null,
+                  [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2022-03-31",
+                  160.59,
+                  17.84,
+                  1.18,
+                  1.44,
+                  0.13,
+                  0,
+                  0.13,
+                  0.08,
+                  null,
+                  null,
+                  [
+                    17.84,
+                    1.44,
+                    0,
+                    0.13,
+                    0,
+                    0.13
+                  ]
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2022-04-30",
+                  141.37,
+                  17.67,
+                  0.66,
+                  1.42,
+                  0.13,
+                  0,
+                  0.13,
+                  0.05,
+                  null,
+                  null,
+                  [
+                    35.51,
+                    2.86,
+                    0,
+                    0.26,
+                    0,
+                    0.26
+                  ]
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2022-05-31",
+                  122.55,
+                  17.5,
+                  0.58,
+                  1.21,
+                  0.11,
+                  0,
+                  0.11,
+                  0.05,
+                  null,
+                  null,
+                  [
+                    53.01,
+                    4.07,
+                    0,
+                    0.37,
+                    0,
+                    0.37
+                  ]
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2022-06-30",
+                  104.03,
+                  17.33,
+                  0.5,
+                  1.09,
+                  0.1,
+                  0,
+                  0.1,
+                  0.05,
+                  null,
+                  null,
+                  [
+                    70.34,
+                    5.16,
+                    0,
+                    0.47,
+                    0,
+                    0.47
+                  ]
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2022-07-31",
+                  85.89,
+                  17.17,
+                  0.42,
+                  0.89,
+                  0.08,
+                  0,
+                  0.08,
+                  0.05,
+                  null,
+                  null,
+                  [
+                    87.51,
+                    6.05,
+                    0,
+                    0.55,
+                    0,
+                    0.55
+                  ]
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2022-08-31",
+                  68.05,
+                  17.01,
+                  0.35,
+                  0.76,
+                  0.07,
+                  0,
+                  0.07,
+                  0.05,
+                  null,
+                  null,
+                  [
+                    104.52,
+                    6.81,
+                    0,
+                    0.62,
+                    0,
+                    0.62
+                  ]
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2022-09-30",
+                  50.55,
+                  16.85,
+                  0.28,
+                  0.6,
+                  0.05,
+                  0,
+                  0.05,
+                  0.05,
+                  null,
+                  null,
+                  [
+                    121.37,
+                    7.41,
+                    0,
+                    0.67,
+                    0,
+                    0.67
+                  ]
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2022-10-31",
+                  33.39,
+                  16.69,
+                  0.2,
+                  0.43,
+                  0.04,
+                  0,
+                  0.04,
+                  0.05,
+                  null,
+                  null,
+                  [
+                    138.06,
+                    7.84,
+                    0,
+                    0.71,
+                    0,
+                    0.71
+                  ]
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2022-11-30",
+                  16.54,
+                  16.54,
+                  0.13,
+                  0.29,
+                  0.02,
+                  0,
+                  0.02,
+                  0.05,
+                  null,
+                  null,
+                  [
+                    154.6,
+                    8.13,
+                    0,
+                    0.73,
+                    0,
+                    0.73
+                  ]
+                ]
+              },
+              {
+                "tag": "MortgageFlow",
+                "contents": [
+                  "2022-12-31",
+                  0,
+                  16.39,
+                  0.06,
+                  0.14,
+                  0.01,
+                  0,
+                  0.01,
+                  0.05,
+                  null,
+                  null,
+                  [
+                    170.99,
+                    8.27,
+                    0,
+                    0.74,
+                    0,
+                    0.74
+                  ]
+                ]
               }
             ]
+          },
+          "asOfDate": "2021-03-01",
+          "issuanceStat": {
+            "IssuanceBalance": 180
+          },
+          "extendPeriods": {
+            "tag": "MonthEnd"
           }
-        ],
-        "futureCf": [
-          {
-            "tag": "MortgageFlow",
-            "contents": [
-              "2021-03-01",
-              180,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              null,
-              null,
-              null
-            ]
-          },
-          {
-            "tag": "MortgageFlow",
-            "contents": [
-              "2022-02-28",
-              180,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0.08,
-              null,
-              null,
-              [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
-              ]
-            ]
-          },
-          {
-            "tag": "MortgageFlow",
-            "contents": [
-              "2022-03-31",
-              160.59,
-              17.84,
-              1.18,
-              1.44,
-              0.13,
-              0,
-              0.13,
-              0.08,
-              null,
-              null,
-              [
-                17.84,
-                1.44,
-                0,
-                0.13,
-                0,
-                0.13
-              ]
-            ]
-          },
-          {
-            "tag": "MortgageFlow",
-            "contents": [
-              "2022-04-30",
-              141.37,
-              17.67,
-              0.66,
-              1.42,
-              0.13,
-              0,
-              0.13,
-              0.05,
-              null,
-              null,
-              [
-                35.51,
-                2.86,
-                0,
-                0.26,
-                0,
-                0.26
-              ]
-            ]
-          },
-          {
-            "tag": "MortgageFlow",
-            "contents": [
-              "2022-05-31",
-              122.55,
-              17.5,
-              0.58,
-              1.21,
-              0.11,
-              0,
-              0.11,
-              0.05,
-              null,
-              null,
-              [
-                53.01,
-                4.07,
-                0,
-                0.37,
-                0,
-                0.37
-              ]
-            ]
-          },
-          {
-            "tag": "MortgageFlow",
-            "contents": [
-              "2022-06-30",
-              104.03,
-              17.33,
-              0.5,
-              1.09,
-              0.1,
-              0,
-              0.1,
-              0.05,
-              null,
-              null,
-              [
-                70.34,
-                5.16,
-                0,
-                0.47,
-                0,
-                0.47
-              ]
-            ]
-          },
-          {
-            "tag": "MortgageFlow",
-            "contents": [
-              "2022-07-31",
-              85.89,
-              17.17,
-              0.42,
-              0.89,
-              0.08,
-              0,
-              0.08,
-              0.05,
-              null,
-              null,
-              [
-                87.51,
-                6.05,
-                0,
-                0.55,
-                0,
-                0.55
-              ]
-            ]
-          },
-          {
-            "tag": "MortgageFlow",
-            "contents": [
-              "2022-08-31",
-              68.05,
-              17.01,
-              0.35,
-              0.76,
-              0.07,
-              0,
-              0.07,
-              0.05,
-              null,
-              null,
-              [
-                104.52,
-                6.81,
-                0,
-                0.62,
-                0,
-                0.62
-              ]
-            ]
-          },
-          {
-            "tag": "MortgageFlow",
-            "contents": [
-              "2022-09-30",
-              50.55,
-              16.85,
-              0.28,
-              0.6,
-              0.05,
-              0,
-              0.05,
-              0.05,
-              null,
-              null,
-              [
-                121.37,
-                7.41,
-                0,
-                0.67,
-                0,
-                0.67
-              ]
-            ]
-          },
-          {
-            "tag": "MortgageFlow",
-            "contents": [
-              "2022-10-31",
-              33.39,
-              16.69,
-              0.2,
-              0.43,
-              0.04,
-              0,
-              0.04,
-              0.05,
-              null,
-              null,
-              [
-                138.06,
-                7.84,
-                0,
-                0.71,
-                0,
-                0.71
-              ]
-            ]
-          },
-          {
-            "tag": "MortgageFlow",
-            "contents": [
-              "2022-11-30",
-              16.54,
-              16.54,
-              0.13,
-              0.29,
-              0.02,
-              0,
-              0.02,
-              0.05,
-              null,
-              null,
-              [
-                154.6,
-                8.13,
-                0,
-                0.73,
-                0,
-                0.73
-              ]
-            ]
-          },
-          {
-            "tag": "MortgageFlow",
-            "contents": [
-              "2022-12-31",
-              0,
-              16.39,
-              0.06,
-              0.14,
-              0.01,
-              0,
-              0.01,
-              0.05,
-              null,
-              null,
-              [
-                170.99,
-                8.27,
-                0,
-                0.74,
-                0,
-                0.74
-              ]
-            ]
-          }
-        ],
-        "asOfDate": "2021-03-01",
-        "issuanceStat": {
-          "IssuanceBalance": 180
-        },
-        "extendPeriods": {
-          "tag": "MonthEnd"
         }
       },
       "waterfall": {
@@ -1947,6 +2165,7 @@
         {
           "tag": "Collect",
           "contents": [
+            null,
             "CollectedInterest",
             "\u8d26\u623701"
           ]
@@ -1954,6 +2173,7 @@
         {
           "tag": "Collect",
           "contents": [
+            null,
             "CollectedPrincipal",
             "\u8d26\u623701"
           ]
@@ -1961,6 +2181,7 @@
         {
           "tag": "Collect",
           "contents": [
+            null,
             "CollectedPrepayment",
             "\u8d26\u623701"
           ]
@@ -1968,6 +2189,7 @@
         {
           "tag": "Collect",
           "contents": [
+            null,
             "CollectedRecoveries",
             "\u8d26\u623701"
           ]
@@ -1984,289 +2206,362 @@
       "ledgers": null
     }
   },
-  [
-    {
-      "tag": "MortgageFlow",
+  {
+    "PoolConsol": {
+      "tag": "CashFlowFrame",
       "contents": [
-        "2021-03-01",
-        180,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        null,
-        null,
-        null
-      ]
-    },
-    {
-      "tag": "MortgageFlow",
-      "contents": [
-        "2022-02-28",
-        180,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0.08,
-        null,
-        null,
-        [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ]
-      ]
-    },
-    {
-      "tag": "MortgageFlow",
-      "contents": [
-        "2022-03-31",
-        160.59,
-        17.84,
-        1.18,
-        1.44,
-        0.13,
-        0,
-        0.13,
-        0.08,
-        null,
-        null,
-        [
-          17.84,
-          1.44,
-          0,
-          0.13,
-          0,
-          0.13
-        ]
-      ]
-    },
-    {
-      "tag": "MortgageFlow",
-      "contents": [
-        "2022-04-30",
-        141.37,
-        17.67,
-        0.66,
-        1.42,
-        0.13,
-        0,
-        0.13,
-        0.05,
-        null,
-        null,
-        [
-          35.51,
-          2.86,
-          0,
-          0.26,
-          0,
-          0.26
-        ]
-      ]
-    },
-    {
-      "tag": "MortgageFlow",
-      "contents": [
-        "2022-05-31",
-        122.55,
-        17.5,
-        0.58,
-        1.21,
-        0.11,
-        0,
-        0.11,
-        0.05,
-        null,
-        null,
-        [
-          53.01,
-          4.07,
-          0,
-          0.37,
-          0,
-          0.37
-        ]
-      ]
-    },
-    {
-      "tag": "MortgageFlow",
-      "contents": [
-        "2022-06-30",
-        104.03,
-        17.33,
-        0.5,
-        1.09,
-        0.1,
-        0,
-        0.1,
-        0.05,
-        null,
-        null,
-        [
-          70.34,
-          5.16,
-          0,
-          0.47,
-          0,
-          0.47
-        ]
-      ]
-    },
-    {
-      "tag": "MortgageFlow",
-      "contents": [
-        "2022-07-31",
-        85.89,
-        17.17,
-        0.42,
-        0.89,
-        0.08,
-        0,
-        0.08,
-        0.05,
-        null,
-        null,
-        [
-          87.51,
-          6.05,
-          0,
-          0.55,
-          0,
-          0.55
-        ]
-      ]
-    },
-    {
-      "tag": "MortgageFlow",
-      "contents": [
-        "2022-08-31",
-        68.05,
-        17.01,
-        0.35,
-        0.76,
-        0.07,
-        0,
-        0.07,
-        0.05,
-        null,
-        null,
-        [
-          104.52,
-          6.81,
-          0,
-          0.62,
-          0,
-          0.62
-        ]
-      ]
-    },
-    {
-      "tag": "MortgageFlow",
-      "contents": [
-        "2022-09-30",
-        50.55,
-        16.85,
-        0.28,
-        0.6,
-        0.05,
-        0,
-        0.05,
-        0.05,
-        null,
-        null,
-        [
-          121.37,
-          7.41,
-          0,
-          0.67,
-          0,
-          0.67
-        ]
-      ]
-    },
-    {
-      "tag": "MortgageFlow",
-      "contents": [
-        "2022-10-31",
-        33.39,
-        16.69,
-        0.2,
-        0.43,
-        0.04,
-        0,
-        0.04,
-        0.05,
-        null,
-        null,
-        [
-          138.06,
-          7.84,
-          0,
-          0.71,
-          0,
-          0.71
-        ]
-      ]
-    },
-    {
-      "tag": "MortgageFlow",
-      "contents": [
-        "2022-11-30",
-        16.54,
-        16.54,
-        0.13,
-        0.29,
-        0.02,
-        0,
-        0.02,
-        0.05,
-        null,
-        null,
-        [
-          154.6,
-          8.13,
-          0,
-          0.73,
-          0,
-          0.73
-        ]
-      ]
-    },
-    {
-      "tag": "MortgageFlow",
-      "contents": [
-        "2022-12-31",
-        0,
-        16.39,
-        0.06,
-        0.14,
-        0.01,
-        0,
-        0.01,
-        0.05,
-        null,
-        null,
-        [
-          170.99,
-          8.27,
-          0,
-          0.74,
-          0,
-          0.74
-        ]
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2021-10-15",
+            180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2021-10-31",
+            180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2021-11-30",
+            180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2021-12-31",
+            180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2022-01-31",
+            180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2022-02-28",
+            180,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.08,
+            null,
+            null,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2022-03-31",
+            160.59,
+            17.84,
+            1.18,
+            1.44,
+            0.13,
+            0,
+            0.13,
+            0.08,
+            null,
+            null,
+            [
+              17.84,
+              1.44,
+              0,
+              0.13,
+              0,
+              0.13
+            ]
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2022-04-30",
+            141.37,
+            17.67,
+            0.66,
+            1.42,
+            0.13,
+            0,
+            0.13,
+            0.05,
+            null,
+            null,
+            [
+              35.51,
+              2.86,
+              0,
+              0.26,
+              0,
+              0.26
+            ]
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2022-05-31",
+            122.55,
+            17.5,
+            0.58,
+            1.21,
+            0.11,
+            0,
+            0.11,
+            0.05,
+            null,
+            null,
+            [
+              53.01,
+              4.07,
+              0,
+              0.37,
+              0,
+              0.37
+            ]
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2022-06-30",
+            104.03,
+            17.33,
+            0.5,
+            1.09,
+            0.1,
+            0,
+            0.1,
+            0.05,
+            null,
+            null,
+            [
+              70.34,
+              5.16,
+              0,
+              0.47,
+              0,
+              0.47
+            ]
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2022-07-31",
+            85.89,
+            17.17,
+            0.42,
+            0.89,
+            0.08,
+            0,
+            0.08,
+            0.05,
+            null,
+            null,
+            [
+              87.51,
+              6.05,
+              0,
+              0.55,
+              0,
+              0.55
+            ]
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2022-08-31",
+            68.05,
+            17.01,
+            0.35,
+            0.76,
+            0.07,
+            0,
+            0.07,
+            0.05,
+            null,
+            null,
+            [
+              104.52,
+              6.81,
+              0,
+              0.62,
+              0,
+              0.62
+            ]
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2022-09-30",
+            50.55,
+            16.85,
+            0.28,
+            0.6,
+            0.05,
+            0,
+            0.05,
+            0.05,
+            null,
+            null,
+            [
+              121.37,
+              7.41,
+              0,
+              0.67,
+              0,
+              0.67
+            ]
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2022-10-31",
+            33.39,
+            16.69,
+            0.2,
+            0.43,
+            0.04,
+            0,
+            0.04,
+            0.05,
+            null,
+            null,
+            [
+              138.06,
+              7.84,
+              0,
+              0.71,
+              0,
+              0.71
+            ]
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2022-11-30",
+            16.54,
+            16.54,
+            0.13,
+            0.29,
+            0.02,
+            0,
+            0.02,
+            0.05,
+            null,
+            null,
+            [
+              154.6,
+              8.13,
+              0,
+              0.73,
+              0,
+              0.73
+            ]
+          ]
+        },
+        {
+          "tag": "MortgageFlow",
+          "contents": [
+            "2022-12-31",
+            0,
+            16.39,
+            0.06,
+            0.14,
+            0.01,
+            0,
+            0.01,
+            0.05,
+            null,
+            null,
+            [
+              170.99,
+              8.27,
+              0,
+              0.74,
+              0,
+              0.74
+            ]
+          ]
+        }
       ]
     }
-  ],
+  },
   [
     {
       "tag": "BondOutstandingInt",

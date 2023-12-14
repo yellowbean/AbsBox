@@ -1,4 +1,3 @@
-from absbox.local.china import *
 from absbox.local.generic import * 
 from absbox.local.component import * 
 from absbox.local.util import * 
@@ -10,13 +9,6 @@ from rich.console import Console
 
 console = Console()
 
-def isMixedDeal(x:dict) -> bool :
-    if 'assets' in x or 'cashflow' in x:
-        return False
-    assetTags = query(x,[S.MVALS,S.ALL,'assets',S.FIRST,S.FIRST])
-    if len(set(assetTags))>1:
-        return True
-    return False
 
 def mkDeal(x:dict,preCheck=True):
     name = getValWithKs(x, ['name', "名称", "comment", '备注'], defaultReturn="")

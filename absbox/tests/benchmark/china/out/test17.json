@@ -31,43 +31,46 @@
       }
     },
     "pool": {
-      "assets": [
-        {
-          "tag": "Mortgage",
-          "contents": [
-            {
-              "originBalance": 120,
-              "originRate": {
-                "tag": "Fix",
-                "contents": [
-                  "DC_ACT_365F",
-                  0.045
-                ]
+      "tag": "SoloPool",
+      "contents": {
+        "assets": [
+          {
+            "tag": "Mortgage",
+            "contents": [
+              {
+                "originBalance": 120,
+                "originRate": {
+                  "tag": "Fix",
+                  "contents": [
+                    "DC_ACT_365F",
+                    0.045
+                  ]
+                },
+                "originTerm": 30,
+                "period": "Monthly",
+                "startDate": "2021-02-01",
+                "prinType": {
+                  "tag": "Even"
+                },
+                "prepaymentPenalty": null,
+                "tag": "MortgageOriginalInfo"
               },
-              "originTerm": 30,
-              "period": "Monthly",
-              "startDate": "2021-02-01",
-              "prinType": {
-                "tag": "Even"
-              },
-              "prepaymentPenalty": null,
-              "tag": "MortgageOriginalInfo"
-            },
-            120,
-            0.08,
-            20,
-            null,
-            {
-              "tag": "Current"
-            }
-          ]
+              120,
+              0.08,
+              20,
+              null,
+              {
+                "tag": "Current"
+              }
+            ]
+          }
+        ],
+        "asOfDate": "2021-03-31",
+        "issuanceStat": null,
+        "futureCf": null,
+        "extendPeriods": {
+          "tag": "MonthEnd"
         }
-      ],
-      "asOfDate": "2021-03-31",
-      "issuanceStat": null,
-      "futureCf": null,
-      "extendPeriods": {
-        "tag": "MonthEnd"
       }
     },
     "bonds": {
@@ -219,6 +222,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedInterest",
           "\u8d26\u623701"
         ]
@@ -226,6 +230,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedPrincipal",
           "\u8d26\u623701"
         ]
@@ -233,6 +238,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedPrepayment",
           "\u8d26\u623701"
         ]
@@ -240,6 +246,7 @@
       {
         "tag": "Collect",
         "contents": [
+          null,
           "CollectedRecoveries",
           "\u8d26\u623701"
         ]

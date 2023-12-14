@@ -3,12 +3,12 @@ import functools
 
 from absbox import *
 from absbox.local.util import mkTag,mapListValBy,mapValsBy,renameKs2\
-                              ,guess_pool_flow_header,positionFlow,mapNone
+                              ,guess_pool_flow_header,positionFlow,mapNone\
+                              ,isMixedDeal
 from absbox.local.component import *
 from absbox.local.base import * 
 import pandas as pd
 import collections
-from absbox.deal import isMixedDeal
 
 @dataclass
 class Generic:

@@ -7,7 +7,7 @@ import numpy as np
 import dataclasses
 from functools import reduce
 from absbox.local.base import *
-from pyspecter import query
+from pyspecter import query,S
 
 
 def mapNone(x, v):
@@ -399,3 +399,11 @@ def searchByFst(xs, v, defaultRtn=None):
         if x[0] == v:
             return x
     return defaultRtn
+
+def isMixedDeal(x:dict) -> bool :
+    if 'assets' in x or 'cashflow' in x:
+        return False
+    assetTags = query(x, [S.MVALS,S.ALL,'assets',S.FIRST,S.FIRST])
+    if len(set(assetTags))>1:
+        return True
+    return False

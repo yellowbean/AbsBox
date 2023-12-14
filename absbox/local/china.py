@@ -6,11 +6,12 @@ import pandas as pd
 import numpy as np
 from urllib.request import unquote
 from functools import reduce 
-from pyspecter import query
+from pyspecter import query,S
 
 from absbox import *
 from absbox.local.util import *
 from absbox.local.component import *
+from absbox.deal import isMixedDeal
 
 
 
@@ -34,9 +35,10 @@ class SPV:
 
     @property
     def json(self):
-        stated = False 
         parsedDates = mkDate(self.日期)
         defaultStartDate = self.日期.get("起息日",None) or self.日期['归集日'][0]
+        mixedAssetFlag = isMixedDeal(self.资产池)
+        (lastAssetDate,lastCloseDate) = getStartDate(self.日期)
         """
         get the json formatted string
         """
@@ -44,11 +46,7 @@ class SPV:
             "dates": parsedDates,
             "name": self.名称,
             "status": mkStatus(self.状态),
-            "pool":{"assets": [mkAsset(x) for x in self.资产池.get('清单',[])]
-                , "asOfDate": self.日期.get('封包日',None) or self.日期['归集日'][0]
-                , "issuanceStat": readCutoffFields(self.资产池)
-                , "futureCf":mkCf(self.资产池.get('归集表', []))
-                , "extendPeriods":mkDatePattern(self.资产池.get('extendBy',"MonthEnd"))},
+            "pool":mkPoolType(lastAssetDate, self.资产池, mixedAssetFlag),
             "bonds": {bn: mkBnd(bn,bo)  for (bn,bo) in self.债券 },
             "waterfall": mkWaterfall({},self.分配规则.copy()),
             "fees": {fn :mkFee(fo|{"名称":fn},fsDate=defaultStartDate) for (fn,fo) in self.费用 },
@@ -113,15 +111,15 @@ class SPV:
         output['agg_accounts'] = aggAccs(output['accounts'],'chinese')
 
         output['pool'] = {}
-        if deal_content['pool']['futureCf'] is None:
+        if deal_content['pool']['contents']['futureCf'] is None:
             output['pool']['flow'] = None
         else:
-            _pool_cf_header, _, expandFlag = guess_pool_flow_header(deal_content['pool']['futureCf'][0], "chinese")
+            _pool_cf_header, _, expandFlag = guess_pool_flow_header(deal_content['pool']['contents']['futureCf']['contents'][0], "chinese")
             if not expandFlag:
-                output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['futureCf']]
+                output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['contents']['futureCf']['contents']]
                                                       , columns=_pool_cf_header)
             else:
-                output['pool']['flow'] = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[None]*6) for _ in deal_content['pool']['futureCf']]
+                output['pool']['flow'] = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[None]*6) for _ in deal_content['pool']['contents']['futureCf']['contents']]
                                                       , columns=_pool_cf_header)                
             
             pool_idx = "日期"
