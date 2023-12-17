@@ -9,6 +9,11 @@ from functools import reduce
 from absbox.local.base import *
 from pyspecter import query,S
 
+import rich
+from rich.console import Console
+from rich.json import JSON
+
+console = Console()
 
 def mapNone(x, v):
     if x is None:
@@ -30,15 +35,17 @@ def mkTag(x: tuple) -> dict:
 
 
 def readTagStr(x: str) -> str:
-    _x = json.loads(x.replace("'", "\"").replace("True", "true").replace("False", "false"))
-    match _x:
+    x = json.loads(x.replace("'", "\"").replace("True", "true").replace("False", "false").replace("None","null"))
+    match x:
+        case {"tag": _t, "contents": None}:
+            return f"<{_t}>"
         case {"tag": _t, "contents": _c} if isinstance(_c, list):
             _cs = [str(_) for _ in _c]
             return f"<{_t}:{','.join(_cs)}>"
         case {"tag": _t}:
             return f"<{_t}>"
         case _ :
-            return f"<{_x}>"
+            return f"<{x}>"
 
 
 def readTag(x: dict):

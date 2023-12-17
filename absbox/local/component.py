@@ -222,10 +222,8 @@ def mkDs(x):
             return mkTag(("PoolCumCollectionTill", [idx, [mkPoolSource(_) for _ in i], None] ))
         case ("资产池当期", pNames, *i) | ("curPoolCollection", pNames, *i):
             if pNames:
-                print("pool cmu >>> ",pNames)
                 return mkTag(("PoolCurCollection", [[mkPoolSource(_) for _ in i]
                                                     ,[mkPid(p) for p in pNames]]))
-            print("pool cmu >>> None")
             return mkTag(("PoolCurCollection", [[mkPoolSource(_) for _ in i]
                                                 , None]))
         case ("资产池当期至", pNames, idx, *i) | ("curPoolCollectionStats", pNames, idx, *i):
@@ -233,6 +231,10 @@ def mkDs(x):
                 return mkTag(("PoolCurCollectionStats", [idx, [mkPoolSource(_) for _ in i]
                                                          ,[mkPid(p) for p in pNames]]))
             return mkTag(("PoolCurCollectionStats", [idx, [mkPoolSource(_) for _ in i], None]))
+        case ("计划资产池估值", pricingMethod, *pNames) | ("schedulePoolValuation", pricingMethod, *pNames):
+            if pNames:
+                return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), [mkPid(p) for p in pNames]]))
+            return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), None]))
         case ("债券系数",) | ("bondFactor",):
             return mkTag("BondFactor")
         case ("资产池系数", *pNames) | ("poolFactor", *pNames):
@@ -246,7 +248,7 @@ def mkDs(x):
         case ("资产池利率", *pNames) | ("poolWaRate", *pNames):
             if pNames:
                 return mkTag(("PoolWaRate", [mkPid(p) for p in pNames]))
-            return mkTag("PoolWaRate")
+            return mkTag(("PoolWaRate", None))
         case ("所有账户余额",) | ("accountBalance"):
             return mkTag("AllAccBalance")
         case ("账户余额", *ans) | ("accountBalance", *ans):
@@ -533,6 +535,10 @@ def mkLiqMethod(x):
             return mkTag(("PV", [a, b]))
         case ["贴现曲线", ts] | ["PVCurve", ts]:
             return mkTag(("PVCurve", mkTs("PricingCurve", ts)))
+        case ["贴现率", r] | ["PvRate", r] | ("PvRate", r) if isinstance(r, float):
+            return mkTag(("PvRate", r))
+        case ["贴现率", r] | ["PvRate", r] | ("PvRate", r):
+            return mkTag(("PvByRef", mkDs(r)))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkLiqMethod")
 
