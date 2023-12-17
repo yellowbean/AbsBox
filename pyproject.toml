@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "0.23.3"
+version = "0.24.1"
 name = "absbox"
 description = "an analytical library for cashflow modeling on ABS/MBS products"
 readme = "README.md"
@@ -30,6 +30,7 @@ dependencies = [
     "requests",
     "rich",
     "pyxirr",
+    "lenses",
     "pyspecter",
     "graphviz"
 ]
