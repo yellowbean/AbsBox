@@ -46,7 +46,7 @@ class SPV:
             "dates": parsedDates,
             "name": self.名称,
             "status": mkStatus(self.状态),
-            "pool":mkPoolType(lastAssetDate, self.资产池, mixedAssetFlag),
+            "pool":  mkPoolType(lastAssetDate, self.资产池, mixedAssetFlag),
             "bonds": {bn: mkBnd(bn,bo)  for (bn,bo) in self.债券 },
             "waterfall": mkWaterfall({},self.分配规则.copy()),
             "fees": {fn :mkFee(fo|{"名称":fn},fsDate=defaultStartDate) for (fn,fo) in self.费用 },

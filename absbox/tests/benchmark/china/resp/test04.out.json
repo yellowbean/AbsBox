@@ -31895,7 +31895,7 @@
                   0,
                   0,
                   0,
-                  0,
+                  0.04,
                   null,
                   null,
                   null
@@ -31912,7 +31912,7 @@
                   0,
                   0,
                   0,
-                  0,
+                  0.04,
                   null,
                   null,
                   null
@@ -35568,6 +35568,10 @@
               }
             ]
           },
+          "futureScheduleCf": {
+            "tag": "CashFlowFrame",
+            "contents": []
+          },
           "asOfDate": "2022-10-02",
           "issuanceStat": {
             "IssuanceBalance": 11439328599.28
@@ -35745,7 +35749,7 @@
             0,
             0,
             0,
-            0,
+            0.04,
             null,
             null,
             null
@@ -35762,7 +35766,7 @@
             0,
             0,
             0,
-            0,
+            0.04,
             null,
             null,
             null

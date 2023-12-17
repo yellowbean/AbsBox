@@ -876,9 +876,13 @@ def mkAction(x:list):
         case ["条件执行2", pre, actions1, actions2] | ["IfElse", pre, actions1, actions2]:
             return mkTag(("ActionWithPre2", [mkPre(pre), [mkAction(a) for a in actions1], [mkAction(a) for a in actions2]] ))
         case ["购买资产", liq, source, _limit] | ["buyAsset", liq, source, _limit]:
-            return mkTag(("BuyAsset", [mkLimit(_limit), mkLiqMethod(liq), source]))
+            return mkTag(("BuyAsset", [mkLimit(_limit), mkLiqMethod(liq), source, None]))
+        case ["购买资产", liq, source, None] | ["buyAsset", liq, source, None]:
+            return mkTag(("BuyAsset", [None, mkLiqMethod(liq), source, None]))
+        case ["购买资产", liq, source, mPns] | ["buyAsset", liq, source, mPns]:
+            return mkTag(("BuyAsset", [None, mkLiqMethod(liq), source, [mkPid(_) for _ in mPns] ]))
         case ["购买资产", liq, source] | ["buyAsset", liq, source]:
-            return mkTag(("BuyAsset", [None, mkLiqMethod(liq), source]))
+            return mkTag(("BuyAsset", [None, mkLiqMethod(liq), source, None]))
         case ["更新事件", trgName] | ["runTrigger", trgName]:
             return mkTag(("RunTrigger", ["InWF",trgName]))
         case ["查看", comment, *ds] | ["inspect", comment, *ds]:
@@ -1244,7 +1248,7 @@ def identify_deal_type(x):
             return "MDeal"
         case {"assets": [{'tag': 'AdjustRateMortgage'}, *rest]}:
             return "MDeal"
-        case {"assets": [], "futureCf": cfs} if cfs[0]['tag'] == 'MortgageFlow':
+        case {"assets": [], "futureCf": cfs} if cfs['contents'][0]['tag'] == 'MortgageFlow':
             return "MDeal"
         case {"assets": [{'tag': 'Installment'}, *rest]}:
             return "IDeal"
@@ -1587,7 +1591,8 @@ def mkCf(x:list):
     if len(x) == 0:
         return None
     else:
-        return [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None,None])) for _x in x]
+        cfs = [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None,None])) for _x in x]
+        return mkTag(("CashFlowFrame",cfs))
 
 def mkPid(x):
     match x:

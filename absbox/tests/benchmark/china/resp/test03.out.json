@@ -1723,7 +1723,7 @@
                   0,
                   0,
                   0,
-                  0,
+                  0.08,
                   null,
                   null,
                   null
@@ -1740,7 +1740,7 @@
                   0,
                   0,
                   0,
-                  0,
+                  0.08,
                   null,
                   null,
                   null
@@ -1757,7 +1757,7 @@
                   0,
                   0,
                   0,
-                  0,
+                  0.08,
                   null,
                   null,
                   null
@@ -1774,7 +1774,7 @@
                   0,
                   0,
                   0,
-                  0,
+                  0.08,
                   null,
                   null,
                   null
@@ -1791,7 +1791,7 @@
                   0,
                   0,
                   0,
-                  0,
+                  0.08,
                   null,
                   null,
                   null
@@ -2063,6 +2063,10 @@
               }
             ]
           },
+          "futureScheduleCf": {
+            "tag": "CashFlowFrame",
+            "contents": []
+          },
           "asOfDate": "2021-03-01",
           "issuanceStat": {
             "IssuanceBalance": 180
@@ -2221,7 +2225,7 @@
             0,
             0,
             0,
-            0,
+            0.08,
             null,
             null,
             null
@@ -2238,7 +2242,7 @@
             0,
             0,
             0,
-            0,
+            0.08,
             null,
             null,
             null
@@ -2255,7 +2259,7 @@
             0,
             0,
             0,
-            0,
+            0.08,
             null,
             null,
             null
@@ -2272,7 +2276,7 @@
             0,
             0,
             0,
-            0,
+            0.08,
             null,
             null,
             null
@@ -2289,7 +2293,7 @@
             0,
             0,
             0,
-            0,
+            0.08,
             null,
             null,
             null

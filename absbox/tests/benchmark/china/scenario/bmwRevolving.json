@@ -2,13 +2,13 @@
         [
             {"tag": "MonthEnd"
             },
-            {"tag": "CurrentBondBalance"
+            {"tag": "CurrentBondBalance", "contents":null
             }
         ],
         [
             {"tag": "MonthFirst"
             },
-            {"tag": "CurrentPoolBalance"
+            {"tag": "CurrentPoolBalance", "contents":null
             }
         ]
     ],
