@@ -4,10 +4,10 @@ import logging
 import itertools,re
 from enum import Enum
 import numpy as np
-import dataclasses
 from functools import reduce
 from absbox.local.base import *
-from pyspecter import query,S
+from pyspecter import query, S
+from datetime import datetime
 
 import rich
 from rich.console import Console
@@ -133,24 +133,6 @@ def update_deal(d, i, c):
     return _d
 
 
-def mkDealsBy(d, m: dict)->dict:
-    return {k: dataclasses.replace(d, **v) for k, v in m.items()} 
-
-
-class DC(Enum):  # TODO need to check with HS code
-    DC_30E_360 = "DC_30E_360"
-    DC_30Ep_360 = "DC_30Ep_360"
-    DC_ACT_360 = "DC_ACT_360"
-    DC_ACT_365A = "DC_ACT_365A"
-    DC_ACT_365L = "DC_ACT_365L"
-    DC_NL_365 = "DC_NL_365"
-    DC_ACT_365F = "DC_ACT_365F"
-    DC_ACT_ACT = "DC_ACT_ACT"
-    DC_30_360_ISDA = "DC_30_360_ISDA"
-    DC_30_360_German = "DC_30_360_German"
-    DC_30_360_US = "DC_30_360_US"
-
-
 def str2date(x: str):
     return datetime.strptime(x, '%Y-%m-%d').date()
 
@@ -160,7 +142,7 @@ def normDate(x: str):
         return f"{x[:4]}-{x[4:6]}-{x[6:8]}"
 
 
-def daysBetween(sd,ed):
+def daysBetween(sd, ed):
     return (ed - sd).days
 
 
@@ -172,9 +154,9 @@ def guess_locale(x):
     acc_cols = set(list(accs.values())[0].columns.to_list())
     locale = None
     if acc_cols == set(["余额", "变动额", "备注"]):
-        locale="cn"
+        locale = "cn"
     if acc_cols == set(["balance", "change", "memo"]):
-        locale="en"
+        locale = "en"
     return locale
 
 
@@ -187,7 +169,7 @@ def guess_pool_locale(x):
         raise RuntimeError("Failed to match {x} in guess pool locale")
 
 
-def renameKs(m:dict, mapping, opt_key=False):
+def renameKs(m: dict, mapping, opt_key=False):
     '''
     rename keys in a map with from a mapping tuple passed in 
     `opt_key` = True, allow skipping mapping tuple not exist in the map
@@ -206,7 +188,6 @@ def subMap(m: dict, ks: list):
 
 
 def subMap2(m: dict, ks: list):
-    #fieldNames = [ fName for (fName, fTargetName, fDefaultValue) in ks]
     _m = {k: m.get(k, defaultVal) for (k, _, defaultVal) in ks}
     _mapping = [_[:2] for _ in ks]
     return renameKs(_m, _mapping)
@@ -237,7 +218,7 @@ def applyFnToKey(m: dict, f, k, applyNone=False):
     return m
 
 
-def renameKs2(m:dict, kmapping):
+def renameKs2(m: dict, kmapping):
     ''' Given a map, rename ks from a key-mapping '''
     assert isinstance(m, dict), "M is not a map"
     assert isinstance(kmapping, dict), f"Mapping is not a map: {kmapping}"
@@ -246,7 +227,7 @@ def renameKs2(m:dict, kmapping):
 
 
 def ensure100(xs, msg=""):
-    assert sum(xs)==1.0, f"Doesn't not sum up 100%: {msg}"
+    assert sum(xs) == 1.0, f"Doesn't not sum up 100%: {msg}"
 
 
 def guess_pool_flow_header(x, l):

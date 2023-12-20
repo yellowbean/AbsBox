@@ -1,11 +1,9 @@
 from absbox.local.generic import * 
 from absbox.local.component import * 
 from absbox.local.util import * 
-from pyspecter import * 
-import rich
 from rich.console import Console
-
-
+from lenses import lens
+from itertools import permutations, product
 
 console = Console()
 
@@ -25,11 +23,6 @@ def mkDeal(x:dict,preCheck=True):
                                             , defaultReturn={}).items())
     
     pool = getValWithKs(x, ['pool', "collateral", "资产池"])
-    # _assets = [mkAsset(x) for x in getValWithKs(_pool
-    #                                             , ['assets', 'loans', 'mortgages', "清单", "资产清单"])]
-    # _asOfDate = getValWithKs(_pool, ["asOfDate", "asofDate", "封包日"])
-    # _issuanceStat = readIssuance(_pool)
-    # _futureCf = mkCf(getValWithKs(_pool,["归集表","现金流归集表","projected","cashflow"],defaultReturn=[]))
 
     bonds = list((bn,bo)
                 for bn,bo in getValWithKs(x
@@ -82,3 +75,22 @@ def mkDeal(x:dict,preCheck=True):
     return deal
 
 
+def mkDealsBy(d, m: dict)->list:
+    "Input a deal, permunations, lenses ,and return a list of deals with variety"
+    #return {k: dataclasses.replace(d, **v) for k, v in m.items()}
+
+
+def setDealsBy(d, *receipes: list):
+    "input a deal object, a list of tweaks( path, values) ,return an updated deals"
+    for (p, v) in receipes:
+        d &= p.set(v)
+    return d
+
+
+def prodDealsBy(d, *receipes) -> dict:
+    inflated = [[(p, _) for _ in vs] for (p, vs) in receipes]
+    #print("inflated",inflated)
+    permus = product(*inflated)
+    #return permus
+    #names = [str(_) for _ in permus]
+    return {str(v): setDealsBy(d, *v) for v in permus}

@@ -1,3 +1,5 @@
+from enum import Enum
+
 
 # Bond 
 china_bondflow_fields = ["日期", "余额", "利息", "本金", "执行利率", "本息合计", "备注"]
@@ -124,3 +126,16 @@ dealStatusMap = {"en": {'amort': "Amortizing", 'def': "Defaulted", 'acc': "Accel
                         ,'ramp':"RampUp"}}
 
 cfIndexMap = {'cn':"日期",'en':"Date","english":"Date","chinese":"日期"}
+
+class DC(Enum):  # TODO need to check with HS code
+    DC_30E_360 = "DC_30E_360"
+    DC_30Ep_360 = "DC_30Ep_360"
+    DC_ACT_360 = "DC_ACT_360"
+    DC_ACT_365A = "DC_ACT_365A"
+    DC_ACT_365L = "DC_ACT_365L"
+    DC_NL_365 = "DC_NL_365"
+    DC_ACT_365F = "DC_ACT_365F"
+    DC_ACT_ACT = "DC_ACT_ACT"
+    DC_30_360_ISDA = "DC_30_360_ISDA"
+    DC_30_360_German = "DC_30_360_German"
+    DC_30_360_US = "DC_30_360_US"

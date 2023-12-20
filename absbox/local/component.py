@@ -1,4 +1,4 @@
-from absbox.local.util import mkTag, DC, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100
+from absbox.local.util import mkTag, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100
 from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
 
@@ -10,6 +10,7 @@ import logging
 
 import pandas as pd
 from pyspecter import query, S
+
 
 def mkLiq(x):
     ''' make pricing method '''
@@ -25,8 +26,9 @@ def mkLiq(x):
         case _:
             raise RuntimeError(f"Failed to match {x} in Liquidation Method")
 
+
 def mkDatePattern(x):
-    ''' make date pattern '''
+    ''' make date pattern, to describle a series of dates'''
     match x:
         case ["DayOfMonth", _d] | ["每月", _d] | ("每月", _d):
             return mkTag(("DayOfMonth", _d))
@@ -51,6 +53,7 @@ def mkDatePattern(x):
         case _:
             raise RuntimeError(f"Failed to match {x}")
 
+
 def getStartDate(x):
     match x:
         case {"封包日": a, "起息日": b, "首次兑付日": c, "法定到期日": d, "收款频率": pf, "付款频率": bf} | \
@@ -64,6 +67,7 @@ def getStartDate(x):
             return (lastCollected, pp)
         case _:
             raise RuntimeError(f"Failed to get Start Date from {x}")
+
 
 def mkDate(x):
     ''' make date component for deal '''
@@ -87,11 +91,13 @@ def mkDate(x):
         case _:
             raise RuntimeError(f"Failed to match:{x} in Dates")
 
+
 def mkDsRate(x):
     if isinstance(x,float):
         return mkDs(("constant", x))
     else:
         return mkDs(x)
+
 
 def mkFeeType(x):
     match x:
@@ -135,6 +141,7 @@ def mkDateVector(x):
         case _:
             raise RuntimeError(f"not match found: {x}")
 
+
 def mkPoolSource(x):
     match x:
         case "利息" | "Interest" | "利息回款" | "CollectedInterest" :
@@ -157,6 +164,7 @@ def mkPoolSource(x):
             return "NewLosses"
         case _ :
             raise RuntimeError(f"not match found: {x} :make Pool Source")
+
 
 @functools.lru_cache(maxsize=128)
 def mkDs(x):
@@ -340,8 +348,10 @@ def mkDs(x):
         case _:
             raise RuntimeError(f"Failed to match DS/Formula: {x}")
 
+
 def mkCurve(tag, xs):
     return mkTag((tag, xs))
+
 
 def mkPre(p):
     def queryType(y):
@@ -519,8 +529,6 @@ def mkBnd(bn, x):
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
                     , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
                     , "bndLastIntPayDate": lastIntPayDate}
-
-
         case _:
             raise RuntimeError(f"Failed to match bond:{bn},{x}:mkBnd")
 
@@ -790,7 +798,7 @@ def mkAction(x:list):
         case ["特殊计提利息", (mbal, mrate), bndName] | ["calcIntBy", (mbal, mrate), bndName]:
             return mkTag(("CalcBondInt", [[bndName]
                                           , earlyReturnNone(mkDs, mbal)
-                                          , earlyReturnNone(mkDsRate,mrate)]))
+                                          , earlyReturnNone(mkDsRate, mrate)]))
         case ["计提利息", *bndNames] | ["calcInt", *bndNames]:
             return mkTag(("CalcBondInt", [bndNames, None, None]))
         case ["计提支付费用", source, target, m] | ["calcAndPayFee", source, target, m]:
