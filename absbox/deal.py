@@ -3,7 +3,8 @@ from absbox.local.component import *
 from absbox.local.util import * 
 from rich.console import Console
 from lenses import lens
-from itertools import permutations, product
+from itertools import product
+import dataclasses
 
 console = Console()
 
@@ -79,16 +80,13 @@ def mkDealsBy(d, m: dict)->dict:
     "Input a deal, permunations, lenses ,and return a list of deals with variety"
     return {k: dataclasses.replace(d, **v) for k, v in m.items()} 
 
-def setDealsBy(d, *receipes: list, init=None, common=None):
+
+def setDealsBy(d, *receipes: list, init=None):
     "input a deal object, a list of tweaks( path, values) ,return an updated deal"
-    if common:
-        receipes = [ (common & _[0],_[1]) for _ in receipes ]
     if init:
-        for (p, v) in receipes:
-            d &= (init & p).set(v)
-    else:
-        for (p,v) in receipes:
-            d &= p.set(v)
+        receipes = [(init & _[0], _[1]) for _ in receipes]
+    for (p, v) in receipes:
+        d &= p.set(v)
     return d
 
 
