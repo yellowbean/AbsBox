@@ -75,22 +75,24 @@ def mkDeal(x:dict,preCheck=True):
     return deal
 
 
-def mkDealsBy(d, m: dict)->list:
+def mkDealsBy(d, m: dict)->dict:
     "Input a deal, permunations, lenses ,and return a list of deals with variety"
-    #return {k: dataclasses.replace(d, **v) for k, v in m.items()}
+    return {k: dataclasses.replace(d, **v) for k, v in m.items()} 
 
-
-def setDealsBy(d, *receipes: list):
-    "input a deal object, a list of tweaks( path, values) ,return an updated deals"
-    for (p, v) in receipes:
-        d &= p.set(v)
+def setDealsBy(d, *receipes: list, init=None, common=None):
+    "input a deal object, a list of tweaks( path, values) ,return an updated deal"
+    if common:
+        receipes = [ (common & _[0],_[1]) for _ in receipes ]
+    if init:
+        for (p, v) in receipes:
+            d &= (init & p).set(v)
+    else:
+        for (p,v) in receipes:
+            d &= p.set(v)
     return d
 
 
-def prodDealsBy(d, *receipes) -> dict:
+def prodDealsBy(d, *receipes, **kwargs) -> dict:
     inflated = [[(p, _) for _ in vs] for (p, vs) in receipes]
-    #print("inflated",inflated)
     permus = product(*inflated)
-    #return permus
-    #names = [str(_) for _ in permus]
-    return {str(v): setDealsBy(d, *v) for v in permus}
+    return {str(v): setDealsBy(d, *v, **kwargs) for v in permus}
