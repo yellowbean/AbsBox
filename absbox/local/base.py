@@ -139,3 +139,6 @@ class DC(Enum):  # TODO need to check with HS code
     DC_30_360_ISDA = "DC_30_360_ISDA"
     DC_30_360_German = "DC_30_360_German"
     DC_30_360_US = "DC_30_360_US"
+
+#valid inspection tags
+inspectTags = ["InspectBal", "InspectBool", "InspectRate", "InspectInt"]

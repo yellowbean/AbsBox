@@ -119,3 +119,7 @@ class Generic:
         output['result'] = readRunSummary(resp[2], 'en')
         output['_deal'] = resp[0]
         return output
+    
+    def __str__(self):
+        ''' Return a simplified string representation of deal object '''
+        return f"{self.name}"

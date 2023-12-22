@@ -1,17 +1,15 @@
 import pandas as pd
-import functools,json,copy
-import logging
-import itertools,re
-from enum import Enum
 import numpy as np
+import functools,json,copy,logging,re,itertools
+from enum import Enum
 from functools import reduce
 from absbox.local.base import *
 from pyspecter import query, S
 from datetime import datetime
-
 import rich
 from rich.console import Console
 from rich.json import JSON
+from lenses import lens, ui, optics
 
 console = Console()
 
@@ -340,10 +338,12 @@ def flow_by_scenario(rs, flowpath, node="col", rtn_df=True, ax=1, rnd=2):
 
 
 def positionFlow(x, m: dict, facePerPaper=100):
+    ''' Get a position bond cashflow from a run result '''
     _, _bflow = list(x['bonds'].items())[0]
     bflowHeader = _bflow.columns.to_list()
 
-    def calcBondFlow(_bflow, factor):
+    def calcBondFlow(_bflow: pd.DataFrame, factor):
+        ''' input: (bond cashflow : dataframe, factor: float) '''
         bflow = copy.deepcopy(_bflow)
         bflow[bflowHeader[0]] *= factor
         bflow[bflowHeader[1]] *= factor
@@ -353,9 +353,9 @@ def positionFlow(x, m: dict, facePerPaper=100):
         
     assert isinstance(m, dict), "Position info must be a map/dict"
     
-    bOrignBal = {k: x['_deal']['contents']['bonds'][k]['bndOriginInfo']['originBalance'] for k, v in m.items()}
-    bPapersPerBond = {k: v/facePerPaper for k, v in bOrignBal.items()}
-    bflowFactor = {k: (v/bPapersPerBond[k]) for k, v in m.items()}
+    bOrignBal = {bondName: x['_deal']['contents']['bonds'][bondName]['bndOriginInfo']['originBalance'] for bondName, bondPos in m.items()}
+    bPapersPerBond = {bondName: bondOrigBal/facePerPaper for (bondName, bondOrigBal) in bOrignBal.items()}
+    bflowFactor = {bondName: (bondPos/bPapersPerBond[bondName]) for (bondName, bondPos) in m.items()}
     return {bn: calcBondFlow(bf, bflowFactor[bn]) for bn, bf in x['bonds'].items() if bn in m}
 
 
@@ -388,10 +388,31 @@ def searchByFst(xs, v, defaultRtn=None):
             return x
     return defaultRtn
 
-def isMixedDeal(x:dict) -> bool :
+
+def isMixedDeal(x: dict) -> bool :
     if 'assets' in x or 'cashflow' in x:
         return False
-    assetTags = query(x, [S.MVALS,S.ALL,'assets',S.FIRST,S.FIRST])
-    if len(set(assetTags))>1:
+    assetTags = query(x, [S.MVALS, S.ALL, 'assets', S.FIRST, S.FIRST])
+    if len(set(assetTags)) > 1:
         return True
     return False
+
+
+def strFromPath(xs: list) -> str:
+    ps = [strFromLens(_)+f":{v}" for (_,v) in xs]
+    return "/".join(ps)
+
+
+def strFromLens(x) -> str: 
+    if isinstance(x, ui.UnboundLens) and not hasattr(x._optic, "lenses"):
+        if isinstance(x._optic, optics.true_lenses.GetitemLens):
+            return str(x._optic.key)
+        return x._optic.name
+    elif isinstance(x, ui.UnboundLens) and hasattr(x._optic, "lenses"):
+        return "-".join([strFromLens(_) for _ in x._optic.lenses])
+    elif isinstance(x, optics.true_lenses.GetitemLens):
+        return str(x.key)
+    elif isinstance(x, optics.traversals.GetZoomAttrTraversal):
+        return x.name   
+    else:
+        return str(x)

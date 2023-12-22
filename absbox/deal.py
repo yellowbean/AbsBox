@@ -81,7 +81,7 @@ def mkDealsBy(d, m: dict)->dict:
     return {k: dataclasses.replace(d, **v) for k, v in m.items()} 
 
 
-def setDealsBy(d, *receipes: list, init=None):
+def setDealsBy(d, *receipes: list, init=None, **kwargs):
     "input a deal object, a list of tweaks( path, values) ,return an updated deal"
     if init:
         receipes = [(init & _[0], _[1]) for _ in receipes]
@@ -93,4 +93,21 @@ def setDealsBy(d, *receipes: list, init=None):
 def prodDealsBy(d, *receipes, **kwargs) -> dict:
     inflated = [[(p, _) for _ in vs] for (p, vs) in receipes]
     permus = product(*inflated)
-    return {str(v): setDealsBy(d, *v, **kwargs) for v in permus}
+    # print(list(permus)[0])
+    if kwargs.get('guessKey', False) == True:
+        return {strFromPath(v): setDealsBy(d, *v, **kwargs) for v in permus}
+    return {v: setDealsBy(d, *v, **kwargs) for v in permus}
+
+
+def setAssumpsBy(a, *receipes: list, init=None):
+    if init:
+        receipes = [(init & _[0], _[1]) for _ in receipes]
+    for (p, v) in receipes:
+        a &= p.set(v)
+    return a
+
+
+def prodAssumpsBy(a, *receipes, **kwargs):
+    inflated = [[(p, _) for _ in vs] for (p, vs) in receipes]
+    permus = product(*inflated)
+    return {str(v): setDealsBy(a, *v, **kwargs) for v in permus}

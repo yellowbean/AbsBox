@@ -1600,7 +1600,7 @@ def mkCf(x:list):
         return None
     else:
         cfs = [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None,None])) for _x in x]
-        return mkTag(("CashFlowFrame",cfs))
+        return mkTag(("CashFlowFrame", cfs))
 
 def mkPid(x):
     match x:
@@ -1670,6 +1670,7 @@ def readPricingResult(x, locale) -> dict:
 
     return pd.DataFrame.from_dict({k: v['contents'] for k, v in x.items()}, orient='index', columns=h[locale]).sort_index()
 
+
 def readPoolCf(x, lang='english'):
     r = None
     _pool_cf_header,_,expandFlag = guess_pool_flow_header(x[0], lang)
@@ -1682,6 +1683,7 @@ def readPoolCf(x, lang='english'):
     r = r.set_index(pool_idx)
     r.index.rename(pool_idx, inplace=True)    
     return r
+
 
 def readRunSummary(x, locale) -> dict:
     def filter_by_tags(xs, tags):
@@ -1715,13 +1717,13 @@ def readRunSummary(x, locale) -> dict:
     r['status'] = pd.DataFrame(data=status_change_logs, columns=dealStatusLog[locale])
 
     # inspection variables
-    def uplift_ds(df):
+    def uplift_ds(df:pd.DataFrame) -> pd.DataFrame:
         ds_name = readTagStr(df['DealStats'].iloc[0])
         df.drop(columns=["DealStats"],inplace=True)
         df.rename(columns={"Value":ds_name},inplace=True)
         df.set_index("Date",inplace=True)
         return df
-    inspect_vars = filter_by_tags(x, ["InspectBal", "InspectBool", "InspectRate","InspectInt"])
+    inspect_vars = filter_by_tags(x, inspectTags)
     if inspect_vars:
         inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),c['contents'][2]) for c in inspect_vars ]
                                 ,columns = ["Date","DealStats","Value"])
