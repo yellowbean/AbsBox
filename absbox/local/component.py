@@ -337,6 +337,8 @@ def mkDs(x):
             return mkTag(("FloorWith", [mkDs(ds1), mkDs(ds2)]))
         case ("floorWithZero", ds1):
             return mkTag(("FloorWithZero", mkDs(ds1)))
+        case ("excess", ds1, *dss) | ("超额", ds1, *dss):
+            return mkTag(("Excess", mkDs(ds1)+[mkDs(_) for _ in dss]))
         case ("capWith", ds1, ds2):
             return mkTag(("CapWith", [mkDs(ds1), mkDs(ds2)]))
         case ("/", ds1, ds2) | ("divide", ds1, ds2):
@@ -366,7 +368,7 @@ def mkPre(p):
             #     return "IfBool"
             case _:
                 return "If"
-            
+
     match p:
         case ["状态", _st] | ["status", _st]:
             return mkTag(("IfDealStatus", mkStatus(_st)))

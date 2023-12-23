@@ -112,12 +112,9 @@ class API:
         else:
             result = self._send_req(req, url, timeout=30)
 
-        if result is None:
+        if result is None or 'error' in result:
             console.print("❌[bold red]Failed to get response from run")
-            console.print_json(req)
-            return None
-        if 'error' in result:
-            rich.print_json(result)
+            #console.print_json(req)
             return None
         
         rawErrorMsg = []
