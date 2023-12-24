@@ -18,7 +18,7 @@ def comp_engines(engine1, engine2, d, a=None):
 
     # expense check  
     comp_result['fee'] = {}
-    for fn,f in r1['fees'].items():
+    for fn, f in r1['fees'].items():
         if not f.equals(r2['fees'][fn]):
             comp_result['fee'][fn] = comp_df(f, r2['fees'][fn])
         else:

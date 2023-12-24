@@ -1806,7 +1806,7 @@ def aggAccs(x, locale):
     agg_acc = {}
     for k, v in x.items():
         acc_by_date = v.groupby(header["idx"])
-        acc_txn_amt = acc_by_date.agg(change=(header["change"], sum)).rename(columns={"change":header["change"]})
+        acc_txn_amt = acc_by_date.agg(change=(header["change"], "sum")).rename(columns={"change":header["change"]})
         
         ending_bal_column = acc_by_date.last()[header["bal"][1]].rename(header["bal"][2])
         begin_bal_column = ending_bal_column.shift(1).rename(header["bal"][0])

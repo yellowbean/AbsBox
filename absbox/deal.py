@@ -8,8 +8,7 @@ import dataclasses
 
 console = Console()
 
-
-def mkDeal(x:dict,preCheck=True):
+def mkDeal(x:dict, preCheck=True):
     name = getValWithKs(x, ['name', "名称", "comment", '备注'], defaultReturn="")
     
     dates = getValWithKs(x, ['dates', "date", "日期"])

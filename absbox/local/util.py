@@ -1,17 +1,11 @@
 import pandas as pd
-import numpy as np
 import functools,json,copy,logging,re,itertools
-from enum import Enum
 from functools import reduce
 from absbox.local.base import *
 from pyspecter import query, S
 from datetime import datetime
-import rich
-from rich.console import Console
-from rich.json import JSON
-from lenses import lens, ui, optics
+from lenses import ui, optics
 
-console = Console()
 
 def mapNone(x, v):
     if x is None:

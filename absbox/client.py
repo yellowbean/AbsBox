@@ -1,15 +1,13 @@
-import json, datetime, pickle, re, urllib3, getpass, copy
+import json, urllib3, getpass, enum
 from importlib.metadata import version
 from json.decoder import JSONDecodeError
 from dataclasses import dataclass, field
 
 import rich
 from rich.console import Console
-from rich.json import JSON
 import requests
 from requests.exceptions import ConnectionError, ReadTimeout
 import pandas as pd
-from pyspecter import query
 
 from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header\
                               , _read_cf, _read_asset_pricing, mergeStrWithDict\
@@ -25,6 +23,18 @@ from absbox.local.generic import Generic
 VERSION_NUM = version("absbox")
 urllib3.disable_warnings()
 console = Console()
+
+
+class Endpoints(enum.StrEnum):
+    RunAsset = "runAsset"
+    RunPool = "runPool"
+    RunPoolByScenarios = "runPoolByScenarios"
+    RunDeal = "runDeal"
+    RunDealByScnearios = "runDealByScenarios"
+    RunMultiDeal = "runMultiDeals"
+    Version = "version"
+
+
 
 @dataclass
 class API:
@@ -42,7 +52,7 @@ class API:
         self.url = self.url.rstrip("/")
         with console.status(f"[magenta]Connecting engine server -> {self.url}") as status:
             try:
-                _r = requests.get(f"{self.url}/version",verify=False, timeout=5).text
+                _r = requests.get(f"{self.url}/{Endpoints.Version.value}", verify=False, timeout=5).text
             except (ConnectionRefusedError, ConnectionError):
                 console.print(f"❌[bold red]Error: Can't not connect to API server {self.url}")
                 self.url = None
@@ -83,7 +93,7 @@ class API:
         _rateAssump = [mkRateAssumption(rateAssump) for rateAssump in rateAssumps] if rateAssumps else None
         if isinstance(poolAssump, tuple):
             r = mkTag(("SingleRunPoolReq"
-                       ,[mkPool(pool), mkAssumpType(poolAssump) ,_rateAssump]))
+                       ,[mkPool(pool), mkAssumpType(poolAssump), _rateAssump]))
         elif isinstance(poolAssump, dict):
             r = mkTag(("MultiScenarioRunPoolReq"
                        ,[mkPool(pool) ,mapValsBy(poolAssump, mkAssumpType), _rateAssump])) 
@@ -97,11 +107,9 @@ class API:
             read=True,
             preCheck=True):
 
-        #assert isinstance(runAssump, list),f"runAssump must be a list ,but got {type(runAssump)}"
-
         # if run req is a multi-scenario run
         multi_run_flag = True if isinstance(poolAssump, dict) else False
-        url = f"{self.url}/runDealByScenarios" if multi_run_flag else f"{self.url}/runDeal"
+        url = f"{self.url}/{Endpoints.RunDealByScnearios.value}" if multi_run_flag else f"{self.url}/{Endpoints.RunDeal.value}"
 
         # construct request
         runType = "MultiScenarios" if multi_run_flag else "Single"
@@ -114,7 +122,6 @@ class API:
 
         if result is None or 'error' in result:
             console.print("❌[bold red]Failed to get response from run")
-            #console.print_json(req)
             return None
         
         rawErrorMsg = []
@@ -155,7 +162,7 @@ class API:
             return (result, pool_bals)
             
         multi_scenario = True if isinstance(poolAssump, dict) else False 
-        url = f"{self.url}/runPoolByScenarios" if multi_scenario else f"{self.url}/runPool"
+        url = f"{self.url}/{Endpoints.RunPoolByScenarios.value}" if multi_scenario else f"{self.url}/{Endpoints.RunPool.value}"
         pool_lang = guess_pool_locale(pool)
         req = self.build_pool_req(pool, poolAssump, rateAssump)
         result = self._send_req(req, url)
@@ -169,7 +176,7 @@ class API:
     
     def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, read=True):
         assert isinstance(deals, dict), f"Deals should be a dict but got {deals}"
-        url = f"{self.url}/runMultiDeals" 
+        url = f"{self.url}/{Endpoints.RunMultiDeal.value}" 
         _poolAssump = mkAssumpType(poolAssump) if poolAssump else None 
         _nonPerfAssump = mkNonPerfAssumps({}, nonPoolAssump)
         req = json.dumps(mkTag(("MultiDealRunReq"
@@ -191,14 +198,14 @@ class API:
         def readResult(x):
             try:
                 ((cfs, cfBalance), pr) = x
-                cfs = _read_cf(cfs, self.lang)
+                cfs = _read_cf(cfs['contents'], self.lang)
                 pricingResult = _read_asset_pricing(pr, self.lang) if pr else None
                 return (cfs, cfBalance, pricingResult)
             except Exception as e:
                 print(f"Failed to read result {x}")
                 print(f"error = {e}")
                 return (None, None, None)
-        url = f"{self.url}/runAsset"
+        url = f"{self.url}/{Endpoints.RunAsset.value}"
         _assumptions = mkAssumpType(poolAssump) if poolAssump else None
         _pricing = mkLiqMethod(pricing) if pricing else None
         _rate = [mkRateAssumption(_) for _ in rateAssump] if rateAssump else None

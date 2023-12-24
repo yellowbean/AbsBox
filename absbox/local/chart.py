@@ -77,15 +77,15 @@ def viz(x):
                 return f"{str(action)}"
             
     def build_waterfall2(d, start_name:str, pre_names:list, index, actions, prevLabel=None):
-        if_branching_id = ["条件执行","If"]
-        ifesle_branching_id = ["条件执行2","IfElse"]
-        new_index= index+1
+        if_branching_id = ["条件执行", "If"]
+        ifesle_branching_id = ["条件执行2", "IfElse"]
+        new_index = index+1
         _root_name = ','.join(pre_names)
-        if len(actions)==0:
-            return (start_name,_root_name)
+        if len(actions) == 0:
+            return (start_name, _root_name)
         else:
             match actions:
-                case [action,*rest_actions] if action[0] in set(if_branching_id+ifesle_branching_id) :
+                case [action, *rest_actions] if action[0] in set(if_branching_id+ifesle_branching_id) :
                     new_root_name = f"{_root_name}-{new_index}-{action[1]}"
                     d.node(new_root_name,f"{action[1]}",shape="diamond")
                     [ d.edge(root_name,new_root_name,label=prevLabel) for root_name in pre_names ]

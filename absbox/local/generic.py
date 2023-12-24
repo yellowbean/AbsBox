@@ -31,11 +31,11 @@ class Generic:
 
     @property
     def json(self):
-        dists,collects,cleans = [ self.waterfall.get(wn,[]) for wn in ['Normal','PoolCollection','CleanUp']]
-        distsAs,collectsAs,cleansAs = [ [ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans] ]
-        distsflt,collectsflt,cleanflt = [ itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs] ]
+        dists,collects,cleans = [self.waterfall.get(wn,[]) for wn in ['Normal','PoolCollection','CleanUp']]
+        distsAs,collectsAs,cleansAs = [[ mkWaterfall2(_action) for _action in _actions] for _actions in [dists,collects,cleans]]
+        distsflt,collectsflt,cleanflt = [itertools.chain.from_iterable(x) for x in [distsAs,collectsAs,cleansAs]]
         parsedDates = mkDate(self.dates)
-        (lastAssetDate,lastCloseDate) = getStartDate(self.dates)
+        (lastAssetDate, lastCloseDate) = getStartDate(self.dates)
         mixedAssetFlag = isMixedDeal(self.pool)
         """
         get the json formatted string
