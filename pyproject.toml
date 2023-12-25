@@ -28,6 +28,7 @@ dependencies = [
     "numpy ==1.23.1",
     "matplotlib",
     "requests",
+    "toolz",
     "rich",
     "pyxirr",
     "lenses",

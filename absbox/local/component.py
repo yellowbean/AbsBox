@@ -2,12 +2,12 @@ from absbox.local.util import mkTag, mkTs, guess_locale, readTagStr, subMap, sub
 from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
 from absbox.local.util import filter_by_tags
-
 from absbox.local.base import *
 from enum import Enum
 import itertools
 import functools
 import logging
+import toolz.itertoolz as tz
 
 import pandas as pd
 from pyspecter import query, S
@@ -608,30 +608,6 @@ def mkComment(x):
             return mkTag(("TransferBy",[a1,a2,limit]))
         case {"direction":d}:
             return mkTag(("TxnDirection",d))
-                # = PayInt [BondName]
-                # | PayYield BondName 
-                # | PayPrin [BondName] 
-                # | PayFee FeeName
-                # | SeqPayFee [FeeName] 
-                # | PayFeeYield FeeName
-                # | Transfer AccName AccName 
-                # | TransferBy AccName AccName Limit
-                # | PoolInflow PoolSource
-                # | LiquidationProceeds
-                # | LiquidationSupport String
-                # | LiquidationDraw
-                # | LiquidationRepay
-                # | LiquidationSupportInt Balance Balance
-                # | BankInt
-                # | Empty 
-                # | Tag String
-                # | UsingDS DealStats
-                # | SwapAccure
-                # | SwapInSettle
-                # | SwapOutSettle
-                # | PurchaseAsset
-                # | TxnDirection Direction
-                # | TxnComments [TxnComment]
 
 
 def mkLiqDrawType(x):
@@ -1503,11 +1479,11 @@ def mkPoolType(assetDate, x, mixedFlag) -> dict:
 
 def mkPoolComp(asOfDate, x, mixFlag) -> dict:
     assetFactory = mkAsset if (not mixFlag) else mkAssetUnion
-    r = {"assets": [assetFactory(y) for y in getValWithKs(x, ['assets',"清单"],defaultReturn=[])]
+    r = {"assets": [assetFactory(y) for y in getValWithKs(x, ['assets', "清单"],defaultReturn=[])]
         , "asOfDate": asOfDate
-        , "issuanceStat": getValWithKs(x,["issuanceStat","统计"])
-        , "futureCf":mkCf(getValWithKs(x,['cashflow','现金流归集表','归集表'], []))
-        , "extendPeriods":mkDatePattern(getValWithKs(x,['extendBy'],"MonthEnd"))}
+        , "issuanceStat": getValWithKs(x,["issuanceStat", "统计"])
+        , "futureCf":mkCf(getValWithKs(x,['cashflow', '现金流归集表', '归集表'], []))
+        , "extendPeriods":mkDatePattern(getValWithKs(x,['extendBy'], "MonthEnd"))}
     return r
 
 
@@ -1741,11 +1717,12 @@ def readRunSummary(x, locale) -> dict:
         r['waterfallInspect'] = waterfall_inspect_df
     
     # extract errors and warnings
-    error_warning_logs = filter_by_tags(x, ["ErrorMsg", "WarningMsg"])
+    error_warning_logs = filter_by_tags(x, [ValidationMsg.Warning.value, ValidationMsg.Error.value])
     r['logs'] = None
     if error_warning_logs:
-        errorLogs = [ ["Error",c['contents']] for c in error_warning_logs if c['tag']=="ErrorMsg"]
-        warningLogs = [ ["Warning",c['contents']] for c in error_warning_logs if c['tag']=="WarningMsg"]
+        error_warnings_by_map = tz.groupby('tag',error_warning_logs)
+        errorLogs = [ ["Error",c['contents']] for c in error_warnings_by_map[ValidationMsg.Error.value]] if ValidationMsg.Error.value in error_warnings_by_map else []
+        warningLogs = [ ["Warning",c['contents']] for c in error_warnings_by_map[ValidationMsg.Warning.value]] if ValidationMsg.Warning.value in error_warnings_by_map else []
         r['logs'] = pd.DataFrame(data = errorLogs+warningLogs ,columns = ["Type","Comment"])
 
     # build financial reports

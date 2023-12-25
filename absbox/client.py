@@ -14,7 +14,7 @@ from absbox.local.util import mkTag, guess_pool_locale, mapValsBy, guess_pool_fl
                               , earlyReturnNone, searchByFst, filter_by_tags
 from absbox.local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkPricingAssump, mkLiqMethod\
                                    , mkAssetUnion, mkRateAssumption
-from absbox.local.base import *
+from absbox.local.base import ValidationMsg
 
 from absbox.local.china import SPV
 from absbox.local.generic import Generic
@@ -35,11 +35,6 @@ class Endpoints(str, enum.Enum):
     Version = "version"
 
 
-class ValidationMsg(str, enum.Enum):
-    Warning = "WarningMsg"
-    Error = "ErrorMsg"
-
-
 class RunReqType(str, enum.Enum):
     Single = "SingleRunReq"
     MultiScenarios = "MultiScenarioRunReq"
@@ -52,6 +47,7 @@ class RunResp(int, enum.Enum):
     DealResp = 0
     PoolResp = 1
     LogResp = 2
+
 
 @dataclass
 class API:
@@ -129,7 +125,8 @@ class API:
             poolAssump=None,
             runAssump=[],
             read=True,
-            preCheck=True):
+            preCheck=True,
+            showWarning=False):
 
         # if run req is a multi-scenario run
         multi_run_flag = True if isinstance(poolAssump, dict) else False
@@ -148,15 +145,15 @@ class API:
             console.print("❌[bold red]Failed to get response from run")
             return None
         
-        rawErrorMsg = []
+        rawWarnMsg = []
         if multi_run_flag:
-            rawErrorMsgByScen = {k: [f"❌[bold red]{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value],[ValidationMsg.Warning.value])] for k, v in result.items()}
-            rawErrorMsg = [ b for a in rawErrorMsgByScen.values() for b in a ]
+            rawWarnMsgByScen = {k: [f"⚠[bold yellow]{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value],[ValidationMsg.Warning.value])] for k, v in result.items()}
+            rawWarnMsg = [b for a in rawWarnMsgByScen.values() for b in a]
         else:
-            rawErrorMsg = [f"❌[bold red]{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], [ValidationMsg.Warning.value])]
+            rawWarnMsg = [f"⚠[bold yellow]{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], [ValidationMsg.Warning.value])]
         
-        if rawErrorMsg:
-            rich.print("Error Message from server:\n"+"\n".join(rawErrorMsg))
+        if rawWarnMsg and showWarning:
+            rich.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
 
         # read multi-scenario run result into dict
         if read and multi_run_flag:
@@ -227,8 +224,7 @@ class API:
                 pricingResult = _read_asset_pricing(pr, self.lang) if pr else None
                 return (cfs, cfBalance, pricingResult)
             except Exception as e:
-                print(f"Failed to read result {x}")
-                print(f"error = {e}")
+                print(f"Failed to read result {x} \n with error {e}")
                 return (None, None, None)
         url = f"{self.url}/{Endpoints.RunAsset.value}"
         _assumptions = mkAssumpType(poolAssump) if poolAssump else None
