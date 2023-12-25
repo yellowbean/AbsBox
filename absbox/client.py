@@ -9,9 +9,9 @@ import requests
 from requests.exceptions import ConnectionError, ReadTimeout
 import pandas as pd
 
-from absbox.local.util import mkTag, isDate, flat, guess_pool_locale, mapValsBy, guess_pool_flow_header\
+from absbox.local.util import mkTag, guess_pool_locale, mapValsBy, guess_pool_flow_header\
                               , _read_cf, _read_asset_pricing, mergeStrWithDict\
-                              , earlyReturnNone, searchByFst
+                              , earlyReturnNone, searchByFst, filter_by_tags
 from absbox.local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkPricingAssump, mkLiqMethod\
                                    , mkAssetUnion, mkRateAssumption
 from absbox.local.base import *
@@ -25,7 +25,7 @@ urllib3.disable_warnings()
 console = Console()
 
 
-class Endpoints(enum.StrEnum):
+class Endpoints(str, enum.Enum):
     RunAsset = "runAsset"
     RunPool = "runPool"
     RunPoolByScenarios = "runPoolByScenarios"
@@ -35,6 +35,23 @@ class Endpoints(enum.StrEnum):
     Version = "version"
 
 
+class ValidationMsg(str, enum.Enum):
+    Warning = "WarningMsg"
+    Error = "ErrorMsg"
+
+
+class RunReqType(str, enum.Enum):
+    Single = "SingleRunReq"
+    MultiScenarios = "MultiScenarioRunReq"
+    MultiStructs = "MultiDealRunReq"
+    SinglePool = "SingleRunPoolReq"
+    MultiPoolScenarios = "MultiScenarioRunPoolReq"
+
+
+class RunResp(int, enum.Enum):
+    DealResp = 0
+    PoolResp = 1
+    LogResp = 2
 
 @dataclass
 class API:
@@ -67,7 +84,10 @@ class API:
         self.session = requests.Session() 
 
     def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=[]) -> str:
-        ''' build run deal requests: (single run, multi-scenario run, multi-struct run) '''
+        ''' build run deal requests: (single run, multi-scenario run, multi-struct run)
+              perfAssump: tuple or dict
+              nonPerfAssump: list of non-performance assumptions 
+        '''
         r = None
         _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
 
@@ -75,31 +95,35 @@ class API:
             case "Single" | "S":
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
-                r = mkTag(("SingleRunReq",[_deal, _perfAssump, _nonPerfAssump]))
+                r = mkTag((RunReqType.Single.value, [_deal, _perfAssump, _nonPerfAssump]))
             case "MultiScenarios" | "MS":
                 _deal = deal.json if hasattr(deal, "json") else deal
                 mAssump = mapValsBy(perfAssump, mkAssumpType)
-                r = mkTag(("MultiScenarioRunReq",[_deal, mAssump, _nonPerfAssump]))
+                r = mkTag((RunReqType.MultiScenarios.value, [_deal, mAssump, _nonPerfAssump]))
             case "MultiStructs" | "MD" :
                 mDeal = {k: v.json if hasattr(v, "json") else v for k, v in deal.items() }
                 _perfAssump = mkAssumpType(perfAssump)
-                r = mkTag(("MultiDealRunReq",[mDeal, _perfAssump, _nonPerfAssump]))
+                r = mkTag((RunReqType.MultiStructs.value, [mDeal, _perfAssump, _nonPerfAssump]))
             case _:
                 raise RuntimeError(f"Failed to match run type:{run_type}")
         return json.dumps(r, ensure_ascii=False)
 
-    def build_pool_req(self, pool, poolAssump, rateAssumps, read=None) -> str:
+    def build_pool_req(self, pool, poolAssump, rateAssumps) -> str:
+        ''' build run pool requests: (single run, multi-scenario run) 
+              poolAssump: tuple or dict
+              rateAssumps: list of rate assumptions 
+        '''
         r = None
         _rateAssump = [mkRateAssumption(rateAssump) for rateAssump in rateAssumps] if rateAssumps else None
         if isinstance(poolAssump, tuple):
-            r = mkTag(("SingleRunPoolReq"
-                       ,[mkPool(pool), mkAssumpType(poolAssump), _rateAssump]))
+            r = mkTag((RunReqType.SinglePool.value,
+                       [mkPool(pool), mkAssumpType(poolAssump), _rateAssump]))
         elif isinstance(poolAssump, dict):
-            r = mkTag(("MultiScenarioRunPoolReq"
-                       ,[mkPool(pool) ,mapValsBy(poolAssump, mkAssumpType), _rateAssump])) 
+            r = mkTag((RunReqType.MultiPoolScenarios.value,
+                       [mkPool(pool), mapValsBy(poolAssump, mkAssumpType), _rateAssump])) 
         else:
             raise RuntimeError("Error in build pool req")
-        return json.dumps(r , ensure_ascii=False)
+        return json.dumps(r, ensure_ascii=False)
 
     def run(self, deal,
             poolAssump=None,
@@ -126,20 +150,21 @@ class API:
         
         rawErrorMsg = []
         if multi_run_flag:
-            _x = {k: [f"❌[bold red]{_['contents']}" for _ in v[2] if _['tag'] == "ErrorMsg"] for k, v in result.items()}
-            rawErrorMsg = [ b for a in _x.values() for b in a ]
+            rawErrorMsgByScen = {k: [f"❌[bold red]{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value],[ValidationMsg.Warning.value])] for k, v in result.items()}
+            rawErrorMsg = [ b for a in rawErrorMsgByScen.values() for b in a ]
         else:
-            rawErrorMsg = [ f"❌[bold red]{_['contents']}" for _ in result[2] if _['tag'] == "ErrorMsg"]
+            rawErrorMsg = [f"❌[bold red]{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], [ValidationMsg.Warning.value])]
         
         if rawErrorMsg:
-            rich.print("Error Message from server:\n")
-            rich.print("\n".join(rawErrorMsg))
+            rich.print("Error Message from server:\n"+"\n".join(rawErrorMsg))
 
-        # load deal if it is a multi scenario
+        # read multi-scenario run result into dict
         if read and multi_run_flag:
             return mapValsBy(result, deal.read)
+        # read single scenario run result into tuple
         elif read:
             return deal.read(result)
+        # return raw response
         else:
             return result
 
@@ -304,6 +329,9 @@ class API:
             return None
 
     def _send_req(self, _req, _url: str, timeout=10, headers={})->dict:
+        '''
+            send requests to server, raise error if response is not 200
+        '''
         with console.status("") as status:
             try:
                 hdrs = self.hdrs | headers

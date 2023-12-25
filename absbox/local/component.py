@@ -1,6 +1,7 @@
 from absbox.local.util import mkTag, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100
 from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
+from absbox.local.util import filter_by_tags
 
 from absbox.local.base import *
 from enum import Enum
@@ -1688,10 +1689,6 @@ def readPoolCf(x, lang='english'):
 
 
 def readRunSummary(x, locale) -> dict:
-    def filter_by_tags(xs, tags):
-        tags_set = set(tags)
-        return [ x for x in xs if x['tag'] in tags_set]
-
     r = {}
     if x is None:
         return None

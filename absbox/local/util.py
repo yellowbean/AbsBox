@@ -24,6 +24,11 @@ def mkTag(x: tuple) -> dict:
             return {"tag": tagName, "contents": tagValue}
         case (tagName):
             return {"tag": tagName}
+        
+
+def filter_by_tags(xs:list, tags:list) -> list:
+    tags_set = set(tags)
+    return [x for x in xs if x['tag'] in tags_set]
 
 
 def readTagStr(x: str) -> str:
@@ -185,7 +190,7 @@ def subMap2(m: dict, ks: list):
     return renameKs(_m, _mapping)
 
 
-def mapValsBy(m: dict, f):
+def mapValsBy(m: dict, f: callable):
     ''' Given a map and apply function to every vals'''
     assert isinstance(m, dict), f"M is not a map but a {type(m)}, {m}"
     return {k: f(v) for k, v in m.items()}
@@ -375,7 +380,7 @@ def earlyReturnNone(fn: callable, v):
         return fn(v)
 
 
-def searchByFst(xs, v, defaultRtn=None):
+def searchByFst(xs:list, v, defaultRtn=None):
     "search by first element in a list, return None if not found"
     for x in xs:
         if x[0] == v:
@@ -393,7 +398,7 @@ def isMixedDeal(x: dict) -> bool :
 
 
 def strFromPath(xs: list) -> str:
-    ps = [strFromLens(_)+f":{v}" for (_,v) in xs]
+    ps = [strFromLens(_)+f":{v}" for (_, v) in xs]
     return "/".join(ps)
 
 
