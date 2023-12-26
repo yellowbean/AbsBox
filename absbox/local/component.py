@@ -1222,7 +1222,6 @@ def identify_deal_type(x):
     if query(x, ["pool","tag"])=='SoloPool':
         y = x["pool"]['contents']
     elif x["pool"]['tag']=='MultiPool':
-        #print(list(x["pool"]['contents'].values())[0])
         assetTags = flat(query(x,["pool","contents",S.MVALS,S.ALL,"assets",S.ALL,"tag"]))
         if len(set(assetTags))>1:
             return "UDeal"
@@ -1670,7 +1669,8 @@ def readRunSummary(x, locale) -> dict:
         return None
 
     bndStatus = {'cn': ["本金违约", "利息违约", "起算余额"]
-                ,'en': ["Balance Defaults", "Interest Defaults", "Original Balance"]}
+                ,'en': ["Balance Defaults", "Interest Defaults", "Original Balance"]
+                }
     bond_defaults = [(_['contents'][0], _['tag'], _['contents'][1], _['contents'][2])
                      for _ in x if _['tag'] in set(['BondOutstanding', 'BondOutstandingInt'])]
     _fmap = {"cn": {'BondOutstanding': "本金违约", "BondOutstandingInt": "利息违约"}

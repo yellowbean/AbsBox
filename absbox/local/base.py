@@ -127,6 +127,7 @@ dealStatusMap = {"en": {'amort': "Amortizing", 'def': "Defaulted", 'acc': "Accel
 
 cfIndexMap = {'cn':"日期",'en':"Date","english":"Date","chinese":"日期"}
 
+
 class DC(enum.Enum):  # TODO need to check with HS code
     DC_30E_360 = "DC_30E_360"
     DC_30Ep_360 = "DC_30Ep_360"
@@ -142,6 +143,14 @@ class DC(enum.Enum):  # TODO need to check with HS code
 
 #valid inspection tags
 inspectTags = ["InspectBal", "InspectBool", "InspectRate", "InspectInt"]
+
+
+class InspectTags(str, enum.Enum):
+    InspectBal = "InspectBal"
+    InspectBool = "InspectBool"
+    InspectRate = "InspectRate"
+    InspectInt = "InspectInt"
+
 
 class ValidationMsg(str, enum.Enum):
     Warning = "WarningMsg"

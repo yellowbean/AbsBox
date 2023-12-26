@@ -415,3 +415,8 @@ def strFromLens(x) -> str:
         return x.name   
     else:
         return str(x)
+
+
+def enumVals(e):
+    ''' return a list of enum values '''
+    return [_.value for _ in [*e]]

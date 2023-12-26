@@ -49,6 +49,20 @@ class RunResp(int, enum.Enum):
     LogResp = 2
 
 
+class MsgColor(str, enum.Enum):
+    Warning = "[bold yellow]"
+    Error = "[bold red]"
+    Success = "[bold green]"
+    Info = "[bold magenta]"
+
+
+class LibraryEndpoints(str, enum.Enum):
+    Token = "token"
+    Query = "query"
+    List = "list"
+    Run = "run"
+
+
 @dataclass
 class API:
     url: str
@@ -63,20 +77,20 @@ class API:
 
     def __post_init__(self):
         self.url = self.url.rstrip("/")
-        with console.status(f"[magenta]Connecting engine server -> {self.url}") as status:
+        with console.status(f"{MsgColor.Info.value}Connecting engine server -> {self.url}") as status:
             try:
                 _r = requests.get(f"{self.url}/{Endpoints.Version.value}", verify=False, timeout=5).text
             except (ConnectionRefusedError, ConnectionError):
-                console.print(f"❌[bold red]Error: Can't not connect to API server {self.url}")
+                console.print(f"❌{MsgColor.Error.value}Error: Can't not connect to API server {self.url}")
                 self.url = None
                 return
 
             self.server_info = self.server_info | json.loads(_r)
             engine_version = self.server_info['_version'].split(".")
             if self.check and (self.version[1] != engine_version[1]):
-                console.print(f"❌[bold red]Failed to init the api instance, lib support={self.version} but server version={self.server_info['_version']} , pls upgrade your api package by: pip -U absbox")
+                console.print(f"❌{MsgColor.Error.value}Failed to init the api instance, lib support={self.version} but server version={self.server_info['_version']} , pls upgrade your api package by: pip -U absbox")
                 return
-        console.print(f"✅[bold green]Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
+        console.print(f"✅{MsgColor.Success.value}Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
         self.session = requests.Session() 
 
     def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=[]) -> str:
@@ -147,10 +161,10 @@ class API:
         
         rawWarnMsg = []
         if multi_run_flag:
-            rawWarnMsgByScen = {k: [f"⚠[bold yellow]{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value],[ValidationMsg.Warning.value])] for k, v in result.items()}
+            rawWarnMsgByScen = {k: [f"⚠{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value],[ValidationMsg.Warning.value])] for k, v in result.items()}
             rawWarnMsg = [b for a in rawWarnMsgByScen.values() for b in a]
         else:
-            rawWarnMsg = [f"⚠[bold yellow]{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], [ValidationMsg.Warning.value])]
+            rawWarnMsg = [f"⚠{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], [ValidationMsg.Warning.value])]
         
         if rawWarnMsg and showWarning:
             rich.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
@@ -175,7 +189,7 @@ class API:
                 else:
                     result = pd.DataFrame([_['contents'][-1]+_['contents'][-1] for _ in pool_flow], columns=flow_header)
             except ValueError as e:
-                console.print(f"❌[bold red]Failed to match header:{flow_header} with {result[0]['contents']}")
+                console.print(f"❌{MsgColor.Error.value}Failed to match header:{flow_header} with {result[0]['contents']}")
                 console.print(f"error:{e}")
 
             result = result.set_index(idx)
@@ -240,16 +254,16 @@ class API:
             return result
 
     def loginLibrary(self, user, pw, **q):
-        deal_library_url = q['deal_library']+"/token"
+        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.Token.value}"
         cred = {"user": user, "password": pw}
         r = self._send_req(json.dumps(cred), deal_library_url)
         if 'token' in r:
-            console.print(f"✅[bold green] login successfully,{r['msg']}")
+            console.print(f"✅{MsgColor.Success.value} login successfully,{r['msg']}")
             self.token = r['token']
         else:
             if hasattr(self, 'token'):
                 delattr(self, 'token')
-            console.print(f"❌[bold red]Failed to login,{r['msg']}")
+            console.print(f"❌{MsgColor.Error.value} Failed to login,{r['msg']}")
             return None
     
     def safeLogin(self, user, **q):
@@ -257,17 +271,17 @@ class API:
             pw = getpass.getpass()
             self.loginLibrary(user, pw, **q)
         except Exception as e:
-            console.print(f"❌[bold red]{e}")
+            console.print(f"❌{MsgColor.Error.value}{e}")
     
     def queryLibrary(self, ks, **q):
         if not hasattr(self, "token"):
-            console.print(f"❌[bold red] No token found , please call loginLibrary() to login")
+            console.print(f"❌{MsgColor.Error.value} No token found , please call loginLibrary() to login")
             return 
-        deal_library_url = q['deal_library']+"/query"
+        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.Query.value}"
         d = {"bond_id": [k for k in ks]}
         q = {"read": True} | q
         result = self._send_req(json.dumps(d|q), deal_library_url, headers={"Authorization": f"Bearer {self.token}"})
-        console.print(f"✅[bold green] query success")
+        console.print(f"✅{MsgColor.Success.value} query success")
         if q['read']:
             if 'data' in result:
                 return pd.DataFrame(result['data'], columns=result['header'])
@@ -277,23 +291,23 @@ class API:
             return result
 
     def listLibrary(self, **q):
-        deal_library_url = q['deal_library']+"/list"
+        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.List.value}"
         result = self._send_req(json.dumps(q), deal_library_url)
-        console.print(f"✅[bold green]list success")
+        console.print(f"✅{MsgColor.Success.value}list success")
         if ('read' in q) and (q['read'] == True):
             return pd.DataFrame(result['data'], columns=result['header'])
         else:
             return result
 
     def runLibrary(self, _id, **p):
-        deal_library_url = p['deal_library']+"/run"
+        deal_library_url = p['deal_library']+f"/{LibraryEndpoints.Run.value}"
         read = p.get("read", True)
         pricingAssump = p.get("pricing", None)
         dealAssump = p.get("assump", None)
-        prod_flag = {"production":p.get("production", True)}
+        prod_flag = {"production": p.get("production", True)}
         runReq = mergeStrWithDict(self.build_req(_id, dealAssump, pricingAssump), prod_flag)
         if not hasattr(self, "token"):
-            console.print(f"❌[bold red] No token found , please call loginLibrary() to login")
+            console.print(f"❌{MsgColor.Error.value} No token found , please call loginLibrary() to login")
             return 
         result = self._send_req(runReq, deal_library_url, headers={"Authorization": f"Bearer {self.token}"})
         
@@ -308,9 +322,9 @@ class API:
         try:
             ri = result['run_info']
             result = result['run_result']
-            console.print(f"✅[bold green]run success with deal id={ri['deal_id']}/report num={ri['report_num']},doc_id={ri['doc_id']}")
+            console.print(f"✅{MsgColor.Success.value}run success with deal id={ri['deal_id']}/report num={ri['report_num']},doc_id={ri['doc_id']}")
         except Exception as e:
-            console.print(f"❌[bold red]message from API server:{result}")
+            console.print(f"❌{MsgColor.Error.value} message from API server:{result},\n,{e}")
             return None
         try:       
             classReader = lookupReader(p['reader'])
@@ -321,7 +335,7 @@ class API:
             else:
                 return result
         except Exception as e:
-            console.print(f"❌[bold red]{e}")
+            console.print(f"❌{MsgColor.Error.value}: Failed to read result with error = {e}")
             return None
 
     def _send_req(self, _req, _url: str, timeout=10, headers={})->dict:
@@ -333,10 +347,10 @@ class API:
                 hdrs = self.hdrs | headers
                 r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
             except (ConnectionRefusedError, ConnectionError):
-                console.print(f"❌[bold red] Failed to talk to server {_url}")
+                console.print(f"❌{MsgColor.Error.value} Failed to talk to server {_url}")
                 return None
             except ReadTimeout:
-                console.print(f"❌[bold red] Failed to get response from server")
+                console.print(f"❌{MsgColor.Error.value} Failed to get response from server")
                 return None
             if r.status_code != 200:
                 console.print_json(_req)
@@ -347,4 +361,3 @@ class API:
             except JSONDecodeError as e:
                 console.print(e)
                 return None
-    
