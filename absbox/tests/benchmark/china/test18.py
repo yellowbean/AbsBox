@@ -1,4 +1,4 @@
-from absbox.local.china import SPV
+from absbox import SPV
 
 test01 = SPV(
      "未满足摊还目标的加速清偿事件"

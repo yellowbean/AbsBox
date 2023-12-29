@@ -86,7 +86,7 @@ deal_data = ["租金类ABS案例"
     ]
 
 
-from absbox.local.china import SPV
+from absbox import SPV
 from absbox.local.util import bondView
 r = localAPI.run(SPV(*deal_data),assumptions=increase_curve_assump,read=True)
 

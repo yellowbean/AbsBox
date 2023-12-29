@@ -1,4 +1,4 @@
-from absbox.local.china import SPV
+from absbox import SPV
 
 #存量产品建模
 
