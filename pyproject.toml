@@ -33,7 +33,8 @@ dependencies = [
     "pyxirr",
     "lenses",
     "pyspecter",
-    "graphviz"
+    "graphviz",
+    "schema"
 ]
 
 [project.urls]
