@@ -1,6 +1,7 @@
 import pandas as pd 
 from pyxirr import xirr, xnpv
 from absbox.local.base import china_bondflow_fields_s, english_bondflow_fields_s
+from absbox.validation import vStr
 import numpy as np
 
 
@@ -11,7 +12,7 @@ def run_yield_table(api, d, bondName, p_assumps: dict, b_assumps: dict):
                   , runAssump=[('pricing', b_assumps)]
                   , read=True)
 
-    b_pricing = {k: v['pricing'].loc[bondName] for k, v in rs.items()}
+    b_pricing = {k: v['pricing'].loc[vStr(bondName)] for k, v in rs.items()}
     b_table = pd.concat(b_pricing.values(), axis=1)
     b_table.columns = list(b_pricing.keys())
 

@@ -1,4 +1,4 @@
-from absbox.local.china import SPV
+from absbox import SPV
 
 JY_RMBS_2017_5 = SPV(
     "建元2017年第五期个人住房抵押贷款资产支持证券"

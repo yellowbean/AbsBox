@@ -9,6 +9,8 @@ from absbox.local.component import *
 from absbox.local.base import * 
 import pandas as pd
 import collections
+from absbox.validation import vStr,vDate,vNum,vList,vBool,vFloat,vInt
+
 
 @dataclass
 class Generic:
@@ -42,7 +44,7 @@ class Generic:
         """
         _r = {
             "dates": parsedDates,
-            "name": self.name,
+            "name": vStr(self.name),
             "status":mkStatus(self.status),
             "pool":mkPoolType(lastAssetDate, self.pool, mixedAssetFlag),
             "bonds": {bn: mkBnd(bn, bo) for (bn, bo) in self.bonds},

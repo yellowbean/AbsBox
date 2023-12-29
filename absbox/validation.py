@@ -31,6 +31,9 @@ def vFloat(x, msg:str = None) -> float:
 def vInt(x, msg:str = None) -> int:
     return Schema(int).validate(x)
 
+def vBool(x, msg:str = None) -> bool:
+    return Schema(bool).validate(x)
+
 def vDate(x, msg:str = None) -> str:
     return Schema(Regex(r"^\d{4}-\d{2}-\d{2}$")).validate(x)
 
