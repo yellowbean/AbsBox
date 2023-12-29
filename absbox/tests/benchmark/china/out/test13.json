@@ -55,7 +55,7 @@
                 "prepaymentPenalty": null,
                 "tag": "MortgageOriginalInfo"
               },
-              120,
+              130,
               0.6,
               20,
               null,
@@ -167,35 +167,32 @@
             {
               "tag": "DS",
               "contents": {
-                "tag": "FloorWithZero",
-                "contents": {
-                  "tag": "Substract",
-                  "contents": [
-                    {
-                      "tag": "Sum",
-                      "contents": [
-                        {
-                          "tag": "CurrentDueBondInt",
-                          "contents": [
-                            "A1"
-                          ]
-                        },
-                        {
-                          "tag": "CurrentDueFee",
-                          "contents": [
-                            "\u4fe1\u6258\u8d39\u7528"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "tag": "AccBalance",
-                      "contents": [
-                        "\u8d26\u623702"
-                      ]
-                    }
-                  ]
-                }
+                "tag": "Excess",
+                "contents": [
+                  {
+                    "tag": "Sum",
+                    "contents": [
+                      {
+                        "tag": "CurrentDueBondInt",
+                        "contents": [
+                          "A1"
+                        ]
+                      },
+                      {
+                        "tag": "CurrentDueFee",
+                        "contents": [
+                          "\u4fe1\u6258\u8d39\u7528"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "AccBalance",
+                    "contents": [
+                      "\u8d26\u623702"
+                    ]
+                  }
+                ]
               }
             },
             "\u8d26\u623701",
@@ -264,6 +261,14 @@
           "contents": [
             null,
             "\u8d26\u623701",
+            "B"
+          ]
+        },
+        {
+          "tag": "PayIntResidual",
+          "contents": [
+            null,
+            "\u8d26\u623702",
             "B"
           ]
         }

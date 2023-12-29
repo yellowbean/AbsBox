@@ -38,7 +38,7 @@
             "tag": "Mortgage",
             "contents": [
               {
-                "originBalance": 120,
+                "originBalance": 160,
                 "originRate": {
                   "tag": "Fix",
                   "contents": [
@@ -55,7 +55,7 @@
                 "prepaymentPenalty": null,
                 "tag": "MortgageOriginalInfo"
               },
-              120,
+              160,
               0.08,
               10,
               null,
@@ -195,6 +195,14 @@
               "B"
             ],
             null
+          ]
+        },
+        {
+          "tag": "PayIntResidual",
+          "contents": [
+            null,
+            "\u8d26\u623701",
+            "B"
           ]
         }
       ]

@@ -5,6 +5,7 @@ from absbox.local.base import *
 from pyspecter import query, S
 from datetime import datetime
 from lenses import ui, optics
+import toolz as tz
 
 
 def mapNone(x, v):
@@ -420,3 +421,6 @@ def strFromLens(x) -> str:
 def enumVals(e):
     ''' return a list of enum values '''
     return [_.value for _ in [*e]]
+
+def readCfFromLst(lst:list)-> pd.DataFrame:
+    return None

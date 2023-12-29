@@ -1,18 +1,20 @@
 import json, urllib3, getpass, enum
 from importlib.metadata import version
+from schema import Schema, Regex
 from json.decoder import JSONDecodeError
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import rich
 from rich.console import Console
 import requests
 from requests.exceptions import ConnectionError, ReadTimeout
 import pandas as pd
+from absbox.validation import isValidUrl
 
-from absbox.local.util import mkTag, guess_pool_locale, mapValsBy, guess_pool_flow_header\
-                              , _read_cf, _read_asset_pricing, mergeStrWithDict\
+from absbox.local.util import mkTag, guess_pool_locale, mapValsBy, guess_pool_flow_header \
+                              , _read_cf, _read_asset_pricing, mergeStrWithDict \
                               , earlyReturnNone, searchByFst, filter_by_tags
-from absbox.local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkPricingAssump, mkLiqMethod\
+from absbox.local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkLiqMethod \
                                    , mkAssetUnion, mkRateAssumption
 from absbox.local.base import ValidationMsg
 
@@ -76,7 +78,7 @@ class API:
     debug = False
 
     def __post_init__(self):
-        self.url = self.url.rstrip("/")
+        self.url = isValidUrl(self.url).rstrip("/")
         with console.status(f"{MsgColor.Info.value}Connecting engine server -> {self.url}") as status:
             try:
                 _r = requests.get(f"{self.url}/{Endpoints.Version.value}", verify=False, timeout=5).text
@@ -91,9 +93,9 @@ class API:
                 console.print(f"❌{MsgColor.Error.value}Failed to init the api instance, lib support={self.version} but server version={self.server_info['_version']} , pls upgrade your api package by: pip -U absbox")
                 return
         console.print(f"✅{MsgColor.Success.value}Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
-        self.session = requests.Session() 
+        self.session = requests.Session()
 
-    def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=[]) -> str:
+    def build_run_deal_req(self, run_type :str, deal, perfAssump=None, nonPerfAssump=[]) -> str:
         ''' build run deal requests: (single run, multi-scenario run, multi-struct run)
               perfAssump: tuple or dict
               nonPerfAssump: list of non-performance assumptions 
@@ -101,7 +103,7 @@ class API:
         r = None
         _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
 
-        match run_type:
+        match Schema(str).validate(run_type):
             case "Single" | "S":
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
@@ -140,7 +142,7 @@ class API:
             runAssump=[],
             read=True,
             preCheck=True,
-            showWarning=False):
+            showWarning=True):
 
         # if run req is a multi-scenario run
         multi_run_flag = True if isinstance(poolAssump, dict) else False
@@ -161,13 +163,13 @@ class API:
         
         rawWarnMsg = []
         if multi_run_flag:
-            rawWarnMsgByScen = {k: [f"⚠{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value],[ValidationMsg.Warning.value])] for k, v in result.items()}
+            rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value],[ValidationMsg.Warning.value, ValidationMsg.Error.value])] for k, v in result.items()}
             rawWarnMsg = [b for a in rawWarnMsgByScen.values() for b in a]
         else:
-            rawWarnMsg = [f"⚠{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], [ValidationMsg.Warning.value])]
+            rawWarnMsg = [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], [ValidationMsg.Warning.value, ValidationMsg.Error.value])]
         
         if rawWarnMsg and showWarning:
-            rich.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
+            console.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
 
         # read multi-scenario run result into dict
         if read and multi_run_flag:

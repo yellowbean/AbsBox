@@ -856,6 +856,35 @@
           ]
         },
         {
+          "tag": "ActionWithPre",
+          "contents": [
+            {
+              "tag": "IfBool",
+              "contents": [
+                {
+                  "tag": "IsPaidOff",
+                  "contents": [
+                    "\u4f18\u5148",
+                    "\u6b21\u7ea7"
+                  ]
+                },
+                true
+              ]
+            },
+            [
+              {
+                "tag": "Transfer",
+                "contents": [
+                  null,
+                  "\u6d41\u52a8\u6027\u50a8\u5907",
+                  "\u672c\u91d1\u5206\u8d26\u6237",
+                  null
+                ]
+              }
+            ]
+          ]
+        },
+        {
           "tag": "PayIntResidual",
           "contents": [
             null,

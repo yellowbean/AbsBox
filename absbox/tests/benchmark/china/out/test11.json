@@ -180,6 +180,14 @@
             "\u8d26\u623701",
             "B"
           ]
+        },
+        {
+          "tag": "PayIntResidual",
+          "contents": [
+            null,
+            "\u8d26\u623702",
+            "B"
+          ]
         }
       ]
     },

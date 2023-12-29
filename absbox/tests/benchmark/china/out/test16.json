@@ -55,7 +55,7 @@
                 "prepaymentPenalty": null,
                 "tag": "MortgageOriginalInfo"
               },
-              120,
+              140,
               0.08,
               20,
               null,
@@ -188,6 +188,34 @@
             null,
             "\u8d26\u623701",
             "B"
+          ]
+        },
+        {
+          "tag": "ActionWithPre",
+          "contents": [
+            {
+              "tag": "IfBool",
+              "contents": [
+                {
+                  "tag": "IsPaidOff",
+                  "contents": [
+                    "A1",
+                    "B"
+                  ]
+                },
+                true
+              ]
+            },
+            [
+              {
+                "tag": "PayIntResidual",
+                "contents": [
+                  null,
+                  "\u50a8\u5907\u8d26\u6237",
+                  "B"
+                ]
+              }
+            ]
           ]
         }
       ]

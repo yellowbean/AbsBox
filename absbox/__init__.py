@@ -11,7 +11,7 @@ from absbox.local.cmp import comp_engines
 from absbox.local.generic import Generic
 from absbox.deal import mkDeal, mkDealsBy, setDealsBy, prodDealsBy
 from absbox.local.analytics import run_yield_table
-
+from absbox.validation import *
 from importlib.metadata import version
 
 __version__ = version("absbox")

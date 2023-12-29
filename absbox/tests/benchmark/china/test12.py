@@ -1,4 +1,4 @@
-from absbox.local.china import SPV
+from absbox import SPV
 
 JY_RMBS_2019_11 = SPV(
     "建元2019年第十一期个人住房抵押贷款资产支持证券2022年第9期总第32期"
