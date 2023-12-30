@@ -579,17 +579,17 @@ def mkAccountCapType(x):
 def mkLimit(x:dict):
     match x:
        case {"余额百分比": pct} | {"balPct": pct}:
-           return mkTag(("DuePct", pct))
+           return mkTag(("DuePct", vFloat(pct)))
        case {"金额上限": amt} | {"balCapAmt": amt}:
-           return mkTag(("DueCapAmt", amt))
+           return mkTag(("DueCapAmt", vNum(amt)))
        case {"公式": formula} | {"formula": formula}:
            return mkTag(("DS", mkDs(formula)))
        case {"冲销":an} | {"clearLedger": an}:
-           return mkTag(("ClearLedger", an))
+           return mkTag(("ClearLedger", vStr(an)))
        case {"簿记":an} | {"bookLedger": an}:
-           return mkTag(("BookLedger", an))
+           return mkTag(("BookLedger", vStr(an)))
        case {"系数":[limit, factor]} | {"multiple":[limit, factor]}:
-           return mkTag(("Multiple", [mkLimit(limit),factor]))
+           return mkTag(("Multiple", [mkLimit(limit),vNum(factor)]))
        case {"储备":"缺口"} | {"reserve":"gap"} :
            return mkTag(("TillTarget"))
        case {"储备":"盈余"} | {"reserve":"excess"} :
@@ -659,7 +659,7 @@ def mkRateSwapType(pr, rr):
 def mkRsBase(x):
     match x:
         case {"fix": bal} | {"fixed": bal} | {"固定": bal}:
-            return mkTag(("Fixed", bal))
+            return mkTag(("Fixed", vNum(bal)))
         case {"formula": ds} | {"公式": ds}:
             return mkTag(("Base", mkDs(ds)))
         case {"schedule": tbl} | {"计划": tbl}:
