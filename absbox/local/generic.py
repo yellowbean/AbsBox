@@ -5,6 +5,7 @@ from absbox import *
 from absbox.local.util import mkTag,mapListValBy,mapValsBy,renameKs2\
                               ,guess_pool_flow_header,positionFlow,mapNone\
                               ,isMixedDeal
+from absbox.local.util import earlyReturnNone                              
 from absbox.local.component import *
 from absbox.local.base import * 
 import pandas as pd
@@ -73,9 +74,7 @@ class Generic:
         return None
 
     def read_pricing(self, pricing):
-        if pricing:
-            return mkPricingAssump(pricing)
-        return None
+        return earlyReturnNone(mkPricingAssump, pricing)
     
     @staticmethod
     def read(resp):

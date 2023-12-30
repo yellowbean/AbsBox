@@ -310,10 +310,8 @@ def _read_cf(x, lang):
     return result
 
 
-def _read_asset_pricing(xs, lang):
-    header = assetPricingHeader[lang]
-    data = [x['contents'] for x in xs]
-    return pd.DataFrame(data, columns=header)
+def _read_asset_pricing(xs, lang) -> pd.DataFrame:
+    return pd.DataFrame([x['contents'] for x in xs], columns=assetPricingHeader[lang])
 
 
 def mergeStrWithDict(s: str, m: dict) -> str:
@@ -402,7 +400,7 @@ def strFromLens(x) -> str:
         return str(x)
 
 
-def enumVals(e):
+def enumVals(e) -> list:
     ''' return a list of enum values '''
     return [_.value for _ in [*e]]
 

@@ -12,6 +12,7 @@ from absbox.local.generic import Generic
 from absbox.deal import mkDeal, mkDealsBy, setDealsBy, prodDealsBy, setAssumpsBy, prodAssumpsBy
 from absbox.local.analytics import run_yield_table, flow_by_scenario
 from absbox.validation import *
+from absbox.local.chart import viz
 from importlib.metadata import version
 
 __version__ = version("absbox")

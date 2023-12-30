@@ -14,7 +14,8 @@ from absbox.validation import isValidUrl,vStr
 
 from absbox.local.util import mkTag, guess_pool_locale, mapValsBy, guess_pool_flow_header \
                               , _read_cf, _read_asset_pricing, mergeStrWithDict \
-                              , earlyReturnNone, searchByFst, filter_by_tags
+                              , earlyReturnNone, searchByFst, filter_by_tags \
+                              , enumVals
 from absbox.local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkLiqMethod \
                                    , mkAssetUnion, mkRateAssumption
 from absbox.local.base import ValidationMsg
@@ -71,7 +72,7 @@ class API:
     url: str
     lang: str = "chinese"
     check: bool = True
-    server_info = {}
+    server_info: dict = {}
     version = VERSION_NUM.split(".")
     hdrs = {'Content-type': 'application/json', 'Accept': '*/*'
             , 'Accept-Encoding': 'gzip'}
@@ -164,10 +165,10 @@ class API:
         
         rawWarnMsg = []
         if multi_run_flag:
-            rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value],[ValidationMsg.Warning.value, ValidationMsg.Error.value])] for k, v in result.items()}
+            rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
             rawWarnMsg = [b for a in rawWarnMsgByScen.values() for b in a]
         else:
-            rawWarnMsg = [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], [ValidationMsg.Warning.value, ValidationMsg.Error.value])]
+            rawWarnMsg = [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg)])]
         
         if rawWarnMsg and showWarning:
             console.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
