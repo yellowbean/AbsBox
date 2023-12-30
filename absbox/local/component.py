@@ -543,9 +543,9 @@ def mkBnd(bn, x):
 def mkLiqMethod(x):
     match x:
         case ["正常|违约", a, b] | ["Current|Defaulted", a, b]:
-            return mkTag(("BalanceFactor", [a, b]))
+            return mkTag(("BalanceFactor", [vNum(a), vNum(b)]))
         case ["正常|拖欠|违约", a, b, c] | ["Current|Delinquent|Defaulted", a, b, c]:
-            return mkTag(("BalanceFactor2", [a, b, c]))
+            return mkTag(("BalanceFactor2", [vNum(a), vNum(b), vNum(c)]))
         case ["贴现|违约", a, b] | ["PV|Defaulted", a, b]:
             return mkTag(("PV", [a, b]))
         case ["贴现曲线", ts] | ["PVCurve", ts]:
@@ -569,9 +569,9 @@ def mkPDA(x):
 def mkAccountCapType(x):
     match x:
         case {"余额百分比": pct} | {"balPct": pct}:
-            return mkTag(("DuePct", pct))
+            return mkTag(("DuePct", vNum(pct)))
         case {"金额上限": amt} | {"balCapAmt": amt}:
-            return mkTag(("DueCapAmt", amt))
+            return mkTag(("DueCapAmt", vNum(amt)))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAccountCapType")
 
