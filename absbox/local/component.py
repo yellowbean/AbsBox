@@ -1,4 +1,4 @@
-from absbox.local.util import mkTag, mkTs, guess_locale, readTagStr, subMap, subMap2, renameKs, ensure100
+from absbox.local.util import mkTag, mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
 from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
 from absbox.local.util import filter_by_tags, enumVals
@@ -1134,18 +1134,18 @@ def mkAsset(x):
              , {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
             borrowerNum = x[2].get("borrowerNum", None)
             prepayPenalty = getValWithKs(x[1],["prepayPenalty","早偿罚息"])
-            return mkTag(("AdjustRateMortgage", [{"originBalance": originBalance,
+            return mkTag(("AdjustRateMortgage", [{"originBalance": vNum(originBalance),
                                                 "originRate": mkRateType(originRate),
-                                                "originTerm": originTerm,
+                                                "originTerm": vInt(originTerm),
                                                 "period": freqMap[freq],
-                                                "startDate": startDate,
+                                                "startDate": vDate(startDate),
                                                 "prinType": mkAmortPlan(_type),
                                                 "prepaymentPenalty": mkPrepayPenalty(prepayPenalty)
                                                 } | mkTag("MortgageOriginalInfo"),
                                                 mkArm(arm),
-                                                currentBalance,
-                                                currentRate,
-                                                remainTerms,
+                                                vNum(currentBalance),
+                                                vNum(currentRate),
+                                                vInt(remainTerms),
                                                 borrowerNum,
                                                 mkAssetStatus(status)])) 
         case ["按揭贷款", {"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "当前利率": currentRate, "剩余期限": remainTerms, "状态": status}] | \
@@ -1153,45 +1153,45 @@ def mkAsset(x):
 
             borrowerNum = getValWithKs(x[2],["borrowerNum","借款人数量"])
             prepayPenalty = getValWithKs(x[1],["prepayPenalty","早偿罚息"])
-            return mkTag(("Mortgage", [ {"originBalance": originBalance,
+            return mkTag(("Mortgage", [ {"originBalance": vNum(originBalance),
                                         "originRate": mkRateType(originRate),
-                                        "originTerm": originTerm,
+                                        "originTerm": vInt(originTerm),
                                         "period": freqMap[freq],
-                                        "startDate": startDate,
+                                        "startDate": vDate(startDate),
                                         "prinType": mkAmortPlan(_type),
                                         "prepaymentPenalty": mkPrepayPenalty(prepayPenalty)
                                         } | mkTag("MortgageOriginalInfo"),
-                                        currentBalance,
-                                        currentRate,
-                                        remainTerms,
+                                        vNum(currentBalance),
+                                        vNum(currentRate),
+                                        vInt(remainTerms),
                                         borrowerNum,
                                         mkAssetStatus(status)]))
         case ["贷款", {"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "当前利率": currentRate, "剩余期限": remainTerms, "状态": status}] \
                 | ["Loan", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
             return mkTag(("PersonalLoan", [
-                {"originBalance": originBalance,
+                {"originBalance": vNum(originBalance),
                  "originRate": mkRateType(originRate),
-                 "originTerm": originTerm,
+                 "originTerm": vInt(originTerm),
                  "period": freqMap[freq],
-                 "startDate": startDate,
+                 "startDate": vDate(startDate),
                  "prinType": mkAmortPlan(_type)
                  } | mkTag("LoanOriginalInfo"),
-                currentBalance,
-                currentRate,
-                remainTerms,
+                vNum(currentBalance),
+                vNum(currentRate),
+                vInt(remainTerms),
                 mkAssetStatus(status)]))
         case ["分期", {"放款金额": originBalance, "放款费率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "剩余期限": remainTerms, "状态": status}] \
                 | ["Installment", {"originBalance": originBalance, "feeRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "remainTerm": remainTerms, "status": status}]:
             return mkTag(("Installment", [
-                {"originBalance": originBalance,
+                {"originBalance": vNum(originBalance),
                  "originRate": mkRateType(originRate),
-                 "originTerm": originTerm,
+                 "originTerm": vInt(originTerm),
                  "period": freqMap[freq],
-                 "startDate": startDate,
+                 "startDate": vDate(startDate),
                  "prinType": mkAmortPlan(_type)
                  } | mkTag("LoanOriginalInfo"),
-                currentBalance,
-                remainTerms,
+                vNum(currentBalance),
+                vInt(remainTerms),
                 mkAssetStatus(status)]))
         case ["租赁", {"固定租金": dailyRate, "初始期限": originTerm, "频率": dp, "起始日": startDate, "状态": status, "剩余期限": remainTerms}] \
                 | ["Lease", {"fixRental": dailyRate, "originTerm": originTerm, "freq": dp, "originDate": startDate, "status": status, "remainTerm": remainTerms}]:
@@ -1213,10 +1213,10 @@ def mkAsset(x):
              |["FixedAsset",{"start":sd,"originBalance":ob,"originTerm":ot,"residual":rb,"period":p,"amortize":ar
                              ,"capacity":cap}
                            ,{"remainTerm":rt}]:
-            return mkTag(("FixedAsset",[{"startDate":sd,"originBalance":ob,"originTerm":ot,"residualBalance":rb
+            return mkTag(("FixedAsset",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originTerm":vInt(ot),"residualBalance":vNum(rb)
                                          ,"period":freqMap[p],"accRule":mkAccRule(ar)
                                          ,"capacity":mkCapacity(cap)} | mkTag("FixedAssetInfo")
-                                        ,rt]))
+                                        ,vInt(rt)]))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 
@@ -1249,7 +1249,6 @@ def identify_deal_type(x):
         case {"assets": [{'tag': 'FixedAsset'}, *rest]}:
             return "FDeal"
         case _:
-            print(">>>",x['pool'])
             raise RuntimeError(f"Failed to identify deal type {y}")
 
 
@@ -1692,7 +1691,7 @@ def readRunSummary(x, locale) -> dict:
     r['bonds'] = bndSummary
     ## Build status change logs
     status_change_logs = [(_['contents'][0], readStatus(_['contents'][1], locale), readStatus(_['contents'][2], locale))
-                          for _ in x if _['tag'] in set(['DealStatusChangeTo'])]
+                          for _ in filter_by_tags(x, ["DealStatusChangeTo"])]
     r['status'] = pd.DataFrame(data=status_change_logs, columns=dealStatusLog[locale])
 
     # inspection variables

@@ -145,6 +145,7 @@ def daysBetween(sd, ed):
 
 
 def guess_locale(x):
+    ''' Guess local from deal map'''
     accs = x['accounts']
 
     assert len(accs) > 0, "Failed to identify via deal accounts result"
@@ -197,7 +198,7 @@ def mapValsBy(m: dict, f: callable):
     return {k: f(v) for k, v in m.items()}
 
 
-def mapListValBy(m: dict, f):
+def mapListValBy(m: dict, f: callable):
     ''' Given a map, whose vals are list,  apply function to every element in each list of each val'''
     assert isinstance(m, dict), "M is not a map"
     return {k: [f(_v) for _v in v] for k,v in m.items()}
@@ -320,23 +321,6 @@ def mergeStrWithDict(s: str, m: dict) -> str:
     t = t | m
     return json.dumps(t)
 
-
-def flow_by_scenario(rs, flowpath, node="col", rtn_df=True, ax=1, rnd=2):
-    "pull flows from multiple scenario"
-    r = None
-    if node == "col":
-        r = {k: query(v, flowpath[:-1])[flowpath[-1]] for k, v in rs.items()}    
-    elif node == "idx":
-        r = {k: query(v, flowpath[:-1]).loc[flowpath[-1]] for k, v in rs.items()}    
-    else:
-        r = {k: query(v, flowpath) for k, v in rs.items()}
-    if rtn_df:
-        _vs = list(r.values())
-        _ks = list(r.keys())
-        r = pd.concat(_vs, keys=_ks, axis=ax) 
-    return r
-
-
 def positionFlow(x, m: dict, facePerPaper=100):
     ''' Get a position bond cashflow from a run result '''
     _, _bflow = list(x['bonds'].items())[0]
@@ -389,7 +373,7 @@ def searchByFst(xs:list, v, defaultRtn=None):
     return defaultRtn
 
 
-def isMixedDeal(x: dict) -> bool :
+def isMixedDeal(x: dict) -> bool:
     if 'assets' in x or 'cashflow' in x:
         return False
     assetTags = query(x, [S.MVALS, S.ALL, 'assets', S.FIRST, S.FIRST])

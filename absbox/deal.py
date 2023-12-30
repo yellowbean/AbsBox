@@ -92,7 +92,6 @@ def setDealsBy(d, *receipes: list, init=None, **kwargs):
 def prodDealsBy(d, *receipes, **kwargs) -> dict:
     inflated = [[(p, _) for _ in vs] for (p, vs) in receipes]
     permus = product(*inflated)
-    # print(list(permus)[0])
     if kwargs.get('guessKey', False) == True:
         return {strFromPath(v): setDealsBy(d, *v, **kwargs) for v in permus}
     return {v: setDealsBy(d, *v, **kwargs) for v in permus}
@@ -109,4 +108,4 @@ def setAssumpsBy(a, *receipes: list, init=None):
 def prodAssumpsBy(a, *receipes, **kwargs):
     inflated = [[(p, _) for _ in vs] for (p, vs) in receipes]
     permus = product(*inflated)
-    return {str(v): setDealsBy(a, *v, **kwargs) for v in permus}
+    return {str(v): setAssumpsBy(a, *v, **kwargs) for v in permus}

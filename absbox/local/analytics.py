@@ -3,7 +3,7 @@ from pyxirr import xirr, xnpv
 from absbox.local.base import china_bondflow_fields_s, english_bondflow_fields_s
 from absbox.validation import vStr
 import numpy as np
-
+from toolz import get_in
 
 def run_yield_table(api, d, bondName, p_assumps: dict, b_assumps: dict):
     assert isinstance(p_assumps, dict), f"pool assumption should be a map but got {type(p_assumps)}"
@@ -76,3 +76,19 @@ def npv(_flow: pd.DataFrame, **p):
             return _pv("cash")
         case _:
             raise RuntimeError("Failed to match", cols, idx_name)
+
+
+def flow_by_scenario(rs, flowpath, node="col", rtn_df=True, ax=1, rnd=2):
+    "pull flows from multiple scenario"
+    r = None
+    if node == "col":
+        r = {k: get_in(flowpath[:-1], v)[flowpath[-1]] for k, v in rs.items()}    
+    elif node == "idx":
+        r = {k: get_in(flowpath[:-1], v).loc[flowpath[-1]] for k, v in rs.items()}    
+    else:
+        r = {k: get_in(flowpath, v) for k, v in rs.items()}
+    if rtn_df:
+        _vs = list(r.values())
+        _ks = list(r.keys())
+        r = pd.concat(_vs, keys=_ks, axis=ax) 
+    return r
