@@ -12,6 +12,7 @@ def viz(x):
     rateSwap = getValWithKs(x,["利率对冲","rateSwap"])
     currencySwap = getValWithKs(x,["汇率对冲","currencySwap"])
     trigger = getValWithKs(x,["触发事件","trigger"])
+    name = getValWithKs(x,["名称", "name"])
     #bonds = getattr(x,"状态","bonds")
     
     def build_agg(d, y):
@@ -124,7 +125,7 @@ def viz(x):
         head_of_waterfalls = [build_subwaterfall(d, ds, waterfall[ds]) for ds in deal_status]
         return head_of_waterfalls
             
-    dot = graphviz.Digraph('round-table', comment="", filename=x.name, format='svg')
+    dot = graphviz.Digraph('round-table', comment="", filename=name, format='svg')
     build_agg(dot, agg)
     head_of_waterfalls = build_waterfall(dot, waterfall)
     dot.node("end",label="end")

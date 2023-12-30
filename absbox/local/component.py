@@ -418,18 +418,18 @@ def mkAccInt(x):
 def mkAccType(x):
     match x:
         case ("固定", amt) | ("fix", amt) | {"固定储备金额": amt} | {"fixReserve": amt}:
-            return mkTag(("FixReserve", amt))
+            return mkTag(("FixReserve", vNum(amt)))
         case ("目标", base, rate) | ("target", base, rate) | {"目标储备金额": [base, rate]} | {"targetReserve": [base, rate]}:
             match base:
                 case ("合计", *qs) | ("sum", *qs) | ["合计", *qs] | ["Sum", *qs]:
                     sumDs = [mkDs(q) for q in qs]
-                    return mkTag(("PctReserve", [mkTag(("Sum", sumDs)), rate]))
+                    return mkTag(("PctReserve", [mkTag(("Sum", sumDs)), vNum(rate)]))
                 case _:
-                    return mkTag(("PctReserve", [mkDs(base), rate]))
+                    return mkTag(("PctReserve", [mkDs(base), vNum(rate)]))
         case {"目标储备金额": {"公式": ds, "系数": rate}} | {"targetReserve": {"formula": ds, "factor": rate}}:
-            return mkTag(("PctReserve", [mkDs(ds), rate]))
+            return mkTag(("PctReserve", [mkDs(ds), vNum(rate)]))
         case ("目标", ds, rate) | ("target", ds, rate):
-            return mkTag(("PctReserve", [mkDs(ds), rate]))        
+            return mkTag(("PctReserve", [mkDs(ds), vNum(rate)]))
         case ("目标", ds) | ("target", ds):
             return mkTag(("PctReserve", [mkDs(ds), 1.0]))
         case {"较高": _s} | {"max": _s} if isinstance(_s, list):
@@ -461,10 +461,10 @@ def mkAccTxn(xs: list):
 def mkAcc(an, x):
     match x:
         case {"余额": b, "类型": t, "计息": i, "记录": tx} | {"balance": b, "type": t, "interest": i, "txn": tx}:
-            return {"accBalance": b, "accName": an, "accType": mkAccType(t), "accInterest": mkAccInt(i), "accStmt": mkAccTxn(tx)}
+            return {"accBalance": vNum(b), "accName": vStr(an), "accType": mkAccType(t), "accInterest": mkAccInt(i), "accStmt": mkAccTxn(tx)}
 
         case {"余额": b} | {"balance": b}:
-            return mkAcc(an, x | {"计息": x.get("计息", None), "interest": x.get("interest", None), "记录": x.get("记录", None), "txn": x.get("txn", None), "类型": x.get("类型", None), "type": x.get("type", None)})
+            return mkAcc(vStr(an), x | {"计息": x.get("计息", None), "interest": x.get("interest", None), "记录": x.get("记录", None), "txn": x.get("txn", None), "类型": x.get("类型", None), "type": x.get("type", None)})
         case _:
             raise RuntimeError(f"Failed to match account: {an},{x}")
 
@@ -476,7 +476,7 @@ def mkBondType(x):
         case {"过手摊还": None} | {"Sequential": None}:
             return mkTag(("Sequential"))
         case {"锁定摊还": _after} | {"Lockout": _after}:
-            return mkTag(("Lockout", _after))
+            return mkTag(("Lockout", vDate(_after)))
         case {"权益": _} | {"Equity": _}:
             return mkTag(("Equity"))
         case _:
@@ -492,15 +492,15 @@ def mkBondRate(x):
              {"floater": [r, _index, Spread, resetInterval]} :
             return mkBondRate(x | {"日历": DC.DC_ACT_365F.value, "dayCount": DC.DC_ACT_365F.value})
         case {"固定": _rate, "日历": dc} | {"fix": _rate, "dayCount": dc}:
-            return mkTag(("Fix", [_rate, dc]))
+            return mkTag(("Fix", [vNum(_rate), dc]))
         case {"固定": _rate} | {"Fixed": _rate} | {"fix": _rate}:
-            return mkTag(("Fix", [_rate, DC.DC_ACT_365F.value]))
+            return mkTag(("Fix", [vNum(_rate), DC.DC_ACT_365F.value]))
         case {"期间收益": _yield}:
             return mkTag(("InterestByYield", _yield))
         case ("上限", cap, br) | ("cap", cap, br):
-            return mkTag(("CapRate", [mkBondRate(br), cap]))
+            return mkTag(("CapRate", [mkBondRate(br), vNum(cap)]))
         case ("下限", floor, br) | ("floor", floor, br):
-            return mkTag(("FloorRate", [mkBondRate(br), floor]))
+            return mkTag(("FloorRate", [mkBondRate(br), vNum(floor)]))
         case _:
             raise RuntimeError(f"Failed to match bond rate type:{x}")
 
@@ -508,9 +508,9 @@ def mkBondRate(x):
 def mkStepUp(x):
     match x:
         case ("ladder", d, spd, dp):
-            return mkTag(("PassDateLadderSpread", [d, spd, mkDatePattern(dp)]))
+            return mkTag(("PassDateLadderSpread", [d, vNum(spd), mkDatePattern(dp)]))
         case ("once", d, spd):
-            return mkTag(("PassDateSpread", [d, spd]))
+            return mkTag(("PassDateSpread", [d, vNum(spd)]))
         case _:
             raise RuntimeError(f"Failed to match bond step up type:{x}")
 
@@ -524,14 +524,14 @@ def mkBnd(bn, x):
     match x:
         case {"当前余额": bndBalance, "当前利率": bndRate, "初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
              {"balance": bndBalance, "rate": bndRate, "originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
-            return {"bndName": bn, "bndBalance": bndBalance, "bndRate": bndRate
+            return {"bndName": vStr(bn), "bndBalance": bndBalance, "bndRate": bndRate
                     , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
                     , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
                     , "bndLastIntPayDate": lastIntPayDate}
         case {"初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
              {"originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
-            return {"bndName": bn, "bndBalance": originBalance, "bndRate": originRate
+            return {"bndName": vStr(bn), "bndBalance": originBalance, "bndRate": originRate
                     , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
                     , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
