@@ -4,7 +4,7 @@ import re
 from urllib.parse import urlparse
 
 
-def isValidUrl(url: str) -> str:
+def isValidUrl(url: str) -> str | None:
     try:
         result = urlparse(url)
         if all([result.scheme, result.netloc]):

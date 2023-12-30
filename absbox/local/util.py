@@ -19,7 +19,7 @@ def flat(xss) -> list:
     return reduce(lambda xs, ys: xs + ys, xss)
 
 
-def mkTag(x: tuple) -> dict:
+def mkTag(x: tuple|str) -> dict:
     match x:
         case (tagName, tagValue):
             return {"tag": tagName, "contents": tagValue}

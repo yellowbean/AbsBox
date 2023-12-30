@@ -3,13 +3,14 @@ from importlib.metadata import version
 from schema import Schema, Regex
 from json.decoder import JSONDecodeError
 from dataclasses import dataclass
+from typing import Union
 
 import rich
 from rich.console import Console
 import requests
 from requests.exceptions import ConnectionError, ReadTimeout
 import pandas as pd
-from absbox.validation import isValidUrl
+from absbox.validation import isValidUrl,vStr
 
 from absbox.local.util import mkTag, guess_pool_locale, mapValsBy, guess_pool_flow_header \
                               , _read_cf, _read_asset_pricing, mergeStrWithDict \
@@ -213,7 +214,7 @@ class API:
             return result
     
     def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, read=True):
-        assert isinstance(deals, dict), f"Deals should be a dict but got {deals}"
+        assert isinstance(deals, dict), f"Deals should be a dict but got {type(deals)}"
         url = f"{self.url}/{Endpoints.RunMultiDeal.value}" 
         _poolAssump = mkAssumpType(poolAssump) if poolAssump else None 
         _nonPerfAssump = mkNonPerfAssumps({}, nonPoolAssump)
@@ -257,7 +258,7 @@ class API:
 
     def loginLibrary(self, user, pw, **q):
         deal_library_url = q['deal_library']+f"/{LibraryEndpoints.Token.value}"
-        cred = {"user": user, "password": pw}
+        cred = {"user": vStr(user), "password": pw}
         r = self._send_req(json.dumps(cred), deal_library_url)
         if 'token' in r:
             console.print(f"✅{MsgColor.Success.value} login successfully,{r['msg']}")
@@ -340,14 +341,19 @@ class API:
             console.print(f"❌{MsgColor.Error.value}: Failed to read result with error = {e}")
             return None
 
-    def _send_req(self, _req, _url: str, timeout=10, headers={})->dict:
+    def _send_req(self, _req, _url: str, timeout=10, headers={})-> dict | None:
         '''
             send requests to server, raise error if response is not 200
         '''
         with console.status("") as status:
             try:
                 hdrs = self.hdrs | headers
-                r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
+                r = None
+                if self.session:
+                    r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
+                else:
+                    console.print(f"❌{MsgColor.Error.value} None type for session")
+                    return None
             except (ConnectionRefusedError, ConnectionError):
                 console.print(f"❌{MsgColor.Error.value} Failed to talk to server {_url}")
                 return None

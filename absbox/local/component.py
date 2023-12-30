@@ -1634,7 +1634,7 @@ def mkPricingAssump(x):
             raise RuntimeError(f"Failed to match pricing assumption: {x}")
 
 
-def readPricingResult(x, locale) -> dict:
+def readPricingResult(x, locale) -> dict | None:
     if x is None:
         return None
     h = None
@@ -1646,8 +1646,7 @@ def readPricingResult(x, locale) -> dict:
     elif tag == "ZSpread":
         h = {"cn": ["静态利差"], "en": ["Z-spread"]}
     else:
-        raise RuntimeError(
-            f"Failed to read princing result: {x} with tag={tag}")
+        raise RuntimeError(f"Failed to read princing result: {x} with tag={tag}")
 
     return pd.DataFrame.from_dict({k: v['contents'] for k, v in x.items()}, orient='index', columns=h[locale]).sort_index()
 
@@ -1830,7 +1829,7 @@ def mkRateAssumption(x):
 
 
 def mkNonPerfAssumps(r, xs:list) -> dict:
-    def translate(y):
+    def translate(y) -> dict:
         match y:
             case ("stop", d):
                 return {"stopRunBy":vDate(d)}
