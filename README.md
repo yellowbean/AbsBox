@@ -33,8 +33,8 @@ a structured finance cashflow engine wrapper for structured credit professionals
     * Fix Asset
 * Features
   * Sensitivity Analysis on different scenarios or deal structures
-    * sensitiviy analysis on pool performance assumptions
-    * sensitiviy analysis on capital structures or any deal components
+    * sensitivity analysis on pool performance assumptions
+    * sensitivity analysis on capital structures or any deal components
   * Bond Cashflow/Pool Cashflow Forecast, Pricing
 
 ## Data flow
