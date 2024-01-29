@@ -20,7 +20,7 @@ myPool = {'assets':[
          'cutoffDate':"2021-03-01"}
 
 localAPI.runPool(myPool,
-                 runAssump=[("interest"
+                 rateAssump=[("interest"
                              ,("LIBOR1M",[["2021-01-01",0.05]
                                           ,["2022-02-01",0.055]
                                           ,["2022-07-01",0.0525]
