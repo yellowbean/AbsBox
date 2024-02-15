@@ -5,10 +5,6 @@ from absbox.validation import vStr
 import numpy as np
 from toolz import get_in
 
-
-def run_yield_table(api, d, bondName, p_assumps: dict, b_assumps: dict):
-    return runYieldTable(api, d, bondName, p_assumps, b_assumps)
-
 def runYieldTable(api, d, bondName, p_assumps: dict, b_assumps: dict):
     assert isinstance(p_assumps, dict), f"pool assumption should be a map but got {type(p_assumps)}"
     
@@ -22,6 +18,7 @@ def runYieldTable(api, d, bondName, p_assumps: dict, b_assumps: dict):
 
     return b_table
 
+run_yield_table = runYieldTable
 
 def irr(flow: pd.DataFrame, init):
     def extract_cash_col(_cols):
@@ -94,5 +91,5 @@ def flow_by_scenario(rs, flowpath, node="col", rtn_df=True, ax=1, rnd=2):
     if rtn_df:
         _vs = list(r.values())
         _ks = list(r.keys())
-        r = pd.concat(_vs, keys=_ks, axis=ax) 
+        r = pd.concat(_vs, keys=_ks, axis=ax)
     return r

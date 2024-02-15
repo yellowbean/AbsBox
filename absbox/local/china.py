@@ -8,7 +8,6 @@ from urllib.request import unquote
 from functools import reduce 
 from pyspecter import query,S
 
-from absbox import *
 from absbox.local.util import *
 from absbox.local.component import *
 from absbox.deal import isMixedDeal
@@ -25,18 +24,18 @@ class SPV:
     费用: tuple
     分配规则: dict
     归集规则: tuple
-    流动性支持:dict = None
-    利率对冲:dict = None
-    汇率对冲:dict = None
+    流动性支持: dict = None
+    利率对冲: dict = None
+    汇率对冲: dict = None
     触发事件: dict = None
-    状态:str = "摊销"
+    状态: str = "摊销"
     自定义: dict = None
     科目: dict = None
 
     @property
     def json(self):
         parsedDates = mkDate(self.日期)
-        defaultStartDate = self.日期.get("起息日",None) or self.日期['归集日'][0]
+        defaultStartDate = self.日期.get("起息日", None) or self.日期['归集日'][0]
         mixedAssetFlag = isMixedDeal(self.资产池)
         (lastAssetDate,lastCloseDate) = getStartDate(self.日期)
         """
@@ -47,9 +46,9 @@ class SPV:
             "name": self.名称,
             "status": mkStatus(self.状态),
             "pool":  mkPoolType(lastAssetDate, self.资产池, mixedAssetFlag),
-            "bonds": {bn: mkBnd(bn,bo)  for (bn,bo) in self.债券 },
+            "bonds": {bn: mkBnd(bn, bo) for (bn, bo) in self.债券 },
             "waterfall": mkWaterfall({},self.分配规则.copy()),
-            "fees": {fn :mkFee(fo|{"名称":fn},fsDate=defaultStartDate) for (fn,fo) in self.费用 },
+            "fees": {fn: mkFee(fo|{"名称":fn}, fsDate=defaultStartDate) for (fn, fo) in self.费用 },
             "accounts": {an:mkAcc(an,ao) for (an,ao) in self.账户 },
             "collects": [ mkCollection(c) for c in self.归集规则],
             "rateSwap": {k:mkRateSwap(v) for k,v in self.利率对冲.items()} if self.利率对冲 else None,
@@ -69,11 +68,6 @@ class SPV:
         for _bn,_bo in self.债券:
             if _bn == bn:
                 return _bo
-        return None
-   
-    def read_assump(self, assump):
-        if assump:
-            return [mkAssumption(a) for a in assump]
         return None
 
     def read_pricing(self, pricing):
@@ -108,7 +102,7 @@ class SPV:
                           for f, v in output['fees'].items()}
 
         # aggregate accounts
-        output['agg_accounts'] = aggAccs(output['accounts'],'chinese')
+        output['agg_accounts'] = aggAccs(output['accounts'], 'chinese')
 
         output['pool'] = {}
         if deal_content['pool']['contents']['futureCf'] is None:

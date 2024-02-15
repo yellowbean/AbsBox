@@ -1,7 +1,4 @@
 import pandas as pd
-import numpy as np
-import toolz as tz
-
 
 
 def readToCf(xs, header=None, idx=None, sort_index=False):

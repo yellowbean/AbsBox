@@ -43,6 +43,11 @@ english_fixed_flow = ["Balance", "Depreciation", "CumuDepreciation", "Unit", "Ca
 china_fixed_flow_d = ["日期"] + china_fixed_flow
 english_fixed_flow_d = ["Date"] + english_fixed_flow
 
+## Underlying Bond Flow
+china_uBond_flow = ["余额", "本金", "利息"]
+english_uBond_flow = ["Balance", "Principal", "Interest"]
+china_uBond_flow_d = ["日期"] + china_uBond_flow
+english_uBond_flow_d = ["Date"] + english_uBond_flow
 
 # Fee 
 china_fee_flow_fields_d = ["日期", "余额", "支付", "剩余支付", "备注"]
@@ -143,6 +148,7 @@ class DC(enum.Enum):  # TODO need to check with HS code
 
 
 class InspectTags(str, enum.Enum):
+    """ Inspect Tag when reading deal run logs """
     InspectBal = "InspectBal"
     InspectBool = "InspectBool"
     InspectRate = "InspectRate"
@@ -150,5 +156,6 @@ class InspectTags(str, enum.Enum):
 
 
 class ValidationMsg(str, enum.Enum):
+    """ Validation Message Type """
     Warning = "WarningMsg"
     Error = "ErrorMsg"

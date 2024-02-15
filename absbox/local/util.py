@@ -15,11 +15,15 @@ def mapNone(x, v):
         return x
 
 
+def lmap(f, xs):
+    return list(map(f, xs))
+
+
 def flat(xss) -> list:
     return reduce(lambda xs, ys: xs + ys, xss)
 
 
-def mkTag(x: tuple|str) -> dict:
+def mkTag(x: tuple | str) -> dict:
     match x:
         case (tagName, tagValue):
             return {"tag": tagName, "contents": tagValue}
@@ -27,7 +31,7 @@ def mkTag(x: tuple|str) -> dict:
             return {"tag": tagName}
         
 
-def filter_by_tags(xs:list, tags:list) -> list:
+def filter_by_tags(xs: list, tags: list) -> list:
     tags_set = set(tags)
     return [x for x in xs if x['tag'] in tags_set]
 
@@ -119,7 +123,7 @@ def aggCFby(_df, interval, cols):
         idx = "日期"
     else:
         idx = "date"
-    df[dummy_col]=pd.to_datetime(df[dummy_col]).dt.to_period(_mapping[interval])
+    df[dummy_col] = pd.to_datetime(df[dummy_col]).dt.to_period(_mapping[interval])
     return df.groupby([dummy_col])[cols].sum().rename_axis(idx)
 
 
@@ -207,6 +211,7 @@ def mapListValBy(m: dict, f: callable):
 def applyFnToKey(m: dict, f, k, applyNone=False):
     assert isinstance(m, dict), f"{m} is not a map"
     assert k in m, f"{k} is not in map {m}"
+    assert callable(f), "funciton passed in is not callable"
     match (m[k], applyNone):
         case (None, True):
             m[k] = f(m[k])
@@ -264,11 +269,16 @@ def guess_pool_flow_header(x, l):
             return (china_fixed_flow_d, "日期", False)
         case ('FixedFlow', 6, 'english'):
             return (english_fixed_flow_d, "Date", False)
+        case ('BondFlow', 4, 'chinese'):
+            return (china_uBond_flow_d, "日期", False)
+        case ('BondFlow', 4, 'english'):
+            return (english_uBond_flow_d, "Date", False)
         case _:
-            raise RuntimeError(f"Failed to match pool header with {x['tag']}{l}")
+            raise RuntimeError(f"Failed to match pool header with {x['tag']},{len(x['contents'])},{l}")
 
 
 def uplift_m_list(l: list):
+    """ input a list of dictionary, reduce the maps into a big map """
     return {k: v for m in l for k, v in m.items()}
 
 
@@ -295,6 +305,7 @@ def _read_cf(x, lang):
     if x == []:
         return []
     flow_header, idx, expandFlag = guess_pool_flow_header(x[0], lang)
+    result = None
     try:
         if not expandFlag:
             result = pd.DataFrame([_['contents'] for _ in x], columns=flow_header)
@@ -302,7 +313,7 @@ def _read_cf(x, lang):
             result = pd.DataFrame([_['contents'][:-1]+_['contents'][-1] for _ in x], columns=flow_header)
     except ValueError as e:
         print(e)
-        logging.error(f"Failed to match header:{flow_header} with {result[0]['contents']}")
+        logging.error(f"Failed to match header:{flow_header} with {result}")
         return False
     result.set_index(idx, inplace=True)
     result.index.rename(idx, inplace=True)
@@ -311,13 +322,13 @@ def _read_cf(x, lang):
 
 
 def _read_asset_pricing(xs, lang) -> pd.DataFrame:
-    return pd.DataFrame([x['contents'] for x in xs], columns=assetPricingHeader[lang])
+    return pd.DataFrame(tz.pluck("contents", xs), columns=assetPricingHeader[lang])
 
 
 def mergeStrWithDict(s: str, m: dict) -> str:
     t = json.loads(s)
-    t = t | m
-    return json.dumps(t)
+    return json.dumps(t | m)
+
 
 def positionFlow(x, m: dict, facePerPaper=100):
     ''' Get a position bond cashflow from a run result '''
@@ -373,6 +384,8 @@ def searchByFst(xs:list, v, defaultRtn=None):
 
 def isMixedDeal(x: dict) -> bool:
     if 'assets' in x or 'cashflow' in x:
+        return False
+    if 'deals' in x:
         return False
     assetTags = query(x, [S.MVALS, S.ALL, 'assets', S.FIRST, S.FIRST])
     if len(set(assetTags)) > 1:

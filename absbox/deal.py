@@ -32,7 +32,7 @@ def mkDeal(x:dict, preCheck=True):
     waterfall = getValWithKs(x, ['waterfall', "现金流分配", "分配规则"])
     assert waterfall is not None, f"waterfall shouldn't be None"
     
-    collection = getValWithKs(x,['collect','colleciton', 'collectionRule', 'aggregation','归集规则','归集'])
+    collection = getValWithKs(x,['collect','colleciton', 'collectionRule', 'aggregation', '归集规则', '归集'])
     assert collection is not None , f"collection shouldn't be None"
 
     liqFacility = getValWithKs(x, ['liqFacility', 'liqProvider', "insurance"
