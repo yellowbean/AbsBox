@@ -111,6 +111,7 @@ def run_deal(input_folder, pair):
                                               , nonPerfInput])) 
                 print("build req done")
                 hdrs = {'Content-type': 'application/json', 'Accept': '*/*'}
+                tresp = None
                 try:
                     tresp = requests.post(f"{test_server}/runDeal"
                                           , data=json.dumps(req, ensure_ascii=False).encode('utf-8')
