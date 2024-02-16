@@ -109,7 +109,7 @@ class Generic:
             output['pool']['flow'] = {k: readPoolCf(v['futureCf']['contents']) for (k,v) in poolMap.items() }
         elif deal_content['pool']['tag']=='ResecDeal':
             poolMap = deal_content['pool']['contents']
-            output['pool']['flow'] = {k: readPoolCf(v['futureCf']['contents']) for (k,v) in poolMap.items() }
+            output['pool']['flow'] = {tz.get([1,2,4],k.split(":")): readPoolCf(v['futureCf']['contents']) for (k,v) in poolMap.items() }
         else:
             raise RuntimeError(f"Failed to match deal pool type:{deal_content['pool']['tag']}")
 

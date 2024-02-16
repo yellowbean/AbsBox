@@ -121,7 +121,6 @@ class API:
                 mAssump = mapValsBy(perfAssump, mkAssumpType)
                 r = mkTag((RunReqType.MultiScenarios.value, [_deal, mAssump, _nonPerfAssump]))
             case "MultiStructs" | "MD" :
-                #mDeal = {k: v.json if hasattr(v, "json") else v for k, v in deal.items()}
                 mDeal = {k: v.json if hasattr(v, "json") else v for k, v in deal.items()}
                 _perfAssump = mkAssumpType(perfAssump)
                 r = mkTag((RunReqType.MultiStructs.value, [mDeal, _perfAssump, _nonPerfAssump]))
@@ -199,7 +198,7 @@ class API:
 
         # read multi-scenario run result into dict
         if read and multi_run_flag:
-            return mapValsBy(result, deal.read)
+            return tz.valmap(deal.read, result)
         # read single scenario run result into tuple
         elif read:
             return deal.read(result)
@@ -214,7 +213,6 @@ class API:
             result = None
             try:
                 if not expandFlag:
-                    #result = pd.DataFrame([_['contents'] for _ in pool_flow], columns=flow_header)
                     result = pd.DataFrame(tz.pluck('contents', pool_flow), columns=flow_header)
                 else:
                     result = pd.DataFrame([_['contents'][-1]+_['contents'][-1] for _ in pool_flow], columns=flow_header)
