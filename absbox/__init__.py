@@ -16,4 +16,3 @@ from absbox.local.chart import viz
 from importlib.metadata import version
 
 __version__ = version("absbox")
-

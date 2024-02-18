@@ -383,6 +383,7 @@ def searchByFst(xs:list, v, defaultRtn=None):
 
 
 def isMixedDeal(x: dict) -> bool:
+    
     if 'assets' in x or 'cashflow' in x:
         return False
     if 'deals' in x:

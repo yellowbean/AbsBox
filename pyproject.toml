@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "0.24.2"
+version = "0.25.0"
 name = "absbox"
 description = "an analytical library for cashflow modeling on ABS/MBS products"
 readme = "README.md"
@@ -24,8 +24,8 @@ classifiers = [
 ]
 
 dependencies = [
-    "pandas ==1.4.3",
-    "numpy ==1.23.1",
+    "pandas",
+    "numpy",
     "matplotlib",
     "requests",
     "toolz",
