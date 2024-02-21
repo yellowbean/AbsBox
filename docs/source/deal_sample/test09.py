@@ -54,11 +54,10 @@ test01 = Generic(
     ,("PreClosing","Amortizing")
     )
 
-from absbox import API
+if __name__ == '__main__':
+    from absbox import API
+    localAPI = API("https://absbox.org/api/latest")
 
-#localAPI = API("<url to calculation engine>",'english')
-
-r = localAPI.run(test01,
-                 runAssump=[("inspect",(["DayOfMonth",20],fm['formula']))],
-                 read=True)
-
+    r = localAPI.run(test01,
+                     runAssump=[("inspect",(["DayOfMonth",20],fm['formula']))],
+                     read=True)

@@ -42,13 +42,12 @@ def irr(flow: pd.DataFrame, init):
     return xirr(np.array(dates), np.array(amounts))
 
 
-def sum_fields_to_field(_df: pd.DataFrame, cols: list, col: str):
-    """ Sum up a list of columns and attach to dataframe, reutrn with a copy """
+def sum_fields_to_field(df: pd.DataFrame, cols: list, col: str):
+    """Sum up a list of columns and attach to dataframe, reutrn with a copy
+    """
     assert isinstance(cols, list), "columns to be sum up must be a list"
     assert isinstance(col, str), "result column must be a string"
-    df = _df.copy()
-    df[col] = df[cols].sum(axis=1)
-    return df
+    return df.assign(col=df[cols].sum(axis=1))
 
 
 def npv(_flow: pd.DataFrame, **p):

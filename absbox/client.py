@@ -29,6 +29,7 @@ console = Console()
 
 __all__ = ["API", "Endpoints", "RunReqType", "RunResp", "MsgColor", "LibraryEndpoints"]
 
+
 class Endpoints(str, enum.Enum):
     """API endpoints for engine server
 
@@ -87,6 +88,27 @@ class LibraryEndpoints(str, enum.Enum):
     Run = "run"
 
 
+class VersionMismatch(Exception):
+    """Exception for version mismatch between client and server"""
+    def __init__(self, libVersion, serverVersion) -> None:
+        self.libVersion = libVersion
+        self.serverVersion = serverVersion
+        super().__init__(f"Failed to match version, lib support={libVersion} but server version={serverVersion}")
+
+
+class EngineError(Exception):
+    """Exception for error from engine server"""
+    def __init__(self, engineResp) -> None:
+        errorMsg = engineResp.text
+        super().__init__(errorMsg)
+
+
+class AbsboxError(Exception):
+    """Exception for error from absbox"""
+    def __init__(self, errorMsg) -> None:
+        super().__init__(errorMsg)
+
+
 @dataclass
 class API:
     """ API to connect to engine server, handling requests and responses 
@@ -106,8 +128,7 @@ class API:
     """ internal """
     version = VERSION_NUM.split(".")
     """ internal """
-    hdrs = {'Content-type': 'application/json', 'Accept': '*/*'
-            , 'Accept-Encoding': 'gzip'}
+    hdrs = {'Content-type': 'application/json', 'Accept': '*/*', 'Accept-Encoding': 'gzip'}
     """ internal """
     session = None
     """ internal """
@@ -117,7 +138,9 @@ class API:
     def __post_init__(self) -> None:
         """Init the API instance with url and perform version check
 
-        :raises RuntimeError: Failed to connect to server or version mismatch
+        :raises ConnectionRefusedError: Failed to connect to server
+        :raises RuntimeError: Failed to get version info from server
+        :raises VersionMismatch: Failed to match version between client and server
         """
         self.url = isValidUrl(self.url).rstrip("/")
         with console.status(f"{MsgColor.Info.value}Connecting engine server -> {self.url}") as status:
@@ -132,10 +155,8 @@ class API:
             self.server_info = self.server_info | json.loads(_r)
             engine_version = self.server_info['_version'].split(".")
             if self.check and (self.version[1] != engine_version[1]):
-                console.print(f"❌{MsgColor.Error.value}Failed to init the api instance, \
-                              lib support={self.version} but server version={self.server_info['_version']} ,\
-                              pls upgrade your api package by: pip -U absbox")
-                return
+                console.print("pls upgrade your api package by: pip -U absbox")
+                raise VersionMismatch('.'.join(self.version), '.'.join(engine_version))
         console.print(f"✅{MsgColor.Success.value}Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
         self.session = requests.Session()
 
@@ -200,7 +221,7 @@ class API:
             r = mkTag((RunReqType.MultiPoolScenarios.value,
                        [mkPool(pool), mapValsBy(poolAssump, mkAssumpType), _rateAssump])) 
         else:
-            raise RuntimeError("Error in build pool req")
+            raise RuntimeError(f"Error in build pool req, pool assumption should be a tuple or a dict, but got {type(poolAssump)}")
         return json.dumps(r, ensure_ascii=False)
 
     def run(self, deal,
@@ -241,9 +262,8 @@ class API:
             result = self._send_req(req, url, timeout=30)
 
         if result is None or 'error' in result:
-            console.print(f"❌{MsgColor.Error.value}Failed to get response from run")
-            return None
-        
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run")
+
         rawWarnMsg = []
         if multi_run_flag:
             rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
@@ -395,7 +415,7 @@ class API:
         cred = {"user": vStr(user), "password": pw}
         r = self._send_req(json.dumps(cred), deal_library_url)
         if 'token' in r:
-            console.print(f"✅{MsgColor.Success.value} login successfully,{r['msg']}")
+            console.print(f"✅{MsgColor.Success.value} login successfully, {r['msg']}")
             self.token = r['token']
         else:
             if hasattr(self, 'token'):
@@ -415,7 +435,7 @@ class API:
             pw = getpass.getpass()
             self.loginLibrary(user, pw, **q)
         except Exception as e:
-            console.print(f"❌{MsgColor.Error.value}{e}")
+            raise AbsboxError(f"❌{MsgColor.Error.value} Failed during library login {e}")
 
     def queryLibrary(self, ks, **q):
         """query deal library with bond ids
@@ -430,8 +450,8 @@ class API:
         
         """
         if not hasattr(self, "token"):
-            console.print(f"❌{MsgColor.Error.value} No token found , please call loginLibrary() to login")
-            return None
+            raise AbsboxError(f"❌{MsgColor.Error.value} No token found , please call loginLibrary() to login")
+
         deal_library_url = q['deal_library']+f"/{LibraryEndpoints.Query.value}"
         d = {"bond_id": [k for k in ks]}
         q = {"read": True} | q
@@ -488,10 +508,10 @@ class API:
 
         runReq = mergeStrWithDict(self.build_run_deal_req(runType, _id, poolAssump, dealAssump), prod_flag)
         if not hasattr(self, "token"):
-            console.print(f"❌{MsgColor.Error.value} No token found, please call loginLibrary() to login")
-            return None
-        result = self._send_req(runReq, deal_library_url, headers={"Authorization": f"Bearer {self.token}"})
+            raise AbsboxError(f"❌{MsgColor.Error.value} No token found, please call loginLibrary() to login")
         
+        result = self._send_req(runReq, deal_library_url, headers={"Authorization": f"Bearer {self.token}"})
+
         def lookupReader(x):
             match x:
                 case "china.SPV":
@@ -505,8 +525,7 @@ class API:
             result = result['run_result']
             console.print(f"✅{MsgColor.Success.value}run success with deal id={ri['deal_id']}/report num={ri['report_num']},doc_id={ri['doc_id']}")
         except Exception as e:
-            console.print(f"❌{MsgColor.Error.value} message from API server:{result},\n,{e}")
-            return None
+            raise AbsboxError(f"❌{MsgColor.Error.value} message from API server:{result},\n,{e}")
         try:       
             classReader = lookupReader(p['reader'])
             if read and isinstance(result, list):
@@ -516,8 +535,7 @@ class API:
             else:
                 return result
         except Exception as e:
-            console.print(f"❌{MsgColor.Error.value}: Failed to read result with error = {e}")
-            return None
+            raise AbsboxError(f"❌{MsgColor.Error.value}: Failed to read result with error = {e}")
 
     def _send_req(self, _req, _url: str, timeout=10, headers={})-> dict | None:
         """common function send request to server
@@ -539,23 +557,16 @@ class API:
                 hdrs = self.hdrs | headers
                 r = None
                 if self.session:
-                    r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs
-                                         , verify=False, timeout=timeout)
+                    r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
                 else:
-                    console.print(f"❌{MsgColor.Error.value} None type for session")
-                    return None
+                    raise AbsboxError(f"❌{MsgColor.Error.value}: None type for session")
             except (ConnectionRefusedError, ConnectionError):
-                console.print(f"❌{MsgColor.Error.value} Failed to talk to server {_url}")
-                return None
+                raise AbsboxError(f"❌{MsgColor.Error.value} Failed to talk to server {_url}")
             except ReadTimeout:
-                console.print(f"❌{MsgColor.Error.value} Failed to get response from server")
-                return None
+                raise AbsboxError(f"❌{MsgColor.Error.value} Failed to get response from server")
             if r.status_code != 200:
-                console.print_json(_req)
-                console.print_json(r.text)
-                return None
+                raise EngineError(r)
             try:
                 return json.loads(r.text)
             except JSONDecodeError as e:
-                console.print(e)
-                return None
+                raise EngineError(e)

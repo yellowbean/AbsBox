@@ -1,4 +1,4 @@
-from absbox import API,Generic
+from absbox import Generic
 
 asset = ["AdjustRateMortgage"
         ,{"originBalance":73_875.00
@@ -65,24 +65,27 @@ GNMA_36208ALG4 = Generic(
     ,("PreClosing","Amortizing")
     )
 
+if __name__ == '__main__':
+    from absbox import API
+    localAPI = API("https://absbox.org/api/latest")
 
-r = localAPI.run(GNMA_36208ALG4
-                ,runAssump = [("inspect",("MonthEnd",("cumPoolDefaultedBalance",))
-                                         ,("MonthEnd",("liqBalance","Ginnie_Mae")))
-                              ,("interest",("USCMT1Y",0.0468))]
-                ,poolAssump = ("Pool"
-                              ,("Mortgage",{"CDR":0.005},None,{"Rate":0.3,"Lag":4},None)
-                              ,None
-                              ,None)
-                ,read=True)
+    r = localAPI.run(GNMA_36208ALG4
+                    ,runAssump = [("inspect",("MonthEnd",("cumPoolDefaultedBalance",))
+                                            ,("MonthEnd",("liqBalance","Ginnie_Mae")))
+                                  ,("interest",("USCMT1Y",0.0468))]
+                    ,poolAssump = ("Pool"
+                                  ,("Mortgage",{"CDR":0.005},None,{"Rate":0.3,"Lag":4},None)
+                                  ,None
+                                  ,None)
+                    ,read=True)
 
-# Inspect cumulative defaulted balance
-r['result']['inspect']['<CumulativePoolDefaultedBalance>']
+    # Inspect cumulative defaulted balance
+    r['result']['inspect']['<CumulativePoolDefaultedBalance>']
 
-# Inspect credit provided by Ginnie Mae
-r['result']['inspect']['<LiqBalance:Ginnie_Mae>']
+    # Inspect credit provided by Ginnie Mae
+    r['result']['inspect']['<LiqBalance:Ginnie_Mae>']
 
-# the cash deposited to SPV in account `acc01`
-r['accounts']['acc01'][r['accounts']['acc01']["memo"]=="<Support:Ginnie_Mae>"]
+    # the cash deposited to SPV in account `acc01`
+    r['accounts']['acc01'][r['accounts']['acc01']["memo"]=="<Support:Ginnie_Mae>"]
 
 

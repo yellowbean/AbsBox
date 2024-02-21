@@ -48,20 +48,23 @@ deal_data = {
      ]}
     ,"status":("PreClosing","Amortizing")
 }
+if __name__ == '__main__':
+    from absbox import API
+    localAPI = API("https://absbox.org/api/latest")
 
-from absbox import mkDeal
-deal = mkDeal(deal_data) 
+    from absbox import mkDeal
+    deal = mkDeal(deal_data) 
 
-r = localAPI.run(deal
-                 ,poolAssump = None
-                 ,runAssump = [("inspect",(["DayOfMonth",20],("schedulePoolValuation",('PvRate',0.08)))
-                                          ,(["DayOfMonth",20],("schedulePoolValuation",('PvRate',("max",("poolWaRate",),("const",0.09)))))
-                                          ,(["DayOfMonth",20],("-",("schedulePoolValuation",('PvRate',("poolWaRate",)))
-                                                             ,("schedulePoolValuation",('PvRate',("max",("poolWaRate",),("const",0.09))))))
-                                
-                                )
-                              ]
-                 ,read=True)
+    r = localAPI.run(deal
+                    ,poolAssump = None
+                    ,runAssump = [("inspect",(["DayOfMonth",20],("schedulePoolValuation",('PvRate',0.08)))
+                                              ,(["DayOfMonth",20],("schedulePoolValuation",('PvRate',("max",("poolWaRate",),("const",0.09)))))
+                                              ,(["DayOfMonth",20],("-",("schedulePoolValuation",('PvRate',("poolWaRate",)))
+                                                                ,("schedulePoolValuation",('PvRate',("max",("poolWaRate",),("const",0.09))))))
+                                    
+                                    )
+                                  ]
+                    ,read=True)
 
 # from absbox.local.util import unifyTs
 # unifyTs(r['result']['inspect'].values())

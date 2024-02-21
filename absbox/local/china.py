@@ -49,7 +49,7 @@ class SPV:
             "bonds": {bn: mkBnd(bn, bo) for (bn, bo) in self.债券 },
             "waterfall": mkWaterfall({},self.分配规则.copy()),
             "fees": {fn: mkFee(fo|{"名称":fn}, fsDate=defaultStartDate) for (fn, fo) in self.费用 },
-            "accounts": {an:mkAcc(an,ao) for (an,ao) in self.账户 },
+            "accounts": {an:mkAcc(an,ao) for (an, ao) in self.账户 },
             "collects": [ mkCollection(c) for c in self.归集规则],
             "rateSwap": {k:mkRateSwap(v) for k,v in self.利率对冲.items()} if self.利率对冲 else None,
             "currencySwap": None,
