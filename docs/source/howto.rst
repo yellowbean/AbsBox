@@ -772,26 +772,38 @@ Project Cashflow for Solar Panel
 
 .. versionadded:: 0.23
 
-
 Fixed Asset 
 ^^^^^^^^^^^
-``FixedAsset`` was introduced in ``absbox`` version `0.23`, which represent a thing:
+``FixedAsset`` was introduced in ``absbox`` version `0.23`, which represent a object:
 
-* depreciates per `Accounting` rule
-* has the ability to produce an amount of `something` ,the `ability` may decay as the asset is depreciating.
-* `something` can be monetized in the market.
+* depreciates by `Accounting` rule
+* has the ability to produce an amount of `something`, which can be monetized in the market.
+* the `ability` (maxium amount of `something` produced ) may decay as the asset is depreciating.
 
 But it's not always producing `something` in the maxium level, so it will subject to a ``Utilization Rate`` curve from input assumption.
 And, it can't sell all the `something` at same price all over the time, the market price will be read from ``Price Curve`` from input assumption.
 
-It looks abstract but indeed provide more coverage to different asset classes.
+It looks abstract but indeed provide more coverage to different asset classes, like `Solar Panel` , `Hotel Room` etc .
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: how a fixed Asset generate cash
+    :alt: how a fixed Asset generate cash
+    :align: center
+
+    digraph {
+       "Fixed Asset" -> "Maximum Production" [label="Has a "]
+       "Maximum Production" -> "Unit" [label="Apply with `Utilization Rate Curve` "]
+       "Unit" -> "Cash" [label="Sell `Unit` with `Price Curve` "]       
+    }
+
 
 Solar Panel
 ^^^^^^^^^^^^^^
 
 `Solar Panel` is a good example of this type of asset as it fullfill the feactures below:
 
-* it produce `Electricity` as `Something`, the production of `Electricity` fluctuates due to season, thus ``Utilization Rate`` Curve can be applied.
+* it produce `Electricity` as `Something`, the production of `Electricity` fluctuates due to seasonality, thus ``Utilization Rate`` Curve can be applied.
 * the maxium production capacity is decaying due to the installation equipment depreciates.
 * The `Electricity` can be monetized in someway ,and the price may varies, due to supply and demand, thus ``Price Curve`` can be applied as well.
 

@@ -16,7 +16,7 @@ import pathlib
 #PROJECT_DIR = pathlib.Path(__file__).parent.parent.parent.parent / 'PyABS'
 
 import sys,os
-sys.path.append(str( pathlib.Path(__file__) / "PyABS" ))
+sys.path.append(str( pathlib.Path(__file__).parent.parent))
                 
                 #os.path.relpath(r'PyABS'))
 
