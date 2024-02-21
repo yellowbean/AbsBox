@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "../../../Hastructure"
+		},
+		{
+			"path": "../../../PyABS"
+		},
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../pyabs-doc"
+		}
+	],
+	"settings": {
+		"esbonio.sphinx.confDir": ""
+	}
+}
