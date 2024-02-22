@@ -1049,6 +1049,10 @@ def mkAmortPlan(x) -> dict:
             return mkTag("I_P")
         case "等本等费" | "F_P" | "f_p":
             return mkTag("F_P")
+        case ("NO_FirstN", n, _pt):
+            return mkTag(("NO_FirstN", [n, mkAmortPlan(_pt)]))
+        case ("IO_FirstN", n, _pt):
+            return mkTag(("IO_FirstN", [n, mkAmortPlan(_pt)]))
         case ("计划还款", ts, Dp) | ("Schedule", ts, Dp):
             return mkTag(("ScheduleRepayment", [mkTs("RatioCurve", ts), mkDatePattern(Dp)]))
         case ("计划还款", ts) | ("Schedule", ts):
@@ -1060,10 +1064,6 @@ def mkAmortPlan(x) -> dict:
 def mkArm(x:dict):
     match x:
         case {"initPeriod": ip}:
-            #fc = x.get("firstCap", None)
-            #pc = x.get("periodicCap", None)
-            #floor = x.get("lifeFloor", None)
-            #cap = x.get("lifeCap", None)
             exs = tz.get(["firstCap", "periodicCap", "lifeCap", "lifeFloor"], x, None)
             return mkTag(("ARM", [ip]+list(exs)))
         case _:

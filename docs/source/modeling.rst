@@ -1018,6 +1018,8 @@ Mortgage
   * `Level` -> `Annuity`, `French` style
   * `Even` -> `Linear`
   * `I_P` -> interest only till last payment; last payment will cover all oustanding balance 
+  * `("NO_FirstN",N,<type>)` -> (new after version: 0.25.1) no payment for first N period (capitalized interest), and amortize per `type` following
+  * `("IO_FirstN",N,<type>)` -> (new after version: 0.25.1) interest only for first N period, and amortize per `type` following
 
 .. code-block:: python
 
