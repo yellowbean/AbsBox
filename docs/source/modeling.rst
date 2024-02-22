@@ -1018,8 +1018,11 @@ Mortgage
   * `Level` -> `Annuity`, `French` style
   * `Even` -> `Linear`
   * `I_P` -> interest only till last payment; last payment will cover all oustanding balance 
-  * `("NO_FirstN",N,<type>)` -> (new after version: 0.25.1) no payment for first N period (capitalized interest), and amortize per `type` following
-  * `("IO_FirstN",N,<type>)` -> (new after version: 0.25.1) interest only for first N period, and amortize per `type` following
+  
+  .. versionadded:: 0.25.1
+  
+  * `("NO_FirstN",N,<type>)` -> no payment for first N period (capitalized interest), and amortize per `type` following
+  * `("IO_FirstN",N,<type>)` -> interest only for first N period, and amortize per `type` following
 
 .. code-block:: python
 
@@ -1136,6 +1139,38 @@ User just need to set ``I_P`` in field ``type``, which means ``Interest`` comes 
     ,"currentRate": 0.075
     ,"remainTerm": 24
     ,"status": "Current"}]
+
+IO / NoPayment
+""""""""""""""""""""""
+
+.. versionadded:: 0.25.1
+.. code-block:: python 
+  :emphasize-lines: 6,18
+
+  myAsset1 = ["Mortgage"
+  ,{"originBalance": 12000.0
+    ,"originRate": ["fix",0.045]
+    ,"originTerm": 12
+    ,"freq": "Monthly"
+    ,"type": ("NO_FirstN",6,"Level")
+    ,"originDate": "2021-02-01"}
+  ,{"currentBalance": 10000.0
+    ,"currentRate": 0.075
+    ,"remainTerm": 12
+    ,"status": "Current"}]
+
+  myAsset2 = ["Mortgage"
+  ,{"originBalance": 12000.0
+    ,"originRate": ["fix",0.045]
+    ,"originTerm": 12
+    ,"freq": "Monthly"
+    ,"type": ("IO_FirstN",6,"Level")
+    ,"originDate": "2021-02-01"}
+  ,{"currentBalance": 10000.0
+    ,"currentRate": 0.075
+    ,"remainTerm": 12
+    ,"status": "Current"}]
+
 
 
 Loan
