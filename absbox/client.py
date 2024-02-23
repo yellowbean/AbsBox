@@ -147,9 +147,7 @@ class API:
             try:
                 _r = requests.get(f"{self.url}/{Endpoints.Version.value}", verify=False, timeout=5).text
             except (ConnectionRefusedError, ConnectionError):
-                console.print(f"❌{MsgColor.Error.value}Error: Can't not connect to API server {self.url}")
-                self.url = None
-                return
+                raise AbsboxError(f"❌{MsgColor.Error.value}Error: Can't not connect to API server {self.url}")
             if _r is None:
                 raise RuntimeError(f"Failed to get version from url:{self.url}")
             self.server_info = self.server_info | json.loads(_r)
@@ -195,7 +193,10 @@ class API:
                 r = mkTag((RunReqType.MultiStructs.value, [mDeal, _perfAssump, _nonPerfAssump]))
             case _:
                 raise RuntimeError(f"Failed to match run type:{run_type}")
-        return json.dumps(r, ensure_ascii=False)
+        try:
+            return json.dumps(r, ensure_ascii=False)
+        except TypeError as e:
+            raise AbsboxError(f"❌Failed to convert request to json:{e}")
 
     def build_pool_req(self, pool, poolAssump, rateAssumps) -> str:
         """build pool run request: (single run, multi-scenario run)
@@ -267,7 +268,7 @@ class API:
         rawWarnMsg = []
         if multi_run_flag:
             rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
-            rawWarnMsg = [b for a in rawWarnMsgByScen.values() for b in a]
+            rawWarnMsg = tz.concat(rawWarnMsgByScen.values())
         else:
             rawWarnMsg = [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg))]
         
@@ -295,25 +296,11 @@ class API:
         """
         def read_single(pool_resp):
             (pool_flow, pool_bals) = pool_resp
-            flow_header, idx, expandFlag = guess_pool_flow_header(pool_flow[0], pool_lang)
-            result = None
-            try:
-                if not expandFlag:
-                    result = pd.DataFrame(tz.pluck('contents', pool_flow), columns=flow_header)
-                else:
-                    result = pd.DataFrame([_['contents'][-1]+_['contents'][-1] for _ in pool_flow], columns=flow_header)
-            except ValueError as e:
-                console.print(f"❌{MsgColor.Error.value}Failed to match header:{flow_header} with {pool_flow[0]['contents']}")
-                console.print(f"error:{e}")
-
-            result = result.set_index(idx)
-            result.index.rename(idx, inplace=True)
-            result.sort_index(inplace=True)
+            result = _read_cf(pool_flow['contents'], self.lang)
             return (result, pool_bals)
             
         multi_scenario = True if isinstance(poolAssump, dict) else False
         url = f"{self.url}/{Endpoints.RunPoolByScenarios.value}" if multi_scenario else f"{self.url}/{Endpoints.RunPool.value}"
-        pool_lang = guess_pool_locale(pool)
         req = self.build_pool_req(pool, poolAssump, rateAssump)
         result = self._send_req(req, url)
 
@@ -559,11 +546,11 @@ class API:
                 if self.session:
                     r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
                 else:
-                    raise AbsboxError(f"❌{MsgColor.Error.value}: None type for session")
+                    raise AbsboxError(f"❌: None type for session")
             except (ConnectionRefusedError, ConnectionError):
-                raise AbsboxError(f"❌{MsgColor.Error.value} Failed to talk to server {_url}")
+                raise AbsboxError(f"❌ Failed to talk to server {_url}")
             except ReadTimeout:
-                raise AbsboxError(f"❌{MsgColor.Error.value} Failed to get response from server")
+                raise AbsboxError(f"❌ Failed to get response from server")
             if r.status_code != 200:
                 raise EngineError(r)
             try:

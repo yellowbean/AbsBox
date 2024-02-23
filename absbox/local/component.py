@@ -10,6 +10,7 @@ import itertools
 import functools
 import logging
 import toolz as tz
+from lenses import lens
 
 import pandas as pd
 from pyspecter import query, S
@@ -1242,10 +1243,14 @@ def identify_deal_type(x):
     y = None
     if query(x, ["pool","tag"])=='SoloPool':
         return id_by_pool_assets(x["pool"]['contents'])
+    elif "pool" in x and set(x.keys()) == {"pool"}:
+        return id_by_pool_assets(x['pool'])
     elif "pool" in x and x["pool"]['tag']=='MultiPool':
-        assetTags = flat(query(x,["pool","contents",S.MVALS,S.ALL,"assets",S.ALL,"tag"]))
+        assetTags = lens['pool']['contents'].Values()['assets'][0]['tag'].collect()(x)
         if len(set(assetTags))>1:
             return "UDeal"
+        else:
+            return id_by_pool_assets(list(x["pool"]['contents'].values())[0])
     elif "ResecDeal" == x['pool']['tag']:
         vs = [ v['deal'] for k,v in x["pool"]['contents'].items() ]
         assetTypes = set(map(identify_deal_type, vs))
@@ -1599,9 +1604,9 @@ def mkCollection(x):
         case [None, s, *pcts] if isinstance(pcts, list):
             return mkTag(("CollectByPct" ,[None, mkPoolSource(s), pcts]))
         case [mPids, s, acc] if isinstance(acc, str):
-            return mkTag(("Collect",[map(mkPid,mPids), mkPoolSource(s), acc]))
+            return mkTag(("Collect",[lmap(mkPid,mPids), mkPoolSource(s), acc]))
         case [mPids, s, *pcts] if isinstance(pcts, list):
-            return mkTag(("CollectByPct" ,[map(mkPid,mPids), mkPoolSource(s), pcts]))
+            return mkTag(("CollectByPct" ,[lmap(mkPid,mPids), mkPoolSource(s), pcts]))
         case _:
             raise RuntimeError(f"Failed to match collection rule {x}")
 
@@ -1847,6 +1852,8 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
                 return {"pricing":mkPricingAssump(p)}
             case ("fireTrigger", scheduleFired):
                 return {"fireTrigger":[ (dt, dealCycleMap[cyc], tn) for (dt, cyc, tn) in scheduleFired]}
+            case ("makeWhole", d,spd,tbl):
+                return {"makeWholeWhen": [d,spd,tbl]}
     match xs:
         case None:
             return {}
