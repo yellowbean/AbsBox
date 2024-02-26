@@ -314,7 +314,7 @@ cashflow projection will stop at the date specified.
 
 
 Project Expense
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 a time series of expense will be used in cashflow projection.
 
@@ -391,7 +391,7 @@ Let's build some fancy call condition with a :ref:`Formula` value less than a th
 
 
 Revolving Assumption
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 User can set assumption on revolving pool with two compoenents: assets and performance assumption.
 
@@ -561,6 +561,35 @@ syntax
   
   Example :ref:`Mannual fire a trigger` 
 
+Make Whole Call 
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 0.26.0
+
+User can specify a `Make Whole Call` date , and a `fixed spread` following, and a WAL/Spread mapping.
+
+1. The engine will stop projection at the make whole call date.
+2. Then project with no-stress on the pool and simulate the future bond cashflow.
+3. calculate bond's WAL and find each bond's spread based on the input table
+4. then for each bond's spread will be add with `fixed spread`.
+5. using the total spread ( spread from lookup table and `fixed spread`) to discount future bond cashflow to get the PV 
+6. the PV will be paid off the bond ,if PV > oustanding balance ,then excess will be paid to interest.
+
+
+
+.. code-block:: python 
+
+  r = localAPI.run(deal
+                  ,poolAssump = ("Pool",
+                                    ("Mortgage",{"CDR":0.02} ,None, None, None)
+                                    ,None
+                                    ,None)
+                  ,runAssump = [("interest",("LIBOR6M",0.04))
+                                ,("makeWhole"
+                                  ,"2022-04-20"
+                                  ,0.001
+                                  ,[[0.08,0.005],[0.55,0.01],[100,0.02]])]
+                  ,read=True)  
 
 
 

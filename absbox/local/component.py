@@ -1541,6 +1541,7 @@ def mkLiqProvider(n: str, x: dict):
             r = {"liqName": n, "liqType": mkLiqProviderType({})
                 ,"liqBalance": p.get("balance",0), "liqStart": _sd
                 ,"liqRateType": mkRateType(p.get("rate",None))
+                ,"liqRate": p.get("liqRate",None)
                 ,"liqPremiumRateType": mkRateType(p.get("fee",None))
                 } 
         case {"类型": _sp, "额度": _ab, "起始日": _sd, **p} \
