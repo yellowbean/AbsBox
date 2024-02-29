@@ -911,6 +911,22 @@ syntax
 
   ``assets`` and ``cashflow`` are mutually exclusive, only one of them can be used in a pool
 
+When to model ``asset`` or ``cashflow`` in the pool ?
+
+  .. graphviz::
+      :name: sphinx.ext.graphviz
+      :caption: when to use assets or cashflow
+      :alt: when to use assets or cashflow
+      :align: center
+
+      digraph {
+        rankdir=LR;
+        start -> assets [label="if there is loan level /repline level asset"]
+        start -> cashflow [label="if there is schedule pool cashflow"]
+      }
+
+
+
 issuanceStat
 ^^^^^^^^^^^^^^^^
 a map represents history information of a `ongoing` deal.
