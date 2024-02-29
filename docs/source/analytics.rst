@@ -78,7 +78,7 @@ There are two type of assumptions:
    The assumption of asset start from point of time of `Asset`
    :ref:`How assumption was applied on asset ?`
 
-Mortgage/Loan/Installment
+Mortgage
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. warning::
@@ -97,31 +97,19 @@ Here is sample which used to set ``Pool`` level assumption on ``Mortgage`` asset
                   ,runAssump = None
                   ,read=True)
 
-   r = localAPI.run(deal
-                  ,poolAssump = ("Pool",("Loan",<default assump>,<prepay assump>,<recovery assump>,<extra assump>)
-                                          ,<delinq assumption>
-                                          ,<defaulted assumption>)
-                  ,runAssump = None
-                  ,read=True)
 
-   r = localAPI.run(deal
-                  ,poolAssump = ("Pool",("Installment",<default assump>,<prepay assump>,<recovery assump>,<extra assump>)
-                                          ,<delinq assumption>
-                                          ,<defaulted assumption>)
-                  ,runAssump = None
-                  ,read=True)
+.. note::
 
-Notes:
-
-* ``Pool`` ,means the assumption will be applied to ``all`` the assets in the pool
-* ``Mortgage`` ,means the it's assumption applied to ``Mortgage`` asset class
+  * ``Pool`` ,means the assumption will be applied to ``all`` the assets in the pool
+  * ``Mortgage`` ,means the it's assumption applied to ``Mortgage`` asset class
   
-  for `Performing Asset`
+For `Performing Asset`
 
   * ``<default assump>``   -> default assumption for performing asset: like ``{"CDR":0.01}``
   
     * ``{"CDR":0.01}`` means 1% in annualized of current balance will be defaulted at the end of each period
     * ``{"CDR":[0.01,0.02,0.04]}`` means a vector of CDR will be applied since the asset snapshot date (determined by ``remain terms``)
+    * ``{"ByAmount":(2000,[500,500,1000])}`` apply a custom default amount vector.
   * ``<prepay assump>``    -> prepayment assumption for performing asset : like ``{"CPR":0.01}``
   
     * ``{"CPR":0.01}`` means 1% in annualized of current balance will be prepay at the end of each period
@@ -130,27 +118,58 @@ Notes:
     
     * ``{"Rate":0.7,"Lag":18}`` means 70% of current balance will be recovered at 18 periods after defaulted date
 
-  for `Non-Performing Asset`
+For `Non-Performing Asset`
+
+* ``<delinq assump>``       -> assumption to project cashflow of asset in ``delinquent`` status
   
-  * ``<delinq assump>``       -> assumption to project cashflow of asset in ``delinquent`` status
+  *reserve for future use* : always use ``None``
+
+* ``<defaulted assump>``    -> assumption to project cashflow of asset in ``defaulted`` status
+  i.e 
+
+    .. code-block:: python 
     
-    *reserve for future use* : always use ``None``
+        ("Defaulted":[0.5,4,[0.5,0.2,0.3]])
 
-  * ``<defaulted assump>``    -> assumption to project cashflow of asset in ``defaulted`` status
-    i.e 
+    which says:
 
-      .. code-block:: python 
-      
-          ("Defaulted":[0.5,4,[0.5,0.2,0.3]])
+    * the recovery percentage is 50% of current balance
+    * the recovery starts at 4 periods after defaulted date
+    * the recovery distribution is 50%,20% and 30%
 
-      which says:
 
-      * the recovery percentage is 50% of current balance
-      * the recovery starts at 4 periods after defaulted date
-      * the recovery distribution is 50%,20% and 30%
+Loan
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+   r = localAPI.run(deal
+                  ,poolAssump = ("Pool",("Loan",<default assump>,<prepay assump>,<recovery assump>,<extra assump>)
+                                          ,<delinq assumption>
+                                          ,<defaulted assumption>)
+                  ,runAssump = None
+                  ,read=True)
+
+* <default assump> : ``{"CDR":<%>}``
+* <prepayment assump> : ``{"CPR":<%>}``
+
+Installment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+   r = localAPI.run(deal
+                  ,poolAssump = ("Pool",("Installment",<default assump>,<prepay assump>,<recovery assump>,<extra assump>)
+                                          ,<delinq assumption>
+                                          ,<defaulted assumption>)
+                  ,runAssump = None
+                  ,read=True)
+
+* <default assump> : ``{"CDR":<%>}``
+* <prepayment assump> : ``{"CPR":<%>}``
 
 Extra Stress 
-""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Users are enable to apply:
 
@@ -549,7 +568,7 @@ Mannual Fire Trigger
 It's not that often but someone may need to mannually fire a trigger and run the effects of a trigger. 
 
 syntax
-  [(<Date Of Fire>,<Loc of Trigger>,<Trigger Name>)]
+  ``("fireTrigger", [(<Date Of Fire>,<Loc of Trigger>,<Trigger Name>)])``
 
 
 
@@ -575,7 +594,8 @@ User can specify a `Make Whole Call` date , and a `fixed spread` following, and 
 5. using the total spread ( spread from lookup table and `fixed spread`) to discount future bond cashflow to get the PV 
 6. the PV will be paid off the bond ,if PV > oustanding balance ,then excess will be paid to interest.
 
-
+syntax
+  ``("makeWhole",<date>,<fixed spread>,<WAL/Spread mapping>)``
 
 .. code-block:: python 
 

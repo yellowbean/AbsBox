@@ -299,6 +299,10 @@ Bool Type
 
     * ``("isPaidOff", "A", "B", "C"...)`` -> True if all "A","B","C" bonds are paid off
 
+    .. versionadded:: 0.26.1
+    * ``("hasPassedMaturity","A","B"...)`` -> Ture if all bonds are passed expected maturity date
+    * ``("not",<Formula>)`` -> oppositeof the boolean formula
+
 
 Or `formula` can be an arithmetic calculation on itselfies.
 
@@ -387,6 +391,11 @@ Nested Condition
 
 * ``["all",<condition>,<condition>....]`` -> true if all of <condition> is true
 * ``["any",<condition>,<condition>....]`` -> true if any of <condition> is true
+
+.. versionadded:: 0.26.1
+
+* ``["not",<condition>]`` -> opposite of the <condition>
+
 
 Curve & Table 
 ----------------

@@ -326,10 +326,14 @@ def mkDs(x):
             return mkTag(("IsMostSenior", bn, bns))
         case ("清偿完毕", *bns) | ("isPaidOff", *bns):
             return mkTag(("IsPaidOff", bns))
+        case ("逾期", *bns) | ("hasPassedMaturity", *bns):
+            return mkTag(("HasPassedMaturity",bns))
         case ("比率测试", ds, op, r) | ("rateTest", ds, op, r):
             return mkTag(("TestRate", [mkDs(ds), op_map[op], r]))
         case ("所有测试", b, *ds) | ("allTest", b, *ds):
             return mkTag(("TestAll", [b, [mkDs(_) for _ in ds]]))
+        case ("非", ds) | ("not", ds):
+            return mkTag(("TestNot", mkDs(ds)))
         case ("任一测试", b, *ds) | ("anyTest", b, *ds):
             return mkTag(("TestAny", [b, [mkDs(_) for _ in ds]]))
         case ("自定义", n) | ("custom", n):
@@ -380,6 +384,8 @@ def mkPre(p):
             return mkTag(("All", [mkPre(p) for p in _p]))
         case ["任一满足", *_p] | ["任一", *_p] | ["any", *_p]:
             return mkTag(("Any", [mkPre(p) for p in _p]))
+        case ["非", _p] | ["not", _p]:
+            return mkTag(("IfNot", mkPre(p)))
         case [ds, "=", 0]:
             return mkTag(("IfZero", mkDs(ds)))
         case [ds, b] | [ds, b] if isinstance(b, bool):
