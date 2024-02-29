@@ -1792,6 +1792,7 @@ It was modeled as a map, with key as identifier to distinguish different type of
 * ``"amortizing"`` -> will be picked when deal status is `Amortizing`
 * ``("amortizing", "accelerated")`` -> will be picked when deal status is `Accelerated`
 * ``("amortizing", "defaulted")`` -> will be picked when deal status is `Defaulted`
+* ``"revolving"`` -> will be picked when deal status is `Revolving`
 * ``"endOfCollection"`` -> will be exectued at the end of each collection period
 * ``"default"`` -> the default waterfall to be executed if no other waterfall applicable
 * ``"cleanUp"`` -> will be exectued *once* when deal is being clean up call
