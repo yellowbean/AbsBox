@@ -1,5 +1,6 @@
 import pandas as pd 
 from pyxirr import xirr, xnpv
+import finance_calculator as fc
 from absbox.local.base import china_bondflow_fields_s, english_bondflow_fields_s
 from absbox.validation import vStr
 import numpy as np
@@ -39,7 +40,8 @@ def irr(flow: pd.DataFrame, init):
     dates = [invest_date]+dates
     amounts = [invest_amount]+amounts
     
-    return xirr(np.array(dates), np.array(amounts))
+    #return xirr(np.array(dates), np.array(amounts))
+    return fc.get_xirr([(d, a) for d, a in zip(dates, amounts)])/100
 
 
 def sum_fields_to_field(df: pd.DataFrame, cols: list, col: str):
@@ -48,34 +50,6 @@ def sum_fields_to_field(df: pd.DataFrame, cols: list, col: str):
     assert isinstance(cols, list), "columns to be sum up must be a list"
     assert isinstance(col, str), "result column must be a string"
     return df.assign(col=df[cols].sum(axis=1))
-
-
-def npv(_flow: pd.DataFrame, **p):
-    flow = _flow.copy()
-    cols = flow.columns.to_list()
-    idx_name = flow.index.name
-    init_date, _init_amt = p['init']
-    init_amt = _init_amt if _init_amt != 0.00 else 0.0001
-
-    def _pv(_af):
-        af = flow[_af]
-        return xnpv(p['rate']
-                    , [init_date] + flow.index.to_list()
-                    , [-1 * init_amt] + af.to_list())
-    match (cols, idx_name):
-        case (china_rental_flow, "日期"):
-            return _pv("租金")
-        case (english_rental_flow, "Date"):
-            return _pv("Rental")
-        case (english_mortgage_flow_fields, "Date"):
-            sum_fields_to_field(flow, ["Principal", "Interest", "Prepayment", "Recovery"], "Cash")
-            return _pv("Cash")
-        case (china_bondflow_fields, "日期"):
-            return _pv("本息合计")
-        case (english_bondflow_fields, "Date"):
-            return _pv("cash")
-        case _:
-            raise RuntimeError("Failed to match", cols, idx_name)
 
 
 def flow_by_scenario(rs, flowpath, node="col", rtn_df=True, ax=1, rnd=2):

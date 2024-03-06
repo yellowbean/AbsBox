@@ -160,10 +160,3 @@ def plot_oc(bsReport: pd.DataFrame, bnds: list):
     assert isinstance(bnds, list), "input bond name is not a list"
     
     return None
-
-
-def plot_bs2(r, **kw):
-    dealStatusFlag = []
-    triggerStatusFlag = []
-
-    return None

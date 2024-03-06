@@ -8,8 +8,10 @@ from absbox.local.util import earlyReturnNone,lmap
 from absbox.local.component import *
 from absbox.local.base import * 
 import pandas as pd
+import numpy as np
 import collections
 from absbox.validation import vStr,vDate,vNum,vList,vBool,vFloat,vInt
+import toolz as tz
 
 
 @dataclass
@@ -87,8 +89,12 @@ class Generic:
             for k, x in deal_content[comp_name].items():
                 ir = None
                 if x[comp_v[0]]:
-                    ir = [_['contents'] for _ in x[comp_v[0]]]
-                output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("date")
+                    ir = list(tz.pluck('contents', x[comp_v[0]]))
+                    if comp_v[0]=='bndStmt' and len(ir[0])==7:  #backward compatibility: bond factor
+                        legacy_bond_stmt_col = comp_v[1][:6]+[comp_v[1][-1]]
+                        output[comp_name][k] = pd.DataFrame(ir, columns=legacy_bond_stmt_col).set_index("date")
+                    else:
+                        output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("date")
             output[comp_name] = collections.OrderedDict(sorted(output[comp_name].items()))
         # aggregate fees
         output['fees'] = {f: v.groupby('date').agg({"balance": "min", "payment": "sum", "due": "min"})
@@ -106,7 +112,7 @@ class Generic:
                 output['pool']['flow'] = readPoolCf(deal_content['pool']['contents']['futureCf']['contents'])
         elif deal_content['pool']['tag']=='MultiPool':
             poolMap = deal_content['pool']['contents']
-            output['pool']['flow'] = {k: readPoolCf(v['futureCf']['contents']) for (k,v) in poolMap.items() }
+            output['pool']['flow'] = tz.valmap(lambda v: readPoolCf(v['futureCf']['contents']), poolMap)
         elif deal_content['pool']['tag']=='ResecDeal':
             poolMap = deal_content['pool']['contents']
             output['pool']['flow'] = {tz.get([1,2,4],k.split(":")): readPoolCf(v['futureCf']['contents']) for (k,v) in poolMap.items() }

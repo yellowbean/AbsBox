@@ -7,6 +7,7 @@ import numpy as np
 from urllib.request import unquote
 from functools import reduce 
 from pyspecter import query,S
+import toolz as tz
 
 from absbox.local.util import *
 from absbox.local.component import *
@@ -94,8 +95,12 @@ class SPV:
             for k, x in deal_content[comp_name].items():
                 ir = None
                 if x[comp_v[0]]:
-                    ir = [_['contents'] for _ in x[comp_v[0]]]
-                output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("日期")
+                    ir = list(tz.pluck('contents', x[comp_v[0]]))
+                    if comp_v[0]=='bndStmt' and len(ir[0])==7:  #backward compatibility: bond factor
+                        legacy_bond_stmt_col = comp_v[1][:6]+[comp_v[1][-1]]
+                        output[comp_name][k] = pd.DataFrame(ir, columns=legacy_bond_stmt_col).set_index("日期")
+                    else:
+                        output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("日期")
             output[comp_name] = collections.OrderedDict(sorted(output[comp_name].items()))
         # aggregate fees
         output['fees'] = {f: v.groupby('日期').agg({"余额": "min", "支付": "sum", "剩余支付": "min"})

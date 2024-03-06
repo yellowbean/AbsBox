@@ -127,7 +127,7 @@ def aggCFby(_df, interval, cols):
     return df.groupby([dummy_col])[cols].sum().rename_axis(idx)
 
 
-def update_deal(d, i, c):
+def update_deal(d, i, c): #Deprecated ,to be replace with Lens
     "A patch function to update a deal data component list in immuntable way"
     _d = d.copy()
     _d.pop(i)
@@ -326,6 +326,7 @@ def _read_asset_pricing(xs, lang) -> pd.DataFrame:
 
 
 def mergeStrWithDict(s: str, m: dict) -> str:
+    ''' merge a map to a string'''
     t = json.loads(s)
     return json.dumps(t | m)
 

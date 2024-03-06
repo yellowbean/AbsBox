@@ -2,11 +2,11 @@ import enum
 
 
 # Bond 
-china_bondflow_fields = ["日期", "余额", "利息", "本金", "执行利率", "本息合计", "备注"]
-china_bondflow_fields_s = ["余额", "利息", "本金", "执行利率", "本息合计", "备注"]
-china_bond_cashflow = ["本金","利息","本息合计"]
-english_bondflow_fields = ["date", "balance", "interest", "principal", "rate", "cash", "memo"]
-english_bondflow_fields_s = ["balance", "interest", "principal", "rate", "cash", "memo"]
+china_bondflow_fields_s = ["余额", "利息", "本金", "执行利率", "本息合计", "本金系数", "备注"]
+china_bondflow_fields = ["日期"] + china_bondflow_fields_s
+china_bond_cashflow = ["本金", "利息", "本息合计"]
+english_bondflow_fields_s = ["balance", "interest", "principal", "rate", "cash", "factor",  "memo"]
+english_bondflow_fields = ["date"] + english_bondflow_fields_s
 
 # Cumulative
 china_cumStats = ["累计还款", "累计早偿", "累计拖欠", "累计违约", "累计回收", "累计损失"]

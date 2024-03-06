@@ -40,9 +40,9 @@ p = localAPI.runPool(mypool
                      ,read=True)
 aggCFby(p,"M",["租金"]).plot.bar(rot=45,ylabel="租金合计")
 
-
-from absbox.local.util import npv
-npv(p,rate=0.07,init=("2021-01-04",0))
+#npv was removed since 0.26.x
+#from absbox.local.util import npv
+#npv(p,rate=0.07,init=("2021-01-04",0))
 
 
 deal_data = ["租金类ABS案例"
