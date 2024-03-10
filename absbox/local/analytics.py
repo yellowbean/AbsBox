@@ -1,5 +1,4 @@
 import pandas as pd 
-from pyxirr import xirr, xnpv
 import finance_calculator as fc
 from absbox.local.base import china_bondflow_fields_s, english_bondflow_fields_s
 from absbox.validation import vStr

@@ -202,11 +202,11 @@ def mkDs(x):
             if pNames:
                 return mkTag(("CurrentPoolDefaultedBalance", lmap(mkPid, pNames)))
             return mkTag(("CurrentPoolDefaultedBalance", None))
-        case ("资产池累计违约余额",*pNames) | ("cumPoolDefaultedBalance",*pNames): #DEPRECATE
+        case ("资产池累计违约余额", *pNames) | ("cumPoolDefaultedBalance", *pNames): #DEPRECATE
             if pNames:
-                return mkTag(("CumulativePoolDefaultedBalance",lmap(mkPid,pNames)))
+                return mkTag(("CumulativePoolDefaultedBalance",lmap(mkPid, pNames)))
             return mkTag(("CumulativePoolDefaultedBalance", None))
-        case ("资产池累计违约率",*pNames) | ("cumPoolDefaultedRate",*pNames):  # DEPRECATE
+        case ("资产池累计违约率", *pNames) | ("cumPoolDefaultedRate", *pNames):  # DEPRECATE
             if pNames:
                 return mkTag(("CumulativePoolDefaultedRate", lmap(mkPid,pNames)))
             return mkTag(("CumulativePoolDefaultedRate", None))
@@ -214,9 +214,9 @@ def mkDs(x):
             if pNames:
                 return mkTag(("CumulativePoolDefaultedRateTill", [n,lmap(mkPid,pNames)]))
             return mkTag(("CumulativePoolDefaultedRateTill", [n,None]))
-        case ("资产池累计损失余额",*pNames) | ("cumPoolNetLoss",*pNames): # DEPRECATE
+        case ("资产池累计损失余额", *pNames) | ("cumPoolNetLoss", *pNames): # DEPRECATE
             if pNames:
-                return mkTag(("CumulativeNetLoss", lmap(mkPid,pNames)))
+                return mkTag(("CumulativeNetLoss", lmap(mkPid, pNames)))
             return mkTag(("CumulativeNetLoss", None))
         case ("资产池累计损失率",*pNames) | ("cumPoolNetLossRate",*pNames): # DEPRECATE
             if pNames:
@@ -832,6 +832,12 @@ def mkAction(x:list):
         case ["支付本金", source, target, m] | ["payPrin", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("PayPrin", [l, vStr(source), vList(target, str), s]))
+        case ["减记本金", target, l] | ["writeOff", target, l]:
+            limit = mkLimit(l) if l else None
+            return mkTag(("WriteOff", [limit, vStr(target)]))
+        case ["募集本金", source, target, l] | ["fundWith", source, target, l]:
+            limit = mkLimit(l) if l else None
+            return mkTag(("FundWith", [limit, vStr(source), vStr(target)]))
         case ["支付本金", source, target] | ["payPrin", source, target]:
             return mkTag(("PayPrin", [None, vStr(source), vList(target, str), None]))
         case ["支付剩余本金", source, target] | ["payPrinResidual", source, target]:
