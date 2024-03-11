@@ -837,6 +837,8 @@ def mkAction(x:list):
             return mkTag(("WriteOff", [limit, vStr(target)]))
         case ["募集本金", source, target, l] | ["fundWith", source, target, l]:
             limit = mkLimit(l) if l else None
+            # source = account
+            # tartget = bond
             return mkTag(("FundWith", [limit, vStr(source), vStr(target)]))
         case ["支付本金", source, target] | ["payPrin", source, target]:
             return mkTag(("PayPrin", [None, vStr(source), vList(target, str), None]))
