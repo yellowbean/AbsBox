@@ -301,7 +301,7 @@ Bool Type
 
     .. versionadded:: 0.26.1
     * ``("hasPassedMaturity","A","B"...)`` -> Ture if all bonds are passed expected maturity date
-    * ``("not",<Formula>)`` -> oppositeof the boolean formula
+    * ``("not",<Formula>)`` -> opposite of the boolean formula
 
 
 Or `formula` can be an arithmetic calculation on itselfies.
@@ -2106,7 +2106,31 @@ PayIntResidual
     ``["payIntResidual", {Account}, <Bond>, {"limit": <Limit>} ]``
   
     The ``<Limit>`` :ref:`<limit>`
-  
+
+WriteOff
+  .. versionadded:: 0.26.1
+  write off the bond balance ,with option to set a limit amount to write off
+
+  syntax
+    ``["writeOff", <Bond>]`` 
+
+    ``["writeOff", <Bond>, <Limit>]`` 
+
+    The ``<Limit>`` :ref:`<limit>`
+
+FundWith
+  .. versionadded:: 0.26.1
+  increase balance of the bond and deposit cash to an account
+
+  syntax
+    ``["fundWith", <Account>, <Bond>]``
+
+    ``["fundWith", <Account>, <Bond>, <Limit>]``
+
+    The ``<Limit>`` :ref:`<limit>`
+
+
+
 Account
 ^^^^^^^^^
 
@@ -2570,7 +2594,7 @@ common properites
   * ``lineOfCredit`` -> current available credit to draw
   * ``balance`` -> current balance to be paid back to provider
   * ``rate`` -> interest rate to be used on ``balance``
-  * ``fee`` ->  premium feee to be used on ``lineOfCredit``
+  * ``fee`` ->  premium fee to be used on ``lineOfCredit``
 
 
 Interest Rate Hedge 
