@@ -34,7 +34,8 @@ dependencies = [
     "lenses",
     "pyspecter",
     "graphviz",
-    "schema"
+    "schema",
+    "finance_calculator"
 ]
 
 keywords = ["cashflow", "abs", "mbs", "cashflow model", "rmbs" ,"clo", "cashflow engine","structuring"]
