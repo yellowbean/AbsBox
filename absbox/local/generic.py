@@ -34,7 +34,7 @@ class Generic:
     rateCap: dict = None
 
     @property
-    def json(self):
+    def json(self) -> dict:
         parsedDates = mkDate(self.dates)
         (lastAssetDate, lastCloseDate) = getStartDate(self.dates)
         mixedAssetFlag = isMixedDeal(self.pool)

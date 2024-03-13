@@ -330,7 +330,7 @@ class API:
         _poolAssump = mkAssumpType(poolAssump) if poolAssump else None 
         _nonPerfAssump = mkNonPerfAssumps({}, nonPoolAssump)
         req = json.dumps(mkTag(("MultiDealRunReq"
-                                 ,[ tz.valmap(lambda x:x.json, deals)  # {k:v.json for k,v in deals.items()}
+                                 ,[ tz.valmap(lambda x:x.json, deals)
                                    ,_poolAssump
                                    ,_nonPerfAssump]))
                          ,ensure_ascii=False)

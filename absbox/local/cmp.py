@@ -4,10 +4,10 @@ import pandas as pd
 def comp_df(x, y):
     return pd.merge(x, y, on="日期", how='outer').sort_index().sort_index(axis=1)
 
-def comp_engines(engine1, engine2, d, a=None):
+def comp_engines(engine1, engine2, d, pA=None,rA=[], a=None):
     
-    r1 = engine1.run(d, assumptions=a, read=True)
-    r2 = engine2.run(d, assumptions=a, read=True)
+    r1 = engine1.run(d, poolAssump=pA, runAssump=rA, read=True)
+    r2 = engine2.run(d, poolAssump=pA, runAssump=rA, read=True)
 
     comp_result = {}
     # pool check
