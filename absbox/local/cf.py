@@ -1,4 +1,8 @@
 import pandas as pd
+import toolz as tz
+from lenses import lens
+from functools import reduce
+#from itertools import reduce
 
 
 def readToCf(xs, header=None, idx=None, sort_index=False):
@@ -17,3 +21,18 @@ def readToCf(xs, header=None, idx=None, sort_index=False):
         r = r.sort_index()
 
     return r
+
+def readBondsCf(bMap, keep=[]):
+    def filterCols(xs):
+        return [ _[keep]  for _ in xs ]
+    
+    bondNames = list(bMap.keys())
+    columns = filter(lambda x: x in set(keep)
+                     , bMap[bondNames[0]].columns.to_list())
+    header = pd.MultiIndex.from_product([bondNames, columns]
+                                        , names=['Bond',"Field"])
+    
+    df = pd.concat(filterCols(list(bMap.values())),axis=1)
+    df.columns = header
+    
+    return df

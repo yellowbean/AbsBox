@@ -854,16 +854,22 @@ Bond Cashflow
    r['bonds'].keys() # all bond names
    r['bonds']['A1'] # cashflow for bond `A1`
 
-Bond Cashflow By Position
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 0.26.3
+
+User have the option to view multiple cashflow in a single dataframe,with columns specified.
 
 .. code-block:: python
 
-  from absbox.local.util import positionFlow
+  from absbox import readBondsCf
 
-  r = localAPI.run()
-  
-  positionFlow(r, {'A1':15000000.0} )
+
+.. image:: img/readBondsCf.png
+  :width: 400
+  :alt: readBondsCf
+
+
+
 
 
 Fee Cashflow
