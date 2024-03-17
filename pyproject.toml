@@ -30,7 +30,6 @@ dependencies = [
     "requests",
     "toolz",
     "rich",
-    "pyxirr",
     "lenses",
     "pyspecter",
     "graphviz",

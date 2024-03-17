@@ -2,13 +2,14 @@ requests
 pandas
 numpy
 matplotlib
-pyxirr
+finance-calculator
 pyspecter
 pytest==7.1.2
 jsondiff
 deepdiff
 schema
 toolz
+lenses
 rich
 sphinx==5.3.0
 sphinx_rtd_theme==1.1.1
