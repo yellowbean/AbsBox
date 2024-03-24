@@ -1438,11 +1438,13 @@ Collection Rules
         "Pool Proceeds" -> Prepayment 
         "Pool Proceeds" -> Recovery 
         "Pool Proceeds" -> Cash  
-        "Pool Proceeds" -> Rental 
+        "Pool Proceeds" -> Rental
+        "Pool Proceeds" -> Fee
         Principal [shape=box]
         Interest [shape=box]
         Prepayment [shape=box]
         Recovery [shape=box]
+        Fee [shape=box]
         Cash [shape=box,label="Cash (inlude other fields)"]
         Rental [shape=box]
         Principal -> "Accounts"
@@ -1452,6 +1454,7 @@ Collection Rules
         Recovery -> "Accounts"
         Cash -> "Accounts"
         Rental -> "Accounts"
+        Fee -> "Accounts"
     }
 
 Proceeds
@@ -1468,12 +1471,14 @@ Proceeds
      - Prepayment
      - Recovery
      - Rental
+     - Fee
      - Cash
    * - Mortgage
      - Yes
      - Yes
      - Yes
      - Yes
+     - No
      - No
      - Yes
    * - Installment
@@ -1482,12 +1487,14 @@ Proceeds
      - Yes
      - Yes
      - No
+     - No
      - Yes
    * - Loan
      - Yes
      - Yes
      - Yes
      - Yes
+     - No
      - No
      - Yes
    * - Lease
@@ -1496,6 +1503,7 @@ Proceeds
      - No
      - No
      - Yes
+     - No
      - Yes
    * - FixedAsset
      - No
@@ -1503,8 +1511,17 @@ Proceeds
      - No
      - No
      - No
+     - No
      - Yes
-
+   * - Receivable
+     - Yes
+     - No
+     - No
+     - No
+     - No
+     - Yes
+     - Yes
+ 
 Pool Source Enums
 ^^^^^^^^^^^^^^^^^
 
@@ -1513,6 +1530,7 @@ Pool Source Enums
 * ``CollectedRecoveries``
 * ``CollectedPrepayment``
 * ``CollectedRental``
+* ``CollectedFeePaid``
 * ``CollectedCash``
 
 .. warning::
