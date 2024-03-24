@@ -1400,11 +1400,18 @@ syntax
                   ,"feeType":("AdvanceRate", 0.12)}
                 ,{"status":"Current"}]
 
-  receivable4 = ["Invoice"
+  receivable4_0 = ["Invoice"
                 ,{"start":"2024-04-01","originBalance":2000
                   ,"originAdvance":1500,"dueDate":"2024-06-01"
-                  ,"feeType":("FactorFee", 0.01, 25,["floor",0.1])}
+                  ,"feeType":("FactorFee", 0.01, 25, "Up")}
                 ,{"status":"Current"}]
+
+  receivable4_1 = ["Invoice"
+                ,{"start":"2024-04-01","originBalance":2000
+                  ,"originAdvance":1500,"dueDate":"2024-06-01"
+                  ,"feeType":("FactorFee", 0.01, 25, "Down")}
+                ,{"status":"Current"}]
+
 
   receivable5 = ["Invoice"
                 ,{"start":"2024-04-01","originBalance":2000

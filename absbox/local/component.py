@@ -1140,7 +1140,7 @@ def mkInvoiceFeeType(x):
         case ("FixedRate", rate) | ("固定比例", rate):
             return mkTag(("FixedRateFee", vNum(rate)))
         case ("FactorFee", rate, days, rnd) | ("周期计费", rate, days, rnd):
-            return mkTag(("FactorFee", [vNum(rate), vInt(days), mkRoundingType(rnd)]))
+            return mkTag(("FactorFee", [vNum(rate), vInt(days), rnd]))
         case ("AdvanceRate", rate) | ("提前比例", rate):
             return mkTag(("AdvanceFee", vNum(rate)))
         case ("CompoundFee", *fs) | ("复合计费", *fs):
