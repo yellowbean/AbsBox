@@ -31,6 +31,7 @@ china_rental_flow = ['待收金额', '租金']
 english_rental_flow = ['Balance', 'Rental']
 china_rental_flow_d = ["日期"] + china_rental_flow
 english_rental_flow_d = ["Date"] + english_rental_flow
+
 ## Loan flow
 china_loan_flow = ["余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失金额", "利率"]
 english_loan_flow = ["Balance", "Principal", "Interest", "Prepayment", "Default", "Recovery", "Loss", "WAC"]
@@ -42,6 +43,12 @@ china_fixed_flow = ["余额", "折旧", "累计折旧", "单元", "现金"]
 english_fixed_flow = ["Balance", "Depreciation", "CumuDepreciation", "Unit", "Cash"]
 china_fixed_flow_d = ["日期"] + china_fixed_flow
 english_fixed_flow_d = ["Date"] + english_fixed_flow
+
+## Receivable 
+china_receivable_flow = ["余额", "应计费用", "本金", "费用", "违约", "回收", "损失"]
+english_receivable_flow = ["Balance", "AccuredFee", "Principal", "Fee", "Default", "Recovery", "Loss"]
+china_receivable_flow_d = ["日期"] + china_receivable_flow
+english_receivable_flow_d = ["Date"] + english_receivable_flow
 
 ## Underlying Bond Flow
 china_uBond_flow = ["余额", "本金", "利息"]

@@ -1349,6 +1349,74 @@ This type of asset can be used to model `future flow of securitization` : `Hotel
   To project cashflow , user MUST set assumption for this type asset.
 
 
+Receivable
+^^^^^^^^^^^^^^^^
+
+.. versionadded:: 0.26.5
+
+``Receivable`` is a type of asset which has a fixed amount of receivable in last period, with optional fee collected at end
+
+* if No fee was set, the receivable will be paid off at last period without fee.
+* if there are multiple fee being setup, then ALL fees are sum up and paid off at last period.
+
+syntax
+  ``["Invoice", {<asset description>}, {<status>}]``
+
+  * ``asset description`` -> a map describe the asset
+  * ``status`` -> a map describe the status of asset
+
+* feeType
+
+  * ``Fixed`` -> fixed amount of fee
+  * ``FixedRate`` -> fixed rate of fee, the base was the ``originBalance``
+  * ``AdvanceRate`` -> annualized rate of advance amount, the base was the ``originAdvance``
+  * ``(FactorFee,<service rate>,<days of period>,<rounding>)`` -> total fee = ``service rate`` *  ``originBalance`` * (``days of the invioce``/ ``<days of periods>``)
+  * ``(CompoundFee,<feeType1>,<feeType2>.....)`` -> a compound fee with multiple fee type
+
+
+.. code-block:: python
+
+  receivable = ["Invoice"
+                ,{"start":"2024-04-01","originBalance":2000
+                  ,"originAdvance":1500,"dueDate":"2024-06-01"}
+                ,{"status":"Current"}]
+
+
+  receivable1 = ["Invoice"
+                ,{"start":"2024-04-01","originBalance":2000
+                  ,"originAdvance":1500,"dueDate":"2024-08-01"
+                  ,"feeType":("Fixed",150)}
+                ,{"status":"Current"}]
+
+  receivable2 = ["Invoice"
+                ,{"start":"2024-04-01","originBalance":2000
+                  ,"originAdvance":1500,"dueDate":"2024-06-01"
+                  ,"feeType":("FixedRate",0.1)}
+                ,{"status":"Current"}]
+
+  receivable3 = ["Invoice"
+                ,{"start":"2024-04-01","originBalance":2000
+                  ,"originAdvance":1500,"dueDate":"2024-06-01"
+                  ,"feeType":("AdvanceRate", 0.12)}
+                ,{"status":"Current"}]
+
+  receivable4 = ["Invoice"
+                ,{"start":"2024-04-01","originBalance":2000
+                  ,"originAdvance":1500,"dueDate":"2024-06-01"
+                  ,"feeType":("FactorFee", 0.01, 25,["floor",0.1])}
+                ,{"status":"Current"}]
+
+  receivable5 = ["Invoice"
+                ,{"start":"2024-04-01","originBalance":2000
+                  ,"originAdvance":1500,"dueDate":"2024-06-01"
+                  ,"feeType":("CompoundFee"
+                              ,("AdvanceRate", 0.12)
+                              ,("Fixed",150)
+                              )}
+                ,{"status":"Current"}]
+
+
+
 Collection Rules 
 -------------------
 

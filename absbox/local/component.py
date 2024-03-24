@@ -164,6 +164,8 @@ def mkPoolSource(x):
             return "CollectedRental" 
         case "现金" | "Cash" | "现金回款" | "CollectedCash":
             return "CollectedCash"
+        case "费用" | "Fee" | "现金回款" | "CollectedFeePaid":
+            return "CollectedFeePaid"
         case "新增违约" | "Defaults":
             return "NewDefaults"
         case "新增拖欠" | "Delinquencies":
@@ -1131,6 +1133,20 @@ def mkAccRule(x):
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkAccRule")
 
+def mkInvoiceFeeType(x):
+    match x :
+        case ("Fixed", amt) | ("固定", amt):
+            return mkTag(("FixedFee", vNum(amt)))
+        case ("FixedRate", rate) | ("固定比例", rate):
+            return mkTag(("FixedRateFee", vNum(rate)))
+        case ("FactorFee", rate, days, rnd) | ("周期计费", rate, days, rnd):
+            return mkTag(("FactorFee", [vNum(rate), vInt(days), mkRoundingType(rnd)]))
+        case ("AdvanceRate", rate) | ("提前比例", rate):
+            return mkTag(("AdvanceFee", vNum(rate)))
+        case ("CompoundFee", *fs) | ("复合计费", *fs):
+            return mkTag(("CompoundFee", lmap(mkInvoiceFeeType, fs)))
+        case _:
+            raise RuntimeError(f"Failed to match {x}:mkInvoiceFeeType")
 
 def mkCapacity(x):
     match x: 
@@ -1231,6 +1247,12 @@ def mkAsset(x):
                                          ,"period":freqMap[p],"accRule":mkAccRule(ar)
                                          ,"capacity":mkCapacity(cap)} | mkTag("FixedAssetInfo")
                                         ,vInt(rt)]))
+        case ["Invoice", {"start":sd,"originBalance":ob,"originAdvance":oa,"dueDate":dd,"feeType":ft},{"status":status}] :
+            return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":mkInvoiceFeeType(ft)} | mkTag("ReceivableInfo")
+                                     ,mkAssetStatus(status)]))
+        case ["Invoice", {"start":sd,"originBalance":ob,"originAdvance":oa,"dueDate":dd},{"status":status}] :
+            return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":None} | mkTag("ReceivableInfo")
+                                     ,mkAssetStatus(status)]))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 
@@ -1254,6 +1276,8 @@ def identify_deal_type(x):
                 return "RDeal"
             case {"assets": [{'tag': 'FixedAsset'}, *rest]}:
                 return "FDeal"
+            case {"assets": [{'tag': 'Invoice'}, *rest]}:
+                return "VDeal"
             case _:
                 raise RuntimeError(f"Failed to identify deal type {z}")
     y = None
@@ -1311,6 +1335,8 @@ def mkAssumpDefault(x):
             return mkTag(("DefaultCDR", vNum(r)))
         case {"ByAmount": (bal, rs)}:
             return mkTag(("DefaultByAmt", (vNum(bal), vList(rs,float))))
+        case "DefaultAtEnd":
+            return mkTag(("DefaultAtEnd"))
         case _ :
             raise RuntimeError(f"failed to match {x}")
 
@@ -1428,6 +1454,10 @@ def mkPerfAssumption(x):
         case ("Fixed",utilCurve,priceCurve):
             return mkTag(("FixedAssetAssump",[mkTs("RatioCurve",utilCurve)
                                               ,mkTs("BalanceCurve",priceCurve)]))
+        case ("Receivable", md, mr, mes):
+            d = earlyReturnNone(mkAssumpDefault,md)
+            r = earlyReturnNone(mkAssumpRecovery,mr)
+            return mkTag(("ReceivableAssump",[d, r, mkExtraStress(mes)]))
         case _:
             raise RuntimeError(f"failed to match {x}")
 
@@ -1467,6 +1497,8 @@ def mkAssetUnion(x):
             return mkTag(("LS", mkAsset(x)))
         case "固定资产" | "FixedAsset" : 
             return mkTag(("FA", mkAsset(x)))
+        case "应收帐款" | "Invoice" : 
+            return mkTag(("RE", mkAsset(x)))
         case _:
             raise RuntimeError(f"Failed to match AssetUnion {x}")
 
@@ -1507,7 +1539,8 @@ def mkPoolComp(asOfDate, x, mixFlag) -> dict:
 
 def mkPool(x: dict):
     mapping = {"LDeal": "LPool", "MDeal": "MPool",
-               "IDeal": "IPool", "RDeal": "RPool", "FDeal":"FPool"}
+               "IDeal": "IPool", "RDeal": "RPool", "FDeal":"FPool",
+               "VDeal": "VPool"}
     match x:
         case {"清单": assets, "封包日": d} | {"assets": assets, "cutoffDate": d}:
             _pool = {"assets": [mkAsset(a) for a in assets] , "asOfDate": d}

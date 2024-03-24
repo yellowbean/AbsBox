@@ -269,6 +269,10 @@ def guess_pool_flow_header(x, l):
             return (china_fixed_flow_d, "日期", False)
         case ('FixedFlow', 6, 'english'):
             return (english_fixed_flow_d, "Date", False)
+        case ('ReceivableFlow', 9, 'chinese'):
+            return (china_receivable_flow_d+china_cumStats, "日期", True)
+        case ('ReceivableFlow', 9, 'english'):
+            return (english_receivable_flow_d+english_cumStats, "Date", True)
         case ('BondFlow', 4, 'chinese'):
             return (china_uBond_flow_d, "日期", False)
         case ('BondFlow', 4, 'english'):

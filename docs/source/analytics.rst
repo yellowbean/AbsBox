@@ -168,6 +168,38 @@ Installment
 * <default assump> : ``{"CDR":<%>}``
 * <prepayment assump> : ``{"CPR":<%>}``
 
+Receivable 
+^^^^^^^^^^^^^^^^^^^^^
+
+user can set assumption on receivable asset class:
+
+* assume default at last period ( 0 cash received )
+* a CDR way ,whcih is a percentage of current balance remains.
+
+.. code-block:: python
+
+  # apply on asset level
+  r = localAPI.run(test01
+              ,runAssump=[]
+              ,poolAssump = ("ByIndex"
+                                ,([0],(("Receivable", {"CDR":0.12}, None, None)
+                                      ,None,None))
+                                ,([1],(("Receivable", "DefaultAtEnd", None, None)
+                                      ,None,None))
+                                )
+              ,read=True)
+
+  receivableAssump = ("Pool"
+                      ,("Receivable", {"CDR":0.01}, None, None)
+                      ,None
+                      ,None)
+
+  # apply on pool level
+  r = localAPI.run(test01
+              ,runAssump=[]
+              ,poolAssump = receivableAssump
+              ,read=True)
+
 Extra Stress 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

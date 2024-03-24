@@ -143,18 +143,18 @@ class API:
         :raises VersionMismatch: Failed to match version between client and server
         """
         self.url = isValidUrl(self.url).rstrip("/")
-        with console.status(f"{MsgColor.Info.value}Connecting engine server -> {self.url}") as status:
-            try:
-                _r = requests.get(f"{self.url}/{Endpoints.Version.value}", verify=False, timeout=5).text
-            except (ConnectionRefusedError, ConnectionError):
-                raise AbsboxError(f"❌{MsgColor.Error.value}Error: Can't not connect to API server {self.url}")
-            if _r is None:
-                raise RuntimeError(f"Failed to get version from url:{self.url}")
-            self.server_info = self.server_info | json.loads(_r)
-            engine_version = self.server_info['_version'].split(".")
-            if self.check and (self.version[1] != engine_version[1]):
-                console.print("pls upgrade your api package by: pip -U absbox")
-                raise VersionMismatch('.'.join(self.version), '.'.join(engine_version))
+        console.print(f"{MsgColor.Info.value}Connecting engine server -> {self.url}")
+        try:
+            _r = requests.get(f"{self.url}/{Endpoints.Version.value}", verify=False, timeout=5, headers = {"Origin":"http://localhost:8001"}).text
+        except (ConnectionRefusedError, ConnectionError):
+            raise AbsboxError(f"❌{MsgColor.Error.value}Error: Can't not connect to API server {self.url}")
+        if _r is None:
+            raise RuntimeError(f"Failed to get version from url:{self.url}")
+        self.server_info = self.server_info | json.loads(_r)
+        engine_version = self.server_info['_version'].split(".")
+        if self.check and (self.version[1] != engine_version[1]):
+            console.print("pls upgrade your api package by: pip -U absbox")
+            raise VersionMismatch('.'.join(self.version), '.'.join(engine_version))
         console.print(f"✅{MsgColor.Success.value}Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
         self.session = requests.Session()
 
@@ -371,12 +371,15 @@ class API:
             except Exception as e:
                 print(f"Failed to read result {x} \n with error {e}")
                 return (None, None, None)
+            
         url = f"{self.url}/{Endpoints.RunAsset.value}"
         _assumptions = mkAssumpType(poolAssump) if poolAssump else None
-        _pricing = mkLiqMethod(pricing) if pricing else None
         _rate = lmap(mkRateAssumption, rateAssump) if rateAssump else None
-        assets = lmap(mkAssetUnion, _assets)  # [mkAssetUnion(_) for _ in _assets]
-        req = json.dumps([date, assets, _assumptions, _rate, _pricing], ensure_ascii=False)
+        _pricing = mkLiqMethod(pricing) if pricing else None
+        assets = lmap(mkAssetUnion, _assets) 
+        req = json.dumps([date, assets, _assumptions, _rate, _pricing]
+                         , ensure_ascii=False)
+        #console.print_json(req)
         result = self._send_req(req, url)
         if read:
             return readResult(result)
@@ -539,21 +542,20 @@ class API:
         :return: response in dict
         :rtype: dict | None
         """
-        with console.status("") as status:
-            try:
-                hdrs = self.hdrs | headers
-                r = None
-                if self.session:
-                    r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
-                else:
-                    raise AbsboxError(f"❌: None type for session")
-            except (ConnectionRefusedError, ConnectionError):
-                raise AbsboxError(f"❌ Failed to talk to server {_url}")
-            except ReadTimeout:
-                raise AbsboxError(f"❌ Failed to get response from server")
-            if r.status_code != 200:
-                raise EngineError(r)
-            try:
-                return json.loads(r.text)
-            except JSONDecodeError as e:
-                raise EngineError(e)
+        try:
+            hdrs = self.hdrs | headers
+            r = None
+            if self.session:
+                r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
+            else:
+                raise AbsboxError(f"❌: None type for session")
+        except (ConnectionRefusedError, ConnectionError):
+            raise AbsboxError(f"❌ Failed to talk to server {_url}")
+        except ReadTimeout:
+            raise AbsboxError(f"❌ Failed to get response from server")
+        if r.status_code != 200:
+            raise EngineError(r)
+        try:
+            return json.loads(r.text)
+        except JSONDecodeError as e:
+            raise EngineError(e)
