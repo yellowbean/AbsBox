@@ -1281,7 +1281,8 @@ def identify_deal_type(x):
             case _:
                 raise RuntimeError(f"Failed to identify deal type {z}")
     y = None
-    if query(x, ["pool","tag"])=='SoloPool':
+    #if query(x, ["pool","tag"])=='SoloPool':
+    if tz.get_in(["pool","tag"], x)=='SoloPool':
         return id_by_pool_assets(x["pool"]['contents'])
     elif "pool" in x and set(x.keys()) == {"pool"}:
         return id_by_pool_assets(x['pool'])
