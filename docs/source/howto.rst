@@ -1,7 +1,7 @@
 How To
 ========
 
-a list of articles to show the power of ``absbox`` in Python world
+A list of articles reveals the power of ``absbox`` in Python world
 
 How to load loan level data(Freddie Mac)
 -------------------------------------------
@@ -1062,3 +1062,19 @@ Why using a deal library ?
 
 * seperating deal storages and deal calculation engine, which is good for security and performance.
 * seperating running assumption and deal calculation, which is good for reusability and maintainability.
+
+
+How to pass deal files around ?
+------------------------------------
+
+A deal object 
+^^^^^^^^^^^^^^^^^
+
+A deal object either initialized with `SPV` or `Generic` class, is actually a python `dataclass` which implements a ``.json()`` .
+
+The ``json()`` function will convert the class to a json representation string .
+
+A string 
+^^^^^^^^^^^^^^^
+
+Now with that string, user can just write it into a No-SQL document database . or sent via Email , or Fax it .

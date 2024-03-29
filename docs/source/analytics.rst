@@ -55,10 +55,13 @@ There are two type of assumptions:
         "Mortgage/Installment/Loan" -> "Prepayment" 
         "Mortgage/Installment/Loan" -> "Default"
         "Mortgage/Installment/Loan" -> "Recovery"
+        "Receivable" -> "Recovery" [label="Not implemented", "color"="red"]
+        "Receivable" -> "Default"
         "Current" -> "Lease"
         "Lease" -> "Rental Increase"
         "Lease" -> "Rental Renew"
         "Current" -> "FixedAsset"
+        "Current" -> "Receivable"
         "FixedAsset" -> "Production Rate"
         "FixedAsset" -> "Utilization Rate"
         "Asset Performance" -> "Delinquent" [label="Not implemented","color"="red"]
@@ -1161,22 +1164,6 @@ To access same component from different sceanrio :
   {k: v['accounts']["reserve_account_01"] for k,v in r.items() }
 
   
-
-IRR 
-------------------
-
-powered by `pyxirr`, user have option to calculate the IRR of a bond.
-
-* 1st parameter should pass the dataframe of bond flow 
-* 2nd `init` represent `initial investment` a tuple with first as date of invesment and second as monetary amount of investment
-
-
-.. versionchanged:: 0.23.4
-
-.. code-block:: python
-
-   from absbox.local.analytics import irr
-   irr(r['bonds']['A1'],init=('2021-06-15',-70))
 
 
 Plotting
