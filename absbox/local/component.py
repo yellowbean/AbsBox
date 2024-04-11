@@ -502,8 +502,8 @@ def mkBondRate(x):
             return mkTag(("Fix", [vNum(_rate), dc]))
         case {"固定": _rate} | {"Fixed": _rate} | {"fix": _rate}:
             return mkTag(("Fix", [vNum(_rate), DC.DC_ACT_365F.value]))
-        case {"期间收益": _yield}:
-            return mkTag(("InterestByYield", _yield))
+        case {"期间收益": _yield} | {"interimYield": _yield}:
+            return mkTag(("InterestByYield", vNum(_yield)))
         case ("上限", cap, br) | ("cap", cap, br):
             return mkTag(("CapRate", [mkBondRate(br), vNum(cap)]))
         case ("下限", floor, br) | ("floor", floor, br):
