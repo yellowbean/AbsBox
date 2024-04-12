@@ -18,7 +18,7 @@ here is a list of available servers at `absbox.org <https://absbox.org>`_
 
    from absbox import API
    localAPI = API("https://absbox.org/api/latest")
-   
+
    # setting default language
    localAPI = API("https://absbox.org/api/latest",lang='english')
 
@@ -140,6 +140,33 @@ For `Non-Performing Asset`
     * the recovery starts at 4 periods after defaulted date
     * the recovery distribution is 50%,20% and 30%
 
+Summary
+""""""""""""""""
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: mortgage-assumption
+    :alt: mortgage-assumption
+    :align: center
+    
+    digraph {
+        rankdir = LR
+        Mortgage -> Performing
+        Mortgage -> Delinquent
+        Mortgage -> Defaulted
+        Performing -> "Default Assumption"
+        Performing -> "Prepayment Assumption"
+        Performing -> "Recovery Assumption"
+        "Default Assumption" -> "{'CDR':x}"
+        "Default Assumption" -> "{'CDR':[x...]}"
+        "Default Assumption" -> "{'ByAmount':(<total>, [x...])}"
+        "Prepayment Assumption" -> "{'CPR':x}"
+        "Prepayment Assumption" -> "{'CPR':[x...]}"
+        "Recovery Assumption" -> "{'Rate':x,'Lag':y}"
+        "Defaulted" -> "Defaulted Assumption"
+        "Defaulted Assumption" -> "{'Defaulted':[x,y,[z...]]}"
+    }
+
 
 Loan
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -156,6 +183,29 @@ Loan
 * <default assump> : ``{"CDR":<%>}``
 * <prepayment assump> : ``{"CPR":<%>}``
 
+Summary
+""""""""""""""""
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: loan-assumption
+    :alt: loan-assumption
+    :align: center
+    
+    digraph {
+        rankdir = LR
+        Loan -> Performing
+        Loan -> Delinquent
+        Loan -> Defaulted
+        Performing -> "Default Assumption"
+        Performing -> "Prepayment Assumption"
+        Performing -> "Recovery Assumption"
+        "Prepayment Assumption" -> "{'CPR':x}"
+        "Default Assumption" -> "{'CDR':x}"
+        "Recovery Assumption" -> "{'Rate':x,'Lag':y}"
+    }
+
+
 Installment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -171,13 +221,39 @@ Installment
 * <default assump> : ``{"CDR":<%>}``
 * <prepayment assump> : ``{"CPR":<%>}``
 
+
+Summary
+""""""""""""""""
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: installment-assumption
+    :alt: installment-assumption
+    :align: center
+    
+    digraph {
+        rankdir = LR
+        Installment -> Performing
+        Installment -> Delinquent
+        Installment -> Defaulted
+        Performing -> "Default Assumption"
+        Performing -> "Prepayment Assumption"
+        Performing -> "Recovery Assumption"
+        "Prepayment Assumption" -> "{'CPR':x}"
+        "Default Assumption" -> "{'CDR':x}"
+        "Recovery Assumption" -> "{'Rate':x,'Lag':y}"
+    }
+
+
+
+
 Receivable 
 ^^^^^^^^^^^^^^^^^^^^^
 
 user can set assumption on receivable asset class:
 
 * assume default at last period ( 0 cash received )
-* a CDR way ,whcih is a percentage of current balance remains.
+* a CDR way ,which is a percentage of current balance remains.
 
 .. code-block:: python
 
@@ -202,6 +278,27 @@ user can set assumption on receivable asset class:
               ,runAssump=[]
               ,poolAssump = receivableAssump
               ,read=True)
+
+Summary
+""""""""""""""""
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: receivable-assumption
+    :alt: receivable-assumption
+    :align: center
+    
+    digraph {
+        rankdir = LR
+        Receivable -> Performing
+        Receivable -> Delinquent
+        Receivable -> Defaulted
+        Performing -> "Default Assumption"
+        "Default Assumption" -> "'DefaultAtEnd'"
+        "Default Assumption" -> "{'CDR':x}"
+    }
+
+
 
 Extra Stress 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -251,6 +348,29 @@ Notes:
   * ``<rental assump>`` -> describe the rental increase/decrease over time
   * ``<end date>`` -> the date when lease projection ends 
 
+Summary
+""""""""""""""""
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: installment-assumption
+    :alt: installment-assumption
+    :align: center
+    
+    digraph {
+        rankdir = LR
+        Lease -> Performing
+        Lease -> Delinquent
+        Lease -> Defaulted
+        Performing -> "Lease Gap"
+        Performing -> "Rental Curve"
+        "Lease Gap" -> "{'Days':x}"
+        "Lease Gap" -> "{'DaysByAmount':(tbl,x)}"
+        "Rental Curve" -> "{'AnnualIncrease':x}"
+        "Rental Curve" -> "{'CurveIncrease':x}"
+    }
+
+
 
 Fixed Asset
 ^^^^^^^^^^^^^^^^^
@@ -271,6 +391,26 @@ syntax
                          ,assets
                          ,poolAssump=myAssump
                          ,read=True)
+Summary 
+""""""""""
+
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: fixedAsset-assumption
+    :alt: fixedAsset-assumption
+    :align: center
+    
+    digraph {
+        rankdir = LR
+        "Fixed Asset" -> Performing
+        "Fixed Asset" -> Delinquent
+        "Fixed Asset" -> Defaulted
+        Performing -> "Utilization Rate"
+        Performing -> "Production Rate"
+        "Utilization Rate" -> "[(d,vs)...]"
+        "Production Rate" -> "[(d,vs)]"
+    }
 
 
 

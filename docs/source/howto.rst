@@ -935,7 +935,7 @@ and calculate the IRR of equity investment:
 
 .. code-block:: python 
 
-  from absbox.local.util import irr
+  from absbox.local.analytics import irr
   irr(p['bonds']['EQ'],init=('2024-01-01',-7_000))
 
 it was ``1.67%`` (YoY)...whoa...sad 

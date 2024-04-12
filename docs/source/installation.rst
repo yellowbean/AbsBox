@@ -104,3 +104,23 @@ If user want to have a self-hosted server
       docker pull yellowbean/hastructure
       docker run yellowbean/hastructure
       # by default the server expose its port at 8081
+
+Hastructure ``latest`` v.s ``dev``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There are two builds in the docker hub.
+  * ``latest`` -> stable version
+  * ``dev`` -> most sexy feature included
+
+
+
+    .. code-block:: bash
+
+      # get latest version by default
+      docker pull yellowbean/hastructure  
+
+      # get dev version by default
+      docker pull yellowbean/hastructure:dev
+      
+      # get latest version by default
+      docker pull yellowbean/hastructure:latest
