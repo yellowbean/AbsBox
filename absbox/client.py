@@ -16,7 +16,7 @@ from absbox.local.util import mkTag, guess_pool_locale, mapValsBy, guess_pool_fl
                               , earlyReturnNone, searchByFst, filter_by_tags \
                               , enumVals, lmap
 from absbox.local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkLiqMethod \
-                                   , mkAssetUnion, mkRateAssumption
+                                   , mkAssetUnion, mkRateAssumption,mkDatePattern
 from absbox.local.base import ValidationMsg
 
 from absbox.local.china import SPV
@@ -46,6 +46,8 @@ class Endpoints(str, enum.Enum):
     """Run a single deal with multiple scenarios endpoint"""
     RunMultiDeal = "runMultiDeals"
     """Run multiple deals endpoint"""
+    RunDate = "runDate"
+    """Run Dates from a datepattern """
     Version = "version"
     """Get version of engine server endpoint"""
 
@@ -379,12 +381,26 @@ class API:
         assets = lmap(mkAssetUnion, _assets) 
         req = json.dumps([date, assets, _assumptions, _rate, _pricing]
                          , ensure_ascii=False)
-        #console.print_json(req)
         result = self._send_req(req, url)
         if read:
             return readResult(result)
         else:
             return result
+
+    def runDates(self, d, dp):
+        """generate a list of dates from date pattern
+
+        :param d: a starting date
+        :type d: date
+        :param dp: a date pattern
+        :type dp: date pattern
+        :return: a lsit of dates
+        :rtype: list[date]
+        """
+        url = f"{self.url}/{Endpoints.RunDate.value}"
+        req = json.dumps([d, mkDatePattern(dp)], ensure_ascii=False)
+        result = self._send_req(req, url)
+        return result
 
     def loginLibrary(self, user, pw, **q):
         """login to deal library with user and password
