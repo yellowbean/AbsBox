@@ -1389,6 +1389,8 @@ def mkAssumpRecovery(x):
             return mkTag(("Recovery",[vNum(r),vInt(lag)]))
         case {"Rate":r,"Timing":ts}:
             return mkTag(("RecoveryTiming",[vNum(r),vList(ts, float)]))
+        case {"Rate":r, "ByDays": lst}:
+            return mkTag(("RecoveryByDays",[vNum(r),lst]))
         case _:
             raise RuntimeError(f"failed to match {x}")
 

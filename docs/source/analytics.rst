@@ -252,8 +252,18 @@ Receivable
 
 user can set assumption on receivable asset class:
 
-* assume default at last period ( 0 cash received )
-* a CDR way ,which is a percentage of current balance remains.
+
+* Default
+  
+  * assume default at last period ( 0 cash received )
+  * a CDR way ,which is a percentage of current balance remains.
+
+.. versionadded:: 0.27.3
+
+* Recovery
+  
+  * aussming a reocvery rate, with a distribution of recoverys by day offsets from defaulted day
+
 
 .. code-block:: python
 
@@ -272,6 +282,11 @@ user can set assumption on receivable asset class:
                       ,("Receivable", {"CDR":0.01}, None, None)
                       ,None
                       ,None)
+
+  receivableAssump = ("Pool",("Receivable" ,"DefaultAtEnd" ,{"Rate":0.5,"ByDays":[(10,0.5),(20,0.5)]} ,None)
+                      ,None
+                      ,None)
+
 
   # apply on pool level
   r = localAPI.run(test01
@@ -294,8 +309,10 @@ Summary
         Receivable -> Delinquent
         Receivable -> Defaulted
         Performing -> "Default Assumption"
+        Performing -> "Recovery Assumption"
         "Default Assumption" -> "'DefaultAtEnd'"
         "Default Assumption" -> "{'CDR':x}"
+        "Recovery Assumption" -> "{'Rate':0.5,'ByDays':[(10,0.5),(20,0.5)]}"
     }
 
 
@@ -353,8 +370,8 @@ Summary
 
 .. graphviz::
     :name: sphinx.ext.graphviz
-    :caption: installment-assumption
-    :alt: installment-assumption
+    :caption: lease-assumption
+    :alt: lease-assumption
     :align: center
     
     digraph {
