@@ -15,7 +15,4 @@ sphinx:
 python:
     install:
       - requirements: requirements.txt
-      - method: pip 
-        path: notebook
-      - method: pip
-        path: myst-nb
+      - requirements: docs/requirements.txt
