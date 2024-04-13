@@ -4,3 +4,4 @@ readthedocs-sphinx-search==0.3.2
 sphinxemoji
 notebook
 myst-nb
+absbox
