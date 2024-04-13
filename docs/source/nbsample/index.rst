@@ -5,3 +5,4 @@ Notebook Samples
     :maxdepth: 1
 
    single_invoice
+   single_loan
