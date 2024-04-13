@@ -1,7 +1,8 @@
-Notebook Gallery
+Run Single Assets 
 -------------------
 
 .. toctree::
     :maxdepth: 0
 
-   runAsset
+   single_invoice
+   single_loan
