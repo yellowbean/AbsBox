@@ -9,3 +9,4 @@ Run Single Assets
    single_installment
    single_loan
    single_lease
+   single_fixasset
