@@ -92,8 +92,8 @@ class LibraryEndpoints(str, enum.Enum):
 
 class EnginePath(str, enum.Enum):
     """ Shortcut engine path for client"""
-    Local = "http://localhost:8001"
-    PROD = "https://absbox.org/api/lastest"
+    LOCAL = "http://localhost:8081"
+    PROD = "https://absbox.org/api/latest"
     DEV = "https://absbox.org/api/dev"
 
 

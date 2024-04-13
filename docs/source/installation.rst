@@ -77,6 +77,28 @@ User just need to pass in a URL points to engine.
    # optinally adding a `english` to request all responces in English
    localAPI = API("https://absbox.org/api/latest",'english')
 
+
+Engine Shortcut
+""""""""""""""""""""""""""""
+.. versionadded:: 0.26.7
+
+Since version ``0.26.7``, ``absbox`` ships with a shortcut to connect public/test engines.
+
+
+.. code-block:: python 
+
+  from absbox import API,EnginePath
+
+  # https://absbox.org/api/dev
+  localAPI = API(EnginePath.DEV,check=False)
+  
+  # https://absbox.org/api/latest
+  localAPI = API(EnginePath.PROD,check=False)
+
+  # http://localhost:8081
+  localAPI = API(EnginePath.LOCAL,check=False)
+
+
 Use Public Server
 ^^^^^^^^^^^^^^^^^^^^^
 

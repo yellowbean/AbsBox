@@ -22,6 +22,16 @@ here is a list of available servers at `absbox.org <https://absbox.org>`_
    # setting default language
    localAPI = API("https://absbox.org/api/latest",lang='english')
 
+   # since version 0.26.7
+   # https://absbox.org/api/dev
+   localAPI = API(EnginePath.DEV,check=False)
+    
+   # https://absbox.org/api/latest
+   localAPI = API(EnginePath.PROD,check=False)
+
+   # http://localhost:8081
+   localAPI = API(EnginePath.LOCAL,check=False)
+
 
 .. note::
    User can pull the docker image to run his/her own in-house environment
