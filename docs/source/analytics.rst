@@ -84,8 +84,6 @@ There are two type of assumptions:
 Mortgage
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. warning::
-   <delinq assumption> is not implemented yet ,it only serves as a place holder
 
 
 Here is sample which used to set ``Pool`` level assumption on ``Mortgage`` asset class.
@@ -105,30 +103,48 @@ Here is sample which used to set ``Pool`` level assumption on ``Mortgage`` asset
 
   * ``Pool`` ,means the assumption will be applied to ``all`` the assets in the pool
   * ``Mortgage`` ,means the it's assumption applied to ``Mortgage`` asset class
-  
-For `Performing Asset`
 
-  * ``<default assump>``   -> default assumption for performing asset: like ``{"CDR":0.01}``
+
+Performing
+""""""""""""
+
+* <Default Assumption>
+  
+  default assumption for performing asset
   
     * ``{"CDR":0.01}`` means 1% in annualized of current balance will be defaulted at the end of each period
     * ``{"CDR":[0.01,0.02,0.04]}`` means a vector of CDR will be applied since the asset snapshot date (determined by ``remain terms``)
     * ``{"ByAmount":(2000,[500,500,1000])}`` apply a custom default amount vector.
-  * ``<prepay assump>``    -> prepayment assumption for performing asset : like ``{"CPR":0.01}``
+
+* <Prepayment Assumption>
+  
+  prepayment assumption for performing asset
   
     * ``{"CPR":0.01}`` means 1% in annualized of current balance will be prepay at the end of each period
     * ``{"CPR":[0.01,0.02,0.04]}`` means a vector of CPR will be applied since the asset snapshot date (determined by ``remain terms``)
-  * ``<recovery assump>``  -> recovery assumption for performing asset : like ``{"Rate":0.7,"Lag":18}``
+
+* <Recovery Assumption>
+
+  recovery assumption for performing asset
     
     * ``{"Rate":0.7,"Lag":18}`` means 70% of current balance will be recovered at 18 periods after defaulted date
 
-For `Non-Performing Asset`
+Non-Performing
+""""""""""""""""""""
 
-* ``<delinq assump>``       -> assumption to project cashflow of asset in ``delinquent`` status
+* <Delinquent Assumption>
+
+  assumption to project cashflow of asset in ``delinquent`` status
+
+  .. warning::
+   <delinq assumption> is not implemented yet ,it only serves as a place holder
+
   
   *reserve for future use* : always use ``None``
 
-* ``<defaulted assump>``    -> assumption to project cashflow of asset in ``defaulted`` status
-  i.e 
+* <Defaulted Assumption>
+
+  assumption to project cashflow of asset in ``defaulted`` status
 
     .. code-block:: python 
     
@@ -182,6 +198,7 @@ Loan
 
 * <default assump> : ``{"CDR":<%>}``
 * <prepayment assump> : ``{"CPR":<%>}``
+
 
 Summary
 """"""""""""""""
@@ -426,16 +443,19 @@ Summary
         Performing -> "Utilization Rate"
         Performing -> "Production Rate"
         "Utilization Rate" -> "[(d,vs)...]"
-        "Production Rate" -> "[(d,vs)]"
+        "Production Rate" -> "[(d,vs)..]"
     }
 
 
 
-Assumption on Asset Level
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Asset Level vs Pool Level 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-As suggested above, the assumption would apply to all the asset of deals. But user has the abliity to set assumption on asset level.
+Pool assumption can be applied apply to all the assets in the deal/pool as well as on asset-level asset level.
 
+
+Asset Level By Index
+""""""""""""""""""""""""
 
 .. code-block:: python
    
@@ -497,7 +517,18 @@ i.e
   # asset cashflow
   r[0]
 
+Pool Level
+""""""""""""""""""""""""
 
+The assump will be applied to *ALL* assets in the pool
+
+
+.. code-block:: python
+   
+   #syntax 
+   ("Pool",("Loan",<default assump>,<prepay assump>,<recovery assump>,<extra assump>)
+                                   ,<delinq assumption>
+                                   ,<defaulted assumption>)
 
 Deal Assumption
 ----------------------------------------

@@ -3066,7 +3066,7 @@ the core concept of ``Yield Supplement Overcollateralization`` is
 * subtract the two value, that's amount can be used to paid off to ensure a senior tranche is safe comparing to balance of pool
 * usually , there is a constant OC% needed to inflat the OC over adjusted pool balance.
 
-.. versiondadd:: 0.24.1
+.. versiondadded:: 0.24.1
 
 .. literalinclude:: deal_sample/ysoc.py
    :language: python
@@ -3077,7 +3077,7 @@ the core concept of ``Yield Supplement Overcollateralization`` is
 Expenses Sample
 -------------------
 
-.. versiondadd:: 0.23.5
+.. versiondadded:: 0.23.5
 
 * fix amount of fee for each collection period
 * fee by a table,lookup by a formula

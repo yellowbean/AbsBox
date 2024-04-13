@@ -13,12 +13,8 @@ version = '0.26.0'
 
 import pathlib
 
-#PROJECT_DIR = pathlib.Path(__file__).parent.parent.parent.parent / 'PyABS'
-
 import sys,os
-sys.path.append(str( pathlib.Path(__file__).parent.parent))
-                
-                #os.path.relpath(r'PyABS'))
+sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -30,7 +26,7 @@ extensions = [
     'sphinx.ext.graphviz',
     #'autoapi.extension'
     #'nbsphinx'
-    #'myst_nb'
+    'myst_nb'
 ]
 
 graphviz_output_format = 'svg'

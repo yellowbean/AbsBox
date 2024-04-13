@@ -43,6 +43,7 @@ Content
    howto
    support
    reference
+   nbsample/index
    api
 
 
