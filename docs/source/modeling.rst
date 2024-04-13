@@ -1314,7 +1314,7 @@ Installment
     ,"freq": "Monthly"
     ,"type": "f_p"
     ,"originDate": "2022-01-01"}
-    ,{"status": "current"
+    ,{"status": "Current"
       ,"currentBalance":1000
       ,"remainTerm":10}]
 
