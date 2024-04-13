@@ -90,6 +90,13 @@ class LibraryEndpoints(str, enum.Enum):
     Run = "run"
 
 
+class EnginePath(str, enum.Enum):
+    """ Shortcut engine path for client"""
+    Local = "http://localhost:8001"
+    PROD = "https://absbox.org/api/lastest"
+    DEV = "https://absbox.org/api/dev"
+
+
 class VersionMismatch(Exception):
     """Exception for version mismatch between client and server"""
     def __init__(self, libVersion, serverVersion) -> None:
