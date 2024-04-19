@@ -167,3 +167,27 @@ class ValidationMsg(str, enum.Enum):
     """ Validation Message Type """
     Warning = "WarningMsg"
     Error = "ErrorMsg"
+
+
+class AssetType(str, enum.Enum):
+
+    Mortgage = "Mortgage"
+    Loan = "Loan"
+    Lease = "Lease"
+    Receivable = "Receivable"
+    Installment = "Installment"
+    FixedAsset = "FixedAsset"
+
+
+class SubAssetType(str, enum.Enum):
+
+    Mortgage = "Mortgage"
+    AdjustableRateMortgage = "AdjustableRateMortgage"
+    ScheduleMortgageFlow = "ScheduleMortgageFlow"
+    PersonalLoan = "PersonalLoan"
+    RegularLease = "RegularLease"
+    StepUpLease = "StepUpLease"
+    Invoice = "Invoice"
+    Installment = "Installment"
+    FixedAsset = "FixedAsset"
+

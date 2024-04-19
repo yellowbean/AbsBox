@@ -1481,9 +1481,13 @@ def mkAssumpType(x):
             return mkTag(("ByIndex",[ [idx, mkPDF(a,b,c)] for (idx,(a,b,c)) in ps ]))
         case ("ByName", assumpMap):
             return mkTag(("ByName",{f"PoolName:{k}":mkPDF(*v) for k,v in assumpMap.items()}))
+        case ("ByPoolId", assumpMap):
+            return mkTag(("ByPoolId",{f"PoolName:{k}": mkAssumpType(v) for k,v in assumpMap.items()}))
         case ("ByDealName", assumpMap):
             return mkTag(("ByDealName",{k:(mkAssumpType(perfAssump),mkNonPerfAssumps({},nonPerfAssump)) 
                                         for k,(perfAssump,nonPerfAssump) in assumpMap.items()}))
+        case None:
+            return None
         case _ :
             raise RuntimeError(f"failed to match {x} | mkAssumpType")
 
@@ -1508,7 +1512,7 @@ def mkAssetUnion(x):
 
 def mkRevolvingPool(x):
     assert isinstance(x, list), f"Revolving Pool Assumption should be a list, but got {x}"
-    'intpu with list, return revolving pool'
+    'intput with list, return revolving pool'
     match x:
         case ["constant", *asts]|["固定", *asts]:
             return mkTag(("ConstantAsset", lmap(mkAssetUnion, asts)))
@@ -1539,11 +1543,21 @@ def mkPoolComp(asOfDate, x, mixFlag) -> dict:
         , "extendPeriods":mkDatePattern(getValWithKs(x,['extendBy'], "MonthEnd"))}
     return r
 
+# def mkPoolType(x: dict):
+#     ''' PoolType for running pool endpoint '''
+#     match x:
+#         case {"清单": assets, "封包日": d} | {"assets": assets, "cutoffDate": d}:
+#             _pool = {"assets": [mkAsset(a) for a in assets] , "asOfDate": d}
+#             _pool_asset_type = identify_deal_type({"pool": _pool})
+#             return mkTag((mapping[_pool_asset_type], _pool))
+#         case _:
+#             raise RuntimeError(f"Failed to match {x}:mkPool")
+
 
 def mkPool(x: dict):
     mapping = {"LDeal": "LPool", "MDeal": "MPool",
                "IDeal": "IPool", "RDeal": "RPool", "FDeal":"FPool",
-               "VDeal": "VPool"}
+               "VDeal": "VPool", "UDeal":"UPool"}
     match x:
         case {"清单": assets, "封包日": d} | {"assets": assets, "cutoffDate": d}:
             _pool = {"assets": [mkAsset(a) for a in assets] , "asOfDate": d}

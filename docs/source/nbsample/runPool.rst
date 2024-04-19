@@ -5,4 +5,4 @@ Run Assets in Pool
     :maxdepth: 0
 
    pool_sample1
-   pool_multi_asset
+   pool_multiScenario

@@ -1,24 +1,26 @@
 import json, urllib3, getpass, enum
 from importlib.metadata import version
-from schema import Schema
-import toolz as tz
 from json.decoder import JSONDecodeError
 from dataclasses import dataclass
 
-from rich.console import Console
 import requests
 from requests.exceptions import ConnectionError, ReadTimeout
 import pandas as pd
-from absbox.validation import isValidUrl,vStr
+from rich.console import Console
+from schema import Schema
+import toolz as tz
+from lenses import lens
 
-from absbox.local.util import mkTag, guess_pool_locale, mapValsBy, guess_pool_flow_header \
+
+from absbox.validation import isValidUrl, vStr
+from absbox.local.util import mkTag,mapValsBy \
                               , _read_cf, _read_asset_pricing, mergeStrWithDict \
                               , earlyReturnNone, searchByFst, filter_by_tags \
-                              , enumVals, lmap
+                              , enumVals, lmap, inferPoolTypeFromAst
 from absbox.local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkLiqMethod \
-                                   , mkAssetUnion, mkRateAssumption,mkDatePattern
-from absbox.local.base import ValidationMsg
+                                   , mkAssetUnion, mkRateAssumption, mkDatePattern, mkPoolType
 
+from absbox.local.base import ValidationMsg
 from absbox.local.china import SPV
 from absbox.local.generic import Generic
 
@@ -207,13 +209,13 @@ class API:
         except TypeError as e:
             raise AbsboxError(f"❌Failed to convert request to json:{e}")
 
-    def build_pool_req(self, pool, poolAssump, rateAssumps) -> str:
+    def build_pool_req(self, pool, poolAssump, rateAssumps, isMultiScenario=False) -> str:
         """build pool run request: (single run, multi-scenario run)
 
         :meta private:
-        :param pool: a pool object
+        :param pool: a pool object, could be a single pool or a pool map
         :type pool: _type_
-        :param poolAssump: a tuple of pool level assumption(Default/Prepayment/Recovery) for single run. a map for multi-scenario run
+        :param poolAssump: a tuple of pool level assumption(Default/Prepayment/Recovery) for single run. a map indicates multi-scenario run
         :type poolAssump: _type_
         :param rateAssumps: a list of rate assumptions
         :type rateAssumps: _type_
@@ -224,14 +226,22 @@ class API:
         """
         r = None
         _rateAssump = map(mkRateAssumption, rateAssumps) if rateAssumps else None
-        if isinstance(poolAssump, tuple):
-            r = mkTag((RunReqType.SinglePool.value,
-                       [mkPool(pool), mkAssumpType(poolAssump), _rateAssump]))
-        elif isinstance(poolAssump, dict):
-            r = mkTag((RunReqType.MultiPoolScenarios.value,
-                       [mkPool(pool), mapValsBy(poolAssump, mkAssumpType), _rateAssump])) 
+        assetDate = pool['cutoffDate']
+
+        def buildPoolType(p) -> dict:
+            """ build type for `PoolTypeWrap` """
+            assetTag = inferPoolTypeFromAst(p) if 'assets' in p else "UPool"
+            _p = tz.dissoc(p, 'cutoffDate')
+            if assetTag == "UPool":
+                return mkTag((assetTag, mkPoolType(assetDate, _p, True)))
+            else:
+                return mkTag((assetTag, mkPoolType(assetDate, _p, False)))
+
+        if not isMultiScenario:
+            r = mkTag((RunReqType.SinglePool.value, [buildPoolType(pool), mkAssumpType(poolAssump), _rateAssump]))
         else:
-            raise RuntimeError(f"Error in build pool req, pool assumption should be a tuple or a dict, but got {type(poolAssump)}")
+            r = mkTag((RunReqType.MultiPoolScenarios.value, [buildPoolType(pool), mapValsBy(poolAssump, mkAssumpType), _rateAssump]))
+
         return json.dumps(r, ensure_ascii=False)
 
     def run(self, deal,
@@ -291,7 +301,40 @@ class API:
         else:
             return result
 
-    def runPool(self, pool, poolAssump=None, rateAssump=None, read=True):
+    def read_single(self, pool_resp):
+        (pool_flow, pool_bals) = pool_resp
+        result = _read_cf(pool_flow['contents'], self.lang)
+        return (result, pool_bals)
+
+
+    def runPoolByScenarios(self, pool, poolAssump, rateAssump=None, read=True, debug=False):
+        """ run a pool with multiple scenario ,return result as map , with key same to pool assumption map
+
+        :param pool: _description_
+        :type pool: _type_
+        :param poolAssump: _description_
+        :type poolAssump: dict
+        :param rateAssump: _description_, defaults to None
+        :type rateAssump: _type_, optional
+        :param read: _description_, defaults to True
+        :type read: bool, optional
+        :param debug: _description_, defaults to False
+        :type debug: bool, optional
+        """
+
+        url = f"{self.url}/{Endpoints.RunPoolByScenarios.value}"
+        req = self.build_pool_req(pool, poolAssump, rateAssump, isMultiScenario=True)
+
+        if debug:
+            return req
+
+        result = self._send_req(req, url)
+
+        if read:
+            return result & lens.Values().Values().modify(self.read_single)
+        return result
+
+    def runPool(self, pool, poolAssump=None, rateAssump=None, read=True, debug=False):
         """perform pool run with pool and rate assumptions
 
         :param pool: a pool object
@@ -303,23 +346,21 @@ class API:
         :param read: flag to convert result to pandas dataframe, default to True
         :type read: bool, optional
         """
-        def read_single(pool_resp):
-            (pool_flow, pool_bals) = pool_resp
-            result = _read_cf(pool_flow['contents'], self.lang)
-            return (result, pool_bals)
-            
-        multi_scenario = True if isinstance(poolAssump, dict) else False
-        url = f"{self.url}/{Endpoints.RunPoolByScenarios.value}" if multi_scenario else f"{self.url}/{Endpoints.RunPool.value}"
-        req = self.build_pool_req(pool, poolAssump, rateAssump)
+
+        url = f"{self.url}/{Endpoints.RunPool.value}"
+
+        req = self.build_pool_req(pool, poolAssump, rateAssump, isMultiScenario=False)
+
+        if debug:
+            return req
+
         result = self._send_req(req, url)
 
-        if read and (not multi_scenario):
-            return read_single(result)
-        elif read and multi_scenario: 
-            return mapValsBy(result, read_single)
+        if read:
+            return result & lens.Values().modify(self.read_single)
         else:
             return result
-    
+
     def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, read=True):
         """run multiple deals with same assumption
 

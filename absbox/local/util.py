@@ -71,11 +71,8 @@ def mkTbl(n, vs):
 
 
 mkRatioTs = functools.partial(mkTs, "RatioCurve")
-
 mkRateTs = functools.partial(mkTs, "RateCurve")
-
 mkBalTs = functools.partial(mkTs, "BalanceCurve")
-
 mkFloatTs = functools.partial(mkTs, "FloatCurve")
 
 
@@ -281,6 +278,26 @@ def guess_pool_flow_header(x, l):
             raise RuntimeError(f"Failed to match pool header with {x['tag']},{len(x['contents'])},{l}")
 
 
+def inferPoolTypeFromAst(x:dict) -> str:
+    match x:
+        case {"assets":[["Mortgage",*fields],*ast]} | {"assets":[["AdjustRateMortgage",*fields],*ast]}:
+            return "MPool"
+        case {"assets":[["Loan",*fields],*ast]}:
+            return "LPool"
+        case {"assets":[["Installment",*fields],*ast]}:
+            return "IPool"
+        case {"assets":[["Lease",*fields],*ast]}:
+            return "RPool"
+        case {"assets":[["FixedAsset",*fields],*ast]}:
+            return "FPool"
+        
+        case {"assets":[["Invoice",*fields],*ast]}:
+            return "VPool"
+        case _:
+            raise RuntimeError(f"Failed to find pool type from assets:{x}")
+    
+
+
 def uplift_m_list(l: list):
     """ input a list of dictionary, reduce the maps into a big map """
     return {k: v for m in l for k, v in m.items()}
@@ -388,7 +405,7 @@ def searchByFst(xs:list, v, defaultRtn=None):
 
 
 def isMixedDeal(x: dict) -> bool:
-    
+    ''' check if pool of deals has mixed asset types'''    
     if 'assets' in x or 'cashflow' in x:
         return False
     if 'deals' in x:
