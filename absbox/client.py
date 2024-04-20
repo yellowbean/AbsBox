@@ -248,8 +248,8 @@ class API:
             poolAssump=None,
             runAssump=[],
             read=True,
-            preCheck=True,
-            showWarning=True):
+            showWarning=True,
+            debug=False):
         """ run deal with pool and deal run assumptions, with option of sensitivity run
 
         :param deal: a deal object
@@ -260,8 +260,6 @@ class API:
         :type runAssump: list, optional
         :param read: flag to convert result to pandas dataframe, defaults to True
         :type read: bool, optional
-        :param preCheck: flag to perform a client side validation check, defaults to True
-        :type preCheck: bool, optional
         :param showWarning: flag to show warnings, defaults to True
         :type showWarning: bool, optional
         :return: result of run, a dict or dataframe
@@ -269,12 +267,13 @@ class API:
 
         """        
         # if run req is a multi-scenario run
-        multi_run_flag = True if isinstance(poolAssump, dict) else False
-        url = f"{self.url}/{Endpoints.RunDealByScnearios.value}" if multi_run_flag else f"{self.url}/{Endpoints.RunDeal.value}"
+        url = f"{self.url}/{Endpoints.RunDeal.value}"
 
         # construct request
-        runType = "MultiScenarios" if multi_run_flag else "Single"
+        runType = "Single"
         req = self.build_run_deal_req(runType, deal, poolAssump, runAssump)
+        if debug:
+            return req
         # branching with pricing
         if runAssump is None or searchByFst(runAssump, "pricing") is None:
             result = self._send_req(req, url)
@@ -284,20 +283,60 @@ class API:
         if result is None or 'error' in result:
             raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run")
 
-        rawWarnMsg = []
-        if multi_run_flag:
-            rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
-            rawWarnMsg = tz.concat(rawWarnMsgByScen.values())
+        rawWarnMsg = [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg))]
+        if rawWarnMsg and showWarning:
+            console.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
+
+        if read:
+            return deal.read(result)
         else:
-            rawWarnMsg = [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg))]
+            return result
+
+    def runByScenario(self, deal,
+                    poolAssump=None,
+                    runAssump=[],
+                    read=True,
+                    showWarning=True,
+                    debug=False):
+        """ run deal with multiple scenario
+
+        :param deal: _description_
+        :type deal: _type_
+        :param poolAssump: _description_, defaults to None
+        :type poolAssump: _type_, optional
+        :param runAssump: _description_, defaults to []
+        :type runAssump: list, optional
+        :param read: _description_, defaults to True
+        :type read: bool, optional
+        :param showWarning: _description_, defaults to True
+        :type showWarning: bool, optional
+        :param debug: _description_, defaults to False
+        :type debug: bool, optional
+        """
+
+        url = f"{self.url}/{Endpoints.RunDealByScnearios.value}"
+        runType = "MultiScenarios"
+        req = self.build_run_deal_req(runType, deal, poolAssump, runAssump)
+
+        if debug:
+            return req
+
+        if runAssump is None or searchByFst(runAssump, "pricing") is None:
+            result = self._send_req(req, url)
+        else:
+            result = self._send_req(req, url, timeout=30)
+
+        if result is None or 'error' in result:
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run")
+
+        rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
+        rawWarnMsg = tz.concat(rawWarnMsgByScen.values())
         
         if rawWarnMsg and showWarning:
             console.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
 
-        if read and multi_run_flag:
+        if read:
             return tz.valmap(deal.read, result)
-        elif read:
-            return deal.read(result)
         else:
             return result
 
@@ -361,7 +400,7 @@ class API:
         else:
             return result
 
-    def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, read=True):
+    def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, read=True, debug=False):
         """run multiple deals with same assumption
 
         :param deals: a dict of deals
@@ -385,6 +424,8 @@ class API:
                                    ,_nonPerfAssump]))
                          ,ensure_ascii=False)
 
+        if debug:
+            return req
         result = self._send_req(req, url)
         if read:
             return {k: deals[k].read(v) for k, v in result.items()}    
@@ -392,7 +433,7 @@ class API:
             return result
 
     def runAsset(self, date, _assets, poolAssump=None, rateAssump=None
-                 , pricing=None, read=True):
+                 , pricing=None, read=True, debug=False):
         """run asset with assumptions
 
         :param date: date of start projection and pricing day
@@ -429,6 +470,9 @@ class API:
         assets = lmap(mkAssetUnion, _assets) 
         req = json.dumps([date, assets, _assumptions, _rate, _pricing]
                          , ensure_ascii=False)
+        if debug:
+            return req
+        
         result = self._send_req(req, url)
         if read:
             return readResult(result)
