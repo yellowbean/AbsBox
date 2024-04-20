@@ -1261,10 +1261,10 @@ User can build a simple dict with ``pool assumption`` as value .
                                    ,None
                                    ,None)
    
-   r = localAPI.run(test01
-               ,poolAssump={"00":myAssumption
-                           ,"stressed":myAssumption2}
-               ,read=True)
+   r = localAPI.runByScenarios(test01
+                              ,poolAssump={"00":myAssumption
+                                          ,"stressed":myAssumption2}
+                              ,read=True)
 
 Using Lenses 
 """"""""""""""""""""

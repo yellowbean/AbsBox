@@ -292,7 +292,7 @@ class API:
         else:
             return result
 
-    def runByScenario(self, deal,
+    def runByScenarios(self, deal,
                     poolAssump=None,
                     runAssump=[],
                     read=True,
@@ -330,9 +330,9 @@ class API:
             raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run")
 
         rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
-        rawWarnMsg = tz.concat(rawWarnMsgByScen.values())
+        rawWarnMsg = list(tz.concat(rawWarnMsgByScen.values()))
         
-        if rawWarnMsg and showWarning:
+        if showWarning and len(rawWarnMsg)>0:
             console.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
 
         if read:
