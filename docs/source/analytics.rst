@@ -909,19 +909,19 @@ Pass a map to ``poolAssump`` to run multiple scenarios.
 
 .. code-block:: python
 
-  localAPI.run(test01,
-               poolAssump={"ScenarioA":("Pool",("Mortgage",{"CPR":0.01},{"CDR":0.01},{"Rate":0.7,"Lag":18})
-                                 ,None
-                                 ,None)
-                           ,"ScenarioB":("Pool",("Mortgage",{"CPR":0.02},{"CDR":0.02},{"Rate":0.7,"Lag":18})
-                                 ,None
-                                 ,None)
-                          },
-               runAssump =[("pricing"
-                            ,{"PVDate":"2021-08-22"
-                            ,"PVCurve":[["2021-01-01",0.025]
-                                       ,["2024-08-01",0.025]]})],
-               read=True)
+  localAPI.runByScenarios(test01,
+                          poolAssump={"ScenarioA":("Pool",("Mortgage",{"CPR":0.01},{"CDR":0.01},{"Rate":0.7,"Lag":18})
+                                            ,None
+                                            ,None)
+                                      ,"ScenarioB":("Pool",("Mortgage",{"CPR":0.02},{"CDR":0.02},{"Rate":0.7,"Lag":18})
+                                            ,None
+                                            ,None)
+                                      },
+                          runAssump =[("pricing"
+                                        ,{"PVDate":"2021-08-22"
+                                        ,"PVCurve":[["2021-01-01",0.025]
+                                                  ,["2024-08-01",0.025]]})],
+                          read=True)
 
 
 
@@ -999,9 +999,9 @@ If user pass scenario with a map , the response will be a map as well.
                                       ,None)
   }
   
-  r = localAPI.runPool(myPool
-                      ,poolAssump = multiScenario
-                      ,read=True)
+  r = localAPI.runPoolByScenarios(myPool
+                                ,poolAssump = multiScenario
+                                ,read=True)
   r["Stress01"][0]
   r["Stress02"][0]
 
