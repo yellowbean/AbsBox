@@ -266,6 +266,11 @@ class API:
         :rtype: dict | pd.DataFrame
 
         """        
+
+        if (not isinstance(poolAssump, tuple)) and (poolAssump is not None):
+            raise AbsboxError(f"❌{MsgColor.Error.value} poolAssump should be a tuple but got {type(poolAssump)}")
+
+
         # if run req is a multi-scenario run
         url = f"{self.url}/{Endpoints.RunDeal.value}"
 
@@ -379,12 +384,15 @@ class API:
         :param pool: a pool object
         :type pool: object
         :param poolAssump: pool performance assumption, a tuple for single run and a map for multi-scenario run, defaults to None
-        :type poolAssump: tuple|dict, optional
+        :type poolAssump: tuple
         :param rateAssump: a list of interest rate assumptions, default to None
         :type rateAssump: tuple, optional
         :param read: flag to convert result to pandas dataframe, default to True
         :type read: bool, optional
         """
+
+        if (not isinstance(poolAssump, tuple)) and (poolAssump is not None):
+            raise AbsboxError(f"❌{MsgColor.Error.value} poolAssump should be a tuple but got {type(poolAssump)}")
 
         url = f"{self.url}/{Endpoints.RunPool.value}"
 
@@ -415,6 +423,7 @@ class API:
         :rtype: dict
         """
         assert isinstance(deals, dict), f"Deals should be a dict but got {type(deals)}"
+
         url = f"{self.url}/{Endpoints.RunMultiDeal.value}" 
         _poolAssump = mkAssumpType(poolAssump) if poolAssump else None 
         _nonPerfAssump = mkNonPerfAssumps({}, nonPoolAssump)
