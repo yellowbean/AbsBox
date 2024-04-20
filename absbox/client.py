@@ -308,14 +308,14 @@ class API:
         :param deal: _description_
         :type deal: _type_
         :param poolAssump: _description_, defaults to None
-        :type poolAssump: _type_, optional
+        :type poolAssump: dict, optional
         :param runAssump: _description_, defaults to []
         :type runAssump: list, optional
-        :param read: _description_, defaults to True
+        :param read: if read response into dataframe, defaults to True
         :type read: bool, optional
-        :param showWarning: _description_, defaults to True
+        :param showWarning: if show warning messages from server, defaults to True
         :type showWarning: bool, optional
-        :param debug: _description_, defaults to False
+        :param debug: return request text instead of sending out such request, defaults to False
         :type debug: bool, optional
         """
 
@@ -360,9 +360,9 @@ class API:
         :type poolAssump: dict
         :param rateAssump: _description_, defaults to None
         :type rateAssump: _type_, optional
-        :param read: _description_, defaults to True
+        :param read: if read response into dataframe, defaults to True
         :type read: bool, optional
-        :param debug: _description_, defaults to False
+        :param debug: return request text instead of sending out such request, defaults to False
         :type debug: bool, optional
         """
 

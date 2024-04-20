@@ -858,6 +858,29 @@ Running
      * Deal assumptions (May include Interest Rate / Clean Up Call)
 
 
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: run targets
+    :alt: run targets
+    :align: center
+
+    digraph {
+        rankdir = LR
+        b[label="What to run ?"]
+        b -> "Run Sinlge Asset"  -> "api.runAsset()"
+        b -> "Run a Pool of Assets" 
+        b -> "Run a Deal"
+        "Run a Pool of Assets"  -> "api.runPoolByScenarios()"
+        "Run a Pool of Assets"  -> "api.runPool()"
+        "Run a Deal" -> "api.runByScenarios()"
+        "Run a Deal" -> "api.run()"
+    }
+
+
+
+
+
 Running a deal 
 ^^^^^^^^^^^^^^^^^
 
