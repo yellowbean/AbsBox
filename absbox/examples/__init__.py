@@ -1,1 +1,1 @@
-from absbox.examples.base import test01,test02
+from .base import test01,test02
