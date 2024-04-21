@@ -16,4 +16,6 @@ from absbox.local.chart import viz
 from importlib.metadata import version
 from absbox.local.cf import readBondsCf,readToCf
 
+import absbox.examples.baseCase as baseCase
+
 __version__ = version("absbox")
