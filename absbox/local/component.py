@@ -1744,14 +1744,21 @@ def readRunSummary(x, locale) -> dict:
                 }
     bond_defaults = [(_['contents'][0], _['tag'], _['contents'][1], _['contents'][2])
                      for _ in x if _['tag'] in set(['BondOutstanding', 'BondOutstandingInt'])]
+    
     _fmap = {"cn": {'BondOutstanding': "本金违约", "BondOutstandingInt": "利息违约"}
             ,"en": {'BondOutstanding': "Balance Defaults", "BondOutstandingInt": "Interest Defaults"}}
     ## Build bond summary
+    
     bndNames = set([y[0] for y in bond_defaults])
+
     bndSummary = pd.DataFrame(columns=bndStatus[locale], index=list(bndNames))
+
     for bn, amt_type, amt, begBal in bond_defaults:
-        bndSummary.loc[bn][_fmap[locale][amt_type]] = amt
-        bndSummary.loc[bn][bndStatus[locale][2]] = begBal
+        #bndSummary.loc[bn][_fmap[locale][amt_type]] = amt
+        #bndSummary.loc[bn][bndStatus[locale][2]] = begBal
+        bndSummary.loc[bn, _fmap[locale][amt_type]] = amt
+        bndSummary.loc[bn, bndStatus[locale][2]] = begBal
+    
     bndSummary.fillna(0, inplace=True)
     bndSummary["Total"] = bndSummary[bndStatus[locale][0]] + \
         bndSummary[bndStatus[locale][1]]

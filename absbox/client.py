@@ -249,21 +249,23 @@ class API:
             runAssump=[],
             read=True,
             showWarning=True,
-            debug=False):
-        """ run deal with pool and deal run assumptions, with option of sensitivity run
+            debug=False) -> dict :
+        """ run deal with pool and deal run assumptions
 
         :param deal: a deal object
         :type deal: Generic | SPV
         :param poolAssump: pool performance assumption, a tuple for single run/ a dict for multi-sceanrio run, defaults to None
-        :type poolAssump: tuple | dict , optional
+        :type poolAssump: tuple, optional
         :param runAssump: deal level assumption, defaults to []
         :type runAssump: list, optional
         :param read: flag to convert result to pandas dataframe, defaults to True
         :type read: bool, optional
         :param showWarning: flag to show warnings, defaults to True
         :type showWarning: bool, optional
+        :param debug: return request text instead of sending out such request, defaults to False
+        :type debug: bool, optional
         :return: result of run, a dict or dataframe
-        :rtype: dict | pd.DataFrame
+        :rtype: dict
 
         """        
 
@@ -302,8 +304,8 @@ class API:
                     runAssump=[],
                     read=True,
                     showWarning=True,
-                    debug=False):
-        """ run deal with multiple scenario
+                    debug=False) -> dict :
+        """ run deal with multiple scenarios, return a map
 
         :param deal: _description_
         :type deal: _type_
@@ -317,6 +319,8 @@ class API:
         :type showWarning: bool, optional
         :param debug: return request text instead of sending out such request, defaults to False
         :type debug: bool, optional
+        :return: a dict with scenario names as keys
+        :rtype: dict        
         """
 
         url = f"{self.url}/{Endpoints.RunDealByScnearios.value}"
@@ -345,18 +349,25 @@ class API:
         else:
             return result
 
-    def read_single(self, pool_resp):
+    def read_single(self, pool_resp) -> tuple:
+        """ read pool run response from engine and convert to dataframe
+
+        :param pool_resp: (pool raw cashflow, pool statistics)
+        :type pool_resp: tuple
+        :return: (pool Cashflow in dataFrame, pool statistics)
+        :rtype: tuple
+        """
         (pool_flow, pool_bals) = pool_resp
         result = _read_cf(pool_flow['contents'], self.lang)
         return (result, pool_bals)
 
 
-    def runPoolByScenarios(self, pool, poolAssump, rateAssump=None, read=True, debug=False):
+    def runPoolByScenarios(self, pool, poolAssump, rateAssump=None, read=True, debug=False) -> dict :
         """ run a pool with multiple scenario ,return result as map , with key same to pool assumption map
 
-        :param pool: _description_
-        :type pool: _type_
-        :param poolAssump: _description_
+        :param pool: pool map
+        :type pool: dict
+        :param poolAssump: assumption map
         :type poolAssump: dict
         :param rateAssump: _description_, defaults to None
         :type rateAssump: _type_, optional
@@ -364,6 +375,8 @@ class API:
         :type read: bool, optional
         :param debug: return request text instead of sending out such request, defaults to False
         :type debug: bool, optional
+        :return: a dict with scenario names as keys
+        :rtype: dict
         """
 
         url = f"{self.url}/{Endpoints.RunPoolByScenarios.value}"
@@ -378,7 +391,7 @@ class API:
             return result & lens.Values().Values().modify(self.read_single)
         return result
 
-    def runPool(self, pool, poolAssump=None, rateAssump=None, read=True, debug=False):
+    def runPool(self, pool, poolAssump=None, rateAssump=None, read=True, debug=False) -> tuple:
         """perform pool run with pool and rate assumptions
 
         :param pool: a pool object
@@ -389,6 +402,10 @@ class API:
         :type rateAssump: tuple, optional
         :param read: flag to convert result to pandas dataframe, default to True
         :type read: bool, optional
+        :param debug: return request text instead of sending out such request, defaults to False
+        :type debug: bool, optional
+        :return: tuple of cashflow and pool statistics
+        :rtype: tuple
         """
 
         if (not isinstance(poolAssump, tuple)) and (poolAssump is not None):
@@ -408,7 +425,7 @@ class API:
         else:
             return result
 
-    def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, read=True, debug=False):
+    def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, read=True, debug=False) -> dict:
         """run multiple deals with same assumption
 
         :param deals: a dict of deals
@@ -419,6 +436,8 @@ class API:
         :type nonPoolAssump: _type_, optional
         :param read: _description_, defaults to True
         :type read: bool, optional
+        :param debug: return request text instead of sending out such request, defaults to False
+        :type debug: bool, optional
         :return: a map of results
         :rtype: dict
         """
@@ -442,7 +461,7 @@ class API:
             return result
 
     def runAsset(self, date, _assets, poolAssump=None, rateAssump=None
-                 , pricing=None, read=True, debug=False):
+                 , pricing=None, read=True, debug=False) -> tuple:
         """run asset with assumptions
 
         :param date: date of start projection and pricing day
@@ -457,8 +476,10 @@ class API:
         :type pricing: tuple, optional
         :param read: whether convert raw result to dataframe, defaults to True
         :type read: bool, optional
-        :return: result of run
-        :rtype: dict | pd.DataFrame
+        :param debug: return request text instead of sending out such request, defaults to False
+        :type debug: bool, optional
+        :return: (cashflow, balance, pricing result)
+        :rtype: tuple
         """
         assert isinstance(_assets, list), f"Assets passed in must be a list"
         
