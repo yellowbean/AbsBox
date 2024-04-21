@@ -1,3 +1,0 @@
-from local.china import *
-from local.generic import *
-from local.component import *
