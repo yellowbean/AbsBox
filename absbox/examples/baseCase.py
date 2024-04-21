@@ -1,4 +1,4 @@
-from absbox import Generic
+from ..local.generic import Generic
 
 test01 = Generic(
     "TEST01"
