@@ -328,10 +328,10 @@ def _read_cf(x, lang):
     flow_header, idx, expandFlag = guess_pool_flow_header(x[0], lang)
     result = None
     try:
-        if not expandFlag:
-            result = pd.DataFrame([_['contents'] for _ in x], columns=flow_header)
+        if expandFlag:
+            result = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[0,0,0,0,0,0]) for _ in x], columns=flow_header)
         else:
-            result = pd.DataFrame([_['contents'][:-1]+_['contents'][-1] for _ in x], columns=flow_header)
+            result = pd.DataFrame([_['contents'] for _ in x], columns=flow_header)
     except ValueError as e:
         print(e)
         logging.error(f"Failed to match header:{flow_header} with {result}")
