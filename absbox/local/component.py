@@ -5,6 +5,7 @@ from absbox.local.util import filter_by_tags, enumVals, lmap
 from absbox.local.base import *
 
 from absbox.validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool
+from schema import Or
 from enum import Enum
 import itertools
 import functools
@@ -15,6 +16,7 @@ from lenses import lens
 import pandas as pd
 from pyspecter import query, S
 
+numVal = Or(float,int)
 
 def mkLiq(x):
     ''' make pricing method '''
@@ -1331,11 +1333,11 @@ def mkAssumpDefault(x):
     ''' New default assumption for performing assets '''
     match x:
         case {"CDR": r} if isinstance(r, list):
-            return mkTag(("DefaultVec", vList(r,float)))
+            return mkTag(("DefaultVec", vList(r, numVal)))
         case {"CDR": r}:
             return mkTag(("DefaultCDR", vNum(r)))
-        case {"ByAmount": (bal, rs)}:
-            return mkTag(("DefaultByAmt", (vNum(bal), vList(rs,float))))
+        case {"ByAmount": (bal, rs)} | {"ByAmt": (bal, rs)}:
+            return mkTag(("DefaultByAmt", (vNum(bal), vList(rs,numVal))))
         case "DefaultAtEnd":
             return mkTag(("DefaultAtEnd"))
         case _ :
@@ -1346,7 +1348,7 @@ def mkAssumpPrepay(x):
     ''' New prepayment assumption for performing assets '''
     match x:
         case {"CPR": r} if isinstance(r, list):
-            return mkTag(("PrepaymentVec", vList(r, float)))
+            return mkTag(("PrepaymentVec", vList(r, numVal)))
         case {"CPR": r}:
             return mkTag(("PrepaymentCPR", vNum(r)))
         case _ :
@@ -1388,7 +1390,8 @@ def mkAssumpRecovery(x):
         case {"Rate":r,"Lag":lag}:
             return mkTag(("Recovery",[vNum(r),vInt(lag)]))
         case {"Rate":r,"Timing":ts}:
-            return mkTag(("RecoveryTiming",[vNum(r),vList(ts, float)]))
+            assert sum(ts)==1.0,f"Recvoery timing should sum up to 100%,but current sum up to {sum(ts)}"
+            return mkTag(("RecoveryTiming",[vNum(r),vList(ts, numVal)]))
         case {"Rate":r, "ByDays": lst}:
             return mkTag(("RecoveryByDays",[vNum(r),lst]))
         case _:

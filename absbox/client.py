@@ -1,4 +1,4 @@
-import json, urllib3, getpass, enum
+import json, urllib3, getpass, enum, os
 from importlib.metadata import version
 from json.decoder import JSONDecodeError
 from dataclasses import dataclass
@@ -29,7 +29,7 @@ VERSION_NUM = version("absbox")
 urllib3.disable_warnings()
 console = Console()
 
-__all__ = ["API", "Endpoints", "RunReqType", "RunResp", "MsgColor", "LibraryEndpoints"]
+__all__ = ["API", "Endpoints", "RunReqType", "RunResp", "MsgColor", "LibraryEndpoints","EnginePath"]
 
 
 class Endpoints(str, enum.Enum):
@@ -93,10 +93,16 @@ class LibraryEndpoints(str, enum.Enum):
 
 
 class EnginePath(str, enum.Enum):
-    """ Shortcut engine path for client"""
+    """ Enum class representing shortcut engine paths for the client.
+    """
     LOCAL = "http://localhost:8081"
+    """ Use local default server """
     PROD = "https://absbox.org/api/latest"
     DEV = "https://absbox.org/api/dev"
+    NY_DEV = "https://spv.run/api/dev"
+    NY_PROD = "https://spv.run/api/latest"
+    USE_ENV = "USE_ENV"
+    """ USE_ENV (str): Use environment variable (`ABSBOX_SERVER`) for engine path """
 
 
 class VersionMismatch(Exception):
@@ -153,7 +159,7 @@ class API:
         :raises RuntimeError: Failed to get version info from server
         :raises VersionMismatch: Failed to match version between client and server
         """
-        self.url = isValidUrl(self.url).rstrip("/")
+        self.url = isValidUrl(self.url).rstrip("/") if self.url != EnginePath.USE_ENV.value else os.environ.get("ABSBOX_SERVER")
         console.print(f"{MsgColor.Info.value}Connecting engine server -> {self.url}")
         try:
             _r = requests.get(f"{self.url}/{Endpoints.Version.value}", verify=False, timeout=5, headers = {"Origin":"http://localhost:8001"}).text
