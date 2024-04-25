@@ -159,7 +159,15 @@ class API:
         :raises RuntimeError: Failed to get version info from server
         :raises VersionMismatch: Failed to match version between client and server
         """
-        self.url = isValidUrl(self.url).rstrip("/") if self.url != EnginePath.USE_ENV.value else os.environ.get("ABSBOX_SERVER")
+        if self.url == EnginePath.USE_ENV.value:
+            urlInEnv = os.environ.get("ABSBOX_SERVER")
+            if urlInEnv is None:
+                raise AbsboxError(f"❌{MsgColor.Error.value}No ABSBOX_SERVER found in environment variable")
+            else:
+                self.url = isValidUrl(urlInEnv).rstrip("/")
+        else:
+            self.url = isValidUrl(self.url).rstrip("/")
+            
         console.print(f"{MsgColor.Info.value}Connecting engine server -> {self.url}")
         try:
             _r = requests.get(f"{self.url}/{Endpoints.Version.value}", verify=False, timeout=5, headers = {"Origin":"http://localhost:8001"}).text

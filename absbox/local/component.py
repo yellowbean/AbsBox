@@ -113,17 +113,9 @@ def mkFeeType(x):
     match x:
         case {"年化费率": [base, rate]} | {"annualPctFee": [base, rate]}:
             return mkTag(("AnnualRateFee", [mkDs(base), mkDsRate(rate)]))
-        case {"百分比费率": [*desc, _rate]} | {"pctFee": [*desc, _rate]}:
+        case {"百分比费率": [base, _rate]} | {"pctFee": [base, _rate]}:
             rate = mkDsRate(_rate)
-            match desc:
-                case ["资产池当期", "利息"] | ["poolCurrentCollection", "interest"] | ["资产池回款", "利息"]:
-                    return mkTag(("PctFee", [mkTag(("PoolCurCollection", ["CollectedInterest"])), rate]))
-                case ["已付利息合计", *bns] | ["paidInterest", *bns]:
-                    return mkTag(("PctFee", [mkTag(("LastBondIntPaid", bns)), rate]))
-                case ["已付本金合计", *bns] | ["paidPrincipal", *bns]:
-                    return mkTag(("PctFee", [mkTag(("LastBondPrinPaid", bns)), rate]))
-                case _:
-                    raise RuntimeError(f"Failed to match on 百分比费率：{desc, rate}")
+            return mkTag(("PctFee", [mkDs(base), rate]))
         case {"固定费用": amt} | {"fixFee": amt}:
             return mkTag(("FixFee", vNum(amt)))
         case {"周期费用": [p, amt]} | {"recurFee": [p, amt]}:
@@ -276,8 +268,10 @@ def mkDs(x):
             return mkTag(("LedgerTxnAmt", [vStr(lns), None]))
         case ("债券待付利息", *bnds) | ("bondDueInt", *bnds):
             return mkTag(("CurrentDueBondInt", vList(bnds, str)))
-        case ("债券已付利息", *bnds) | ("lastBondIntPaid", *bnds):
+        case ("债券当期已付利息", *bnds) | ("lastBondIntPaid", *bnds):
             return mkTag(("LastBondIntPaid", vList(bnds, str)))
+        case ("债券当期已付本金", *bnds) | ("lastBondIntPaid", *bnds):
+            return mkTag(("LastBondPrinPaid", vList(bnds, str)))
         case ("债券低于目标余额", bn) | ("behindTargetBalance", bn):
             return mkTag(("BondBalanceGap", vStr(bn)))
         case ("已提供流动性", *liqName) | ("liqBalance", *liqName):

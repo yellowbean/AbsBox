@@ -10,3 +10,4 @@ Run Single Assets
    single_loan
    single_lease
    single_fixasset
+   pricing_asset
