@@ -6,3 +6,5 @@ Run Deals
 
    run_deal
    viewMultipleCfs
+   multiAsset
+   triggers
