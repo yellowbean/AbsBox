@@ -16,7 +16,8 @@ here is a list of available servers at `absbox.org <https://absbox.org>`_
 
 .. code-block:: python
 
-   from absbox import API
+   from absbox import API,EnginePath
+   
    localAPI = API("https://absbox.org/api/latest")
 
    # setting default language

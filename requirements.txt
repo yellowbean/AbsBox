@@ -12,3 +12,4 @@ toolz
 lenses
 rich
 graphviz
+dateparser
