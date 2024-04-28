@@ -22,7 +22,7 @@ def readToCf(xs, header=None, idx=None, sort_index=False) -> pd.DataFrame:
 
     return r
 
-def readBondsCf(bMap, popColumns=["factor","memo"]) -> pd.DataFrame:
+def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注"]) -> pd.DataFrame:
     def filterCols(xs, columnsToKeep):
         return [ _[columnsToKeep] for _ in xs ]
    
@@ -35,7 +35,7 @@ def readBondsCf(bMap, popColumns=["factor","memo"]) -> pd.DataFrame:
     df.columns = header
     return df
 
-def readFeesCf(fMap, popColumns=["due"]) -> pd.DataFrame:
+def readFeesCf(fMap, popColumns=["due","剩余支付"]) -> pd.DataFrame:
     def filterCols(xs, columnsToKeep):
         return [ _[columnsToKeep]  for _ in xs ]
     

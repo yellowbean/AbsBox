@@ -408,6 +408,8 @@ def isMixedDeal(x: dict) -> bool:
     ''' check if pool of deals has mixed asset types'''    
     if 'assets' in x or 'cashflow' in x:
         return False
+    if '清单' in x or '归集表' in x:
+        return False
     if 'deals' in x:
         return False
     assetTags = query(x, [S.MVALS, S.ALL, 'assets', S.FIRST, S.FIRST])

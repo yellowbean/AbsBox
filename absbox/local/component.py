@@ -891,7 +891,7 @@ def mkAction(x:list):
 
 def mkStatus(x: tuple|str):
     match x:
-        case "摊销" | "Amortizing":
+        case "摊销" | "Amortizing" | "摊还":
             return mkTag(("Amortizing"))
         case "循环" | "Revolving":
             return mkTag(("Revolving"))
@@ -1013,7 +1013,7 @@ def mkWaterfall(r, x):
             _w_tag = f"DistributionDay Revolving"
         case ("兑付日", _st) | ("amortizing", _st):
             _w_tag = f"DistributionDay {mapping.get(_st, _st)}"
-        case "兑付日" | "未违约" | "amortizing" | "Amortizing":
+        case "兑付日" | "未违约" | "amortizing" | "Amortizing" | "摊销":
             _w_tag = f"DistributionDay Amortizing"
         case "清仓回购" | "cleanUp":
             _w_tag = "CleanUp"
