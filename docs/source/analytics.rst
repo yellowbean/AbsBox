@@ -1126,9 +1126,6 @@ User have the option to view multiple cashflow in a single dataframe,with column
   :alt: readBondsCf
 
 
-
-
-
 Fee Cashflow
 ^^^^^^^^^^^^^^
 
@@ -1144,6 +1141,12 @@ Account Cashflow
 
    r['accounts'].keys() # all account names
    r['accounts']['acc01'] 
+
+
+.. note::  Getting Multiple Items in same category
+
+  User has the option to view multiple fees  or multiple bonds ,multiple accounts in a single dataframe. -> :ref:`View Multiple cashflow`
+
 
 
 Pool Cashflow 

@@ -9,7 +9,7 @@ import pandas as pd
 import toolz as tz
 import logging
 from absbox.local.base import china_cumStats, english_cumStats,english_non_balance_flow,china_non_balance_flow
-
+from absbox import readFlowsByScenarios
 
 """
  chinese character issue.
@@ -73,13 +73,13 @@ def plotPool(p:pd.DataFrame):
 
     plt.show()
 
+
 def plotFlowByScenarios(rs:dict, path):
     """ Plot time series balance on return of multi-scenario/multi-structure """
 
-    grpNames = list(rs.keys())
-
-    flows =  tz.valmap(lambda x: x & path.get() , rs)
-
+    df = readFlowsByScenarios(rs, path)
+    
+    return df
 
 
 def plot_bond(rs, bnd, flow='本息合计'):
