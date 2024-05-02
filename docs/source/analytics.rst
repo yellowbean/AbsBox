@@ -1386,7 +1386,8 @@ To access same component from different sceanrio :
   {k: v['accounts']["reserve_account_01"] for k,v in r.items() }
 
   
-
+.. seealso::
+  There are couple built-in functions will help user to get result in easier way :ref:`Read Multiple Result Map`
 
 Plotting
 -------------------------
