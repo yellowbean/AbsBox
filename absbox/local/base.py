@@ -13,12 +13,17 @@ china_cumStats = ["累计还款", "累计早偿", "累计拖欠", "累计违约"
 english_cumStats = ["CumPrincipal", "CumPrepay", "CumDelinq", "CumDefault", "CumRecovery", "CumLoss"]
 
 # Pool
-## mortgage
-china_mortgage_flow_fields = ["余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失金额", "利率", "债务人数量","早偿手续费"]
-english_mortgage_flow_fields = ["Balance", "Principal", "Interest", "Prepayment", "Default", "Recovery", "Loss", "WAC","BorrowerNum","PrepayPenalty"]
 
-china_mortgage_delinq_flow_fields = ["余额", "本金", "利息", "早偿金额", "拖欠金额", "违约金额", "回收金额", "损失金额", "利率", "债务人数量","早偿手续费"]
-english_mortgage_delinq_flow_fields = ["Balance", "Principal", "Interest", "Prepayment", "Delinquency", "Default", "Recovery", "Loss", "WAC","BorrowerNum","PrepayPenalty"]
+## Non Balance flow
+china_non_balance_flow = [ "利率","债务人数量","早偿手续费"]
+english_non_balance_flow = [ "WAC","BorrowerNum","PrepayPenalty"]
+
+## mortgage
+china_mortgage_flow_fields = ["余额", "本金", "利息", "早偿金额", "违约金额", "回收金额", "损失金额"]+ china_non_balance_flow
+english_mortgage_flow_fields = ["Balance", "Principal", "Interest", "Prepayment", "Default", "Recovery", "Loss"]+english_non_balance_flow
+
+china_mortgage_delinq_flow_fields = ["余额", "本金", "利息", "早偿金额", "拖欠金额", "违约金额", "回收金额", "损失金额"]+ china_non_balance_flow
+english_mortgage_delinq_flow_fields = ["Balance", "Principal", "Interest", "Prepayment", "Delinquency", "Default", "Recovery", "Loss"]+english_non_balance_flow
 
 china_mortgage_flow_fields_d = ["日期"]+ china_mortgage_flow_fields
 english_mortgage_flow_fields_d = ["Date"] + english_mortgage_flow_fields

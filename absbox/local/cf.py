@@ -62,3 +62,13 @@ def readAccsCf(aMap, popColumns=["memo"]) -> pd.DataFrame:
     df = pd.concat(filterCols(list(aMap.values()),columns),axis=1)
     df.columns = header
     return df
+
+def readFlowsByScenarios(rs:dict, path, fullName=True) -> pd.DataFrame:
+    "read time-series balance from multi scenario or mult-structs"
+    
+    flows = tz.valmap(lambda x: x & path.get(), rs)
+    
+    if fullName:
+        flows = tz.itemmap(lambda kv: (kv[0],kv[1].rename(f"{kv[0]}:{kv[1].name}"))   ,flows)
+    
+    return pd.concat(flows.values(),axis=1)

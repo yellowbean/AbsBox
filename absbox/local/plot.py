@@ -6,7 +6,21 @@ from pyspecter import query
 from functools import reduce
 import numpy as np
 import pandas as pd
+import toolz as tz
 import logging
+from absbox.local.base import china_cumStats, english_cumStats,english_non_balance_flow,china_non_balance_flow
+
+
+"""
+ chinese character issue.
+
+ https://github.com/Clarmy/mplfonts
+ 
+ from mplfonts import use_font
+ use_font('Noto Serif CJK SC')
+
+    
+"""
 
 dmap = {
     "cn":{
@@ -19,7 +33,7 @@ dmap = {
 
 
 def init_plot_fonts():
-    define_list = ['Source Han Serif CN', 'Microsoft Yahei', 'STXihei']
+    define_list = ['Source Han Serif CN', 'Microsoft Yahei', 'STXihei','Heiti TC']
     support_list = font_manager.findSystemFonts(fontpaths=None, fontext='ttf')
     font_p = font_manager.FontProperties()
     try:
@@ -34,6 +48,38 @@ def init_plot_fonts():
         return None
 
 font_p = init_plot_fonts()
+
+def plotPool(p:pd.DataFrame):
+    """ Plot the pool flows """
+
+    dates = p.index.to_list()
+
+    #remove cumut stats
+    fieldsToRemove = set(china_cumStats+english_cumStats+china_non_balance_flow+english_non_balance_flow)
+    
+    flows = tz.pipe(p.fillna(0)
+                    ,p.to_dict(orient='list')
+                    ,lambda x: tz.keyfilter( lambda y: y not in fieldsToRemove , x)
+    )
+
+
+    fig, ax = plt.subplots()
+    ax.stackplot(dates, flows.values(),
+                labels= flows.keys(), alpha=0.8)
+    ax.legend(loc='upper right', reverse=True)
+    ax.set_title('Pool Flows')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Balance')
+
+    plt.show()
+
+def plotFlowByScenarios(rs:dict, path):
+    """ Plot time series balance on return of multi-scenario/multi-structure """
+
+    grpNames = list(rs.keys())
+
+    flows =  tz.valmap(lambda x: x & path.get() , rs)
+
 
 
 def plot_bond(rs, bnd, flow='本息合计'):
