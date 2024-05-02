@@ -72,3 +72,16 @@ def readFlowsByScenarios(rs:dict, path, fullName=True) -> pd.DataFrame:
         flows = tz.itemmap(lambda kv: (kv[0],kv[1].rename(f"{kv[0]}:{kv[1].name}"))   ,flows)
     
     return pd.concat(flows.values(),axis=1)
+
+def readMultiFlowsByScenarios(rs:dict, _path, fullName=True) -> pd.DataFrame:
+    "read multi time-series from multi scenario or mult-structs"
+    
+    (path,cols) = _path
+    _flows = tz.valmap(lambda x: x & path.get(), rs)
+    flows = tz.valmap(lambda df: df[cols],_flows)
+    scenarioNames = list(flows.keys())
+    header = pd.MultiIndex.from_product([ scenarioNames ,cols], names =['Scenario',"Field"])
+
+    df = pd.concat( list(flows.values()) ,axis=1)
+    df.columns = header
+    return df
