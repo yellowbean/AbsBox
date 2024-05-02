@@ -211,6 +211,7 @@ Bond
     * ``("bondBalance",)`` -> sum of all bond balance
     * ``("bondBalance","A","B"...)`` -> sum of balance of bond A and bond B
     * ``("originalBondBalance",)`` -> bond balance at issuance
+    * ``("originalBondBalance","A","B")`` -> bond balance at issuance of "A" and "B" 
     * ``("bondFactor",)``  -> bond factor
     * ``("bondDueInt","A","B")``  -> bond due interest for bond A and bond B
     * ``("lastBondIntPaid","A")``  -> bond last paid interest
@@ -226,10 +227,10 @@ Pool
     * ``("cumPoolDefaultedBalance",)``  -> pool cumulative defaulted balance 
     * ``("cumPoolNetLoss",)`` -> pool cumulative pool net loss balance
     * ``("cumPoolRecoveries",)`` -> pool cumulative recoveries
-    * ``("cumPoolCollection", <field1>,<field2>....)`` -> pool cumulative on <field...> fields :ref:`Pool Sources`
-    * ``("cumPoolCollectionTill", N,<field1>,<field2>....)`` -> pool cumulative on <field...> fields till Period N :ref:`Pool Sources`
-    * ``("curPoolCollection", <field1>,<field2>...)``   -> pool current sum of fields
-    * ``("curPoolCollectionTill", N,<field1>,<field2>...)``   -> pool current sum of fields till Period N
+    * ``("cumPoolCollection", None, <field1>,<field2>....)`` -> pool cumulative on <field...> fields :ref:`Pool Sources`
+    * ``("cumPoolCollectionTill", None, N,<field1>,<field2>....)`` -> pool cumulative on <field...> fields till Period N :ref:`Pool Sources`
+    * ``("curPoolCollection", None, <field1>,<field2>...)``   -> pool current sum of fields
+    * ``("curPoolCollectionTill", None, N,<field1>,<field2>...)``   -> pool current sum of fields till Period N
   
 .. versionadded:: 0.24.1
 

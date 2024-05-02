@@ -1078,3 +1078,11 @@ A string
 ^^^^^^^^^^^^^^^
 
 Now with that string, user can just write it into a No-SQL document database . or sent via Email , or Fax it .
+
+
+How to use Deal JSON string 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The JSON string from `.json()` method can be used as part of post request send to `Hastructure` engine.
+
+But unfortunately there is no way convert the string back to python class so far.

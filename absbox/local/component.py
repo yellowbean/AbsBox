@@ -178,7 +178,9 @@ def mkDs(x):
             return mkTag("CurrentBondBalance")
         case ("债券余额", *bnds) | ("bondBalance", *bnds):
             return mkTag(("CurrentBondBalanceOf", vList(bnds, str)))
-        case ("初始债券余额",) | ("originalBondBalance",):
+        case ("初始债券余额",*bnds) | ("originalBondBalance",*bnds):
+            if bnds:
+                return mkTag("OriginalBondBalanceOf", vList(bnds, str))
             return mkTag("OriginalBondBalance")
         case ("到期月份", bn) | ("monthsTillMaturity", bn):
             return mkTag(("MonthsTillMaturity", vStr(bn)))
@@ -247,7 +249,7 @@ def mkDs(x):
         case ("资产池系数", *pNames) | ("poolFactor", *pNames):
             if pNames:
                 return mkTag(("PoolFactor", lmap(mkPid,pNames)))
-            return mkTag("PoolFactor")
+            return mkTag(("PoolFactor", None))
         case ("债券利率", bn) | ("bondRate", bn):
             return mkTag(("BondRate", vStr(bn)))
         case ("债券加权利率", *bn) | ("bondWaRate", *bn):
@@ -306,6 +308,8 @@ def mkDs(x):
             return mkTag(("AccTxnAmt", [ans, cmt]))
         case ("系数", ds, f) | ("factor", ds, f) | ("*", ds, f) if isinstance(f, float):
             return mkTag(("Factor", [mkDs(ds), f]))
+        case ("*", *ds):
+            return mkTag(("Multiply", lmap(mkDs, ds)))
         case ("Min", *ds) | ("min", *ds):
             return mkTag(("Min", lmap(mkDs, ds)))
         case ("Max", *ds) | ("max", *ds):
