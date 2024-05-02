@@ -8,3 +8,4 @@ Run Deals
    viewMultipleCfs
    multiAsset
    triggers
+   re_securitization_example

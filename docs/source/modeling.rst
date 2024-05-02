@@ -1354,7 +1354,7 @@ Receivable
 
 .. versionadded:: 0.26.5
 
-``Receivable`` is a type of asset which has a fixed amount of receivable in last period, with optional fee collected at end
+``Receivable`` is a type of asset which has a fixed amount of receivable in last period, with optional fee collected at end. It may represent `Invoice` , `Account Receivable` , `Trade Receivable` in the real world.
 
 * if No fee was set, the receivable will be paid off at last period without fee.
 * if there are multiple fee being setup, then ALL fees are sum up and paid off at last period.
