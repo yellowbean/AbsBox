@@ -2201,6 +2201,14 @@ PayIntResidual
   
     The ``<Limit>`` :ref:`<limit>`
 
+PayPrintWithDue
+  .. versionadded:: 0.27.32
+  pay principal to bond till principal due amount. Make sure to run `Calc Bond Principal Due` before this action
+
+  syntax
+    ``["payPrinWithDue", {Account}, [<Bond>]]``
+
+
 WriteOff
   .. versionadded:: 0.26.1
   write off the bond balance ,with option to set a limit amount to write off
