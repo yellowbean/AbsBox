@@ -5,3 +5,4 @@ Model Examples
     :maxdepth: 0
 
    SRT_Example_Native_Prod
+   debug_sample

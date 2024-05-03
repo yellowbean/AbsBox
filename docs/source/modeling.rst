@@ -2058,6 +2058,67 @@ Pay Fee Residual
 Bond
 ^^^^^^
 
+.. list-table:: cheatsheet-bond-action
+   :header-rows: 1
+
+   * - Action Name
+     - Accrue?
+     - Pay?
+     - Multiple Bonds?
+   * - ``calcInt``
+     - Yes, accure Interest
+     - Won't pay cash
+     - Yes
+   * - ``calcIntBy``
+     - Yes, accure Interest
+     - Won't pay cash
+     - No
+   * - ``payInt``
+     - No
+     - Yes, pay till due interest is 0
+     - Yes, pro-rata
+   * - ``payIntBySeq``
+     - No
+     - Yes, pay till due interest is 0
+     - Yes, sequentially
+   * - ``accrueAndPayInt``
+     - Yes
+     - Yes, pay till due interest is 0
+     - Yes, pro-rata
+   * - ``accrueAndPayIntBySeq``
+     - Yes
+     - Yes, pay till due interest is 0
+     - Yes, sequentially
+   * - ``payIntResidual``
+     - No
+     - Yes, pay regardless the due interest
+     - No
+   * - ``calcBondPrin``
+     - Yes, accrue due principal
+     - No
+     - Yes, pro-rata
+   * - ``payPrin``
+     - Yes, accrue due principal
+     - Yes, pay till due principal is 0
+     - Yes, pro-rata
+   * - ``payPrinBySeq``
+     - Yes, accrue due principal
+     - Yes, pay till due principal is 0
+     - Yes, sequentially
+   * - ``payPrinResidual``
+     - No
+     - Yes, pay regardless the due principal
+     - No
+   * - ``payPrinWithDue``
+     - No
+     - Yes, pay till due principal is 0
+     - Yes, pro-rata
+
+
+
+
+
+
 Calc Bond Int
   calculate the due interest of a bond
     
