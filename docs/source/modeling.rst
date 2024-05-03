@@ -2223,7 +2223,19 @@ FundWith
 
     The ``<Limit>`` :ref:`<limit>`
 
+Calc Bond Principal Due 
+  .. versinoadded:: 0.27.32
+  calculate the principal due amount 
 
+  syntax 
+    ``["calcBondPrin", <Account>, [<Bond>]]``
+    
+    ``["calcBondPrin", <Account>, [<Bond>], m ]``
+    
+    `m`is just amp same in the `payFee` , which has keys :
+
+      * ``limit`` -> :ref:`<limit>`
+      * ``support`` -> :ref:`<support>`
 
 Account
 ^^^^^^^^^
