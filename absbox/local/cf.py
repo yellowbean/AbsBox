@@ -33,7 +33,7 @@ def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注"]) -> p
                                         , names=['Bond',"Field"])
     df = pd.concat(filterCols(bMap.values(), columns),axis=1)
     df.columns = header
-    return df
+    return df.sort_index()
 
 def readFeesCf(fMap, popColumns=["due","剩余支付"]) -> pd.DataFrame:
     def filterCols(xs, columnsToKeep):
