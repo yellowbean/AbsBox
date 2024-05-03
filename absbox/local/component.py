@@ -178,6 +178,8 @@ def mkDs(x):
             return mkTag("CurrentBondBalance")
         case ("债券余额", *bnds) | ("bondBalance", *bnds):
             return mkTag(("CurrentBondBalanceOf", vList(bnds, str)))
+        case ("债券应付本金", *bnds) | ("bondDuePrin", *bnds):
+            return mkTag(("BondDuePrin", vList(bnds, str)))
         case ("初始债券余额",*bnds) | ("originalBondBalance",*bnds):
             if bnds:
                 return mkTag("OriginalBondBalanceOf", vList(bnds, str))
@@ -831,6 +833,13 @@ def mkAction(x:list):
             return mkTag(("PayPrinBySeq", [l, vStr(source), vList(target, str), s]))
         case ["顺序支付本金", source, target] | ["payPrinBySeq", source, target]:
             return mkTag(("PayPrinBySeq", [None, vStr(source), vList(target, str), None]))
+        case ["计提应付本金", source, target, m] | ["calcBondPrin", source, target, m]:
+            (l, s) = mkMod(m)
+            return mkTag(("CalcBondPrin", [l, vStr(source), vList(target, str),s]))
+        case ["计提应付本金", source, target] | ["calcBondPrin", source, target]:
+            return mkTag(("CalcBondPrin", [None, vStr(source), vList(target, str),None]))
+        case ["支付计提本金", source, target] | ["payPrinWithDue", source, target]:
+            return mkTag(("PayPrinWithDue", [vStr(source), vList(target, str), None])) 
         case ["支付本金", source, target, m] | ["payPrin", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("PayPrin", [l, vStr(source), vList(target, str), s]))
