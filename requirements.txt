@@ -13,3 +13,4 @@ lenses
 rich
 graphviz
 dateparser
+pyxirr
