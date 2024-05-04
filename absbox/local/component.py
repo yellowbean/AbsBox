@@ -1764,8 +1764,6 @@ def readRunSummary(x, locale) -> dict:
     bndSummary = pd.DataFrame(columns=bndStatus[locale], index=list(bndNames))
 
     for bn, amt_type, amt, begBal in bond_defaults:
-        #bndSummary.loc[bn][_fmap[locale][amt_type]] = amt
-        #bndSummary.loc[bn][bndStatus[locale][2]] = begBal
         bndSummary.loc[bn, _fmap[locale][amt_type]] = amt
         bndSummary.loc[bn, bndStatus[locale][2]] = begBal
     
@@ -1777,7 +1775,8 @@ def readRunSummary(x, locale) -> dict:
     ## Build status change logs
     status_change_logs = [(_['contents'][0], readStatus(_['contents'][1], locale), readStatus(_['contents'][2], locale))
                           for _ in filter_by_tags(x, ["DealStatusChangeTo"])]
-    r['status'] = pd.DataFrame(data=status_change_logs, columns=dealStatusLog[locale])
+    deal_ended_log = [ (_['contents'][0],"DealEnd",_['contents'][1]) for _ in filter_by_tags(x, ["EndRun"])]
+    r['status'] = pd.DataFrame(data=status_change_logs+deal_ended_log, columns=dealStatusLog[locale])
 
     # inspection variables
     def uplift_ds(df:pd.DataFrame) -> pd.DataFrame:

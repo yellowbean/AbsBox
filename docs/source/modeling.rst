@@ -312,6 +312,10 @@ Combination Type
     * ``("factor", <Formula>, <Number>)`` -> multiply <Number> to a formula
 
       * ``("*", <Formula>, <Number>)`` same
+
+      .. versionadded:: 0.27.35
+      * ``("*", <Formula 1>, <Formula 2>)`` multiply 2 formulas
+      
     * ``("max", <Formula>, <Formula>, ...)`` -> get the higher value in the list
     * ``("min", <Formula>, <Formula>, ...)`` -> get the lower value in the list
     * ``("sum", <Formula>, <Formula>, ...)`` -> sum of formula values

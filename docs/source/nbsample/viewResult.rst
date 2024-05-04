@@ -6,3 +6,4 @@ View Result
 
     viewMultipleCfs
     viewMultiResult
+    HowDealEnded
