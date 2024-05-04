@@ -61,6 +61,69 @@ With starting ``("Mortgage","Delinq",...)`` the engine treat this as identifier 
 It is scalable if more assumption type comming in.
 
 
+Deal Run Cycle 
+--------------------
+
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: deal run cycle
+    :alt: deal run cycle
+    :align: center
+    
+    digraph G {
+
+      subgraph cluster_0 {
+        style=filled;
+        color=lightgrey;
+        node [style=filled,color=white];
+        PoolCollectionByRule -> DepositToAccounts -> RunTriggers_EndOfCollection -> EndCollecitonAction -> RunTriggers_EndOfCollectionWF;
+        label = "Pool Collection #1";
+      }
+      
+      RunTriggers_EndOfCollectionWF -> nextAction;
+
+      subgraph cluster_1 {
+        node [style=filled];
+        testTriggers_BeforeWaterfall -> RunWaterfallActionsByDealStatus;
+        RunWaterfallActionsByDealStatus -> testTriggers_AfterWaterfall -> testCallOptions;
+        label = "Run Waterfall #2";
+        color=blue
+      }
+      
+      testCallOptions [shape=diamond] 
+      
+      testCallOptions -> cleanUpActions [label="True"];
+      testCallOptions -> nextAction [label="False"];
+      
+      subgraph cluster_2 {
+        node [style=filled];
+        cleanUpActions;
+        label = "Clean Up Waterfall #3";
+        color=blue
+      }
+      cleanUpActions 
+      
+
+      
+      start -> PoolCollectionByRule;
+      start -> testTriggers_BeforeWaterfall;
+
+      
+      cleanUpActions -> end;
+
+
+      start [shape=Mdiamond];
+      
+      start -> end [label="No more pool cashflow"];
+      start -> end [label="No more action dates"];
+      start -> end [label="Reach stated maturity date"];
+      
+      end [shape=Msquare];
+    }
+
+
+
 Why so many list tuples and maps in deal model
 ---------------------------------------------------
 

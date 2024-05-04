@@ -893,6 +893,9 @@ When the deal was trigger for a run:
 * Feed pool cashflow to waterfall
 * Waterfall distributes the fund to bonds, expenses, etc.
 
+.. seealso::
+  A flow chart may be helpful -> :ref:`Deal Run Cycle`
+
 params:
    * ``deal`` : a deal instance
    * ``poolAssump`` : pool performance assumption, passing a map if run with multi scenaro mode
