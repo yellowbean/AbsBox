@@ -306,7 +306,7 @@ def mkDs(x):
             return mkTag(("FeeTxnAmt", [fns, cmt]))
         case ("债券支付总额", cmt, *bns) | ("bondTxnAmount", cmt, *bns):
             return mkTag(("BondTxnAmt", [bns, cmt]))
-        case ("账户变动总额", cmt, *ans) | ("accountTxnAmount", cmt, *ans):
+        case ("账户变动总额", cmt, *ans) | ("accountTxnAmount", cmt, *ans) | ("accountTxnAmt", cmt, *ans):
             return mkTag(("AccTxnAmt", [ans, cmt]))
         case ("系数", ds, f) | ("factor", ds, f) | ("*", ds, f) if isinstance(f, float):
             return mkTag(("Factor", [mkDs(ds), f]))
@@ -836,8 +836,8 @@ def mkAction(x:list):
         case ["计提应付本金", source, target, m] | ["calcBondPrin", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("CalcBondPrin", [l, vStr(source), vList(target, str),s]))
-        case ["计提应付本金", source, target] | ["calcBondPrin", source, target]:
-            return mkTag(("CalcBondPrin", [None, vStr(source), vList(target, str),None]))
+        case ["计提应付本金", target, limit] | ["calcBondPrin", target, limit]:
+            return mkTag(("CalcBondPrin2", [mkLimit(limit), vList(target, str)]))
         case ["支付计提本金", source, target] | ["payPrinWithDue", source, target]:
             return mkTag(("PayPrinWithDue", [vStr(source), vList(target, str), None])) 
         case ["支付本金", source, target, m] | ["payPrin", source, target, m]:
