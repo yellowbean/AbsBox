@@ -38,12 +38,13 @@ dependencies = [
     "dateparser"
 ]
 
-keywords = ["cashflow", "abs", "mbs", "cashflow model", "rmbs" ,"clo", "cashflow engine","structuring"]
+keywords = ["cashflow", "abs", "mbs", "cashflow model", "rmbs" ,"clo", "cashflow engine","structuring", "srt"]
 
 [project.urls]
 homepage = "https://absbox.org"
 documentation = "https://absbox-doc.readthedocs.io/en/latest/"
 repository = "https://github.com/yellowbean/AbsBox/"
+changelog = "https://github.com/yellowbean/AbsBox/blob/main/CHANGES.md"
 
 
 
