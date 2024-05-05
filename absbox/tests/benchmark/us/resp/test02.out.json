@@ -4,7 +4,7 @@
     "contents": {
       "name": "Multiple Waterfall",
       "status": {
-        "tag": "Ended"
+        "tag": "Amortizing"
       },
       "dates": {
         "tag": "PreClosingDates",
@@ -9435,7 +9435,7 @@
           "bndRate": 0.07,
           "bndDuePrin": 0,
           "bndDueInt": 0,
-          "bndDueIntDate": "2029-12-20",
+          "bndDueIntDate": "2022-10-20",
           "bndLastIntPay": "2022-10-20",
           "bndLastPrinPay": null,
           "bndStmt": [
@@ -9723,7 +9723,7 @@
           "bndRate": 0.07,
           "bndDuePrin": 0,
           "bndDueInt": 0,
-          "bndDueIntDate": "2029-12-20",
+          "bndDueIntDate": "2022-10-20",
           "bndLastIntPay": "2022-10-20",
           "bndLastPrinPay": null,
           "bndStmt": [
@@ -12087,6 +12087,13 @@
         {
           "tag": "Amortizing"
         }
+      ]
+    },
+    {
+      "tag": "EndRun",
+      "contents": [
+        "2030-01-01",
+        "Stop: Stated Maturity"
       ]
     }
   ],

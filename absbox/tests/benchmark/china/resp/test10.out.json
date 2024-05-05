@@ -1516,6 +1516,13 @@
     {
       "tag": "WarningMsg",
       "contents": "Bond B is not paid off"
+    },
+    {
+      "tag": "EndRun",
+      "contents": [
+        "2022-03-26",
+        "Stop: Stated Maturity"
+      ]
     }
   ],
   null

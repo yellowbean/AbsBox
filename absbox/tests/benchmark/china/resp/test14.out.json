@@ -4,7 +4,7 @@
     "contents": {
       "name": "\u7b2c\u4e09\u65b9\u589e\u4fe1",
       "status": {
-        "tag": "Ended"
+        "tag": "Amortizing"
       },
       "dates": {
         "tag": "PreClosingDates",
@@ -60780,7 +60780,7 @@
           "bndRate": 0.065,
           "bndDuePrin": 0,
           "bndDueInt": 0,
-          "bndDueIntDate": "2060-11-26",
+          "bndDueIntDate": "2023-10-26",
           "bndLastIntPay": "2023-10-26",
           "bndLastPrinPay": null,
           "bndStmt": [
@@ -81925,6 +81925,13 @@
         {
           "tag": "Amortizing"
         }
+      ]
+    },
+    {
+      "tag": "EndRun",
+      "contents": [
+        "2060-12-01",
+        "Stop: Stated Maturity"
       ]
     }
   ],

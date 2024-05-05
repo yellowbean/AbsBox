@@ -5505,7 +5505,7 @@
           "bndRate": 0.026,
           "bndDuePrin": 0,
           "bndDueInt": 0,
-          "bndDueIntDate": "2025-05-01",
+          "bndDueIntDate": "2023-03-26",
           "bndLastIntPay": "2023-03-26",
           "bndLastPrinPay": null,
           "bndStmt": [
@@ -8131,6 +8131,13 @@
         {
           "tag": "Amortizing"
         }
+      ]
+    },
+    {
+      "tag": "EndRun",
+      "contents": [
+        "2025-05-01",
+        "No Pool Cashflow/All Account is zero/Not revolving"
       ]
     }
   ],

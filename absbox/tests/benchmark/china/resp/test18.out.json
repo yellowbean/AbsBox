@@ -4,7 +4,8 @@
     "contents": {
       "name": "\u672a\u6ee1\u8db3\u644a\u8fd8\u76ee\u6807\u7684\u52a0\u901f\u6e05\u507f\u4e8b\u4ef6",
       "status": {
-        "tag": "Ended"
+        "tag": "DealAccelerated",
+        "contents": null
       },
       "dates": {
         "tag": "PreClosingDates",
@@ -25773,7 +25774,7 @@
           "bndRate": 0.07,
           "bndDuePrin": -80,
           "bndDueInt": 0,
-          "bndDueIntDate": "2060-11-26",
+          "bndDueIntDate": "2022-12-26",
           "bndLastIntPay": "2060-11-26",
           "bndLastPrinPay": null,
           "bndStmt": [
@@ -27412,6 +27413,13 @@
           "tag": "DealAccelerated",
           "contents": null
         }
+      ]
+    },
+    {
+      "tag": "EndRun",
+      "contents": [
+        "2060-12-01",
+        "Stop: Stated Maturity"
       ]
     }
   ],
