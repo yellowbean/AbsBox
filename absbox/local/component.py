@@ -302,9 +302,9 @@ def mkDs(x):
             return mkTag(("CurrentDueFee", fns))
         case ("已付费用", *fns) | ("lastFeePaid", *fns):
             return mkTag(("LastFeePaid", fns))
-        case ("费用支付总额", cmt, *fns) | ("feeTxnAmount", cmt, *fns):
+        case ("费用支付总额", cmt, *fns) | ("feeTxnAmount", cmt, *fns) | ("feeTxnAmt", cmt, *fns):
             return mkTag(("FeeTxnAmt", [fns, cmt]))
-        case ("债券支付总额", cmt, *bns) | ("bondTxnAmount", cmt, *bns):
+        case ("债券支付总额", cmt, *bns) | ("bondTxnAmount", cmt, *bns) | ("bondTxnAmt", cmt, *bns):
             return mkTag(("BondTxnAmt", [bns, cmt]))
         case ("账户变动总额", cmt, *ans) | ("accountTxnAmount", cmt, *ans) | ("accountTxnAmt", cmt, *ans):
             return mkTag(("AccTxnAmt", [ans, cmt]))
