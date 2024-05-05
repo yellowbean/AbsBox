@@ -27,6 +27,8 @@ def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注"]) -> p
         return [ _[columnsToKeep] for _ in xs ]
    
     bondNames = list(bMap.keys())
+    if not bondNames:
+        return pd.DataFrame()
     bondColumns = bMap[bondNames[0]].columns.to_list()
     columns = list(filter(lambda x: x not in set(popColumns), bondColumns))
     header = pd.MultiIndex.from_product([bondNames,columns]
