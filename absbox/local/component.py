@@ -182,7 +182,7 @@ def mkDs(x):
             return mkTag(("BondDuePrin", vList(bnds, str)))
         case ("初始债券余额",*bnds) | ("originalBondBalance",*bnds):
             if bnds:
-                return mkTag("OriginalBondBalanceOf", vList(bnds, str))
+                return mkTag(("OriginalBondBalanceOf", vList(bnds, str)))
             return mkTag("OriginalBondBalance")
         case ("到期月份", bn) | ("monthsTillMaturity", bn):
             return mkTag(("MonthsTillMaturity", vStr(bn)))
