@@ -274,7 +274,7 @@ def mkDs(x):
             return mkTag(("CurrentDueBondInt", vList(bnds, str)))
         case ("债券当期已付利息", *bnds) | ("lastBondIntPaid", *bnds):
             return mkTag(("LastBondIntPaid", vList(bnds, str)))
-        case ("债券当期已付本金", *bnds) | ("lastBondIntPaid", *bnds):
+        case ("债券当期已付本金", *bnds) | ("lastBondPrinPaid", *bnds):
             return mkTag(("LastBondPrinPaid", vList(bnds, str)))
         case ("债券低于目标余额", bn) | ("behindTargetBalance", bn):
             return mkTag(("BondBalanceGap", vStr(bn)))

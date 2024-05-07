@@ -1,5 +1,5 @@
 import pandas as pd 
-import finance_calculator as fc
+from pyxirr import xirr
 from absbox.local.base import china_bondflow_fields_s, english_bondflow_fields_s
 from absbox.validation import vStr
 import numpy as np
@@ -39,8 +39,7 @@ def irr(flow: pd.DataFrame, init):
     dates = [invest_date]+dates
     amounts = [invest_amount]+amounts
     
-    #return xirr(np.array(dates), np.array(amounts))
-    return fc.get_xirr([(d, a) for d, a in zip(dates, amounts)])/100
+    return xirr(dates,amounts)
 
 
 def sum_fields_to_field(df: pd.DataFrame, cols: list, col: str):
