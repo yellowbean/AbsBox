@@ -214,7 +214,8 @@ Bond
     * ``("originalBondBalance","A","B")`` -> bond balance at issuance of "A" and "B" 
     * ``("bondFactor",)``  -> bond factor
     * ``("bondDueInt","A","B")``  -> bond due interest for bond A and bond B
-    * ``("lastBondIntPaid","A")``  -> bond last paid interest
+    * ``("lastBondIntPaid","A")``  -> sum amount of last paid interest for bonds
+    * ``("lastBondPrinPaid","A")`` -> sum amount of last paid principal for bonds
     * ``("behindTargetBalance","A")``  -> difference of target balance with current balance for the bond A
     * ``("bondTxnAmt", None,"A")``  -> Total transaction amount of bond 'A'
     * ``("bondTxnAmt", "<PayInt:A>","A")``  -> Total transaction amount of interest payment bond 'A'
