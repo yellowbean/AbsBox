@@ -7,3 +7,4 @@ View Result
     viewMultipleCfs
     viewMultiResult
     HowDealEnded
+    bond_pricing

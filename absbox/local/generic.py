@@ -90,7 +90,8 @@ class Generic:
                 ir = None
                 if x[comp_v[0]]:
                     ir = list(tz.pluck('contents', x[comp_v[0]]))
-                    if comp_v[0]=='bndStmt' and len(ir[0])==7:  #backward compatibility: bond factor
+                    if comp_v[0]=='bndStmt' and len(ir[0])==7:  
+                        #backward compatibility: bond factor
                         legacy_bond_stmt_col = comp_v[1][:6]+[comp_v[1][-1]]
                         output[comp_name][k] = pd.DataFrame(ir, columns=legacy_bond_stmt_col).set_index("date")
                     else:

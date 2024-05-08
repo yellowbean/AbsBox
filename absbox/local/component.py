@@ -1726,8 +1726,18 @@ def readPricingResult(x, locale) -> dict | None:
     else:
         raise RuntimeError(f"Failed to read princing result: {x} with tag={tag}")
 
-    #return pd.DataFrame.from_dict({k: v['contents'] for k, v in x.items()}, orient='index', columns=h[locale]).sort_index()
-    return pd.DataFrame.from_dict(tz.valmap(lambda y:y['contents'],x), orient='index', columns=h[locale]).sort_index()
+    # 
+    if (v:=list(x.values())):
+        if len(v[0]['contents'])==6:
+            return pd.DataFrame.from_dict(tz.valmap(lambda y:y['contents'],x)
+                                  , orient='index', columns=h[locale]).sort_index()
+
+    pricingResult = pd.DataFrame.from_dict(tz.valmap(lambda y:y['contents'][:-1],x)
+                                  , orient='index', columns=h[locale]).sort_index()
+    #
+    return {"summary":pricingResult
+           ,"breakdown":tz.valmap(lambda z: pd.DataFrame( [ _['contents'] for _ in z['contents'][-1]], columns=english_bondflow_fields).set_index("date"), x)
+           }
 
 
 def readPoolCf(x, lang='english'):
