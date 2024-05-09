@@ -182,6 +182,7 @@ DatePattern
 * ``"QuarterEnd"``  -> Every March 31, Jun 30, Sep 30, Dec 31 during the projection
 * ``"YearFirst"`` -> Every Jan 1 during the projection
 * ``"YearEnd"`` -> Every Dec 31 during the projection
+* ``["Weekday",0]`` -> Every Sunday
 * ``["MonthDayOfYear",M,D]`` -> Every a day of the year , like Feb 14 on every year during the projection
 * ``["DayOfMonth",M]`` -> A day of the month , like 15 on each month during the projectionh
 * ``["CustomDate","YYYY-MM-DD1","YYYY-MM-DD2"]`` -> a series of user defined dates
@@ -519,6 +520,7 @@ Period
 
 * ``Daily``
 * ``Weekly``
+* ``BiWeekly``
 * ``Monthly``
 * ``Quarterly`` 
 * ``SemiAnnually``
@@ -1049,11 +1051,14 @@ Mortgage
   * `Level` -> `Annuity`, `French` style
   * `Even` -> `Linear`
   * `I_P` -> interest only till last payment; last payment will cover all oustanding balance 
-  
+
   .. versionadded:: 0.25.1
   
   * `("NO_FirstN",N,<type>)` -> no payment for first N period (capitalized interest), and amortize per `type` following
   * `("IO_FirstN",N,<type>)` -> interest only for first N period, and amortize per `type` following
+
+``freq`` 
+  `freq` -> :ref:`Period`
 
 .. code-block:: python
 
@@ -1310,6 +1315,7 @@ Installment
 ``type``
 
   * ``f_p`` : evenly distributed fee and principal
+  * ``("PO_FirstN", N)`` : the `installment` won't charge fee for first N period
 
 .. code-block:: python
 
@@ -1323,6 +1329,17 @@ Installment
     ,{"status": "Current"
       ,"currentBalance":1000
       ,"remainTerm":10}]
+
+  ["Installment"
+    ,{"originBalance": 1200.0
+    ,"feeRate": ["fix",0.01]
+    ,"originTerm": 12
+    ,"freq": "Monthly"
+    ,"type": ("PO_FirstN", 2)
+    ,"originDate": "2022-01-01"}
+    ,{"status": "Current"
+        ,"currentBalance":1200
+        ,"remainTerm":12}]
 
 Fixed Asset
 ^^^^^^^^^^^^^^^^^
