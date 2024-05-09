@@ -1079,6 +1079,8 @@ def mkAmortPlan(x) -> dict:
             return mkTag("I_P")
         case "等本等费" | "F_P" | "f_p":
             return mkTag("F_P")
+        case ("PO_FirstN", n):
+            return mkTag(("PO_FirstN", n))
         case ("NO_FirstN", n, _pt):
             return mkTag(("NO_FirstN", [n, mkAmortPlan(_pt)]))
         case ("IO_FirstN", n, _pt):
