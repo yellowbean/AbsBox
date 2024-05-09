@@ -1,3 +1,10 @@
+## TODO
+
+
+### FIX
+    * Enable `weekly` and `biWeekly` period in asset
+    * Expose `(PO_FirstN,N)` which will exempt fee for first N period in installment
+
 
 ## 0.27.36
 ### NEW
