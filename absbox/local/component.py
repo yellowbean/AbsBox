@@ -44,6 +44,8 @@ def mkDatePattern(x):
             return mkTag(("CustomDate", _ds))
         case ["EveryNMonth", d, n]:
             return mkTag(("EveryNMonth", [vDate(d), vInt(n)]))
+        case ["Weekday", n] if n >= 0 and n <= 6:
+            return mkTag(("Weekday", vInt(n)))
         case ["All", *_dps] | ["AllDatePattern", *_dps]:
             return mkTag(("AllDatePattern", lmap(mkDatePattern, _dps)))
         case ["After", _d, dp] | ["之后", _d, dp]:
