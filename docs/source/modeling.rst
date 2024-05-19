@@ -2384,6 +2384,7 @@ Accure Interest and Pay of Bond Group
 
   syntax
     ``["accrueAndPayIntByGroup", "A"]``
+
     ``["accrueAndPayIntByGroup", "A", m]``
     
   `m`is just amp same in the `payFee` , which has keys :
@@ -2396,18 +2397,26 @@ Pay Interest to Bond Group
 
   syntax
     ``["payIntByGroup", "A", order]``
+
     ``["payIntByGroup", "A", order, m]``
     
-  `m`is just amp same in the `payFee` , which
+  `m`is just amp same in the `payFee` , which has keys :
+
+    * ``limit`` -> :ref:`<limit>`
+    * ``support`` -> :ref:`<support>`
 
 Pay Principal to Bond Group 
   pay principal to bonds in a group via a order 
 
   syntax
     ``["payPrinByGroup", "A", order]``
+    
     ``["payPrinByGroup", "A", order, m]``
     
-  `m`is just amp same in the `payFee` , which
+  `m`is just amp same in the `payFee` , which has keys :
+
+    * ``limit`` -> :ref:`<limit>`
+    * ``support`` -> :ref:`<support>`
 
 
 Account
