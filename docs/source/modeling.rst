@@ -1920,6 +1920,11 @@ Bond Group
 
 `Bond Group` is just a collection of :ref:`Bonds/Tranches` . User can group senior tranches together into a single group. For example
 
+.. image:: img/bondGroup.png
+  :width: 300
+  :alt: bondGroup
+
+
 .. code-block:: python 
 
     ,(("A",{"A-1":
