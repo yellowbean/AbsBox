@@ -1914,6 +1914,42 @@ Equity
            ,"bondType":{"Equity":None} })
 
 
+Bond Group
+^^^^^^^^^^^^^^
+.. versionadded:: 0.28.1
+
+`Bond Group` is just a collection of :ref:`Bonds/Tranches` . User can group senior tranches together into a single group. For example
+
+.. code-block:: python 
+
+    ,(("A",{"A-1":
+            {"balance":400
+             ,"rate":0.09
+             ,"originBalance":400
+             ,"originRate":0.07
+             ,"startDate":"2021-01-03"
+             ,"rateType":{"Fixed":0.08}
+             ,"bondType":{"Sequential":None}
+             ,"maturityDate":"2025-01-01"}
+            ,"A-2":
+            {"balance":600
+             ,"rate":0.08
+             ,"originBalance":600
+             ,"originRate":0.07
+             ,"startDate":"2020-01-03"
+             ,"rateType":{"Fixed":0.08}
+             ,"bondType":{"Sequential":None}
+            ,"maturityDate":"2026-01-01"}           
+           }))
+
+Why Bond Group?
+""""""""""""""""""
+Here is couple benefits to use bond group:
+
+* Simplify the reference to multiple bonds. For example, there are couple senior bonds A-1 A-2 A-3, user can reference them as a group `A` instead of `A-1` `A-2` `A-3`
+* It offers short cut to paydown by different way: by interst rate, by maturity date, by pro-rata, by bond names.
+* In the future, it may offer a way to issue new bonds.( New bond will be inserted into that group)
+
 Waterfall
 -------------
 
@@ -2328,6 +2364,47 @@ Calc Bond Principal Due
       * ``limit`` -> :ref:`<limit>`
       * ``support`` -> :ref:`<support>`
 
+Bond Group
+^^^^^^^^^^^^^^^^^
+.. versionadded:: 0.28.1
+
+Accure Interest of Bond Group
+  accrue interest of bonds in a group
+
+  syntax
+    ``["calcIntByGroup", "A"]``
+
+Accure Interest and Pay of Bond Group
+  accrue interest and pay interest of bonds in a group
+
+  syntax
+    ``["accrueAndPayIntByGroup", "A"]``
+    ``["accrueAndPayIntByGroup", "A", m]``
+    
+  `m`is just amp same in the `payFee` , which has keys :
+
+    * ``limit`` -> :ref:`<limit>`
+    * ``support`` -> :ref:`<support>`
+
+Pay Interest to Bond Group 
+  pay interest to bonds in a group via a order , :ref:`<ordering>`
+
+  syntax
+    ``["payIntByGroup", "A", order]``
+    ``["payIntByGroup", "A", order, m]``
+    
+  `m`is just amp same in the `payFee` , which
+
+Pay Principal to Bond Group 
+  pay principal to bonds in a group via a order 
+
+  syntax
+    ``["payPrinByGroup", "A", order]``
+    ``["payPrinByGroup", "A", order, m]``
+    
+  `m`is just amp same in the `payFee` , which
+
+
 Account
 ^^^^^^^^^
 
@@ -2479,8 +2556,8 @@ syntax
   :ref:`Book Ledger`
 
 
-Limit & Support
-^^^^^^^^^^^^^^^^
+Limit & Support & ordering
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 <limit>
 """"""""""""
@@ -2529,6 +2606,18 @@ examples:
     * supported by mix (draw via sequence)
     
       *  ``["support" ,["account","accountName1"] ,["facility","liquidity provider name"] ,["account","accountName2"]]``
+
+<ordering>
+""""""""""""""""
+  
+  ``ordering`` was used to model the order of bond payment, it was used in the `Bond Group` waterfall.
+
+  options:
+    * ``"byName"`` -> pay bonds by bond name, A-1 first, then A-2... Ascending order
+    * ``"byProrata"`` -> pay bonds by pro-rata against current due amount
+    * ``"byCurRate"`` -> pay bonds by interest rate, the higher rate bond will be paid first
+    * ``"byMaturity"`` -> pay bonds by maturity date, the earlier maturity bond will be paid first
+    * ``"byStartDate"`` -> pay bonds by start date, the earlier start date bond will be paid first
 
 
 Trigger
