@@ -215,6 +215,8 @@ Bond
     * ``("originalBondBalance","A","B")`` -> bond balance at issuance of "A" and "B" 
     * ``("bondFactor",)``  -> bond factor
     * ``("bondDueInt","A","B")``  -> bond due interest for bond A and bond B
+    * ``("bondDueIntOverInt","A","B")``  -> bond due interest over interest for bond A and bond B
+    * ``("bondDueIntTotal","A","B")`` -> sum of interest due and interest over interest for bond A and bond B
     * ``("lastBondIntPaid","A")``  -> sum amount of last paid interest for bonds
     * ``("lastBondPrinPaid","A")`` -> sum amount of last paid principal for bonds
     * ``("behindTargetBalance","A")``  -> difference of target balance with current balance for the bond A
@@ -284,7 +286,7 @@ Ratio Type
     * ``("bondFactor",)`` -> factor of bond
     * ``("poolFactor",)`` -> factor of pool
     * ``("cumPoolDefaultedRate",)`` -> cumulative default rate of pool
-    * ``("cumPoolDefaultedRate",n)`` -> cumulative default rate of pool at `N` period. ( -1 means period before last period)
+    * ``("cumPoolDefaultedRateTill",n)`` -> cumulative default rate of pool at `N` period. ( -1 means period before last period)
     * ``("cumPoolNetLossRate",)`` -> cumulative loss rate of pool
     * ``("poolWaRate",)`` -> weighted average pool coupon 
     * ``("bondWaRate",<Bond1>,<Bond2>...)`` -> weighted average bond coupon
@@ -602,15 +604,16 @@ date example
       ,"poolFreq":"MonthEnd"
       ,"payFreq":["DayOfMonth",20]}
 
+
 Ongoing Deal dates
 ^^^^^^^^^^^^^^^^^^^^^
 
 if deal is ``ongoing`` ( which has been issued ), the difference is that in ``PreClosing`` mode, the projection will include an event of `OnClosingDate` which describe a sequence of actions to be performed at the date of `closing`
 
 ``collect``
-    :code:`[<last pool collection date>,<next pool collection date>]`
+    :code:`[<last pool collection date>, <next pool collection date>]`
 ``pay``
-    :code:`[<last distribution payment date>,<next distribution payment date>]`
+    :code:`[<last distribution payment date>, <next distribution payment date>]`
 ``poolFeq``
     a :ref:`DatePattern`, describle the dates that collect cashflow from pool
 ``payFeq``
@@ -1835,6 +1838,31 @@ syntax
   cap & floor :code:`"rateType":("floor",0.005, ("cap",0.06 ,{"floater":[0.05, "SOFR1Y",-0.0169,"MonthEnd"]}))`
 
   cap & floor :code:`"rateType":("cap",0.06, ("floor",0.005 ,{"floater":[0.05, "SOFR1Y",-0.0169,"MonthEnd"]}))`
+
+
+Interest Over Interest
+""""""""""""""""""""""""""
+
+.. versionadd:: 0.28.1
+
+when `calcInt` was performed, the bond will auto accrue interest over interest if the bond has due interest.
+
+The syntax is quite simple, just wrap the :ref:`Interest` with extra field `withIntOverInt`
+
+Two ways of Interest Over Interest:
+
+* `inflate` : using the inflated rate by `X%` over current bond rate to calculate interest over interest
+
+* `spread` : using the rate by adding a `spread` over current bond rate to calculate interest over interest
+
+syntax
+  
+  :code:`"rateType":("withIntOverInt", ("inflate", 0.2), {"fix":0.0569})`
+
+  :code:`"rateType":("withIntOverInt", ("spread", 0.02), {"fix":0.0569})`
+
+  :code:`"rateType":("withIntOverInt", ("spread", 0.02), ("cap",0.06, ("floor",0.005 ,{"floater":[0.05, "SOFR1Y",-0.0169,"MonthEnd"]})))`
+
 
 
 Principal 

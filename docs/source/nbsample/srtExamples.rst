@@ -1,7 +1,9 @@
-Run Deals
+SRT Examples
 -------------------
 
 .. toctree::
     :maxdepth: 0
 
-   run_deal
+   SRT_Example_Native_Prod
+
+   

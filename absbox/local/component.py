@@ -18,6 +18,7 @@ from pyspecter import query, S
 
 numVal = Or(float,int)
 
+
 def mkLiq(x):
     ''' make pricing method '''
     match x:
@@ -212,7 +213,7 @@ def mkDs(x):
             if pNames:
                 return mkTag(("CumulativePoolDefaultedRate", lmap(mkPid,pNames)))
             return mkTag(("CumulativePoolDefaultedRate", None))
-        case ("资产池累计违约率", n, *pNames) | ("cumPoolDefaultedRate", n, *pNames): # DEPRECATE
+        case ("资产池累计违约率", n, *pNames) | ("cumPoolDefaultedRateTill", n, *pNames): # DEPRECATE
             if pNames:
                 return mkTag(("CumulativePoolDefaultedRateTill", [n,lmap(mkPid,pNames)]))
             return mkTag(("CumulativePoolDefaultedRateTill", [n,None]))
@@ -274,6 +275,10 @@ def mkDs(x):
             return mkTag(("LedgerTxnAmt", [vStr(lns), None]))
         case ("债券待付利息", *bnds) | ("bondDueInt", *bnds):
             return mkTag(("CurrentDueBondInt", vList(bnds, str)))
+        case ("债券待付罚息", *bnds) | ("bondDueIntOverInt", *bnds):
+            return mkTag(("CurrentDueBondIntOverInt", vList(bnds, str)))
+        case ("债券待付合计利息", *bnds) | ("bondDueIntTotal", *bnds):
+            return mkTag(("CurrentDueBondIntTotal", vList(bnds, str)))
         case ("债券当期已付利息", *bnds) | ("lastBondIntPaid", *bnds):
             return mkTag(("LastBondIntPaid", vList(bnds, str)))
         case ("债券当期已付本金", *bnds) | ("lastBondPrinPaid", *bnds):
@@ -378,8 +383,6 @@ def mkPre(p):
                 return "IfRate"
             case (_y, *_) if _y in intLikeFormula:
                 return "IfInt"
-            # case (_y,*_) if _y in boolLikeFormula:
-            #     return "IfBool"
             case _:
                 return "If"
 
@@ -493,6 +496,15 @@ def mkBondType(x):
         case _:
             raise RuntimeError(f"Failed to match bond type: {x}")
 
+def mkBondIoItype(x):
+    match x:
+        case ("上浮", f) | ("inflate", f):
+            return mkTag(("OverCurrRateBy", vNum(f)))
+        case ("利差", spd) | ("spread", spd):
+            return mkTag(("OverFixSpread", vNum(spd)))
+        case _:
+            raise RuntimeError(f"Failed to match bond IoI type:{x}")
+
 
 def mkBondRate(x):
     match x:
@@ -512,6 +524,8 @@ def mkBondRate(x):
             return mkTag(("CapRate", [mkBondRate(br), vNum(cap)]))
         case ("下限", floor, br) | ("floor", floor, br):
             return mkTag(("FloorRate", [mkBondRate(br), vNum(floor)]))
+        case ("罚息", pRateInfo,bRateInfo) | ("withIntOverInt", pRateInfo, bRateInfo):
+            return mkTag(("WithIoI", [mkBondRate(bRateInfo), mkBondIoItype(pRateInfo)]))
         case _:
             raise RuntimeError(f"Failed to match bond rate type:{x}")
 
@@ -525,12 +539,31 @@ def mkStepUp(x):
         case _:
             raise RuntimeError(f"Failed to match bond step up type:{x}")
 
+def mkBndComp(bn,bo):
+    """ Make bond component, accept a tuple with (bond name, bond map) or (bond group name, bond map) """
+    def itlookslikeaBond(bm:dict):
+        try:
+            mkBnd("whatever",bm)
+        except Exception as e:
+            return False
+        return True
 
-def mkBnd(bn, x):
+    match (bn,bo):
+        case (bn, bnd) if itlookslikeaBond(bnd): # single bond
+            return mkBnd(bn, bnd) | {"tag":"Bond"}
+        case (bondGroupName, bndMap) : # bond group
+            return mkTag(("BondGroup", {k:mkBnd(k,v) | {"tag":"Bond"} for k,v in bndMap.items() }))
+        case _ :
+            raise RuntimeError(f"Failed to match bond component")
+
+
+def mkBnd(bn, x:dict):
+    """ Make a single bond object """
     md = getValWithKs(x, ["到期日", "maturityDate"])
     lastAccrueDate = getValWithKs(x, ["计提日", "lastAccrueDate"])
     lastIntPayDate = getValWithKs(x, ["付息日", "lastIntPayDate"])
     dueInt = getValWithKs(x, ["应付利息", "dueInt"], defaultReturn=0)
+    dueIntOverInt = getValWithKs(x, ["拖欠利息", "dueIntOverInt"], defaultReturn=0)
     mSt = earlyReturnNone(mkStepUp, getValWithKs(x, ["调息", "stepUp"], defaultReturn=None))
     match x:
         case {"当前余额": bndBalance, "当前利率": bndRate, "初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
@@ -538,14 +571,14 @@ def mkBnd(bn, x):
             return {"bndName": vStr(bn), "bndBalance": bndBalance, "bndRate": bndRate
                     , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
-                    , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
+                    , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntOverInt":dueIntOverInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
                     , "bndLastIntPayDate": lastIntPayDate}
         case {"初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
              {"originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
             return {"bndName": vStr(bn), "bndBalance": originBalance, "bndRate": originRate
                     , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
-                    , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
+                    , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntOverInt":dueIntOverInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
                     , "bndLastIntPayDate": lastIntPayDate}
         case _:
             raise RuntimeError(f"Failed to match bond:{bn},{x}:mkBnd")
@@ -751,6 +784,7 @@ def mkBookType(x: list):
             raise RuntimeError(f"Failed to match :{x}:mkBookType")
 
 
+
 def mkSupport(x:list):
     match x:
         case ["account", accName, mBookType] | ["suppportAccount", accName, mBookType] | ["支持账户", accName, mBookType]:
@@ -767,6 +801,19 @@ def mkSupport(x:list):
             return None
         case _:
             raise RuntimeError(f"Failed to match :{x}:SupportType")
+
+def mkOrder(x):
+    match x:
+        case "byName":
+            return "ByName"
+        case "byProrata":
+            return "ByProRataCurBal"
+        case "byCurRate":
+            return "ByCurrentRate"
+        case "byMaturity":
+            return "ByMaturity"
+        case "byStartDate":
+            return "ByStartDate"
 
 
 def mkAction(x:list):
@@ -826,6 +873,12 @@ def mkAction(x:list):
         case ["顺序支付利息", source, target, m] | ["payIntBySeq", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("PayIntBySeq", [l, vStr(source), vList(target, str), s]))
+        case ["支付罚息", source, target, m] | ["payIntOverInt", source, target, m]:
+            (l, s) = mkMod(m)
+            return mkTag(("PayIntOverInt", [l, vStr(source), vList(target, str), s]))
+        case ["顺序支付罚息", source, target, m] | ["payIntOverIntBySeq", source, target, m]:
+            (l, s) = mkMod(m)
+            return mkTag(("PayIntOverIntBySeq", [l, vStr(source), vList(target, str), s]))
         case ["支付利息", source, target] | ["payInt", source, target]:
             return mkTag(("PayInt", [None, vStr(source), vList(target, str), None]))
         case ["顺序支付利息", source, target] | ["payIntBySeq", source, target]:
@@ -845,13 +898,34 @@ def mkAction(x:list):
         case ["支付本金", source, target, m] | ["payPrin", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("PayPrin", [l, vStr(source), vList(target, str), s]))
+        case ["支付本金","组",source, target, o, m] | ["payPrinByGroup", source, target,o, m]:
+            (l, s) = mkMod(m)
+            byOrder = mkOrder(o)
+            return mkTag(("PayPrinGroup", [l, vStr(source), vStr(target), byOrder,s]))
+        case ["支付本金","组",source, target, o] | ["payPrinByGroup", source, target, o]:
+            byOrder = mkOrder(o)
+            return mkTag(("PayPrinGroup", [None, vStr(source), vStr(target), byOrder, None]))
+        case ["计提利息","组",targets] | ["calcIntByGroup", targets]:
+            return mkTag(("AccrueIntGroup", vList(targets, str)))
+        case ["支付利息","组",source, target, o, m] | ["payIntByGroup", source, target,o, m]:
+            (l, s) = mkMod(m)
+            byOrder = mkOrder(o)
+            return mkTag(("PayIntGroup", [l, vStr(source), vStr(target),byOrder,s]))
+        case ["支付利息","组",source, target, o] | ["payIntByGroup", source, target, o]:
+            byOrder = mkOrder(o)
+            return mkTag(("PayIntGroup", [None, vStr(source), vStr(target),byOrder,None]))
+        case ["计提支付利息","组",source, target, o, m] | ["accrueAndPayIntByGroup", source, target,o, m]:
+            (l, s) = mkMod(m)
+            byOrder = mkOrder(o)
+            return mkTag(("AccrueAndPayIntGroup", [l, vStr(source), vStr(target),byOrder,s]))
+        case ["计提支付利息","组",source, target, o] | ["accrueAndPayIntByGroup", source, target,o]:
+            byOrder = mkOrder(o)
+            return mkTag(("AccrueAndPayIntGroup", [None, vStr(source), vStr(target),byOrder,None]))
         case ["减记本金", target, l] | ["writeOff", target, l]:
             limit = mkLimit(l) if l else None
             return mkTag(("WriteOff", [limit, vStr(target)]))
         case ["募集本金", source, target, l] | ["fundWith", source, target, l]:
             limit = mkLimit(l) if l else None
-            # source = account
-            # tartget = bond
             return mkTag(("FundWith", [limit, vStr(source), vStr(target)]))
         case ["支付本金", source, target] | ["payPrin", source, target]:
             return mkTag(("PayPrin", [None, vStr(source), vList(target, str), None]))
@@ -1746,11 +1820,12 @@ def readPricingResult(x, locale) -> dict | None:
 
 def readPoolCf(x, lang='english'):
     r = None
-    _pool_cf_header,_,expandFlag = guess_pool_flow_header(x[0], lang)
+    cflow = x[1]
+    _pool_cf_header,_,expandFlag = guess_pool_flow_header(cflow[0], lang)
     if not expandFlag:
         r = pd.DataFrame(tz.pluck('contents',x), columns=_pool_cf_header)
     else:
-        r = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[None]*6) for _ in x]
+        r = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[None]*6) for _ in cflow]
                                                 , columns=_pool_cf_header)
     pool_idx = cfIndexMap[lang]
     r = r.set_index(pool_idx)

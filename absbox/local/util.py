@@ -29,7 +29,7 @@ def mkTag(x: tuple | str) -> dict:
             return {"tag": tagName, "contents": tagValue}
         case (tagName):
             return {"tag": tagName}
-        
+
 
 def filter_by_tags(xs: list, tags: list) -> list:
     tags_set = set(tags)
@@ -444,3 +444,8 @@ def enumVals(e) -> list:
 
 def readCfFromLst(lst:list)-> pd.DataFrame:
     return None
+
+def tupleToDictWithKey(xs,key="name"):
+    return dict([ (n,x|{key:n}) for (n,x) in xs ])
+
+

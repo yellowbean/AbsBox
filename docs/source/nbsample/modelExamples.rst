@@ -4,5 +4,7 @@ Model Examples
 .. toctree::
     :maxdepth: 0
 
-   SRT_Example_Native_Prod
-   debug_sample
+   multiAsset
+   re_securitization_example
+   IntOverIntExample
+   

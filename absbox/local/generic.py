@@ -46,7 +46,8 @@ class Generic:
             "name": vStr(self.name),
             "status":mkStatus(self.status),
             "pool":mkPoolType(lastAssetDate, self.pool, mixedAssetFlag),
-            "bonds": {bn: mkBnd(bn, bo) for (bn, bo) in self.bonds},
+          # "bonds": {bn: mkBnd(bn, bo) for (bn, bo) in self.bonds},
+            "bonds": {bn: mkBndComp(bn, bo) for (bn, bo) in self.bonds},
             "waterfall": mkWaterfall({},self.waterfall.copy()),  
             "fees": {fn: mkFee(fo|{"name": fn}, fsDate = lastCloseDate) for (fn, fo) in self.fees},
             "accounts": {an:mkAcc(an, ao) for (an, ao) in self.accounts},
@@ -71,8 +72,18 @@ class Generic:
     
     @staticmethod
     def read(resp):
-        read_paths = {'bonds': ('bndStmt', english_bondflow_fields, "bond")
-                     , 'fees': ('feeStmt', english_fee_flow_fields_d, "fee")
+        def readBondStmt(respBond):
+            match respBond:
+                case {'tag':'BondGroup','contents':bndMap }:
+                    return {k: pd.DataFrame(list(tz.pluck("contents",[] if v['bndStmt'] is None else v['bndStmt'])), columns=english_bondflow_fields).set_index("date") for k,v in bndMap.items() }
+                case {'tag':'Bond', **singleBndMap }:
+                    bStmt = singleBndMap.get('bndStmt',[])
+                    return pd.DataFrame(list(tz.pluck("contents", bStmt)), columns=english_bondflow_fields).set_index("date")
+                case _:
+                    raise RuntimeError("Failed to read bond flow from resp",respBond)
+
+        read_paths = {
+                      'fees': ('feeStmt', english_fee_flow_fields_d, "fee")
                      , 'accounts': ('accStmt', english_acc_flow_fields_d, "account")
                      , 'liqProvider': ('liqStmt', english_liq_flow_fields_d, "")
                      , 'rateSwap': ('rsStmt', english_rs_flow_fields_d, "")
@@ -90,16 +101,14 @@ class Generic:
                 ir = None
                 if x[comp_v[0]]:
                     ir = list(tz.pluck('contents', x[comp_v[0]]))
-                    if comp_v[0]=='bndStmt' and len(ir[0])==7:  
-                        #backward compatibility: bond factor
-                        legacy_bond_stmt_col = comp_v[1][:6]+[comp_v[1][-1]]
-                        output[comp_name][k] = pd.DataFrame(ir, columns=legacy_bond_stmt_col).set_index("date")
-                    else:
-                        output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("date")
+                    output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("date")
             output[comp_name] = collections.OrderedDict(sorted(output[comp_name].items()))
         # aggregate fees
         output['fees'] = {f: v.groupby('date').agg({"balance": "min", "payment": "sum", "due": "min"})
                           for f, v in output['fees'].items()}
+
+        # read bonds
+        output['bonds'] = {k :readBondStmt(v) for k,v in deal_content['bonds'].items()}
 
         # aggregate accounts
         output['agg_accounts'] = aggAccs(output['accounts'], 'english')

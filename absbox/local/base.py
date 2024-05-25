@@ -2,10 +2,10 @@ import enum
 
 
 # Bond 
-china_bondflow_fields_s = ["余额", "利息", "本金", "执行利率", "本息合计", "本金系数", "备注"]
+china_bondflow_fields_s = ["余额", "利息", "本金", "执行利率", "本息合计","应付利息","罚息" "本金系数", "备注"]
 china_bondflow_fields = ["日期"] + china_bondflow_fields_s
 china_bond_cashflow = ["本金", "利息", "本息合计"]
-english_bondflow_fields_s = ["balance", "interest", "principal", "rate", "cash", "factor",  "memo"]
+english_bondflow_fields_s = ["balance", "interest", "principal", "rate", "cash", "intDue","intOverInt","factor",  "memo"]
 english_bondflow_fields = ["date"] + english_bondflow_fields_s
 
 # Cumulative
@@ -93,7 +93,7 @@ freqMap = {"每月": "Monthly", "每季度": "Quarterly", "每半年": "SemiAnnu
            ,"Weekly":"Weekly","weekly":"Weekly","每周":"Weekly","BiWeekly":"BiWeekly","biweekly":"BiWeekly","每两周":"BiWeekly"}
 
 rateLikeFormula = set(["bondFactor", "poolFactor", "cumPoolDefaultedRate","poolWaRate","bondWaRate", "资产池累计违约率", "债券系数", "资产池系数"
-                      ,"cumPoolNetLossRate"])
+                      ,"cumPoolNetLossRate","cumPoolDefaultedRateTill"])
 intLikeFormula = set(["borrowerNumber", "monthsTillMaturity", "periodNum"])
 boolLikeFormula = set(["trigger", "事件", "isMostSenior", "最优先", "isPaidOff","清偿完毕","rateTest","allTest","anyTest","比率测试","任一测试","所有测试"])
 

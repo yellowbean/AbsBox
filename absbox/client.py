@@ -90,6 +90,15 @@ class LibraryEndpoints(str, enum.Enum):
     Query = "query"
     List = "list"
     Run = "run"
+    Data = "data"
+    DataList = "data/list"
+    DataFetch = "data/fetch"
+
+
+
+class LibraryPath(str, enum.Enum):
+    """ Enum class representing shortcut to deal library and data service """
+    CHINA = "http://absbox.org......."
 
 
 class EnginePath(str, enum.Enum):
@@ -678,6 +687,33 @@ class API:
                 return result
         except Exception as e:
             raise AbsboxError(f"❌{MsgColor.Error.value}: Failed to read result with error = {e}")
+
+    def listLibraryData(self, **q):
+        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.DataList.value}"
+        result = self._send_req(json.dumps(q), deal_library_url)
+        console.print(f"✅{MsgColor.Success.value} list success")
+        if ('read' in q) and (q['read'] == True):
+            return pd.DataFrame(result['data'], columns=result['header'])
+        else:
+            return result
+
+
+    def fetchLibraryData(self, **q):
+        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.DataFetch.value}"
+        # fetch type
+        ## by single bond id
+        ## by deal id 
+        ## by series name
+
+        ## filter ,date range
+
+        result = self._send_req(json.dumps(q), deal_library_url)
+        console.print(f"✅{MsgColor.Success.value} fetch success")
+        if ('read' in q) and (q['read'] == True):
+            return r
+        else:
+            return r
+
 
     def _send_req(self, _req, _url: str, timeout=10, headers={})-> dict | None:
         """common function send request to server

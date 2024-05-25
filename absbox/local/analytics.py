@@ -38,7 +38,6 @@ def irr(flow: pd.DataFrame, init):
     invest_date, invest_amount = init
     dates = [invest_date]+dates
     amounts = [invest_amount]+amounts
-    
     return xirr(dates,amounts)
 
 

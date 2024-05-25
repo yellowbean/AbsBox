@@ -22,20 +22,60 @@ def readToCf(xs, header=None, idx=None, sort_index=False) -> pd.DataFrame:
 
     return r
 
-def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注"]) -> pd.DataFrame:
-    def filterCols(xs, columnsToKeep):
-        return [ _[columnsToKeep] for _ in xs ]
+
+def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注","应付利息","罚息","intDue","intOverInt"]) -> pd.DataFrame:
+    def isBondGroup(k,v) -> bool:
+        if isinstance(k,str) and isinstance(v,dict):
+            return True
+        else:
+            return False
+    
+    def hasBondGroup():
+        _r = [ isBondGroup(k,v) for k,v in bMap.items()]
+        return any(_r)
+        
+    def filterCols(x:dict, columnsToKeep) -> pd.DataFrame:
+        return lens.Recur(pd.DataFrame).modify(lambda z: z[columnsToKeep])(x)
    
     bondNames = list(bMap.keys())
     if not bondNames:
         return pd.DataFrame()
-    bondColumns = bMap[bondNames[0]].columns.to_list()
+
+    # colums of bond from resp
+    bondColumns = (bMap & lens.Recur(pd.DataFrame).get()).columns.to_list()
+
+    # columns to show for each bond
     columns = list(filter(lambda x: x not in set(popColumns), bondColumns))
-    header = pd.MultiIndex.from_product([bondNames,columns]
-                                        , names=['Bond',"Field"])
-    df = pd.concat(filterCols(bMap.values(), columns),axis=1)
+    
+    if not hasBondGroup():
+        header = pd.MultiIndex.from_product([bondNames,columns]
+                                            , names=['Bond',"Field"])
+        yyz = list(filterCols(bMap, columns).values())
+        df = pd.concat(yyz,axis=1)
+        
+    else:
+        bMap = filterCols(bMap, columns)
+        bondDf = bMap & lens.Recur(pd.DataFrame).collect()
+        indexes = []
+        cfFrame = []
+        for k,v in bMap.items():
+            if isBondGroup(k,v):
+                for _k,_v in v.items(): # sub bonds
+                    indexes.extend([(k,_k,_) for _ in columns])
+                    cfFrame.append(_v)
+            else:
+                if bMap[k] is not None:
+                    indexes.extend([(k,"-",_) for _ in columns])
+                    cfFrame.append(v)
+                    
+        header = pd.MultiIndex.from_tuples(indexes
+                                          , names=["BondGroup",'Bond',"Field"]
+                                          )       
+        
+        df = pd.concat(cfFrame,axis=1)
     df.columns = header
     return df.sort_index()
+
 
 def readFeesCf(fMap, popColumns=["due","剩余支付"]) -> pd.DataFrame:
     def filterCols(xs, columnsToKeep):

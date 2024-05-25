@@ -35,7 +35,8 @@ dependencies = [
     "graphviz",
     "schema",
     "dateparser",
-    "pyxirr"
+    "pyxirr",
+    "more-itertools"
 ]
 
 keywords = ["cashflow", "abs", "mbs", "cashflow model", "rmbs" ,"clo", "cashflow engine","structuring", "srt"]

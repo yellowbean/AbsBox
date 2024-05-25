@@ -1,7 +1,10 @@
-Run Deals
+Trigger Examples
 -------------------
 
 .. toctree::
     :maxdepth: 0
 
-   run_deal
+   triggers
+   triggerRolling
+
+   

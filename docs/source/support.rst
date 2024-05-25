@@ -1,6 +1,15 @@
 Support
 =========
 
+
+.. note::
+  Obvisouly, you have some curiosity and trouble before clicking this link.
+
+  Structured Finance is most complicated fix-income instrument. `absbox` is being engineered to make it simple and easy to understand.
+
+  It is simple, but takes time.
+
+
 Issue & Training
 -----------------------
 
@@ -8,7 +17,7 @@ If any **Bug** found or  **features/documenent** request,please raise tickets al
 
 https://github.com/yellowbean/AbsBox/issues
 
-**AbsBox** training is offered via google meeting .
+**AbsBox** training is offered via webmeeting .
 
 API Integration
 ------------------
@@ -27,16 +36,11 @@ API Integration
   :alt: intergration-landscape
 
 
-Email
---------
+Email & Slack
+-------------------
 
 .. image:: img/email-image.png
   :width: 200
   :alt: Support Email 
 
-Slack
----------
-
-``absbox & hastructure``
-
-https://absboxhastructure.slack.com
+``absbox & hastructure`` -> https://absboxhastructure.slack.com

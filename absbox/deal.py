@@ -3,6 +3,7 @@ from absbox.local.component import *
 from absbox.local.util import * 
 from rich.console import Console
 from lenses import lens
+import toolz as tz
 from itertools import product
 import dataclasses
 

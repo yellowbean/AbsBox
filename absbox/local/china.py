@@ -47,7 +47,7 @@ class SPV:
             "name": self.名称,
             "status": mkStatus(self.状态),
             "pool":  mkPoolType(lastAssetDate, self.资产池, mixedAssetFlag),
-            "bonds": {bn: mkBnd(bn, bo) for (bn, bo) in self.债券 },
+            "bonds": {bn: mkBndComp(bn, bo) for (bn, bo) in self.债券 },
             "waterfall": mkWaterfall({},self.分配规则.copy()),
             "fees": {fn: mkFee(fo|{"名称":fn}, fsDate=defaultStartDate) for (fn, fo) in self.费用 },
             "accounts": {an:mkAcc(an,ao) for (an, ao) in self.账户 },
@@ -78,8 +78,8 @@ class SPV:
     
     @staticmethod
     def read(resp):
-        read_paths = {'bonds': ('bndStmt', china_bondflow_fields, "债券")
-                    , 'fees': ('feeStmt', china_fee_flow_fields_d, "费用")
+        read_paths = { #'bonds': ('bndStmt', china_bondflow_fields, "债券")
+                     'fees': ('feeStmt', china_fee_flow_fields_d, "费用")
                     , 'accounts': ('accStmt', china_acc_flow_fields_d , "账户")
                     , 'liqProvider': ('liqStmt', china_liq_flow_fields_d, "流动性支持")
                     , 'rateSwap': ('rsStmt', china_rs_flow_fields_d, "")
@@ -96,15 +96,14 @@ class SPV:
                 ir = None
                 if x[comp_v[0]]:
                     ir = list(tz.pluck('contents', x[comp_v[0]]))
-                    if comp_v[0]=='bndStmt' and len(ir[0])==7:  #backward compatibility: bond factor
-                        legacy_bond_stmt_col = comp_v[1][:6]+[comp_v[1][-1]]
-                        output[comp_name][k] = pd.DataFrame(ir, columns=legacy_bond_stmt_col).set_index("日期")
-                    else:
-                        output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("日期")
+                    output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("日期")
             output[comp_name] = collections.OrderedDict(sorted(output[comp_name].items()))
         # aggregate fees
         output['fees'] = {f: v.groupby('日期').agg({"余额": "min", "支付": "sum", "剩余支付": "min"})
                           for f, v in output['fees'].items()}
+
+        # read bonds
+        output['bonds'] = {k :readBondStmt(v) for k,v in deal_content['bonds'].items()}
 
         # aggregate accounts
         output['agg_accounts'] = aggAccs(output['accounts'], 'chinese')

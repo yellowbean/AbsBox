@@ -1,7 +1,9 @@
-Run Deals
+Debug Examples
 -------------------
 
 .. toctree::
     :maxdepth: 0
 
-   run_deal
+   debug_sample
+
+   

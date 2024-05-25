@@ -13,3 +13,4 @@ rich
 graphviz
 dateparser
 pyxirr
+more-itertools
