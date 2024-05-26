@@ -1346,6 +1346,7 @@ def mkAsset(x):
 def identify_deal_type(x):
     """ identify deal type from 1st asset in asset list  """
     def id_by_pool_assets(z):
+        print("cfs",z)
         match z:
             case {"assets": [{'tag': 'PersonalLoan'}, *rest]}:
                 return "LDeal"
@@ -1353,7 +1354,7 @@ def identify_deal_type(x):
                 return "MDeal"
             case {"assets": [{'tag': 'AdjustRateMortgage'}, *rest]}:
                 return "MDeal"
-            case {"assets": [], "futureCf": cfs} if cfs['contents'][0]['tag'] == 'MortgageFlow':
+            case {"assets": [], "futureCf": cfs} if cfs['contents'][1][0]['tag'] == 'MortgageFlow':
                 return "MDeal"
             case {"assets": [{'tag': 'Installment'}, *rest]}:
                 return "IDeal"
@@ -1627,7 +1628,7 @@ def mkPoolComp(asOfDate, x, mixFlag) -> dict:
     r = {"assets": [assetFactory(y) for y in getValWithKs(x, ['assets', "清单"],defaultReturn=[])]
         , "asOfDate": asOfDate
         , "issuanceStat": getValWithKs(x,["issuanceStat", "统计"])
-        , "futureCf":mkCf(getValWithKs(x,['cashflow', '现金流归集表', '归集表'], []))
+        , "futureCf":mkCf(getValWithKs(x,['cashflow', '现金流归集表', '归集表'],[]))
         , "extendPeriods":mkDatePattern(getValWithKs(x,['extendBy'], "MonthEnd"))}
     return r
 
@@ -1733,8 +1734,10 @@ def mkCf(x:list):
     if len(x) == 0:
         return None
     else:
+        print("heading",x)
         cfs = [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None,None])) for _x in x]
-        return mkTag(("CashFlowFrame", cfs))
+        return mkTag(("CashFlowFrame", [[0,"1900-01-01",None],cfs]))
+
 
 def mkPid(x):
     match x:

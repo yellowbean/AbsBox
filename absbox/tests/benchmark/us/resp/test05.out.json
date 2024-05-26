@@ -50,6 +50,7 @@
       "fees": {},
       "bonds": {
         "A1": {
+          "tag": "Bond",
           "bndName": "A1",
           "bndType": {
             "tag": "Sequential"
@@ -75,12 +76,14 @@
           "bndRate": 0.08,
           "bndDuePrin": 0,
           "bndDueInt": 0,
+          "bndDueIntOverInt": 0,
           "bndDueIntDate": null,
           "bndLastIntPay": null,
           "bndLastPrinPay": null,
           "bndStmt": null
         },
         "B": {
+          "tag": "Bond",
           "bndName": "B",
           "bndType": {
             "tag": "Sequential"
@@ -106,6 +109,7 @@
           "bndRate": 0.05,
           "bndDuePrin": 0,
           "bndDueInt": 0,
+          "bndDueIntOverInt": 0,
           "bndDueIntDate": null,
           "bndLastIntPay": null,
           "bndLastPrinPay": null,
