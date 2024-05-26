@@ -114,9 +114,11 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
+        "bndDueIntOverInt": 0,
         "bndDueIntDate": null,
         "bndStepUp": null,
-        "bndLastIntPayDate": null
+        "bndLastIntPayDate": null,
+        "tag": "Bond"
       },
       "A2": {
         "bndName": "A2",
@@ -151,9 +153,11 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
+        "bndDueIntOverInt": 0,
         "bndDueIntDate": null,
         "bndStepUp": null,
-        "bndLastIntPayDate": null
+        "bndLastIntPayDate": null,
+        "tag": "Bond"
       },
       "A3": {
         "bndName": "A3",
@@ -188,9 +192,11 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
+        "bndDueIntOverInt": 0,
         "bndDueIntDate": null,
         "bndStepUp": null,
-        "bndLastIntPayDate": null
+        "bndLastIntPayDate": null,
+        "tag": "Bond"
       },
       "\u6b21\u7ea7": {
         "bndName": "\u6b21\u7ea7",
@@ -214,9 +220,11 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
+        "bndDueIntOverInt": 0,
         "bndDueIntDate": null,
         "bndStepUp": null,
-        "bndLastIntPayDate": null
+        "bndLastIntPayDate": null,
+        "tag": "Bond"
       }
     },
     "waterfall": {

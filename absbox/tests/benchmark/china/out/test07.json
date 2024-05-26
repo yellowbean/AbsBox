@@ -647,9 +647,11 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
+        "bndDueIntOverInt": 0,
         "bndDueIntDate": null,
         "bndStepUp": null,
-        "bndLastIntPayDate": null
+        "bndLastIntPayDate": null,
+        "tag": "Bond"
       },
       "\u6b21\u7ea7": {
         "bndName": "\u6b21\u7ea7",
@@ -673,9 +675,11 @@
         },
         "bndDuePrin": 0,
         "bndDueInt": 0,
+        "bndDueIntOverInt": 0,
         "bndDueIntDate": null,
         "bndStepUp": null,
-        "bndLastIntPayDate": null
+        "bndLastIntPayDate": null,
+        "tag": "Bond"
       }
     },
     "waterfall": {
