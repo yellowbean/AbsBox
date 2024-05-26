@@ -3,7 +3,7 @@ Support
 
 
 .. note::
-  Obvisouly, you have some curiosity and trouble before clicking this link.
+  Obiviously, you have some curiosity and trouble before clicking this link.
 
   Structured Finance is most complicated fix-income instrument. `absbox` is being engineered to make it simple and easy to understand.
 
