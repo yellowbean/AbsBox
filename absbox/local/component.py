@@ -1346,7 +1346,6 @@ def mkAsset(x):
 def identify_deal_type(x):
     """ identify deal type from 1st asset in asset list  """
     def id_by_pool_assets(z):
-        print("cfs",z)
         match z:
             case {"assets": [{'tag': 'PersonalLoan'}, *rest]}:
                 return "LDeal"
@@ -1734,7 +1733,6 @@ def mkCf(x:list):
     if len(x) == 0:
         return None
     else:
-        print("heading",x)
         cfs = [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None,None])) for _x in x]
         return mkTag(("CashFlowFrame", [[0,"1900-01-01",None],cfs]))
 
