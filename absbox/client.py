@@ -710,9 +710,9 @@ class API:
         result = self._send_req(json.dumps(q), deal_library_url)
         console.print(f"✅{MsgColor.Success.value} fetch success")
         if ('read' in q) and (q['read'] == True):
-            return r
+            return result
         else:
-            return r
+            return result
 
 
     def _send_req(self, _req, _url: str, timeout=10, headers={})-> dict | None:
