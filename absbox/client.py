@@ -16,7 +16,7 @@ from absbox.validation import isValidUrl, vStr
 from absbox.local.util import mkTag,mapValsBy \
                               , _read_cf, _read_asset_pricing, mergeStrWithDict \
                               , earlyReturnNone, searchByFst, filter_by_tags \
-                              , enumVals, lmap, inferPoolTypeFromAst
+                              , enumVals, lmap, inferPoolTypeFromAst, getValWithKs
 from absbox.local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkLiqMethod \
                                    , mkAssetUnion, mkRateAssumption, mkDatePattern, mkPoolType
 
@@ -249,11 +249,12 @@ class API:
         """
         r = None
         _rateAssump = map(mkRateAssumption, rateAssumps) if rateAssumps else None
-        assetDate = pool['cutoffDate']
+        assetDate = getValWithKs(pool, ['cutoffDate', '封包日'])
+        #assetDate = pool['cutoffDate']
 
         def buildPoolType(p) -> dict:
             """ build type for `PoolTypeWrap` """
-            assetTag = inferPoolTypeFromAst(p) if 'assets' in p else "UPool"
+            assetTag = inferPoolTypeFromAst(p) if (('assets' in p) or ('清单' in p)) else "UPool"
             _p = tz.dissoc(p, 'cutoffDate')
             if assetTag == "UPool":
                 return mkTag((assetTag, mkPoolType(assetDate, _p, True)))
@@ -381,7 +382,7 @@ class API:
         :rtype: tuple
         """
         (pool_flow, pool_bals) = pool_resp
-        result = _read_cf(pool_flow['contents'], self.lang)
+        result = _read_cf(pool_flow['contents'][1], self.lang)
         return (result, pool_bals)
 
 
@@ -509,7 +510,7 @@ class API:
         def readResult(x):
             try:
                 ((cfs, cfBalance), pr) = x
-                cfs = _read_cf(cfs['contents'], self.lang)
+                cfs = _read_cf(cfs['contents'][1], self.lang)
                 pricingResult = _read_asset_pricing(pr, self.lang) if pr else None
                 return (cfs, cfBalance, pricingResult)
             except Exception as e:
@@ -539,7 +540,7 @@ class API:
         :type d: date
         :param dp: a date pattern
         :type dp: date pattern
-        :return: a lsit of dates
+        :return: a list of dates
         :rtype: list[date]
         """
         url = f"{self.url}/{Endpoints.RunDate.value}"

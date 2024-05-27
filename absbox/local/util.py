@@ -280,18 +280,17 @@ def guess_pool_flow_header(x, l):
 
 def inferPoolTypeFromAst(x:dict) -> str:
     match x:
-        case {"assets":[["Mortgage",*fields],*ast]} | {"assets":[["AdjustRateMortgage",*fields],*ast]}:
+        case {"assets":[["Mortgage",*fields],*ast]} | {"assets":[["AdjustRateMortgage",*fields],*ast]} | {'清单': [['按揭贷款', *fields], *ast]}:
             return "MPool"
-        case {"assets":[["Loan",*fields],*ast]}:
+        case {"assets":[["Loan",*fields],*ast]} | {'清单': [['贷款', *fields], *ast]}:
             return "LPool"
-        case {"assets":[["Installment",*fields],*ast]}:
+        case {"assets":[["Installment",*fields],*ast]} | {'清单': [['分期', *fields], *ast]}:
             return "IPool"
-        case {"assets":[["Lease",*fields],*ast]}:
+        case {"assets":[["Lease",*fields],*ast]} | {'清单': [['租赁', *fields], *ast]}:
             return "RPool"
         case {"assets":[["FixedAsset",*fields],*ast]}:
             return "FPool"
-        
-        case {"assets":[["Invoice",*fields],*ast]}:
+        case {"assets":[["Invoice",*fields],*ast]} | {'清单': [['应收账款', *fields], *ast]}:
             return "VPool"
         case _:
             raise RuntimeError(f"Failed to find pool type from assets:{x}")
