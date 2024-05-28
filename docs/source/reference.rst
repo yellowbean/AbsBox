@@ -4,7 +4,22 @@ Reference
 Slides & Videos
 ------------------------
 
+Slides 
+""""""""""
+
 * Goolge Slide : `absbox 101 <https://docs.google.com/presentation/d/1mKJsClatZhm7UY-wzNGNgdYpy9D1niUgSJBYAw_7HOg/>`_
+
+Videos
+""""""""
+
+.. list-table:: Tutorial Videos
+   :header-rows: 1
+
+   * - Title
+     - URL
+   * - 101 - Introduction
+     - https://www.youtube.com/watch?v=fb8j96beLGQ
+
 
 
 Asset Cashflow Projection Document

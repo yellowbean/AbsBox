@@ -2777,6 +2777,18 @@ Add a trigger
                ,"status":...
                ,"curable":...})]
 
+Perform Actions
+  .. versionadded:: 0.28.5
+  Perform a list of ``Action`` ,when trigger is fired.
+
+.. code-block:: python
+  
+  "effects":("actions"
+              ,["transfer","acc01","acc02"]
+              ,["payFeeBySeq","acc01",["feeA","feeB"]]
+              .... 
+              )
+
 Combination of above
   a list of above can be combined together with keyword ``Effects``
 
