@@ -40,8 +40,12 @@ a structured finance cashflow engine wrapper for structured credit professionals
   * Bond Cashflow/Pool Cashflow Forecast, Pricing
 
 ## What it takes to master
-* Python syntax.
+* Python syntax, nice to have knowledge of functional programming ,or exposure to package `toolz`/`lenses`
 * Patience & Persistence, but remember , there is a slack community and responsive support !
+
+## Missing Features ? 
+
+Raise issues or disucssion with the prospectus or spreadsheet how asset cashflow should be projected.
 
 
 ## Data flow
