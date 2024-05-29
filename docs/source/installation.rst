@@ -99,6 +99,25 @@ Since version ``0.26.7``, ``absbox`` ships with a shortcut to connect public/tes
   localAPI = API(EnginePath.LOCAL,check=False)
 
 
+Auto Connect Best Fit Engine
+""""""""""""""""""""""""""""""""
+
+The function ``PickApiFrom`` will try to connect to the best fit engine from the list of APIs.
+
+If ``absbox`` is version ``0.28.5``, it will find first engine with version ``0.28.x`` and connect to it.
+
+.. versionadded:: 0.28.5
+
+.. code-block:: python 
+
+  from absbox import PickApiFrom
+
+  # auto connect to the best fit engine
+  listOfApis = [EnginePath.PROD,EnginePath.DEV,"http://your_own_server:8081"]
+
+  api = PickApiFrom(listOfApis,check=False,lang='english')
+
+
 Use Public Server
 ^^^^^^^^^^^^^^^^^^^^^
 

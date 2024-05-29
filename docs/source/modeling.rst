@@ -1626,9 +1626,6 @@ syntax:
      - Yes
      - Optional
 
-syntax
-  ``({account name},{account description})``
-
 
 Bank Account
 ^^^^^^^^^^^^^^^^^^
@@ -1651,48 +1648,78 @@ There is one extra field to set for ``Reserve Account`` : ``type``
 syntax
   ``(<account name>,{'balance':<cash on account>,'type':<reserve target amount>})``
 
-  * Fix Amount: a single reserve amount 
-  
+
+``type`` can be set as :
+
+  * Fix Amount: a single reserve amount which fixed during cashflow projection
+    
+    syntax
+      ``("fix",<Amount>)``
+      
+      ``("fixReserve",<Amount>)``
+
     .. code-block:: python
 
-      ("ReserveAccountA",{"balance":0
-                         ,"type":{"fixReserve":1000}})
+      # 3 forms are all valid and same
+      ("ReserveAccountA",{"balance":0,"type":{"fixReserve":1000}})
+      
+      ("ReserveAcc1",{"balance":100, "type":("fix",1000)})
+      ("ReserveAcc2",{"balance":100, "type":("fixReserve",1000)})
 
   * Formula: the target reserve amount is derived from a :ref:`Formula` , like 2% of pool balance
+    
+    syntax
+      ``("target",<Formula>,<Factor>)``
+      
+      ``("target",<Formula>)``
   
     .. code-block:: python
 
       ("ReserveAccountB",{"balance":0
                          ,"type":{"targetReserve":[("poolBalance",),0.015]}})
+      
+      # type: ("target",<Formula>,<Factor>)
+      ("ReserveAcc3",{"balance":100, "type":("target"
+                                            ,("poolBalance",)
+                                            ,0.015)})
+      
+      # type: ("target",<Formula>)
+      ("ReserveAcc3",{"balance":100, "type":("target"
+                                            ,("*",("poolBalance",),0.015))})
 
-  * Nested Formula, the target reserve amount is base on higher or lower of two formula 
+  * Nested Formula, the target reserve amount is base on *higher* or *lower* of two formulas
+
+    User can just reuse the powerful expression from :ref:`Formula` to set the reserve amount.
+    
+    .. code-block:: python
+
+      ("target",("max"
+                    ,("*",("poolBalance",),0.01)
+                    ,("const",1000)
+                    ))
+      
+      ("target",("floorWith"
+                  ,("max"
+                    ,("*",("poolBalance",),0.01)
+                    ,("const",1000))
+                  ,("const",100)))
+
 
   * Conditional amount starts with ``When``, the target reserve amount depends on :ref:`Condition`:
     
     * Use 1st formula if condition is true
     * Use 2nd formula if condition is false
+    
+    syntax
+      ``{"when":[<Condition>,<type1>,<type2>]}``
+      
+      ``("when", <Condition>, <type1>, <type2>)`` 
   
     .. code-block:: python
 
-      ("ReserveAccountC",{"balance":0
-                         ,"type":{"max":[
-                                   {"targetReserve":[("poolBalance",),0.015]}
-                                   ,{"fixReserve":100}]})
-
-      ("ReserveAccountD",{"balance":0
-                         ,"type":{"min":[
-                                    {"targetReserve":[("poolBalance",),0.015]}
-                                    ,{"fixReserve":100}]})
-
-      ("ReserveAccountE",{"balance":0
-                         ,"type":{"min":[
-                                    {"max":[{"targetReserve":[("poolBalance",),0.015]}
-                                           ,{"fixReserve":100}]}
-                                    ,{"fixReserve":150}]})
-
       ("ReserveAccountF",{"balance":0
                          ,"type":{"when":[
-                                     [("bondBalance",">",0]
+                                     [("bondBalance",),">",0]
                                     ,{"max":[{"targetReserve":[("poolBalance",),0.015]}
                                            ,{"fixReserve":100}]}
                                     ,{"fixReserve":150}]})
@@ -1700,24 +1727,25 @@ syntax
       ("ReserveAccountG",{"balance":0
                          ,"type":{"when":[
                                      ["any"
-                                       ,[("bondBalance",">",0]
-                                       ,[("poolFactor","<",0.5]]
+                                       ,[("bondBalance",),">",0]
+                                       ,[("poolFactor",),"<",0.5]]
                                     ,{"max":[{"targetReserve":[("poolBalance",),0.015]}
                                            ,{"fixReserve":100}]}
                                     ,{"fixReserve":150}]})
 
-Model Reinvestment
+Reinvestment Setup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To model the interest or short-term investment income in the account.
+To model the interest or short-term investment income in the account. The earning rate can either be fixed rate or floating rate.
 
-* fix rate syntax: 
 
+Fix rate syntax: 
   ``{"period": <date Pattern>, "rate": <number>, "lastSettleDate":<date>}``
 
-* floater rate syntax: 
-
+Floater rate syntax: 
   ``{"period": <date Pattern>, "index": <index name>, "spread": <number>, "lastSettleDate":<date>}``
+  
+  Make sure there the index rate curve is supplied in the assumption.
 
 
 .. code-block:: python

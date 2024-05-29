@@ -19,6 +19,14 @@ Videos
      - URL
    * - 101 - Introduction
      - https://www.youtube.com/watch?v=fb8j96beLGQ
+   * - 102 - Account
+     - TBD
+   * - 103 - Assets
+     - TBD
+   * - 104 - Bonds
+     - TBD
+   * - 105 - Waterfall
+     - TBD
 
 
 
