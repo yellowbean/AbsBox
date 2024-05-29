@@ -135,6 +135,37 @@ class AbsboxError(Exception):
         super().__init__(errorMsg)
 
 
+def PickApiFrom(Apilist:list,**kwargs):
+    """ Auto init API instance from a list of API urls with version check
+
+    :param Apilist: list of API urls
+    :type Apilist: list
+    """
+    def pingApi(x):
+        try:
+            r = requests.get(f"{x.value}/{Endpoints.Version.value}", verify=False, timeout=5 ,headers={"Origin":"http://localhost:8001"}).text 
+            return json.loads(r) 
+        except Exception as e:
+            return ("Error",e)
+
+    _,libVersion,_ = VERSION_NUM.split(".")
+    
+    apiResps = [{"url":api,"resp":pingApi(api)} for api in Apilist ]
+    validApis = tz.pipe(apiResps
+                    ,lambda apis: list(filter(lambda x:"Error" not in x['resp'],apis))
+                    ,lambda apis: lens.Each()['resp']['_version'].modify(lambda x: x.split("."))(apis)
+                    ,lambda apis: filter(lambda x:x['resp']['_version'][1]==libVersion, apis) 
+                    ,lambda apis: sorted(apis,key=lambda x: x['resp']['_version'][2])
+    )
+
+    r = list(validApis)
+
+    if len(r)>0: 
+        return API(r[0],**kwargs)
+    else:
+        raise AbsboxError(f"❌{MsgColor.Error.value}No valid API found in list match current lib version {libVersion}, from list:{apiResps}")
+
+
 @dataclass
 class API:
     """ API to connect to engine server, handling requests and responses 

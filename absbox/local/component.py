@@ -431,6 +431,7 @@ def mkAccInt(x):
 
 def mkAccType(x):
     match x:
+        # fixed amount
         case ("固定", amt) | ("fix", amt) | {"固定储备金额": amt} | {"fixReserve": amt}:
             return mkTag(("FixReserve", vNum(amt)))
         case ("目标", base, rate) | ("target", base, rate) | {"目标储备金额": [base, rate]} | {"targetReserve": [base, rate]}:
@@ -440,23 +441,27 @@ def mkAccType(x):
                     return mkTag(("PctReserve", [mkTag(("Sum", sumDs)), vNum(rate)]))
                 case _:
                     return mkTag(("PctReserve", [mkDs(base), vNum(rate)]))
+        # formula and rate
         case {"目标储备金额": {"公式": ds, "系数": rate}} | {"targetReserve": {"formula": ds, "factor": rate}}:
             return mkTag(("PctReserve", [mkDs(ds), vNum(rate)]))
         case ("目标", ds, rate) | ("target", ds, rate):
             return mkTag(("PctReserve", [mkDs(ds), vNum(rate)]))
         case ("目标", ds) | ("target", ds):
             return mkTag(("PctReserve", [mkDs(ds), 1.0]))
+        # higher
         case {"较高": _s} | {"max": _s} if isinstance(_s, list):
             return mkTag(("Max", lmap(mkAccType, _s)))
         case ("较高", *_s) | ("max", *_s):
             return mkTag(("Max", lmap(mkAccType, _s)))
+        # lower
         case {"较低": _s} | {"min": _s} if isinstance(_s, list):
             return mkTag(("Min", lmap(mkAccType, _s)))
-        case ("较低", *_s) | ("mmx", *_s):
+        case ("较低", *_s) | ("min", *_s):
             return mkTag(("Min", lmap(mkAccType, _s)))
-        case ("分段", p, a, b) | ("When", p, a, b):
+        # with predicate
+        case ("分段", p, a, b) | ("when", p, a, b):
             return mkTag(("Either", [mkPre(p), mkAccType(a), mkAccType(b)]))
-        case {"分段": [p, a, b]} | {"When": [p, a, b]}:
+        case {"分段": [p, a, b]} | {"when": [p, a, b]}:
             return mkTag(("Either", [mkPre(p), mkAccType(a), mkAccType(b)]))
         case None:
             return None
@@ -1065,6 +1070,8 @@ def mkTriggerEffect(x):
     match x:
         case ("新状态", s) | ("newStatus", s):
             return mkTag(("DealStatusTo", mkStatus(s)))
+        case ("动作", *actions) | ("actions", *actions):
+            return mkTag(("RunActions", lmap(mkAction, actions)))
         case ["计提费用", *fn] | ["accrueFees", *fn]:
             return mkTag(("DoAccrueFee", vList(fn, str)))
         case ["新增事件", trg] | ["newTrigger", trg]: # not implementd in Hastructure
