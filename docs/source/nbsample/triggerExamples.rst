@@ -6,5 +6,6 @@ Trigger Examples
 
    triggers
    triggerRolling
+   TriggerWithWaterfallActions
 
    

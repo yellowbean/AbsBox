@@ -900,6 +900,7 @@ params:
    * ``deal`` : a deal instance
    * ``poolAssump`` : pool performance assumption, passing a map if run with multi scenaro mode
    * ``runAssump`` : deal assumptions 
+   * ``showWarning``: if `False`, client won't show warning messages, defualt is `True`
    * ``read`` : if `True` , will try it best to parse the result into `DataFrame`
 
 returns:
@@ -911,6 +912,9 @@ returns:
      * ``pool``
      * ``result``
      * ``pricing``
+     * ``_deal``
+     * ``ledgers``
+     * ``agg_accounts``
 
 .. image:: img/deal_cycle_flow.png
   :width: 600

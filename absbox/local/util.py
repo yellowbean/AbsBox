@@ -9,6 +9,7 @@ import toolz as tz
 
 
 def mapNone(x, v):
+    ''' return a default value if x is None, other wise, return x '''
     if x is None:
         return v
     else:
@@ -16,6 +17,7 @@ def mapNone(x, v):
 
 
 def lmap(f, xs):
+    ''' just make it looks more functional '''
     return list(map(f, xs))
 
 
@@ -32,6 +34,7 @@ def mkTag(x: tuple | str) -> dict:
 
 
 def filter_by_tags(xs: list, tags: list) -> list:
+    ''' fiter a list of maps by tags'''
     tags_set = set(tags)
     return [x for x in xs if x['tag'] in tags_set]
 
@@ -53,18 +56,14 @@ def readTagStr(x: str) -> str:
 def readTag(x: dict):
     return f"<{x['tag']}:{','.join(x['contents'])}>"
 
-
 def isDate(x):
     return re.match(r"\d{4}\-\d{2}\-\d{2}", x)
-
 
 def allList(xs):
     return all([isinstance(x, list) for x in xs])
 
-
 def mkTs(n, vs):
     return mkTag((n, vs))
-
 
 def mkTbl(n, vs):
     return mkTag((n, vs))
