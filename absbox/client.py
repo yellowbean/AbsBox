@@ -2,6 +2,7 @@ import json, urllib3, getpass, enum, os
 from importlib.metadata import version
 from json.decoder import JSONDecodeError
 from dataclasses import dataclass
+from datetime import datetime
 
 import requests
 from requests.exceptions import ConnectionError, ReadTimeout
@@ -281,7 +282,6 @@ class API:
         r = None
         _rateAssump = map(mkRateAssumption, rateAssumps) if rateAssumps else None
         assetDate = getValWithKs(pool, ['cutoffDate', '封包日'])
-        #assetDate = pool['cutoffDate']
 
         def buildPoolType(p) -> dict:
             """ build type for `PoolTypeWrap` """
@@ -319,7 +319,7 @@ class API:
         :type showWarning: bool, optional
         :param debug: return request text instead of sending out such request, defaults to False
         :type debug: bool, optional
-        :return: result of run, a dict or dataframe
+        :return: result of run, a dict of dataframe if `read` is True.
         :rtype: dict
 
         """        
@@ -345,9 +345,9 @@ class API:
         if result is None or 'error' in result:
             raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run")
 
-        rawWarnMsg = [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg))]
+        rawWarnMsg = map( lambda x:f"{MsgColor.Warning.value}{x['contents']}", filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg)))
         if rawWarnMsg and showWarning:
-            console.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
+            console.print("Warning Message from server:\n"+"\n".join(list(rawWarnMsg)))
 
         if read:
             return deal.read(result)
