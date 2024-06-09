@@ -8,6 +8,8 @@ from urllib.request import unquote
 from functools import reduce 
 from pyspecter import query,S
 import toolz as tz
+from absbox.local.base import *
+
 
 from absbox.local.util import *
 from absbox.local.component import *
@@ -109,15 +111,16 @@ class SPV:
         output['agg_accounts'] = aggAccs(output['accounts'], 'chinese')
 
         output['pool'] = {}
-        if deal_content['pool']['contents']['futureCf'] is None:
+        mFutureFlow = tz.get_in(['pool','contents','futureCf'], deal_content, default=None)
+        if mFutureFlow is None:
             output['pool']['flow'] = None
         else:
-            _pool_cf_header, _, expandFlag = guess_pool_flow_header(deal_content['pool']['contents']['futureCf']['contents'][0], "chinese")
+            _pool_cf_header, _, expandFlag = guess_pool_flow_header(mFutureFlow['contents'][1][0], "chinese")
             if not expandFlag:
-                output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in deal_content['pool']['contents']['futureCf']['contents']]
+                output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in mFutureFlow['contents'][1]]
                                                       , columns=_pool_cf_header)
             else:
-                output['pool']['flow'] = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[None]*6) for _ in deal_content['pool']['contents']['futureCf']['contents']]
+                output['pool']['flow'] = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[None]*6) for _ in mFutureFlow['contents'][1]]
                                                       , columns=_pool_cf_header)                
             
             pool_idx = "日期"

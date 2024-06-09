@@ -72,16 +72,6 @@ class Generic:
     
     @staticmethod
     def read(resp):
-        def readBondStmt(respBond):
-            match respBond:
-                case {'tag':'BondGroup','contents':bndMap }:
-                    return {k: pd.DataFrame(list(tz.pluck("contents",[] if v['bndStmt'] is None else v['bndStmt'])), columns=english_bondflow_fields).set_index("date") for k,v in bndMap.items() }
-                case {'tag':'Bond', **singleBndMap }:
-                    bStmt = mapNone(singleBndMap.get('bndStmt',[]),[])
-                    return pd.DataFrame(list(tz.pluck("contents", bStmt)), columns=english_bondflow_fields).set_index("date")
-                case _:
-                    raise RuntimeError("Failed to read bond flow from resp",respBond)
-
         read_paths = {
                       'fees': ('feeStmt', english_fee_flow_fields_d, "fee")
                      , 'accounts': ('accStmt', english_acc_flow_fields_d, "account")
