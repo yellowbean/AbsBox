@@ -19,8 +19,15 @@ def hyphenToZero(x):
 def removeEmpty(x):
     return [ _ for _ in x if _]
 
+def removePg(xs):
+    return [ x for x in xs if not re.match(r"^\d+$",x)]
+
+
 def splitSpace(xs:list):
     return [ _.split(" ") for _ in xs]
 
 def normalizedDate(x:str):
     return dateparser.parse(x).strftime("%Y-%m-%d")
+
+def removeIfAllinSet(xs:list,s:set):
+    return [ x for x in xs if not set(x) == s]
