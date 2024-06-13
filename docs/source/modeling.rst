@@ -2229,8 +2229,8 @@ Bond
      - Yes, sequentially
    * - ``payPrinResidual``
      - No
-     - Yes, pay regardless the due principal
-     - No
+     - Yes, pay regardless the due principal(PAC)
+     - Yes
    * - ``payPrinWithDue``
      - No
      - Yes, pay till due principal is 0
@@ -2372,7 +2372,7 @@ PayPrinResidual
   pay principal to a bond regardless its due principal balance
     
   syntax
-    ``["payPrinResidual", {Account}, <Bond> ]``
+    ``["payPrinResidual", {Account}, [<Bond>] ]``
   
 PayIntResidual 
   pay interest to a bond regardless its interest due.
@@ -2900,6 +2900,31 @@ Examples
 Query trigger during run
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+There are two ways to track how trigger is being fired or not.
+
+
+Via `Result`
+""""""""""""""
+.. versionadded:: 0.28.6
+
+syntax 
+  ``r['triggers'][<Location>][<Trigger Name>]``
+
+The location:
+  *   `EndCollection` : Before pool collection
+  *   `EndCollectionWF` : After pool collection 
+  *   `BeginDistributionWF` Before bond payment waterfall 
+  *   `EndDistributionWF` : After bond payment waterfall 
+
+.. code-block:: python
+
+  #example
+  r['triggers']['EndCollectionWF']['poolDef']
+ 
+
+
+Via `inspect`
+""""""""""""""""
 By specify in the `inspect`, user are able to view the status of trigger during the run.
 
 .. seealso::
