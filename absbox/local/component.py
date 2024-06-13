@@ -1096,14 +1096,13 @@ def mkWaterfall(r, x):
         "未设立": "PreClosing",
     }
     if len(x) == 0:
-        #return {k: list(v) for k, v in r.items()}
         return tz.valmap(list, r)
     _k, _v = x.popitem()
     _w_tag = None
     match _k:
         case ("兑付日", "加速清偿") | ("amortizing", "accelerated") | "Accelerated" :
             _w_tag = f"DistributionDay (DealAccelerated Nothing)"
-        case ("兑付日", "违约") | ("amortizing", "defaulted") | "Defaulted":
+        case ("兑付日", "违约") | ("amortizing", "defaulted") | "Defaulted" | "违约后":
             _w_tag = f"DistributionDay (DealDefaulted Nothing)"
         case "Revolving" | "循环" | "revolving" | ("兑付日", "循环") :
             _w_tag = f"DistributionDay Revolving"
@@ -1120,7 +1119,7 @@ def mkWaterfall(r, x):
         case "默认" | "default":
             _w_tag = f"DefaultDistribution"
         case _:
-            raise RuntimeError(f"Failed to match :{x}:mkWaterfall")
+            raise RuntimeError(f"Failed to match :{x}:mkWaterfall with key {_k}")
     #r[_w_tag] = [mkAction(_a) for _a in _v]
     r[_w_tag] = lmap(mkAction, _v)
     return mkWaterfall(r, x)

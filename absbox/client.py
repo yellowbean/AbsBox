@@ -564,7 +564,7 @@ class API:
         else:
             return result
 
-    def runDates(self, d, dp):
+    def runDates(self, d, dp, eDate=None):
         """generate a list of dates from date pattern
 
         :param d: a starting date
@@ -575,7 +575,7 @@ class API:
         :rtype: list[date]
         """
         url = f"{self.url}/{Endpoints.RunDate.value}"
-        req = json.dumps([d, mkDatePattern(dp)], ensure_ascii=False)
+        req = json.dumps([d, mkDatePattern(dp), eDate], ensure_ascii=False)
         result = self._send_req(req, url)
         return result
 
