@@ -1,7 +1,6 @@
 import enum 
 from absbox.local.util import *
 
-
 # Bond 
 china_bondflow_fields_s = ["余额", "利息", "本金", "执行利率", "本息合计","应付利息","罚息" "本金系数", "备注"]
 china_bondflow_fields = ["日期"] + china_bondflow_fields_s
@@ -65,6 +64,10 @@ english_uBond_flow_d = ["Date"] + english_uBond_flow
 # Fee 
 china_fee_flow_fields_d = ["日期", "余额", "支付", "剩余支付", "备注"]
 english_fee_flow_fields_d = ["date", "balance", "payment", "due", "memo"]
+
+# Trigger 
+china_trigger_flow_fields_d = ["日期", "status","备注"]
+english_trigger_flow_fields_d = ["date","status","memo"]
 
 # Account
 china_acc_flow_fields_d = ["日期", "余额", "变动额", "备注"]
@@ -199,13 +202,4 @@ class SubAssetType(str, enum.Enum):
     FixedAsset = "FixedAsset"
 
 
-def readBondStmt(respBond):
-    match respBond:
-        case {'tag':'BondGroup','contents':bndMap }:
-            return {k: pd.DataFrame(list(tz.pluck("contents",[] if v['bndStmt'] is None else v['bndStmt'])), columns=english_bondflow_fields).set_index("date") for k,v in bndMap.items() }
-        case {'tag':'Bond', **singleBndMap }:
-            bStmt = mapNone(singleBndMap.get('bndStmt',[]),[])
-            return pd.DataFrame(list(tz.pluck("contents", bStmt)), columns=english_bondflow_fields).set_index("date")
-        case _:
-            raise RuntimeError("Failed to read bond flow from resp",respBond)
 
