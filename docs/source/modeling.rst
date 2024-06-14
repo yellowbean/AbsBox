@@ -345,7 +345,7 @@ condition is a `boolean` type test
 
 * it can be set up in reserve account to define different target reserve amount;
 * or in the waterfall to run the distribution action only when the testing is passing;
-* or it can be used in trigger to describle whether it will be triggered or not.
+* or it can be used in trigger to describe whether it will be triggered or not.
 
 There are couple type of ``Condition`` to perform :
 
@@ -590,9 +590,9 @@ if it is ``preclosing`` stage ( the deal has not been issued yet )
 ``stated``
     legal maturity date of the deal.
 ``poolFreq``
-    a :ref:`DatePattern`, describle the dates that collect cashflow from pool
+    a :ref:`DatePattern`, describe the dates that collect cashflow from pool
 ``payFreq``
-    a :ref:`DatePattern`, describle the dates that distribution funds to fees and bonds.
+    a :ref:`DatePattern`, describe the dates that distribution funds to fees and bonds.
 
 date example
   .. code-block:: python
@@ -615,9 +615,9 @@ if deal is ``ongoing`` ( which has been issued ), the difference is that in ``Pr
 ``pay``
     :code:`[<last distribution payment date>, <next distribution payment date>]`
 ``poolFeq``
-    a :ref:`DatePattern`, describle the dates that collect cashflow from pool
+    a :ref:`DatePattern`, describe the dates that collect cashflow from pool
 ``payFeq``
-    a :ref:`DatePattern`, describle the dates that distribution funds to fees and bonds.
+    a :ref:`DatePattern`, describe the dates that distribution funds to fees and bonds.
 
 .. code-block:: python
 
@@ -2635,7 +2635,7 @@ Limit & Support & ordering
 <limit>
 """"""""""""
 
-``limit`` is a usedful decorator which describle how much it should pay, usually it's a cap.
+``limit`` is a usedful decorator which describe how much it should pay, usually it's a cap.
 it is being widely used in scope :
 
 * pay fee 
@@ -3216,7 +3216,7 @@ The relationship is being defined by a tuple :
 
 * User can set assumption to undelrying deal at line:93-97
 
-  * it's a tuple to describle assumption of underlying deals: ``("ByDealName",<an assumption map>)``
+  * it's a tuple to describe assumption of underlying deals: ``("ByDealName",<an assumption map>)``
   * ``<an assumption map>``: ``{<underlying deal name>:(<pool assump>, <deal run assump>)}``
   
     * key of map is the name of underlying deal

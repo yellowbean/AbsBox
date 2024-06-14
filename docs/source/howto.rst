@@ -526,7 +526,7 @@ Cash Report will list a cash inflows and outflows of the deal. Report was compil
 Balancesheet Report
 ^^^^^^^^^^^^^^^^^^^^
 
-Balancesheet Report will take a `snapshot` of the deal on the dates describled in `DatePattern`.
+Balancesheet Report will take a `snapshot` of the deal on the dates described in `DatePattern`.
 It will also include the bond interest accured or fee accured as both of them are `Payable` in the balance sheet .
 
 .. code-block:: python 
