@@ -13290,7 +13290,49 @@
               }
             },
             "trgStatus": true,
-            "trgCurable": false
+            "trgCurable": false,
+            "trgStmt": [
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-05-26",
+                  false,
+                  "<Tag:Any:2023-05-26 GE 2024-05-26|0.004983 G 0.016000>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-06-26",
+                  false,
+                  "<Tag:Any:2023-06-26 GE 2024-05-26|0.005558 G 0.016000>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-07-26",
+                  false,
+                  "<Tag:Any:2023-07-26 GE 2024-05-26|0.010290 G 0.016000>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-08-26",
+                  false,
+                  "<Tag:Any:2023-08-26 GE 2024-05-26|0.015085 G 0.016000>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-09-26",
+                  true,
+                  "<Tag:Any:2023-09-26 GE 2024-05-26|0.020453 G 0.016000>"
+                ]
+              }
+            ]
           }
         },
         "EndDistributionWF": {},
@@ -13325,7 +13367,201 @@
               ]
             },
             "trgStatus": true,
-            "trgCurable": false
+            "trgCurable": false,
+            "trgStmt": [
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-05-26",
+                  false,
+                  "<Tag:2683683102.05 G 6940000000.00>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-06-26",
+                  false,
+                  "<Tag:373863675.12 G 6940000000.00>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-07-26",
+                  false,
+                  "<Tag:498846662.58 G 6940000000.00>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-08-26",
+                  false,
+                  "<Tag:497858117.40 G 6940000000.00>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-09-26",
+                  false,
+                  "<Tag:508120163.74 G 6940000000.00>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-10-26",
+                  false,
+                  "<Tag:521335611.12 G 6511879836.28>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-11-26",
+                  false,
+                  "<Tag:516386360.59 G 6070544225.18>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2023-12-26",
+                  false,
+                  "<Tag:509445752.16 G 5634157864.61>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2024-01-26",
+                  false,
+                  "<Tag:499065061.25 G 5204712112.47>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2024-02-26",
+                  false,
+                  "<Tag:492554544.48 G 4785647051.24>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2024-03-26",
+                  false,
+                  "<Tag:480936525.91 G 4373092506.78>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2024-04-26",
+                  false,
+                  "<Tag:468207121.95 G 3972155980.89>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2024-05-26",
+                  false,
+                  "<Tag:458404225.81 G 3583948858.96>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2024-06-26",
+                  false,
+                  "<Tag:447715029.95 G 3205544633.17>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2024-07-26",
+                  false,
+                  "<Tag:441848036.54 G 2837829603.24>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2024-08-26",
+                  false,
+                  "<Tag:424183132.87 G 2475981566.72>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2024-09-26",
+                  false,
+                  "<Tag:412552518.10 G 2131798433.87>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2024-10-26",
+                  false,
+                  "<Tag:399060148.20 G 1799245915.79>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2024-11-26",
+                  false,
+                  "<Tag:388128831.87 G 1480185767.61>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2024-12-26",
+                  false,
+                  "<Tag:378716481.86 G 1172056935.76>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2025-01-26",
+                  false,
+                  "<Tag:368207051.61 G 873340453.92>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2025-02-26",
+                  false,
+                  "<Tag:359987710.30 G 585133402.33>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2025-03-26",
+                  false,
+                  "<Tag:244533451.98 G 305145692.05>"
+                ]
+              },
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2025-04-26",
+                  true,
+                  "<Tag:223661572.00 G 140612240.09>"
+                ]
+              }
+            ]
           }
         }
       },

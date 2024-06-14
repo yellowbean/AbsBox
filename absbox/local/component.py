@@ -35,7 +35,7 @@ def mkLiq(x):
 
 
 def mkDatePattern(x):
-    ''' make date pattern, to describle a series of dates'''
+    ''' make date pattern, to describe a series of dates'''
     match x:
         case ["DayOfMonth", _d] | ["每月", _d] | ("每月", _d):
             return mkTag(("DayOfMonth", vInt(_d)))

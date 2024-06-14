@@ -115,7 +115,7 @@ class Generic:
         output['bonds'] = {k :readBondStmt(v) for k,v in deal_content['bonds'].items()}
 
         # triggers 
-        if 'triggers' in deal_content:
+        if 'triggers' in deal_content and deal_content['triggers']:
             output['triggers'] = deal_content['triggers'] & lens.Values().Values().modify(readTrgStmt)    
         else:
             output['triggers'] = None

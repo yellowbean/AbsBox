@@ -15,6 +15,20 @@ from absbox.local.util import *
 from absbox.local.component import *
 from absbox.deal import isMixedDeal
 
+def readBondStmt(respBond):
+    match respBond:
+        case {'tag':'BondGroup','contents':bndMap }:
+            return {k: pd.DataFrame(list(tz.pluck("contents",[] if v['bndStmt'] is None else v['bndStmt'])), columns=english_bondflow_fields).set_index("date") for k,v in bndMap.items() }
+        case {'tag':'Bond', **singleBndMap }:
+            bStmt = mapNone(singleBndMap.get('bndStmt',[]),[])
+            return pd.DataFrame(list(tz.pluck("contents", bStmt)), columns=china_bondflow_fields).set_index("date")
+        case _:
+            raise RuntimeError("Failed to read bond flow from resp",respBond)
+
+def readTrgStmt(x):
+    tStmt = mapNone(x.get('trgStmt',[]),[])
+    return pd.DataFrame(list(tz.pluck("contents", tStmt)), columns=china_trigger_flow_fields_d).set_index("date")
+
 
 
 @dataclass
@@ -107,6 +121,12 @@ class SPV:
         # read bonds
         output['bonds'] = {k :readBondStmt(v) for k,v in deal_content['bonds'].items()}
 
+        # trigger 
+        if 'triggers' in deal_content:
+            output['triggers'] = deal_content['triggers'] & lens.Values().Values().modify(readTrgStmt)    
+        else:
+            output['triggers'] = None
+        
         # aggregate accounts
         output['agg_accounts'] = aggAccs(output['accounts'], 'chinese')
 

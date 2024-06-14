@@ -26885,7 +26885,17 @@
               }
             },
             "trgStatus": true,
-            "trgCurable": false
+            "trgCurable": false,
+            "trgStmt": [
+              {
+                "tag": "TrgTxn",
+                "contents": [
+                  "2021-06-26",
+                  true,
+                  "<Tag:20.00 G 0.00>"
+                ]
+              }
+            ]
           }
         }
       },
