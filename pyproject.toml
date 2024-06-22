@@ -51,15 +51,21 @@ changelog = "https://github.com/yellowbean/AbsBox/blob/main/CHANGES.md"
 
 
 [tool.pytest.ini_options]
-minversion = "6.0"
-addopts = "-ra -q --color=yes"
+minversion = "7.0"
+addopts = "-ra -q --color=yes  --import-mode=importlib"
+
 testpaths = [
     "absbox/tests",
+    "docs/source/nbsample"
 ]
+
+pythonpath = "/Users/xiaoyu/Projects/PyABS"
 
 [project.optional-dependencies]
 test = [
     "pytest",
     "jsondiff",
     "deepdiff",
+    "ipykernel",
+    "pytest-notebook"
 ]
