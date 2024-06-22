@@ -849,7 +849,7 @@ syntax
 Issue Bonds (Master Trust & Warehousing)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. versionadded:: 0.28.8
+.. versionadded:: 0.28.9
 
 In the `Master Trust` or `Warehousing Funding` structure, the deal shall able to raise extra funds and create a new liability.
 
