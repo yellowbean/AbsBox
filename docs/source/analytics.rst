@@ -854,7 +854,7 @@ Issue Bonds (Master Trust & Warehousing)
 In the `Master Trust` or `Warehousing Funding` structure, the deal shall able to raise extra funds and create a new liability.
 
 syntax
-  ``("issueBond",<fundingPlan>)``
+  ``("issueBond",<fundingPlan 1>,<fundingPlan 2>....)``
 
 fundingPlan
   ``(<date of issuance>,<bond group name>,<account name>,<bond detail>)``
