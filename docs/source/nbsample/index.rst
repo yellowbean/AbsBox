@@ -16,3 +16,4 @@ Feel free to raise any question or report any error here ->  :ref:`Support`
    srtExamples
    triggerExamples
    debugExamples
+   warehouse
