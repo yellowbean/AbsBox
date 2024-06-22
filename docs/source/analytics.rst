@@ -846,6 +846,53 @@ syntax
                   ,read=True)  
 
 
+Issue Bonds (Master Trust & Warehousing)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 0.28.8
+
+In the `Master Trust` or `Warehousing Funding` structure, the deal shall able to raise extra funds and create a new liability.
+
+syntax
+  ``("issueBond",<fundingPlan>)``
+
+fundingPlan
+  ``(<date of issuance>,<bond group name>,<account name>,<bond detail>)``
+
+.. warning::
+  In the ``bond detail``, share same syntax of :ref:`Bonds/Tranches` , but require extra field ``name``.
+  Make sure the ``name`` is unique in the ``bond group``.
+
+.. code-block:: python
+
+  fundingPlan = [("2022-04-02","A","acc01"
+                      ,{"balance":600
+                         ,"rate":0.08
+                         ,"name":"A-3"
+                         ,"originBalance":600
+                         ,"originRate":0.07
+                         ,"startDate":"2022-04-02"
+                         ,"rateType":{"Fixed":0.08}
+                         ,"bondType":{"Sequential":None}
+                        ,"maturityDate":"2026-01-01"}
+                      )]
+
+
+  r = localAPI.run(test01
+                  ,runAssump = [
+                      ("issueBond",*fundingPlan)
+                  ]
+                  ,read=True)
+
+
+.. seealso::
+  
+  Example :ref:`Master Trust/Warehousing Funding Example` 
+
+
+
+
+
 
 Running
 --------------

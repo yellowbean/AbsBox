@@ -2033,6 +2033,9 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
                 return {"fireTrigger":[ (dt, dealCycleMap[cyc], tn) for (dt, cyc, tn) in scheduleFired]}
             case ("makeWhole", d,spd,tbl):
                 return {"makeWholeWhen": [d,spd,tbl]}
+            case ("issueBond", *issuancePlan):
+                return {"issueBondSchedule": [ [vDate(d),[vStr(bGrpName),vStr(accName),mkBnd(bnd["name"],bnd)|{"tag":"Bond"}]] 
+                                                for (d,bGrpName,accName,bnd) in issuancePlan]  }
     match xs:
         case None:
             return {}
