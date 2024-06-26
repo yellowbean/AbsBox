@@ -2034,7 +2034,9 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
             case ("makeWhole", d,spd,tbl):
                 return {"makeWholeWhen": [d,spd,tbl]}
             case ("issueBond", *issuancePlan):
-                return {"issueBondSchedule": [ [vDate(d),[vStr(bGrpName),vStr(accName),mkBnd(bnd["name"],bnd)|{"tag":"Bond"}]] 
+                return {"issueBondSchedule": [ [vDate(d),[vStr(bGrpName)
+                                                         ,vStr(accName)
+                                                         ,mkBnd(bnd["name"],bnd|{"startDate":vDate(d)})|{"tag":"Bond"}]] 
                                                 for (d,bGrpName,accName,bnd) in issuancePlan]  }
     match xs:
         case None:
