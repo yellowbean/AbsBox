@@ -280,7 +280,7 @@ class API:
 
         """
         r = None
-        _rateAssump = map(mkRateAssumption, rateAssumps) if rateAssumps else None
+        _rateAssump = lmap(mkRateAssumption, rateAssumps) if rateAssumps else None
         assetDate = getValWithKs(pool, ['cutoffDate', '封包日'])
 
         def buildPoolType(p) -> dict:

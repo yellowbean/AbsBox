@@ -1346,6 +1346,11 @@ def mkAsset(x):
         case ["Invoice", {"start":sd,"originBalance":ob,"originAdvance":oa,"dueDate":dd},{"status":status}] :
             return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":None} | mkTag("ReceivableInfo")
                                      ,mkAssetStatus(status)]))
+        case ["ProjectedFlowFix", cf, dp]:
+            return mkTag(("ProjectedFlowFixed",[mkCashFlowFrame(cf) ,mkDatePattern(dp)]))
+        case ['ProjectedFlowMix', cf, dp, fixPct, floatPcts]:
+            return mkTag(("ProjectedFlowMixFloater",[mkCashFlowFrame(cf) ,mkDatePattern(dp)
+                                                   , fixPct, floatPcts]))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 
@@ -1371,6 +1376,8 @@ def identify_deal_type(x):
                 return "FDeal"
             case {"assets": [{'tag': 'Invoice'}, *rest]}:
                 return "VDeal"
+            case {"assets": [{'tag': 'ProjectedFlowMix'}, *rest]} | {"assets": [{'tag': 'ProjectedFlowMixFloater'}, *rest]}:
+                return "PDeal"
             case _:
                 raise RuntimeError(f"Failed to identify deal type {z}")
     y = None
@@ -1600,6 +1607,8 @@ def mkAssetUnion(x):
             return mkTag(("FA", mkAsset(x)))
         case "应收帐款" | "Invoice" : 
             return mkTag(("RE", mkAsset(x)))
+        case "ProjectedFlowFix" | "ProjectedFlowMix" :
+            return mkTag(("PF", mkAsset(x)))
         case _:
             raise RuntimeError(f"Failed to match AssetUnion {x}")
 
@@ -1741,6 +1750,14 @@ def mkCf(x:list):
     else:
         cfs = [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None,None])) for _x in x]
         return mkTag(("CashFlowFrame", [[0,"1900-01-01",None],cfs]))
+    
+def mkCashFlowFrame(x):
+    """ Make cashflow frame """ 
+    flows = x.get("flows",[])
+    begBal = x.get("beginBalance",0)
+    begDate = x.get("beginDate","1900-01-01")
+    accInt = x.get("accruedInterest",None)
+    return mkTag(("CashFlowFrame", [[begBal,begDate,accInt], [ mkTag(("MortgageFlow", f+[0.0]*5+[None,None,None] )) for f in flows] ]))
 
 
 def mkPid(x):
