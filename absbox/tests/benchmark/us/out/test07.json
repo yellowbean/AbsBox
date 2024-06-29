@@ -1260,7 +1260,9 @@
           "tag": "RunTrigger",
           "contents": [
             "InWF",
-            "ExcessTrigger"
+            [
+              "ExcessTrigger"
+            ]
           ]
         },
         {

@@ -977,7 +977,7 @@ def mkAction(x:list):
             return mkTag(("BuyAsset", [None, mkLiqMethod(liq), vStr(source), lmap(mkPid, mPns)]))
         case ["购买资产", liq, source] | ["buyAsset", liq, source]:
             return mkTag(("BuyAsset", [None, mkLiqMethod(liq), vStr(source), None]))
-        case ["更新事件", trgName] | ["runTriggers", *trgName]:
+        case ["更新事件", trgName] | ["runTriggers", *trgName] | ["runTrigger", *trgName]:
             return mkTag(("RunTrigger", ["InWF", vList(trgName, str)]))
         case ["查看", comment, *ds] | ["inspect", comment, *ds]:
             return mkTag(("WatchVal", [comment, lmap(mkDs, ds)]))
