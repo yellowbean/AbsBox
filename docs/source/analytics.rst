@@ -871,7 +871,6 @@ fundingPlan
                          ,"name":"A-3"
                          ,"originBalance":600
                          ,"originRate":0.07
-                         ,"startDate":"2022-04-02"
                          ,"rateType":{"Fixed":0.08}
                          ,"bondType":{"Sequential":None}
                         ,"maturityDate":"2026-01-01"}

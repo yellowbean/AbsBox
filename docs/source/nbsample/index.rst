@@ -17,3 +17,4 @@ Feel free to raise any question or report any error here ->  :ref:`Support`
    triggerExamples
    debugExamples
    warehouse
+   IC_Test

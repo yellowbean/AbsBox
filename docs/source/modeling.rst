@@ -294,15 +294,17 @@ Ratio Type
 Bool Type
 ^^^^^^^^^^
     * ``("trigger", loc ,<trigger name>)`` -> status of trigger with name ``<trigger name>`` at :ref:`Trigger Locations`
-    * ``("isMostSenior","A",["B","C"])`` -> True if the bond "A" is oustanding and "B" and "C" are not outsanding
+    * ``("isMostSenior","A",["B","C"])`` -> True if the bond "A" is oustanding and "B" and "C" are not outstanding
     * ``("status", <deal status>)`` -> True if current deal status is :ref:`Deal Status`
     * ``("rateTest", <formula>, <cmp>, rate)`` -> True if :ref:`Formula` compare with a rate value
     * ``("allTest", True|False, <boolean type ds>....)`` -> True if all boolean type ds are True/False
     * ``("anyTest", True|False, <boolean type ds>....)`` -> True if any boolean type ds are True/False
     
     .. versionadded:: 0.23.4
-
     * ``("isPaidOff", "A", "B", "C"...)`` -> True if all "A","B","C" bonds are paid off
+    
+    .. versionadded:: 0.28.10
+    * ``("isOutstanding", "A", "B", "C"...)`` -> True if all "A","B","C" bonds are ALL active
 
     .. versionadded:: 0.26.1
     * ``("hasPassedMaturity","A","B"...)`` -> Ture if all bonds are passed expected maturity date

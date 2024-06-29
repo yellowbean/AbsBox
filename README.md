@@ -33,6 +33,7 @@ a structured finance cashflow engine wrapper for structured credit professionals
     * Fix Asset (Solar Panel/Hotel)
     * Receivable
     * SRT/Siginificant Risk Transfer
+    * Master Trust
 * Features
   * Sensitivity Analysis on different scenarios or deal structures
     * sensitivity analysis on pool performance assumptions

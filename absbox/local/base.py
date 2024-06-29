@@ -99,7 +99,8 @@ freqMap = {"每月": "Monthly", "每季度": "Quarterly", "每半年": "SemiAnnu
 rateLikeFormula = set(["bondFactor", "poolFactor", "cumPoolDefaultedRate","poolWaRate","bondWaRate", "资产池累计违约率", "债券系数", "资产池系数"
                       ,"cumPoolNetLossRate","cumPoolDefaultedRateTill"])
 intLikeFormula = set(["borrowerNumber", "monthsTillMaturity", "periodNum"])
-boolLikeFormula = set(["trigger", "事件", "isMostSenior", "最优先", "isPaidOff","清偿完毕","rateTest","allTest","anyTest","比率测试","任一测试","所有测试"])
+boolLikeFormula = set(["trigger", "事件", "isMostSenior", "最优先", "isPaidOff","清偿完毕","rateTest","allTest","anyTest","比率测试","任一测试","所有测试"
+                        "isOutstanding"])
 
 op_map = {">": "G", ">=": "GE", "<": "L", "<=": "LE", "=": "E"}
 
