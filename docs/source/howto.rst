@@ -1086,3 +1086,22 @@ How to use Deal JSON string
 The JSON string from `.json()` method can be used as part of post request send to `Hastructure` engine.
 
 But unfortunately there is no way convert the string back to python class so far.
+
+
+Tempalte: Model CLO
+---------------------------
+
+.. warning::
+    Working in progess
+
+
+CLO features:
+^^^^^^^^^^^^^^^^^^^
+
+ * Quarterly Payment
+ * Floating Rate of assets and liabilities
+ * IC/OC/IDT test
+ * Interest & Principal Waterfall
+
+
+

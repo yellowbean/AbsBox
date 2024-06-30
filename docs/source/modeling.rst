@@ -289,6 +289,7 @@ Ratio Type
     * ``("cumPoolDefaultedRateTill",n)`` -> cumulative default rate of pool at `N` period. ( -1 means period before last period)
     * ``("cumPoolNetLossRate",)`` -> cumulative loss rate of pool
     * ``("poolWaRate",)`` -> weighted average pool coupon 
+    * ``("bondRate","A")`` -> the bond rate of bond "A"
     * ``("bondWaRate",<Bond1>,<Bond2>...)`` -> weighted average bond coupon
 
 Bool Type
