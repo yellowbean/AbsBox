@@ -21,7 +21,7 @@ def readBondStmt(respBond):
             return {k: pd.DataFrame(list(tz.pluck("contents",[] if v['bndStmt'] is None else v['bndStmt'])), columns=english_bondflow_fields).set_index("date") for k,v in bndMap.items() }
         case {'tag':'Bond', **singleBndMap }:
             bStmt = mapNone(singleBndMap.get('bndStmt',[]),[])
-            return pd.DataFrame(list(tz.pluck("contents", bStmt)), columns=china_bondflow_fields).set_index("date")
+            return pd.DataFrame(list(tz.pluck("contents", bStmt)), columns=english_bondflow_fields).set_index("date")
         case _:
             raise RuntimeError("Failed to read bond flow from resp",respBond)
 
@@ -122,7 +122,7 @@ class SPV:
         output['bonds'] = {k :readBondStmt(v) for k,v in deal_content['bonds'].items()}
 
         # trigger 
-        if 'triggers' in deal_content:
+        if 'triggers' in deal_content and deal_content['triggers']:
             output['triggers'] = deal_content['triggers'] & lens.Values().Values().modify(readTrgStmt)    
         else:
             output['triggers'] = None
