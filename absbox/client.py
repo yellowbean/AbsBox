@@ -17,7 +17,7 @@ from absbox.validation import isValidUrl, vStr
 from absbox.local.util import mkTag,mapValsBy \
                               , _read_cf, _read_asset_pricing, mergeStrWithDict \
                               , earlyReturnNone, searchByFst, filter_by_tags \
-                              , enumVals, lmap, inferPoolTypeFromAst, getValWithKs
+                              , enumVals, lmap, inferPoolTypeFromAst, getValWithKs, mapNone
 from absbox.local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkLiqMethod \
                                    , mkAssetUnion, mkRateAssumption, mkDatePattern, mkPoolType
 
