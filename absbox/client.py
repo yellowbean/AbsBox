@@ -1,4 +1,4 @@
-import json, urllib3, getpass, enum, os
+import json, urllib3, getpass, enum, os, pickle
 from importlib.metadata import version
 from json.decoder import JSONDecodeError
 from dataclasses import dataclass
@@ -94,6 +94,7 @@ class LibraryEndpoints(str, enum.Enum):
     Data = "data"
     DataList = "data/list"
     DataFetch = "data/fetch"
+    DealFetch = "deal/fetch"
 
 
 
@@ -480,7 +481,7 @@ class API:
         else:
             return result
 
-    def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, read=True, debug=False) -> dict:
+    def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, runAssump=None, read=True, debug=False) -> dict:
         """run multiple deals with same assumption
 
         :param deals: a dict of deals
@@ -489,6 +490,8 @@ class API:
         :type poolAssump: _type_, optional
         :param nonPoolAssump: _description_, defaults to None
         :type nonPoolAssump: _type_, optional
+        :param runAssump: _description_, defaults to None
+        :type runAssump: _type_, optional
         :param read: _description_, defaults to True
         :type read: bool, optional
         :param debug: return request text instead of sending out such request, defaults to False
@@ -500,7 +503,7 @@ class API:
 
         url = f"{self.url}/{Endpoints.RunMultiDeal.value}" 
         _poolAssump = mkAssumpType(poolAssump) if poolAssump else None 
-        _nonPerfAssump = mkNonPerfAssumps({}, nonPoolAssump)
+        _nonPerfAssump = mkNonPerfAssumps({}, mapNone(nonPoolAssump,[]) + mapNone(runAssump,[]))
         req = json.dumps(mkTag(("MultiDealRunReq"
                                  ,[ tz.valmap(lambda x:x.json, deals)
                                    ,_poolAssump
@@ -677,7 +680,7 @@ class API:
                     - {"deal_library": <deal library url> }, specify the deal library server;
                     - {"read":True}, return a dataframe, else return raw result;
                     - {"poolAssump":<pool assumptions>}, specify pool assumptions;
-                    - {"dealAssump":<deal assumptions>}, specify deal assumptions;
+                    - {"runAssump":<deal assumptions>}, specify run assumptions;
         :type p: dict
         :raises RuntimeError: _description_
         :return: raw string or dataframe
@@ -685,7 +688,7 @@ class API:
         """
         deal_library_url = p['deal_library']+f"/{LibraryEndpoints.Run.value}"
         read = p.get("read", True)
-        dealAssump, poolAssump = tz.get(["dealAssump", "poolAssump"], p, None)
+        dealAssump, poolAssump = tz.get(["runAssump", "poolAssump"], p, None)
         runType = p.get("runType", "S")
         prod_flag = {"production": p.get("production", True)}
 
@@ -745,6 +748,16 @@ class API:
             return result
         else:
             return result
+    
+    def fetchLibraryDeal(self, **q):
+        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.DealFetch.value}"
+        hdrs = self.hdrs | {"Authorization": f"Bearer {self.token}"}
+        r = None
+        if self.session:
+            r = self.session.post(deal_library_url, data=json.dumps(q).encode('utf-8'), headers=hdrs, verify=False, timeout=15)
+            if r.status_code != 200:
+                raise AbsboxError(f"❌{MsgColor.Error.value}Failed to fetch deal from library")
+            return pickle.loads(r.content)
 
 
     def _send_req(self, _req, _url: str, timeout=10, headers={})-> dict | None:

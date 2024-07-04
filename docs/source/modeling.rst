@@ -1457,9 +1457,9 @@ syntax
 Projected Cashflow
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-It's possible that to build a deal model with `Projected Cashflow` which means the there is no way to get loan level data of `Assets` but only cashflow derived from these assets.
+It's possible that to build a deal model with ``Projected Cashflow`` which means the there is no way to get loan level data of `Assets` but only cashflow derived from these assets.
 
-There are two type of `Projected Cashflow`
+There are two type of ``Projected Cashflow``
 
 * Fixed Projected Flow -> the cashflow is projected via assets with fix rate.
 * Mixed Projected Flow -> the cashflow is projected via a pool of assets with %x of fixed rate asset and %y1 %y2 ...
@@ -1468,9 +1468,9 @@ Fix Rate Flow
 """"""""""""""""""""
 
 syntax 
-  ["ProjectedFlowFix" ,{"flows":[["2024-09-01",<Balance>,<Principal>,<Interest>]....] ,"beginDate":"2024-06-01","beginBalance":1000},"MonthEnd"]
+  ``["ProjectedFlowFix" ,{"flows":[["2024-09-01",<Balance>,<Principal>,<Interest>]....] ,"beginDate":"2024-06-01","beginBalance":1000},"MonthEnd"]``
 
-* `MonthEnd`
+* ``MonthEnd``
 
   Means if there is default/recovery lag how the cashflow periods extended
 
@@ -1479,12 +1479,12 @@ Mix Rate Flow
 """"""""""""""""""""
 
 syntax 
-  ["ProjectedFlowMix" ,{"flows":[["2024-09-01",100,10,10]] ,"beginDate":"2024-06-01" ,"beginBalance":110} ,"MonthEnd" ,(.5,0.08) ,[(1.0,0.02,"LIBOR1M")]]
+  ``["ProjectedFlowMix" ,{"flows":[["2024-09-01",100,10,10]] ,"beginDate":"2024-06-01" ,"beginBalance":110} ,"MonthEnd" ,(.5,0.08) ,[(1.0,0.02,"LIBOR1M")]]``
 
-* `(0.5,0.08)`
+* ``(0.5,0.08)``
 
   Means, 50% of projected cashflow are attributed to fix rate assets with fix rate of 8%
-* `[(1.0,0.02,"LIBOR1M")]`
+* ``[(1.0,0.02,"LIBOR1M")]``
 
   Means 100% of rest cashflow are generated from floater asset with spread of 2% and index of `LIBOR1M`
 

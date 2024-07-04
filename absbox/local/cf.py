@@ -3,6 +3,7 @@ import toolz as tz
 from lenses import lens
 from functools import reduce
 #from itertools import reduce
+from absbox.validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool
 
 
 def readToCf(xs, header=None, idx=None, sort_index=False) -> pd.DataFrame:
@@ -106,8 +107,9 @@ def readAccsCf(aMap, popColumns=["memo"]) -> pd.DataFrame:
     return df
 
 def readFlowsByScenarios(rs:dict, path, fullName=True) -> pd.DataFrame:
-    "read time-series balance from multi scenario or mult-structs"
+    "read time-series balance flow from multi scenario or mult-structs"
     
+    # transfrom result map to values of paths
     flows = tz.valmap(lambda x: x & path.get(), rs)
     
     if fullName:
@@ -119,11 +121,12 @@ def readMultiFlowsByScenarios(rs:dict, _path, fullName=True) -> pd.DataFrame:
     "read multi time-series from multi scenario or mult-structs"
     
     (path,cols) = _path
+    vCols = vList(cols, vStr)
     _flows = tz.valmap(lambda x: x & path.get(), rs)
-    flows = tz.valmap(lambda df: df[cols],_flows)
+    flows = tz.valmap(lambda df: df[vCols],_flows)
     scenarioNames = list(flows.keys())
-    header = pd.MultiIndex.from_product([ scenarioNames ,cols], names =['Scenario',"Field"])
+    header = pd.MultiIndex.from_product([ scenarioNames ,vCols], names =['Scenario',"Field"])
 
-    df = pd.concat( list(flows.values()) ,axis=1)
+    df = pd.concat(list(flows.values()) ,axis=1)
     df.columns = header
     return df
