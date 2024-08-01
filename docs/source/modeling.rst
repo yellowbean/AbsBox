@@ -2379,7 +2379,7 @@ PayPrin
 
     ``["payPrin", {Account}, [<Bonds>], m ]``      # pay bond via pro-rata basis
     
-    `m`is just amp same in the `payFee` , which has keys :
+    `m`is just map same in the `payFee` , which has keys :
 
       * ``limit`` -> :ref:`<limit>`
       * ``support`` -> :ref:`<support>`
@@ -2404,7 +2404,7 @@ PayPrinBySeq
   syntax
     ``["payPrinBySeq", {Account}, [<Bonds>], m ]``  # pay bonds by sequential, with optional cap in `m` ,:ref:`PayBond Sequential`
 
-    `m`is just amp same in the `payFee` , which has keys :
+    `m`is just map same in the `payFee` , which has keys :
 
       * ``limit`` -> :ref:`<limit>`
       * ``support`` -> :ref:`<support>`
@@ -2465,7 +2465,7 @@ Calc Bond Principal Due
     
     ``["calcBondPrin", <Account>, [<Bond>], m ]``
     
-    `m`is just amp same in the `payFee` , which has keys :
+    `m`is just map same in the `payFee` , which has keys :
 
       * ``limit`` -> :ref:`<limit>`
       * ``support`` -> :ref:`<support>`
@@ -2488,7 +2488,7 @@ Accure Interest and Pay of Bond Group
 
     ``["accrueAndPayIntByGroup", "A", m]``
     
-  `m`is just amp same in the `payFee` , which has keys :
+  `m`is just map same in the `payFee` , which has keys :
 
     * ``limit`` -> :ref:`<limit>`
     * ``support`` -> :ref:`<support>`
@@ -2501,7 +2501,7 @@ Pay Interest to Bond Group
 
     ``["payIntByGroup", "A", order, m]``
     
-  `m`is just amp same in the `payFee` , which has keys :
+  `m`is just map same in the `payFee` , which has keys :
 
     * ``limit`` -> :ref:`<limit>`
     * ``support`` -> :ref:`<support>`
@@ -2514,7 +2514,7 @@ Pay Principal to Bond Group
     
     ``["payPrinByGroup", "A", order, m]``
     
-  `m`is just amp same in the `payFee` , which has keys :
+  `m`is just map same in the `payFee` , which has keys :
 
     * ``limit`` -> :ref:`<limit>`
     * ``support`` -> :ref:`<support>`
