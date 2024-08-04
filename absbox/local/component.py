@@ -1171,6 +1171,8 @@ def mkAmortPlan(x) -> dict:
             return mkTag(("ScheduleRepayment", [mkTs("RatioCurve", ts), mkDatePattern(Dp)]))
         case ("计划还款", ts) | ("Schedule", ts):
             return mkTag(("ScheduleRepayment", [mkTs("RatioCurve", ts), None]))
+        case ("Balloon", n):
+            return mkTag(("Balloon", n))
         case _:
             raise RuntimeError(f"Failed to match AmortPlan {x}:mkAmortPlan")
 

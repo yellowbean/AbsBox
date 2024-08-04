@@ -2,11 +2,15 @@ import enum
 from absbox.local.util import *
 
 # Bond 
-china_bondflow_fields_s = ["余额", "利息", "本金", "执行利率", "本息合计","应付利息","罚息" "本金系数", "备注"]
+china_bondflow_cash = "本息合计"
+china_bondflow_fields_s = ["余额", "利息", "本金", "执行利率", china_bondflow_cash,"应付利息","罚息" "本金系数", "备注"]
 china_bondflow_fields = ["日期"] + china_bondflow_fields_s
-china_bond_cashflow = ["本金", "利息", "本息合计"]
-english_bondflow_fields_s = ["balance", "interest", "principal", "rate", "cash", "intDue","intOverInt","factor",  "memo"]
+china_bond_cashflow = ["本金", "利息", china_bondflow_cash]
+
+english_bondflow_cash = "cash"
+english_bondflow_fields_s = ["balance", "interest", "principal", "rate", english_bondflow_cash, "intDue","intOverInt","factor",  "memo"]
 english_bondflow_fields = ["date"] + english_bondflow_fields_s
+english_bond_cashflow = ["principal", "interest", english_bondflow_cash]
 
 # Cumulative
 china_cumStats = ["累计还款", "累计早偿", "累计拖欠", "累计违约", "累计回收", "累计损失"]

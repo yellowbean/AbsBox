@@ -1,6 +1,6 @@
 import pandas as pd 
 from pyxirr import xirr
-from absbox.local.base import china_bondflow_fields_s, english_bondflow_fields_s
+from absbox.local.base import china_bondflow_fields_s, english_bondflow_fields_s,english_bondflow_cash,china_bondflow_cash
 from absbox.validation import vStr
 import numpy as np
 from toolz import get_in
@@ -23,9 +23,9 @@ run_yield_table = runYieldTable
 def irr(flow: pd.DataFrame, init):
     def extract_cash_col(_cols):
         if _cols == china_bondflow_fields_s:
-            return flow['本息合计']
+            return flow[china_bondflow_cash]
         elif _cols == english_bondflow_fields_s: 
-            return flow['cash']
+            return flow[english_bondflow_cash]
         else:
             raise RuntimeError("Failed to match", _cols)
 

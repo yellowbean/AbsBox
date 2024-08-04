@@ -59,7 +59,6 @@ class Generic:
             "name": vStr(self.name),
             "status":mkStatus(self.status),
             "pool":mkPoolType(lastAssetDate, self.pool, mixedAssetFlag),
-          # "bonds": {bn: mkBnd(bn, bo) for (bn, bo) in self.bonds},
             "bonds": {bn: mkBndComp(bn, bo) for (bn, bo) in self.bonds},
             "waterfall": mkWaterfall({},self.waterfall.copy()),  
             "fees": {fn: mkFee(fo|{"name": fn}, fsDate = lastCloseDate) for (fn, fo) in self.fees},
@@ -114,7 +113,7 @@ class Generic:
         # read bonds
         output['bonds'] = {k :readBondStmt(v) for k,v in deal_content['bonds'].items()}
 
-        # triggers 
+        # triggers
         if 'triggers' in deal_content and deal_content['triggers']:
             output['triggers'] = deal_content['triggers'] & lens.Values().Values().modify(readTrgStmt)    
         else:

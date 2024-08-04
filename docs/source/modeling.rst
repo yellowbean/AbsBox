@@ -1065,6 +1065,10 @@ Mortgage
   
   * `("NO_FirstN",N,<type>)` -> no payment for first N period (capitalized interest), and amortize per `type` following
   * `("IO_FirstN",N,<type>)` -> interest only for first N period, and amortize per `type` following
+  
+  .. versionadded:: 0.28.16
+  * `("Balloon",N)` -> ballon mortgage with amortization period of N
+  
 
 ``freq`` 
   `freq` -> :ref:`Period`
@@ -2120,6 +2124,9 @@ This workflow chart demostrate how engine pick the waterfall to execute during d
      - every distribution day
    * - ``(amortizing, defaulted)``
      - deal status is `Defaulted`
+     - every distribution day
+   * - ``(amortizing, revolving)``
+     - deal status is `Revolving`
      - every distribution day
    * - ``endOfCollection``
      - any deal status
