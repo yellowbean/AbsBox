@@ -27,7 +27,7 @@ def readBondStmt(respBond):
 
 def readTrgStmt(x):
     tStmt = mapNone(x.get('trgStmt',[]),[])
-    return pd.DataFrame(list(tz.pluck("contents", tStmt)), columns=china_trigger_flow_fields_d).set_index("date")
+    return pd.DataFrame(list(tz.pluck("contents", tStmt)), columns=china_trigger_flow_fields_d).set_index("日期")
 
 
 
@@ -118,6 +118,7 @@ class SPV:
         output['fees'] = {f: v.groupby('日期').agg({"余额": "min", "支付": "sum", "剩余支付": "min"})
                           for f, v in output['fees'].items()}
 
+        
         # read bonds
         output['bonds'] = {k :readBondStmt(v) for k,v in deal_content['bonds'].items()}
 
