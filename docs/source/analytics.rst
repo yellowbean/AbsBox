@@ -126,6 +126,7 @@ Performing
     * ``{"CDR":0.01}`` means 1% in annualized of current balance will be defaulted at the end of each period
     * ``{"CDR":[0.01,0.02,0.04]}`` means a vector of CDR will be applied since the asset snapshot date (determined by ``remain terms``)
     * ``{"ByAmount":(2000,[500,500,1000])}`` apply a custom default amount vector.
+    * ``{"DefaultAtEndByRate":(0.05,0.10)}``, will apply 5% as CDR for all periods except last period. The last period will use default CDR 10% (which start from begining day).
 
 * <Prepayment Assumption>
   
@@ -187,6 +188,7 @@ Summary
         "Default Assumption" -> "{'CDR':x}"
         "Default Assumption" -> "{'CDR':[x...]}"
         "Default Assumption" -> "{'ByAmount':(<total>, [x...])}"
+        "Default Assumption" -> "{'DefaultAtEndByRate':(x,y)}"
         "Prepayment Assumption" -> "{'CPR':x}"
         "Prepayment Assumption" -> "{'CPR':[x...]}"
         "Recovery Assumption" -> "{'Rate':x,'Lag':y}"
@@ -230,6 +232,7 @@ Summary
         Performing -> "Recovery Assumption"
         "Prepayment Assumption" -> "{'CPR':x}"
         "Default Assumption" -> "{'CDR':x}"
+        "Default Assumption" -> "{'DefaultAtEndByRate':(x,y)}"
         "Recovery Assumption" -> "{'Rate':x,'Lag':y}"
     }
 
@@ -269,6 +272,7 @@ Summary
         Performing -> "Recovery Assumption"
         "Prepayment Assumption" -> "{'CPR':x}"
         "Default Assumption" -> "{'CDR':x}"
+        "Default Assumption" -> "{'DefaultAtEndByRate':(x,y)}"
         "Recovery Assumption" -> "{'Rate':x,'Lag':y}"
     }
 

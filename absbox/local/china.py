@@ -30,7 +30,6 @@ def readTrgStmt(x):
     return pd.DataFrame(list(tz.pluck("contents", tStmt)), columns=china_trigger_flow_fields_d).set_index("日期")
 
 
-
 @dataclass
 class SPV:
     名称: str

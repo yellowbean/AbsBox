@@ -1442,6 +1442,8 @@ def mkAssumpDefault(x):
             return mkTag(("DefaultByAmt", (vNum(bal), vList(rs,numVal))))
         case "DefaultAtEnd":
             return mkTag(("DefaultAtEnd"))
+        case {"DefaultAtEndByRate":(r1,r2)}:
+            return mkTag(("DefaultAtEndByRate", [vNum(r1), vNum(r2)]))
         case _ :
             raise RuntimeError(f"failed to match {x}")
 

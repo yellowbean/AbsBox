@@ -6,3 +6,9 @@ notebook
 myst-nb
 absbox
 pyxirr
+toolz
+lenses
+dateparser
+more_itertools
+pandas
+python-dateutil
