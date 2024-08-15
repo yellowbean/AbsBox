@@ -157,7 +157,7 @@ dealStatusMap = {"en": {'amort': "Amortizing", 'def': "Defaulted", 'acc': "Accel
                         ,'called':"清仓回购"
                         ,'ramp':"RampUp"}}
 
-cfIndexMap = {'cn':"日期",'en':"Date","english":"Date","chinese":"日期"}
+cfIndexMap = {'cn':"日期",'en':english_date,"english":english_date,"chinese":"日期"}
 
 
 class DC(enum.Enum):  # TODO need to check with HS code

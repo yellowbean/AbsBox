@@ -130,3 +130,20 @@ def readMultiFlowsByScenarios(rs:dict, _path, fullName=True) -> pd.DataFrame:
     df = pd.concat(list(flows.values()) ,axis=1)
     df.columns = header
     return df
+
+
+def readFieldsByScenarios(rs:dict, path, extractor, flip=False) -> pd.DataFrame:
+    """  
+        read fields from multi scenario or mult-structs
+        make sure the `path` points to a single value
+    """
+
+    # transfrom result map to values of paths
+    tbls = tz.valmap(lambda x: x & path.get(), rs)
+    
+    if flip:
+        r = tz.valmap(lambda x: x.T.loc.__getitem__(extractor), tbls)
+    else:
+        r = tz.valmap(lambda x: x.loc.__getitem__(extractor), tbls)
+        
+    return pd.DataFrame.from_dict(r)
