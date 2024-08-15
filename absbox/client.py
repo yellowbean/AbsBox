@@ -112,6 +112,8 @@ class EnginePath(str, enum.Enum):
     DEV = "https://absbox.org/api/dev"
     NY_DEV = "https://spv.run/api/dev"
     NY_PROD = "https://spv.run/api/latest"
+    LDN_DEV = "https://ldn.spv.run/api/dev"
+    LDN_PROD = "https://ldn.spv.run/api/latest"
     USE_ENV = "USE_ENV"
     """ USE_ENV (str): Use environment variable (`ABSBOX_SERVER`) for engine path """
 
