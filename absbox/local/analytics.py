@@ -63,3 +63,23 @@ def flow_by_scenario(rs, flowpath, node="col", rtn_df=True, ax=1, rnd=2):
         _ks = list(r.keys())
         r = pd.concat(_vs, keys=_ks, axis=ax)
     return r
+
+
+def viewBalanceAccount(accStmt, date=None) -> float :
+    if date is None:
+        return 1
+    
+    return 0
+
+
+
+def FlowSummary(r:dict, start_date=None, end_date=None):
+    """Sum up cash flow from result
+    """
+    accsMap = r['accounts']
+
+
+
+
+
+    return {}
