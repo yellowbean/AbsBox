@@ -969,16 +969,24 @@ def mkAction(x:list):
             return mkTag(("ActionWithPre", [mkPre(pre), lmap(mkAction,actions)]))
         case ["条件执行2", pre, actions1, actions2] | ["IfElse", pre, actions1, actions2]:
             return mkTag(("ActionWithPre2", [mkPre(pre), lmap(mkAction,actions1), lmap(mkAction,actions2)]))
+        ## Revolving buy
+        ### Revolving buy with optional limit and target pool
+        case ["购买资产", liq, source, _limit, mPns] | ["buyAsset", liq, source, _limit, mPns]:
+            return mkTag(("BuyAsset", [mkLimit(_limit), mkLiqMethod(liq), vStr(source), lmap(mkPid, mPns)]))
+        ### Revolving buy with optional limit and default pool
         case ["购买资产", liq, source, _limit] | ["buyAsset", liq, source, _limit]:
             return mkTag(("BuyAsset", [mkLimit(_limit), mkLiqMethod(liq), vStr(source), None]))
-        case ["购买资产", liq, source, None] | ["buyAsset", liq, source, None]:
-            return mkTag(("BuyAsset", [None, mkLiqMethod(liq), vStr(source), None]))
-        case ["购买资产", liq, source, mPns] | ["buyAsset", liq, source, mPns]:
-            return mkTag(("BuyAsset", [None, mkLiqMethod(liq), vStr(source), lmap(mkPid, mPns)]))
+        ### Revolving buy with all cash and default pool
         case ["购买资产", liq, source] | ["buyAsset", liq, source]:
             return mkTag(("BuyAsset", [None, mkLiqMethod(liq), vStr(source), None]))
+        ### Revolving buy with all cash and source/target pool 
+        case ["购买资产2", liq, source, _limit, sPool, mPn] | ["buyAsset2", liq, source, _limit, sPool, mPn ]:
+            return mkTag(("BuyAssetFrom", [mkLimit(_limit), mkLiqMethod(liq), vStr(source), sPool, mkPid(mPn)]))
+        
+        ## Trigger
         case ["更新事件", trgName] | ["runTriggers", *trgName] | ["runTrigger", *trgName]:
             return mkTag(("RunTrigger", ["InWF", vList(trgName, str)]))
+        ## Inspect
         case ["查看", comment, *ds] | ["inspect", comment, *ds]:
             return mkTag(("WatchVal", [comment, lmap(mkDs, ds)]))
         case _:
@@ -2043,6 +2051,8 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
                 return {"callWhen":[mkCallOptions(opt) for opt in opts]}
             case ("revolving", rPool, rPerf):
                 return {"revolving":mkTag(("AvailableAssets", [mkRevolvingPool(rPool), mkAssumpType(rPerf)]))}
+            case ("revolving", rPoolPerfMap) if isinstance(rPoolPerfMap, dict):
+                return {"revolving":mkTag(("AvailableAssetsBy", {k: [mkRevolvingPool(vPool),mkAssumpType(vAssump)]  for (k,(vPool,vAssump)) in rPoolPerfMap.items()}))}
             case ("interest", *ints):
                 return {"interest":[mkRateAssumption(_) for _ in ints]}
             case ("inspect", *tps):

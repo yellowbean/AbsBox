@@ -17,7 +17,7 @@ If any **Bug** found or  **features/documenent** request,please raise tickets al
 
 https://github.com/yellowbean/AbsBox/issues
 
-**AbsBox** training is offered via webmeeting .
+
 
 API Integration
 ------------------
@@ -26,15 +26,15 @@ API Integration
 - or building webservice layer with `absbox` to intergate with other system
 - or using the `RESTful service <https://github.com/yellowbean/Hastructure>`_  directly with anyother language.
     - ``Swagger.json`` file is ready for integration.
-- Docker 
-    - ``docker pull yellowbean/hastructure:latest``
+- deploy engine locally via Docker 
+    - ``docker pull yellowbean/hastructure:latest`` for stable version 
+    - ``docker pull yellowbean/hastructure:dev`` for development version 
     - ``docker run -p 5000:8081 yellowbean/hastructure``
     - the server runs at port ``8081``
 
 .. image:: img/Intergration.png
   :width: 600
   :alt: intergration-landscape
-
 
 Email & Slack
 -------------------
@@ -44,3 +44,17 @@ Email & Slack
   :alt: Support Email 
 
 ``absbox & hastructure`` -> https://absboxhastructure.slack.com
+
+
+Consulting & Training
+----------------------------
+
+
+- **AbsBox** training is offered via webmeeting .
+- **Hastructure** integration is provided by commercial term.
+
+Please concact us for more details.
+
+.. image:: img/email-image.png
+  :width: 200
+  :alt: Support Email 

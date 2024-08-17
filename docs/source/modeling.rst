@@ -2567,10 +2567,24 @@ Buy Asset
     
     ``["buyAsset",{pricing method}, {Account}, {limit}]``
 
-    ``limit`` : {"formula": :ref:`Formula`}
+    * ``{pricing method``: :ref:`Pricing Method`
+    * ``{limit}``: :ref:`<limit>`
 
-    ``{pricing method}``: :ref:`Pricing Method`
-      
+Buy Asset From/To different Pools
+  .. versionadded:: 0.28.15
+  use cash from an account to buy asset a pool by name and deposit the asset to another pool by name.
+
+  syntax 
+    ``[ "buyAsset2", {pricing method}, {Account}, {limit}, {revolving pool name}, {deal pool name} ]``
+
+    * ``{pricing method``: :ref:`Pricing Method`
+    * ``{limit}``: :ref:`<limit>`
+
+  .. note::
+    Notebook example 
+    
+    :ref:`Revolving Feature Example`
+  
 
 Liquidtiy Facility 
 ^^^^^^^^^^^^^^^^^^^
