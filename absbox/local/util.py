@@ -52,6 +52,20 @@ def readTagStr(x: str) -> str:
         case _ :
             return f"<{x}>"
 
+def readTagMap(x:dict) -> str:
+    match x:
+        case {"tag": _t, "contents": None}:
+            return f"<{_t}>"
+        case {"tag": _t, "contents": _c} if isinstance(_c, list):
+            _cs = [str(_) for _ in _c]
+            return f"<{_t}:{','.join([ readTagMap(_) for _ in _cs])}>"
+        case {"tag": _t,"contents":_c}:
+            return f"<{_t}:{readTagMap(_c)}>"
+        case {"tag": _t}:
+            return f"<{_t}>"
+        case _ :
+            return f"<{x}>"
+
 
 def readTag(x: dict):
     return f"<{x['tag']}:{','.join(x['contents'])}>"
@@ -343,7 +357,8 @@ def _read_cf(x, lang):
 
 
 def _read_asset_pricing(xs, lang) -> pd.DataFrame:
-    return pd.DataFrame(tz.pluck("contents", xs), columns=assetPricingHeader[lang])
+    return pd.DataFrame(tz.pluck("contents", xs)
+            , columns=assetPricingHeader[lang])
 
 
 def mergeStrWithDict(s: str, m: dict) -> str:

@@ -1037,6 +1037,11 @@ Pls make sure there are couple adjustment to set assumptions and get result.
 
 .. seealso:: :ref:`Multiple Pool with mixed assets`
 
+.. warning:: 
+
+  Make sure you will change the ``collection rule`` as well to instruct the deal pick different fields from multiple pools. 
+  See exmaple: :ref:`Multiple Pool with mixed assets`
+
 Resecuritizaiton
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -2153,6 +2158,14 @@ example:
       ,"cleanUp":[]
       }
 
+.. note::
+
+  .. versionadded:: 0.28.17
+
+  User can inspect which waterfall actions have been executed by checking the `log` result. 
+  :ref:`Which waterfalls has been run?`
+
+
 .. warning::
    
    Make sure there are waterfall to be run if deal status changed. Otherwise the deal won't do anything. ie. if there is trigger change in deal,make sure there is a corresponding waterfall modeled for that status.
@@ -3002,10 +3015,20 @@ Liquidity Provider
 
 If there is a shortage on fee or interest or principal, user can setup rules to draw cash from the `Liquidity Provider`  and deposity cash to accounts.
 
+common properites
+  * ``start`` -> when the liquidity provider start to be effective
+  * ``lineOfCredit`` -> current available credit to draw, served as base to calculate premium fee
+  * ``balance`` -> current balance to be paid back to provider, served as base to calculate interest
+  * ``rate`` -> interest rate to be used on ``balance``
+  * ``fee`` ->  premium fee to be used on ``lineOfCredit``
+
+Different types of line of credit
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 There are couple types available:
 
 Unlimit Liquidity 
-^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""
 
 It provides unlimit liquidity.
 
@@ -3015,7 +3038,7 @@ It provides unlimit liquidity.
   ,"start": <Date>}
 
 Fix Support
-^^^^^^^^^^^^^
+""""""""""""""""""""
 
 It provides liquidity up to a fix amount of cash
 
@@ -3027,7 +3050,7 @@ It provides liquidity up to a fix amount of cash
 
 
 Reset Line of Credit 
-^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""
 
 The line of credit will be reset periodically.
 
@@ -3039,7 +3062,8 @@ The line of credit will be reset periodically.
   ,"start": <Date>}
 
 Formula-based Line of Credit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""
+
 
 .. code-block:: python 
 
@@ -3048,12 +3072,6 @@ Formula-based Line of Credit
            ,"pct":<Percentage>}
   ,"start": <Date>}
 
-common properites
-  * ``start`` -> when the liquidity provider start to be effective
-  * ``lineOfCredit`` -> current available credit to draw
-  * ``balance`` -> current balance to be paid back to provider
-  * ``rate`` -> interest rate to be used on ``balance``
-  * ``fee`` ->  premium fee to be used on ``lineOfCredit``
 
 
 Interest Rate Hedge 

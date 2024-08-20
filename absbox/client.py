@@ -213,6 +213,10 @@ class API:
             self.url = isValidUrl(self.url).rstrip("/")
             
         console.print(f"{MsgColor.Info.value}Connecting engine server -> {self.url}")
+        
+        if self.lang not in ["chinese", "english"]:
+            raise AbsboxError(f"❌{MsgColor.Error.value}Invalid language:{self.lang}, only support 'chinese' or 'english' ")
+
         try:
             _r = requests.get(f"{self.url}/{Endpoints.Version.value}", verify=False, timeout=5, headers = {"Origin":"http://localhost:8001"}).text
         except (ConnectionRefusedError, ConnectionError):

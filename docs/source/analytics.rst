@@ -1086,6 +1086,13 @@ If user pass scenario with a map , the response will be a map as well.
   r["Stress01"][0]
   r["Stress02"][0]
 
+.. note::
+
+  ``Run Pool of Asset`` is a good way to test the asset performance assumption and cashflow before running the whole deal. see example: :ref:`Run Assets in Pool` 
+
+
+
+
 Running a single asset 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1129,6 +1136,10 @@ returns:
 
   # or just pattern match on the result
   (cf,stat,pricing) = localAPI.runAsset(....)
+
+.. note::
+
+  ``Run single asset`` is a good way to test the asset performance assumption and cashflow before running the whole deal. see example: :ref:`Run Single Assets` 
 
 
 Getting cashflow

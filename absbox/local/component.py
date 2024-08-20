@@ -1,7 +1,7 @@
 from absbox.local.util import mkTag, mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
 from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
-from absbox.local.util import filter_by_tags, enumVals, lmap
+from absbox.local.util import filter_by_tags, enumVals, lmap, readTagMap
 from absbox.local.base import *
 
 from absbox.validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool
@@ -1337,11 +1337,9 @@ def mkAsset(x):
             dailyRatePlan = None
             _stepUpType = "curve" if isinstance(rate, list) else "constant"
             if _stepUpType == "constant":
-                dailyRatePlan = mkTag(
-                    ("FlatRate", [mkDatePattern(accDp), rate]))
+                dailyRatePlan = mkTag(("FlatRate", [mkDatePattern(accDp), rate]))
             else:
-                dailyRatePlan = mkTag(
-                    ("ByRateCurve", [mkDatePattern(accDp), rate]))
+                dailyRatePlan = mkTag(("ByRateCurve", [mkDatePattern(accDp), rate]))
             return mkTag(("StepUpLease", [{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp), "originRental": dailyRate} | mkTag("LeaseInfo"), dailyRatePlan, 0, remainTerms, mkAssetStatus(status)]))
         case ["固定资产",{"起始日":sd,"初始余额":ob,"初始期限":ot,"残值":rb,"周期":p,"摊销":ar,"产能":cap}
                       ,{"剩余期限":rt}] \
@@ -1938,6 +1936,14 @@ def readRunSummary(x, locale) -> dict:
         errorLogs = [ ["Error",c['contents']] for c in error_warnings_by_map[ValidationMsg.Error.value]] if ValidationMsg.Error.value in error_warnings_by_map else []
         warningLogs = [ ["Warning",c['contents']] for c in error_warnings_by_map[ValidationMsg.Warning.value]] if ValidationMsg.Warning.value in error_warnings_by_map else []
         r['logs'] = pd.DataFrame(data = errorLogs+warningLogs ,columns = ["Type","Comment"])
+
+    # extract waterfall in use 
+    waterfall_logs = filter_by_tags(x, ["RunningWaterfall"])
+    r['waterfall'] = None
+    if waterfall_logs:
+        r['waterfall'] = pd.DataFrame(data = [ [c['contents'][0],readTagMap(c['contents'][1])] for c in waterfall_logs ]
+                                        ,columns = ["Date","Waterfall Location"])
+
 
     # build financial reports
     def mapItem(z):

@@ -715,7 +715,7 @@ if user want to view the break down of waterfall distribution, user may view acc
 
 
 Inspect Free Formulas on projection 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 If user would like to view variables during the cashflow projection, there is a `time machine` built for this purpose. :ref:`Inspecting Numbers`
@@ -726,7 +726,7 @@ User just need to provide :
 * "What" variables to view via a :ref:`Formula`
 
 Inspect Free formulas within waterfall distribution
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. versionadded:: 0.22
 
@@ -741,6 +741,24 @@ Inspect Free formulas within waterfall distribution
       formula value was evaluated at **End of Day** on dates specified via ``DatePattern``. The value won't be changed again in that day.
   * Free formula in **Waterfall** 
       formula value was evaluated at **Point of time** on the location in the waterfall. The value may changes if futhur actions were taken in the waterfall in that day.
+
+
+Which waterfalls has been run?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 0.28.17
+
+User can inspect the waterfalls has been run via:
+
+.. code-block:: python
+
+  r['result']['waterfall']
+
+.. image:: img/waterfallResult.png
+  :width: 350
+  :alt: waterfall_result
+
+
 
 
 Visualize the cash `flow`
@@ -1086,6 +1104,14 @@ How to use Deal JSON string
 The JSON string from `.json()` method can be used as part of post request send to `Hastructure` engine.
 
 But unfortunately there is no way convert the string back to python class so far.
+
+
+Primary Pricing with `Absbox`
+-----------------------------------
+
+Primary Pricing is a process of calculating the price of a bond at the time of issuance.
+
+
 
 
 Tempalte: Model CLO
