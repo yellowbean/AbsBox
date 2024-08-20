@@ -15088,6 +15088,24 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-04-07",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-04-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2023-04-30",
@@ -15109,8 +15127,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2023-05-26with statusRevolving"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-05-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-05-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15134,8 +15166,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2023-06-26with statusRevolving"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-06-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15159,8 +15205,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2023-07-26with statusRevolving"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-07-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15184,8 +15244,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2023-08-26with statusRevolving"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-08-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15221,8 +15295,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2023-09-26with statusRevolving"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-09-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-09-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15246,8 +15334,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2023-10-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-10-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-10-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15271,8 +15373,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2023-11-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-11-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-11-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15296,8 +15412,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2023-12-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-12-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-12-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15321,8 +15451,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2024-01-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-01-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-01-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15346,8 +15490,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2024-02-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-02-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-02-29",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15371,8 +15529,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2024-03-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-03-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-03-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15396,8 +15568,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2024-04-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-04-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-04-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15421,8 +15607,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2024-05-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-05-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-05-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15446,8 +15646,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2024-06-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-06-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15471,8 +15685,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2024-07-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-07-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15496,8 +15724,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2024-08-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-08-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15521,8 +15763,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2024-09-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-09-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-09-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15546,8 +15802,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2024-10-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-10-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-10-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15571,8 +15841,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2024-11-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-11-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-11-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15596,8 +15880,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2024-12-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-12-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-12-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15621,8 +15919,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2025-01-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-01-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-01-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15646,8 +15958,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2025-02-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-02-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-02-28",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15671,8 +15997,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2025-03-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-03-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-03-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15696,8 +16036,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2025-04-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-04-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-04-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15721,8 +16075,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2025-05-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-05-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-05-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15746,8 +16114,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2025-06-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-06-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15771,8 +16153,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2025-07-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-07-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15796,8 +16192,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2025-08-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-08-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15821,8 +16231,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2025-09-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-09-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-09-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15846,8 +16270,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2025-10-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-10-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-10-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15871,8 +16309,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2025-11-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-11-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-11-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15896,8 +16348,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2025-12-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-12-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-12-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15921,8 +16387,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2026-01-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-01-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-01-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15946,8 +16426,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2026-02-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-02-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-02-28",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15971,8 +16465,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2026-03-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-03-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-03-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -15996,8 +16504,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2026-04-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-04-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-04-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16021,8 +16543,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2026-05-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-05-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-05-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16046,8 +16582,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2026-06-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-06-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16071,8 +16621,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2026-07-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-07-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16096,8 +16660,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2026-08-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-08-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16121,8 +16699,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2026-09-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-09-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-09-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16146,8 +16738,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2026-10-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-10-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-10-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16171,8 +16777,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2026-11-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-11-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-11-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16196,8 +16816,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2026-12-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-12-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-12-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16221,8 +16855,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2027-01-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-01-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-01-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16246,8 +16894,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2027-02-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-02-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-02-28",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16271,8 +16933,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2027-03-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-03-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-03-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16296,8 +16972,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2027-04-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-04-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-04-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16321,8 +17011,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2027-05-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-05-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-05-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16346,8 +17050,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2027-06-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-06-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16371,8 +17089,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2027-07-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-07-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16396,8 +17128,22 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2027-08-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-08-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
     },
     {
       "tag": "InspectBal",
@@ -16421,8 +17167,13 @@
       ]
     },
     {
-      "tag": "WarningMsg",
-      "contents": "No waterfall distribution found on date2027-09-26with statusAmortizing"
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-09-26",
+        {
+          "tag": "DefaultDistribution"
+        }
+      ]
     },
     {
       "tag": "EndRun",

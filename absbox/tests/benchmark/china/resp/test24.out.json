@@ -13854,6 +13854,24 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-04-07",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-04-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2023-04-30",
@@ -13872,6 +13890,27 @@
           "contents": null
         },
         5566351930.9
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-05-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-05-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -13896,6 +13935,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-06-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2023-06-30",
@@ -13914,6 +13974,27 @@
           "contents": null
         },
         7563723941.45
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-07-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -13938,6 +14019,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-08-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2023-08-31",
@@ -13956,6 +14058,27 @@
           "contents": null
         },
         7512195256.47
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-09-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-09-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -13980,6 +14103,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-10-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-10-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2023-10-31",
@@ -13998,6 +14142,27 @@
           "contents": null
         },
         6599255505.36
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-11-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-11-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14022,6 +14187,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-12-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-12-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2023-12-31",
@@ -14040,6 +14226,27 @@
           "contents": null
         },
         5734505403.65
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-01-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-01-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14064,6 +14271,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-02-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-02-29",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2024-02-29",
@@ -14082,6 +14310,27 @@
           "contents": null
         },
         4913114922.02
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-03-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-03-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14106,6 +14355,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-04-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-04-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2024-04-30",
@@ -14124,6 +14394,27 @@
           "contents": null
         },
         4143511351.8
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-05-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-05-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14148,6 +14439,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-06-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2024-06-30",
@@ -14166,6 +14478,27 @@
           "contents": null
         },
         3413507626.09
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-07-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14190,6 +14523,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-08-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2024-08-31",
@@ -14208,6 +14562,27 @@
           "contents": null
         },
         2738638068.01
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-09-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-09-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14232,6 +14607,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-10-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-10-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2024-10-31",
@@ -14250,6 +14646,27 @@
           "contents": null
         },
         2116754404.03
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-11-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-11-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14274,6 +14691,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-12-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2024-12-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2024-12-31",
@@ -14292,6 +14730,27 @@
           "contents": null
         },
         1538023280.5
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-01-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-01-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14316,6 +14775,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-02-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-02-28",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2025-02-28",
@@ -14334,6 +14814,27 @@
           "contents": null
         },
         1104529923.91
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-03-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-03-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14358,6 +14859,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-04-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-04-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2025-04-30",
@@ -14376,6 +14898,27 @@
           "contents": null
         },
         853113227.5
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-05-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-05-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14400,6 +14943,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-06-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2025-06-30",
@@ -14418,6 +14982,27 @@
           "contents": null
         },
         682123341.66
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-07-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14442,6 +15027,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-08-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2025-08-31",
@@ -14460,6 +15066,27 @@
           "contents": null
         },
         556421472.5
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-09-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-09-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14484,6 +15111,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-10-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-10-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2025-10-31",
@@ -14502,6 +15150,27 @@
           "contents": null
         },
         466299919.75
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-11-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-11-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14526,6 +15195,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-12-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2025-12-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2025-12-31",
@@ -14544,6 +15234,27 @@
           "contents": null
         },
         383630787.31
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-01-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-01-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14568,6 +15279,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-02-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-02-28",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2026-02-28",
@@ -14586,6 +15318,27 @@
           "contents": null
         },
         308704937.86
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-03-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-03-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14610,6 +15363,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-04-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-04-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2026-04-30",
@@ -14628,6 +15402,27 @@
           "contents": null
         },
         241698432.87
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-05-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-05-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14652,6 +15447,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-06-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2026-06-30",
@@ -14670,6 +15486,27 @@
           "contents": null
         },
         181257596.11
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-07-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14694,6 +15531,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-08-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2026-08-31",
@@ -14712,6 +15570,27 @@
           "contents": null
         },
         129744396.73
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-09-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-09-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14736,6 +15615,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-10-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-10-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2026-10-31",
@@ -14754,6 +15654,27 @@
           "contents": null
         },
         87193184.02
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-11-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-11-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14778,6 +15699,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-12-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2026-12-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2026-12-31",
@@ -14796,6 +15738,27 @@
           "contents": null
         },
         53262303.39
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-01-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-01-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14820,6 +15783,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-02-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-02-28",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2027-02-28",
@@ -14838,6 +15822,27 @@
           "contents": null
         },
         29064560.31
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-03-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-03-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14862,6 +15867,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-04-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-04-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2027-04-30",
@@ -14880,6 +15906,27 @@
           "contents": null
         },
         13522230.95
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-05-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-05-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14904,6 +15951,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-06-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2027-06-30",
@@ -14922,6 +15990,27 @@
           "contents": null
         },
         3634035.12
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-07-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
       ]
     },
     {
@@ -14946,6 +16035,27 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-08-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "InspectBal",
       "contents": [
         "2027-08-31",
@@ -14964,6 +16074,18 @@
           "contents": null
         },
         0.37
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2027-09-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
       ]
     },
     {

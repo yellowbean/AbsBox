@@ -1559,6 +1559,54 @@
       "contents": "Bond B is not paid off"
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-04-15",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-05-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-07-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-03-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
       "tag": "EndRun",
       "contents": [
         "2022-03-26",

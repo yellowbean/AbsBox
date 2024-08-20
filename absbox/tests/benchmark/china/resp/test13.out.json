@@ -6968,6 +6968,582 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-06-15",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-07-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-08-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-09-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-09-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-10-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-10-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-11-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-11-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-12-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-12-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-01-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-01-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-02-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-02-28",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-03-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-03-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-04-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-04-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-05-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-05-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-06-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-07-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-08-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-09-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-09-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-10-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-10-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-11-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-11-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-12-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-12-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-01-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-01-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-02-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-02-28",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-03-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-03-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-04-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-04-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-05-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-05-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-06-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-06-30",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-07-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-07-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-08-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2023-09-26",
+        {
+          "tag": "DistributionDay",
+          "contents": {
+            "tag": "Amortizing"
+          }
+        }
+      ]
+    },
+    {
       "tag": "EndRun",
       "contents": [
         "2023-09-30",
