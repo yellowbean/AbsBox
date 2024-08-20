@@ -1,7 +1,7 @@
 # AbsBox 
 a structured finance cashflow engine wrapper for structured credit professionals:
 
-* transparency -> open source for both wrapper and backend engine.
+* transparency -> open source for both wrapper and backend engine, great variable inspection support.
 * human readable waterfall -> no more coding/scripting, just *lists* and *maps* in Python !
 * easy interaction with Python numeric libraries as well as databases/Excel to accomodate daily work.
 
@@ -26,7 +26,7 @@ a structured finance cashflow engine wrapper for structured credit professionals
 ## What it does
 * Provide building blocks to create cashflow models for ABS/MBS
 * Adapt to multiple asset classes
-    * Residential Mortgage / AdjustRateMortgage / Auto Loans
+    * Residential Mortgage / AdjustRateMortgage/ IO,PO,Balloon Mortgages / Auto Loans
     * Corp Loans
     * Consumer Credit
     * Lease (For CMBS)
@@ -52,6 +52,12 @@ Raise issues or disucssion with the prospectus or spreadsheet how asset cashflow
 ## Data flow
 
 <img src="https://absbox-doc.readthedocs.io/en/latest/_images/Intergration.png" width="600" height="347"/>
+
+## Data Privacy
+
+User can have option to connect to a private calculation engine in his/her own environment
+
+![Screenshot_2024-08-19_15-09-10](https://github.com/user-attachments/assets/d4d7d6da-db38-46bd-96ed-524c92c1aa27)
 
 
 ## Community & Support
