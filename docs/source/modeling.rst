@@ -2072,14 +2072,35 @@ Waterfall means a *list* of ``Action`` to be executed. A Deal may have more than
 
 It was modeled as a map, with key as identifier to distinguish different type of waterfall.
 
-* ``"amortizing"`` -> will be picked when deal status is `Amortizing`
-* ``("amortizing", "accelerated")`` -> will be picked when deal status is `Accelerated`
-* ``("amortizing", "defaulted")`` -> will be picked when deal status is `Defaulted`
-* ``"revolving"`` -> will be picked when deal status is `Revolving`
-* ``"endOfCollection"`` -> will be exectued at the end of each collection period
-* ``"default"`` -> the default waterfall to be executed if no other waterfall applicable
-* ``"cleanUp"`` -> will be exectued *once* when deal is being clean up call
-* ``"closingDay"`` -> will be exectued *once* at the `Day of Closing` if deal status is `PreClosing`
+* Waterfall which being executed multiple times during deal run:
+
+  * Watefall exectued on deal distribution day:
+  
+    * When deal status is `Amortizing`:
+    
+      * ``"amortizing"`` -> will be picked when deal status is `Amortizing`
+      * ``"default"`` -> the default waterfall to be executed if no other waterfall applicable
+    
+    * When deal status is `Accelerated`:
+  
+      * ``("amortizing", "accelerated")`` -> will be picked when deal status is `Accelerated`
+ 
+    * When deal status is `Defaulted`:
+  
+      * ``("amortizing", "defaulted")`` -> will be picked when deal status is `Defaulted`
+    
+    * When deal status is `Revolving`:
+  
+      * ``"revolving"`` -> will be picked when deal status is `Revolving`
+  
+  * Watefall exectued on pool collection day:
+
+    * ``"endOfCollection"`` -> will be exectued at the end of each collection period
+
+* Waterfall which being executed only once :
+  
+  * ``"cleanUp"`` -> will be exectued *once* when deal is being clean up call
+  * ``"closingDay"`` -> will be exectued *once* at the `Day of Closing` if deal status is `PreClosing` ( only valid for deals in `PreClosing` status)
 
 
 How engine pick which waterfall to execute?
