@@ -64,10 +64,10 @@ How assumption was applied on asset ?
 
 
 Non-Performing Asset(WIP)
-""""""""""""""""""""""
+""""""""""""""""""""""""""""
 
 Why Mortgage Performance Assumption is so complex ?
-----------------------------------------
+--------------------------------------------------------
 
 Before version ``0.21.x`` , pool performance assumption is just a *LIST*, which includes like ``{"CDR":0.05}``
 
@@ -202,8 +202,10 @@ JSON Format
 --------------
 
 Deal 
-^^^^^^^^
+"""""""""
 A deal object can be converted into json format via a property field `.json`
+
+User can save this string/json object to database or file system, building a ``Deal Library``
 
 .. code-block:: python
    
@@ -223,4 +225,13 @@ A deal object can be converted into json format via a property field `.json`
    #  'status': {'tag': 'Amortizing'},
    #  'pool': {'assets': [{'tag': 'Mortgage',
    #     'contents': [{'originBalanc
+Run Request 
+""""""""""""""""
 
+For user who has a strong curiosity in `Hastructure` webservice interface, user can use `build_run_deal_req()` to get a json request in string.
+
+This trick is useful to understand how `Hastructure` API work and integration with `Hastructure` directly.
+
+.. code-block:: python 
+
+  api.build_run_deal_req(....)

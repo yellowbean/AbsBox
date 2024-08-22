@@ -1,19 +1,19 @@
 # Configuration file for the Sphinx documentation builder.
 
+import pathlib
+import sys
+
 # -- Project information
 
 project = 'absbox'
 copyright = '2024, Xiaoyu Zhang'
 author = 'Xiaoyu Zhang'
 
-release = "0.28.11"
-release = "0.28.11"
+release = "0.28.17"
+release = "0.28.17"
 
 # -- General configuration
 
-import pathlib
-
-import sys,os
 sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
 extensions = [
@@ -24,6 +24,7 @@ extensions = [
     'sphinx.ext.autosectionlabel',
     'sphinxemoji.sphinxemoji',
     'sphinx.ext.graphviz',
+    'sphinx_changelog',
     #'autoapi.extension'
     #'nbsphinx'
     'myst_nb'

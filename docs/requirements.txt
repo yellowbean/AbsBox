@@ -12,3 +12,4 @@ dateparser
 more_itertools
 pandas
 python-dateutil
+sphinx_changelog

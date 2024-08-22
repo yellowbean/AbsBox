@@ -45,7 +45,7 @@ keywords = ["cashflow", "abs", "mbs", "cashflow model", "rmbs" ,"clo", "cashflow
 homepage = "https://absbox.org"
 documentation = "https://absbox-doc.readthedocs.io/en/latest/"
 repository = "https://github.com/yellowbean/AbsBox/"
-changelog = "https://github.com/yellowbean/AbsBox/blob/main/CHANGES.md"
+changelog = "https://github.com/yellowbean/AbsBox/blob/main/CHANGELOG.rst"
 
 
 
@@ -69,3 +69,54 @@ test = [
     "ipykernel",
     "pytest-notebook"
 ]
+
+[tool.towncrier]
+directory = "changes"
+name = "Absbox"
+filename = "CHANGELOG.rst"
+
+start_string = ".. towncrier release notes start\n"
+underlines = ["-", "~", "\""]
+title_format = "`{version} <https://github.com/yellowbean/AbsBox/tree/{version}>`_ - {project_date}"
+issue_format = "`{issue} <https://github.com/yellowbean/AbsBox/issues/{issue}>`_"
+
+[[tool.towncrier.type]]
+directory = "security"
+name = "Security"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "removed"
+name = "Removed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "deprecated"
+name = "Deprecated"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "added"
+name = "Added"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "changed"
+name = "Changed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "fixed"
+name = "Fixed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "performance"
+name = "Performance"
+showcontent = true
+
+
+[[tool.towncrier.type]]
+directory = "enhance"
+name = "Enhance"
+showcontent = true

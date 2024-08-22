@@ -10,8 +10,8 @@ Support
   It is simple, but takes time.
 
 
-Issue & Training
------------------------
+Issue & Feature Request
+-------------------------
 
 If any **Bug** found or  **features/documenent** request,please raise tickets alongside with deal documents to
 
@@ -51,7 +51,7 @@ Consulting & Training
 
 
 - **AbsBox** training is offered via webmeeting .
-- **Hastructure** integration is provided by commercial term.
+- **Hastructure** integration provided via a commercial term.
 
 Please concact us for more details.
 

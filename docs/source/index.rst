@@ -33,6 +33,7 @@ Welcome to  AbsBox Documentation!
      :width: 200
      :alt: Support Email 
 
+
 Content
 ------------
 
@@ -45,5 +46,7 @@ Content
    reference
    nbsample/index
    api
+   changelog
+
 
 
