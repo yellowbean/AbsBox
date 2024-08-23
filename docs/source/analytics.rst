@@ -903,12 +903,11 @@ Running
 Running
   Means sending request to backend engine server. A request has three elmenets:
    * API instance 
+   * Deal Object
    * Assumptions
 
      * Pool performance assumptions
      * Deal assumptions (May include Interest Rate / Clean Up Call)
-
-
 
 .. graphviz::
     :name: sphinx.ext.graphviz
@@ -922,10 +921,12 @@ Running
         b -> "Run Sinlge Asset"  -> "api.runAsset()"
         b -> "Run a Pool of Assets" 
         b -> "Run a Deal"
+        b -> "Run Multi Deals"
         "Run a Pool of Assets"  -> "api.runPoolByScenarios()"
         "Run a Pool of Assets"  -> "api.runPool()"
         "Run a Deal" -> "api.runByScenarios()"
         "Run a Deal" -> "api.run()"
+        "Run Multi Deals" -> "api.runStructs()"
     }
 
 
