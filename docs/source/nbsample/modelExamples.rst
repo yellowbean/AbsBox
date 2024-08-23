@@ -10,3 +10,4 @@ Model Examples
    AccountSetup
    How-to-price-Balloon-Mortgage
    revolving_buy_multiple_pools
+   IntroWaterfall
