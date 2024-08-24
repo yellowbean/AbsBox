@@ -2079,7 +2079,6 @@ It was modeled as a map, with key as identifier to distinguish different type of
     * When deal status is `Amortizing`:
     
       * ``"amortizing"`` -> will be picked when deal status is `Amortizing`
-      * ``"default"`` -> the default waterfall to be executed if no other waterfall applicable
     
     * When deal status is `Accelerated`:
   
@@ -2092,6 +2091,10 @@ It was modeled as a map, with key as identifier to distinguish different type of
     * When deal status is `Revolving`:
   
       * ``"revolving"`` -> will be picked when deal status is `Revolving`
+    
+    * If there is no waterfall matched, the default waterfall will be picked:
+  
+      * ``"default"`` -> the default waterfall to be executed if no other waterfall applicable
   
   * Watefall exectued on pool collection day:
 
