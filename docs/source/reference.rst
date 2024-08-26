@@ -18,7 +18,7 @@ Videos
    * - Title
      - URL
    * - 101 - Introduction
-     - https://www.youtube.com/watch?v=fb8j96beLGQ
+     - https://youtu.be/fb8j96beLGQ
    * - 102 - Account
      - https://youtu.be/uD7MmiIftLs
    * - 103 - Assets
