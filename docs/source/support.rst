@@ -49,9 +49,15 @@ Email & Slack
 Consulting & Training
 ----------------------------
 
+For those who want to
 
-- **AbsBox** training is offered via webmeeting .
-- **Hastructure** integration provided via a commercial term.
+- Accelerate the integration process
+- Understand how ``Absbox/Hastructure`` can reshape existing workflow & analytics
+
+Service offered:
+
+- Training is offered via webmeeting .
+- Integration service provided via a commercial term.
 
 Please concact us for more details.
 

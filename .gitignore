@@ -139,4 +139,9 @@ pyabs/*.ipynb
 .idea/workspace.xml
 .gitignore
 absbox/tests/config.json
-absbox/tests/config.json
+
+#
+bin/
+etc/jupyter/
+pyvenv.cfg
+share/
