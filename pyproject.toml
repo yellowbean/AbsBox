@@ -31,7 +31,6 @@ dependencies = [
     "toolz",
     "rich",
     "lenses",
-    "pyspecter",
     "graphviz",
     "schema",
     "dateparser",

@@ -2,7 +2,6 @@ requests
 pandas
 numpy
 matplotlib
-pyspecter
 pytest==7.1.2
 jsondiff
 deepdiff
