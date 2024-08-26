@@ -14,7 +14,6 @@ import toolz as tz
 from lenses import lens
 
 import pandas as pd
-from pyspecter import query, S
 
 numVal = Or(float,int)
 

@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
 from absbox.local.util import guess_locale, aggStmtByDate, consolStmtByDate
-from pyspecter import query
 #from itertools import reduce
 from functools import reduce
 import numpy as np
@@ -126,32 +125,32 @@ def plot_bonds(r, bnds:list, flow='本息合计'):
     return plt
 
 
-def plot_by_scenario(rs, flowtype, flowpath):
-    "Plot with multiple scenario"
-    plt.figure(figsize=(12,8))
-    scenario_names = rs.keys()
-    dflows = [query(rs,[s]+flowpath) for s in scenario_names]
-    _alpha =  0.8
-
-    x_labels = reduce(lambda acc,x:acc.union(x) ,[ _.index for _ in dflows ]).unique()
-    x = np.arange(len(x_labels))
-    width = 1 
-    step_length = width / (len(scenario_names)+1)
-
-    for (idx,(scen,dflow)) in enumerate(zip(scenario_names,dflows)):
-        if flowtype=="balance":
-            cb = consolStmtByDate(dflow)
-            plt.step(cb.index, cb, alpha=_alpha, linewidth=5, label=f"{scen}")
-        elif flowtype=="amount":
-            cb = aggStmtByDate(dflow)
-            _bar = plt.bar(x+idx*step_length,cb,width=step_length,label=scen)
-        else:
-            plt.plot(dflow.index,dflow, alpha=_alpha, linewidth=5, label=f"{scen}")
-
-    plt.legend(scenario_names,loc='upper right', prop=font_p)
-    plt.grid(True)
-    plt.axis('tight')
-    plt.xticks(ticks=x,labels=x_labels,rotation=30)
+# def plot_by_scenario(rs, flowtype, flowpath):
+#    "Plot with multiple scenario"
+#    plt.figure(figsize=(12,8))
+#    scenario_names = rs.keys()
+#    dflows = [query(rs,[s]+flowpath) for s in scenario_names]
+#    _alpha =  0.8
+#
+#    x_labels = reduce(lambda acc,x:acc.union(x) ,[ _.index for _ in dflows ]).unique()
+#    x = np.arange(len(x_labels))
+#    width = 1 
+#    step_length = width / (len(scenario_names)+1)
+#
+#    for (idx,(scen,dflow)) in enumerate(zip(scenario_names,dflows)):
+#        if flowtype=="balance":
+#            cb = consolStmtByDate(dflow)
+#            plt.step(cb.index, cb, alpha=_alpha, linewidth=5, label=f"{scen}")
+#        elif flowtype=="amount":
+#            cb = aggStmtByDate(dflow)
+#            _bar = plt.bar(x+idx*step_length,cb,width=step_length,label=scen)
+#        else:
+#            plt.plot(dflow.index,dflow, alpha=_alpha, linewidth=5, label=f"{scen}")
+#
+#    plt.legend(scenario_names,loc='upper right', prop=font_p)
+#    plt.grid(True)
+#    plt.axis('tight')
+#    plt.xticks(ticks=x,labels=x_labels,rotation=30)
 
 
 def plot_bs(x, excludeItems=["FeeDue","IntAccrue","Account"]):

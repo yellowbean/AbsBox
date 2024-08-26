@@ -6,7 +6,6 @@ import pandas as pd
 import numpy as np
 from urllib.request import unquote
 from functools import reduce 
-from pyspecter import query,S
 import toolz as tz
 from absbox.local.base import *
 

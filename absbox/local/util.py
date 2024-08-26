@@ -2,9 +2,8 @@ import pandas as pd
 import functools,json,copy,logging,re,itertools
 from functools import reduce
 from absbox.local.base import *
-from pyspecter import query, S
 from datetime import datetime
-from lenses import ui, optics
+from lenses import lens,ui, optics
 import toolz as tz
 
 
@@ -427,7 +426,7 @@ def isMixedDeal(x: dict) -> bool:
         return False
     if 'deals' in x:
         return False
-    assetTags = query(x, [S.MVALS, S.ALL, 'assets', S.FIRST, S.FIRST])
+    assetTags = x & lens.Values().Each()[1][0][0].collect()
     if len(set(assetTags)) > 1:
         return True
     return False
