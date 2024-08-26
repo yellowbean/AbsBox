@@ -8228,6 +8228,15 @@
       "contents": "Fee \u589e\u503c\u7a0e is not paid off"
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-07-26",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "DealStatusChangeTo",
       "contents": [
         "2022-07-26",
@@ -8239,15 +8248,6 @@
         },
         {
           "tag": "Amortizing"
-        }
-      ]
-    },
-    {
-      "tag": "RunningWaterfall",
-      "contents": [
-        "2022-07-26",
-        {
-          "tag": "EndOfPoolCollection"
         }
       ]
     },

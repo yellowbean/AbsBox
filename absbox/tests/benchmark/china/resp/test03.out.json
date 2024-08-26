@@ -2765,6 +2765,15 @@
       "contents": "Fee \u670d\u52a1\u5546\u8d39\u7528 is not paid off"
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-10-15",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "DealStatusChangeTo",
       "contents": [
         "2021-10-15",
@@ -2776,15 +2785,6 @@
         },
         {
           "tag": "Amortizing"
-        }
-      ]
-    },
-    {
-      "tag": "RunningWaterfall",
-      "contents": [
-        "2021-10-15",
-        {
-          "tag": "EndOfPoolCollection"
         }
       ]
     },

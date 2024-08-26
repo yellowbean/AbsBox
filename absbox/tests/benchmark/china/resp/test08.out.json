@@ -11808,6 +11808,15 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2022-08-31",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "DealStatusChangeTo",
       "contents": [
         "2022-08-31",
@@ -11819,15 +11828,6 @@
         },
         {
           "tag": "Amortizing"
-        }
-      ]
-    },
-    {
-      "tag": "RunningWaterfall",
-      "contents": [
-        "2022-08-31",
-        {
-          "tag": "EndOfPoolCollection"
         }
       ]
     },

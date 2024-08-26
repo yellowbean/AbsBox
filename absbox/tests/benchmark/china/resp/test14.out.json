@@ -82940,6 +82940,15 @@
       "contents": "Account \u8d26\u623701 has cash to be distributed"
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-06-15",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "DealStatusChangeTo",
       "contents": [
         "2021-06-15",
@@ -82951,15 +82960,6 @@
         },
         {
           "tag": "Amortizing"
-        }
-      ]
-    },
-    {
-      "tag": "RunningWaterfall",
-      "contents": [
-        "2021-06-15",
-        {
-          "tag": "EndOfPoolCollection"
         }
       ]
     },

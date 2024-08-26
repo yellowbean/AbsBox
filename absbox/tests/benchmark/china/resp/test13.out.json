@@ -6953,6 +6953,15 @@
       ]
     },
     {
+      "tag": "RunningWaterfall",
+      "contents": [
+        "2021-06-15",
+        {
+          "tag": "EndOfPoolCollection"
+        }
+      ]
+    },
+    {
       "tag": "DealStatusChangeTo",
       "contents": [
         "2021-06-15",
@@ -6964,15 +6973,6 @@
         },
         {
           "tag": "Amortizing"
-        }
-      ]
-    },
-    {
-      "tag": "RunningWaterfall",
-      "contents": [
-        "2021-06-15",
-        {
-          "tag": "EndOfPoolCollection"
         }
       ]
     },
