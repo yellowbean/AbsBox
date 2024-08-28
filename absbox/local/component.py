@@ -2044,6 +2044,19 @@ def mkRateAssumption(x):
         case _ :
             raise RuntimeError(f"Failed to match RateAssumption:{x}")
 
+def mkFundingPlan(x:tuple):
+    # IssueBondEvent mPre bondName accountName Bond mFormula mFormula
+    match x:
+        case (d,p,bName,accName,bnd,mBal,mRate):
+            return [vDate(d), mkTag(("IssueBondEvent",[earlyReturnNone(mkPre,p),vStr(bName),vStr(accName)
+                                                       ,mkBnd(bnd["name"],bnd|{"startDate":vDate(d)})|{"tag":"Bond"}
+                                                       ,earlyReturnNone(mkDs,mBal)
+                                                       ,earlyReturnNone(mkDs,mRate)]))]
+        case (d,bName,accName,bnd):
+            return [vDate(d), mkTag(("IssueBondEvent",[None,vStr(bName),vStr(accName),mkBnd(bnd["name"],bnd|{"startDate":vDate(d)})|{"tag":"Bond"},None,None]))]
+        case _:
+            raise RuntimeError(f"Failed to match mkFundingPlan:{x}")
+
 
 def mkNonPerfAssumps(r, xs:list) -> dict:
     def translate(y) -> dict:
@@ -2072,10 +2085,7 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
             case ("makeWhole", d,spd,tbl):
                 return {"makeWholeWhen": [d,spd,tbl]}
             case ("issueBond", *issuancePlan):
-                return {"issueBondSchedule": [ [vDate(d),[vStr(bGrpName)
-                                                         ,vStr(accName)
-                                                         ,mkBnd(bnd["name"],bnd|{"startDate":vDate(d)})|{"tag":"Bond"}]] 
-                                                for (d,bGrpName,accName,bnd) in issuancePlan]  }
+                return {"issueBondSchedule": [ mkFundingPlan(p) for p in issuancePlan]  }
     match xs:
         case None:
             return {}
