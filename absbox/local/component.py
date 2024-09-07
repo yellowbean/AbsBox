@@ -1261,6 +1261,13 @@ def mkCapacity(x):
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkCapacity")
 
+def mkObligor(x:dict) -> dict:
+    return {
+        "obligorId": x.get("id", None),
+        "obligorTag": x.get("tag",[]),
+        "obligorFields": x.get("fields", {})
+    }
+
 
 def mkAsset(x):
     match x:
@@ -1268,13 +1275,16 @@ def mkAsset(x):
              , {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
             borrowerNum = x[2].get("borrowerNum", None)
             prepayPenalty = getValWithKs(x[1],["prepayPenalty","早偿罚息"])
+            obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
+
             return mkTag(("AdjustRateMortgage", [{"originBalance": vNum(originBalance),
                                                 "originRate": mkRateType(originRate),
                                                 "originTerm": vInt(originTerm),
                                                 "period": freqMap[freq],
                                                 "startDate": vDate(startDate),
                                                 "prinType": mkAmortPlan(_type),
-                                                "prepaymentPenalty": mkPrepayPenalty(prepayPenalty)
+                                                "prepaymentPenalty": mkPrepayPenalty(prepayPenalty),
+                                                "obligor": obligorInfo
                                                 } | mkTag("MortgageOriginalInfo"),
                                                 mkArm(arm),
                                                 vNum(currentBalance),
@@ -1287,13 +1297,15 @@ def mkAsset(x):
 
             borrowerNum = getValWithKs(x[2],["borrowerNum","借款人数量"])
             prepayPenalty = getValWithKs(x[1],["prepayPenalty","早偿罚息"])
+            obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
             return mkTag(("Mortgage", [ {"originBalance": vNum(originBalance),
                                         "originRate": mkRateType(originRate),
                                         "originTerm": vInt(originTerm),
                                         "period": freqMap[freq],
                                         "startDate": vDate(startDate),
                                         "prinType": mkAmortPlan(_type),
-                                        "prepaymentPenalty": mkPrepayPenalty(prepayPenalty)
+                                        "prepaymentPenalty": mkPrepayPenalty(prepayPenalty),
+                                        "obligor": obligorInfo
                                         } | mkTag("MortgageOriginalInfo"),
                                         vNum(currentBalance),
                                         vNum(currentRate),
@@ -1302,13 +1314,15 @@ def mkAsset(x):
                                         mkAssetStatus(status)]))
         case ["贷款", {"放款金额": originBalance, "放款利率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "当前利率": currentRate, "剩余期限": remainTerms, "状态": status}] \
                 | ["Loan", {"originBalance": originBalance, "originRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "currentRate": currentRate, "remainTerm": remainTerms, "status": status}]:
+            obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
             return mkTag(("PersonalLoan", [
                 {"originBalance": vNum(originBalance),
                  "originRate": mkRateType(originRate),
                  "originTerm": vInt(originTerm),
                  "period": freqMap[freq],
                  "startDate": vDate(startDate),
-                 "prinType": mkAmortPlan(_type)
+                 "prinType": mkAmortPlan(_type),
+                 "obligor": obligorInfo
                  } | mkTag("LoanOriginalInfo"),
                 vNum(currentBalance),
                 vNum(currentRate),
@@ -1316,30 +1330,36 @@ def mkAsset(x):
                 mkAssetStatus(status)]))
         case ["分期", {"放款金额": originBalance, "放款费率": originRate, "初始期限": originTerm, "频率": freq, "类型": _type, "放款日": startDate}, {"当前余额": currentBalance, "剩余期限": remainTerms, "状态": status}] \
                 | ["Installment", {"originBalance": originBalance, "feeRate": originRate, "originTerm": originTerm, "freq": freq, "type": _type, "originDate": startDate}, {"currentBalance": currentBalance, "remainTerm": remainTerms, "status": status}]:
+            obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
             return mkTag(("Installment", [
                 {"originBalance": vNum(originBalance),
                  "originRate": mkRateType(originRate),
                  "originTerm": vInt(originTerm),
                  "period": freqMap[freq],
                  "startDate": vDate(startDate),
-                 "prinType": mkAmortPlan(_type)
+                 "prinType": mkAmortPlan(_type),
+                 "obligor": obligorInfo
                  } | mkTag("LoanOriginalInfo"),
                 vNum(currentBalance),
                 vInt(remainTerms),
                 mkAssetStatus(status)]))
         case ["租赁", {"固定租金": dailyRate, "初始期限": originTerm, "频率": dp, "起始日": startDate, "状态": status, "剩余期限": remainTerms}] \
                 | ["Lease", {"fixRental": dailyRate, "originTerm": originTerm, "freq": dp, "originDate": startDate, "status": status, "remainTerm": remainTerms}]:
-            return mkTag(("RegularLease", [{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp), "originRental": dailyRate} | mkTag("LeaseInfo"), 0, remainTerms, mkAssetStatus(status)]))
+            obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
+            return mkTag(("RegularLease"
+                            , [{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp), "originRental": dailyRate
+                                ,"obligor": obligorInfo} | mkTag("LeaseInfo"), 0, remainTerms, mkAssetStatus(status)]))
         case ["租赁", {"初始租金": dailyRate, "初始期限": originTerm, "频率": dp, "起始日": startDate, "计提周期": accDp, "涨幅": rate, "状态": status, "剩余期限": remainTerms}] \
                 | ["Lease", {"initRental": dailyRate, "originTerm": originTerm, "freq": dp, "originDate": startDate, "accrue": accDp, "pct": rate, "status": status, "remainTerm": remainTerms}]:
 
+            obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
             dailyRatePlan = None
             _stepUpType = "curve" if isinstance(rate, list) else "constant"
             if _stepUpType == "constant":
                 dailyRatePlan = mkTag(("FlatRate", [mkDatePattern(accDp), rate]))
             else:
                 dailyRatePlan = mkTag(("ByRateCurve", [mkDatePattern(accDp), rate]))
-            return mkTag(("StepUpLease", [{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp), "originRental": dailyRate} | mkTag("LeaseInfo"), dailyRatePlan, 0, remainTerms, mkAssetStatus(status)]))
+            return mkTag(("StepUpLease", [{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp), "originRental": dailyRate, "obligor": obligorInfo} | mkTag("LeaseInfo"), dailyRatePlan, 0, remainTerms, mkAssetStatus(status)]))
         case ["固定资产",{"起始日":sd,"初始余额":ob,"初始期限":ot,"残值":rb,"周期":p,"摊销":ar,"产能":cap}
                       ,{"剩余期限":rt}] \
              |["FixedAsset",{"start":sd,"originBalance":ob,"originTerm":ot,"residual":rb,"period":p,"amortize":ar
@@ -1350,10 +1370,12 @@ def mkAsset(x):
                                          ,"capacity":mkCapacity(cap)} | mkTag("FixedAssetInfo")
                                         ,vInt(rt)]))
         case ["Invoice", {"start":sd,"originBalance":ob,"originAdvance":oa,"dueDate":dd,"feeType":ft},{"status":status}] :
-            return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":mkInvoiceFeeType(ft)} | mkTag("ReceivableInfo")
+            obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
+            return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":mkInvoiceFeeType(ft),"obligor":obligorInfo} | mkTag("ReceivableInfo")
                                      ,mkAssetStatus(status)]))
         case ["Invoice", {"start":sd,"originBalance":ob,"originAdvance":oa,"dueDate":dd},{"status":status}] :
-            return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":None} | mkTag("ReceivableInfo")
+            obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
+            return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":None,"obligor":obligorInfo} | mkTag("ReceivableInfo")
                                      ,mkAssetStatus(status)]))
         case ["ProjectedFlowFix", cf, dp]:
             return mkTag(("ProjectedFlowFixed",[mkCashFlowFrame(cf) ,mkDatePattern(dp)]))
@@ -1583,6 +1605,17 @@ def mkPDF(a, b, c):
             ,mkDelinqAssumption(b)
             ,mkDefaultedAssumption(c)]
 
+def mkObligorStrategy(x):
+    match x:
+        case ("ById",ids,assumps)| ("ByID",ids,assumps):
+            return mkTag(("ObligorById",[[vStr(i) for i in ids],mkPDF(*assumps)]))
+        case ("ByTag",tags,rule,assumps):
+            return mkTag(("ObligorByTag",[[vStr(t) for t in tags],rule,mkPDF(*assumps)]))
+        case ("ByDefault",assumps) | ("_",assumps):
+            return mkTag(("ObligorByDefault",mkPDF(*assumps)))
+        case _:
+            raise RuntimeError(f"failed to match {x}, mkObligorStrategy")
+
 
 def mkAssumpType(x):
     ''' make assumps either on pool level or asset level '''
@@ -1591,6 +1624,8 @@ def mkAssumpType(x):
             return mkTag(("PoolLevel",mkPDF(p, d, f)))
         case ("ByIndex", *ps):
             return mkTag(("ByIndex",[ [idx, mkPDF(a,b,c)] for (idx,(a,b,c)) in ps ]))
+        case ("ByObligor",*rules):
+            return mkTag(("ByObligor",[mkObligorStrategy(r) for r in rules]))
         case ("ByName", assumpMap):
             return mkTag(("ByName",{f"PoolName:{k}":mkPDF(*v) for k,v in assumpMap.items()}))
         case ("ByPoolId", assumpMap):

@@ -863,6 +863,17 @@ syntax
 fundingPlan
   ``(<date of issuance>,<bond group name>,<account name>,<bond detail>)``
 
+.. versionadded:: 0.29.1
+
+dynamic fundingPlan
+  ``(<date of issuance>,<condition> , <bond group name>,<account name>,<bond detail>,<balance override>,<rate override>)``
+
+  * ``<condition>`` : a :ref:`Condition` to check if the bond should be issued
+  * ``<balance override>`` : a :ref:`Formula` to override the balance of the bond
+  * ``<rate override>`` : a :ref:`Formula` to override the rate of the bond
+  
+
+
 .. warning::
   In the ``bond detail``, share same syntax of :ref:`Bonds/Tranches` , but require extra field ``name``.
   Make sure the ``name`` is unique in the ``bond group``.
@@ -890,7 +901,7 @@ fundingPlan
 
 .. seealso::
   
-  Example :ref:`Master Trust/Warehousing Funding Example` 
+  Example :ref:`Master Trust Example` 
 
 
 
