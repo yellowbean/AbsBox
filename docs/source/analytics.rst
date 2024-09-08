@@ -472,6 +472,32 @@ Pool assumption can be applied via multiple ways:
 * By Asset Index
 * By Obligor
 
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: asset-assumption
+    :alt: asset-assumption
+    :align: center
+    
+    digraph {
+        rankdir = LR
+        "Asset Assumption" -> "Whole Pool"
+        "Whole Pool" -> "('Pool',<assump>)"
+        "Asset Assumption" -> "By Pool Index"
+        "By Pool Index" -> "('ByIndex',(index,<assump>)...)"
+        "Asset Assumption" -> "By Obligor"
+        "By Obligor" -> "obligor Id"
+        "By Obligor" -> "obligor Tag"
+        "By Obligor" -> "obligor Default"
+        "obligor Tag" -> "TagEq"
+        "obligor Tag" -> "TagAny"
+        "obligor Tag" -> "TagSubset"
+        "obligor Tag" -> "TagSuperset"
+    }
+
+
+
+
 Pool Level
 """"""""""""""""""""""""
 
@@ -488,6 +514,8 @@ The assump will be applied to *ALL* assets in the pool
 
 Asset Level By Index
 """"""""""""""""""""""""
+
+The assumption will be applied to assets by their index position in the pool
 
 .. code-block:: python
    
