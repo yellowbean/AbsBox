@@ -3,6 +3,22 @@ Changelogs
 
 .. towncrier release notes start
 
+`0.29.2 <https://github.com/yellowbean/AbsBox/tree/0.29.2>`_ - 2024-09-08
+-------------------------------------------------------------------------
+
+Removed
+~~~~~~~
+
+- remove plot_by_scenario()/pyspecter (`75 <https://github.com/yellowbean/AbsBox/issues/75>`_)
+- remove plot_by_scenario() (`75 <https://github.com/yellowbean/AbsBox/issues/75>`_)
+
+
+Enhance
+~~~~~~~
+
+- Include towncrier as changelog plugin (`74 <https://github.com/yellowbean/AbsBox/issues/74>`_)
+
+
 `0.0.0 <https://github.com/yellowbean/AbsBox/tree/0.0.0>`_ - 2024-08-22
 -------------------------------------------------------------------------
 
