@@ -53,6 +53,7 @@
                   "tag": "Level"
                 },
                 "prepaymentPenalty": null,
+                "obligor": null,
                 "tag": "MortgageOriginalInfo"
               },
               7596981800,
@@ -83,6 +84,7 @@
                   "tag": "Even"
                 },
                 "prepaymentPenalty": null,
+                "obligor": null,
                 "tag": "MortgageOriginalInfo"
               },
               2397902000.0,

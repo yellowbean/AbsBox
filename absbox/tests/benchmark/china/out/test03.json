@@ -61,6 +61,7 @@
                   "tag": "Even"
                 },
                 "prepaymentPenalty": null,
+                "obligor": null,
                 "tag": "MortgageOriginalInfo"
               },
               180,

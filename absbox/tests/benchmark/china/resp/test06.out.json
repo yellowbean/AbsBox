@@ -330,7 +330,8 @@
                   "prinType": {
                     "tag": "Even"
                   },
-                  "prepaymentPenalty": null
+                  "prepaymentPenalty": null,
+                  "obligor": null
                 },
                 2261042196.13,
                 0.0444,

@@ -53,6 +53,7 @@
                   "tag": "Level"
                 },
                 "prepaymentPenalty": null,
+                "obligor": null,
                 "tag": "MortgageOriginalInfo"
               },
               2500,

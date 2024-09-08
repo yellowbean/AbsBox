@@ -43273,7 +43273,8 @@
                   "prinType": {
                     "tag": "Level"
                   },
-                  "prepaymentPenalty": null
+                  "prepaymentPenalty": null,
+                  "obligor": null
                 },
                 7596981800,
                 0.0495,
@@ -43303,7 +43304,8 @@
                   "prinType": {
                     "tag": "Even"
                   },
-                  "prepaymentPenalty": null
+                  "prepaymentPenalty": null,
+                  "obligor": null
                 },
                 2397902000,
                 0.0495,

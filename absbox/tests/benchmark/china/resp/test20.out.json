@@ -3527,7 +3527,8 @@
                   "startDate": "2021-02-01",
                   "prinType": {
                     "tag": "I_P"
-                  }
+                  },
+                  "obligor": null
                 },
                 120000,
                 0.05,

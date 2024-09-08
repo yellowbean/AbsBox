@@ -11,6 +11,7 @@ Feel free to raise any question or report any error here ->  :ref:`Support`
    runAsset
    runPool
    runDeal
+   assumption
    viewResult
    modelExamples
    srtExamples

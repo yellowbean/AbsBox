@@ -3495,7 +3495,8 @@
                   "prinType": {
                     "tag": "Even"
                   },
-                  "prepaymentPenalty": null
+                  "prepaymentPenalty": null,
+                  "obligor": null
                 },
                 120,
                 0.08,
@@ -3525,7 +3526,8 @@
                   "prinType": {
                     "tag": "Even"
                   },
-                  "prepaymentPenalty": null
+                  "prepaymentPenalty": null,
+                  "obligor": null
                 },
                 60,
                 0.08,

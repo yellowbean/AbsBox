@@ -52,6 +52,7 @@
                 "prinType": {
                   "tag": "I_P"
                 },
+                "obligor": null,
                 "tag": "LoanOriginalInfo"
               },
               120000,

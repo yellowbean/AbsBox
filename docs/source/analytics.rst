@@ -463,10 +463,27 @@ Summary
 
 
 
-Asset Level vs Pool Level 
+How to setup assumption for assets 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Pool assumption can be applied apply to all the assets in the deal/pool as well as on asset-level asset level.
+Pool assumption can be applied via multiple ways:
+
+* By Pool Level
+* By Asset Index
+* By Obligor
+
+Pool Level
+""""""""""""""""""""""""
+
+The assump will be applied to *ALL* assets in the pool
+
+
+.. code-block:: python
+   
+   #syntax 
+   ("Pool",("Loan",<default assump>,<prepay assump>,<recovery assump>,<extra assump>)
+                                   ,<delinq assumption>
+                                   ,<defaulted assumption>)
 
 
 Asset Level By Index
@@ -532,18 +549,35 @@ i.e
   # asset cashflow
   r[0]
 
-Pool Level
+
+By Obligor
 """"""""""""""""""""""""
 
-The assump will be applied to *ALL* assets in the pool
+User can apply assumption on assets with specific obligor tags/id with optional default clause.
 
+.. versionadded:: 0.29.1
+
+User supply a list of rules to match assets, each rule will match a set of assets and apply the same assumption.
+
+`Sequence` is important, earlier rule has higher priority, the assets not match any of above rules will be test agaist the rules next.
+
+* By ID: hit when obligor id is in the list
+* By Tag:
+  <Match Rule>
+
+  * ``TagEq`` hit when asset tags equals to tags in the assumption
+  * ``TagSubset`` hit when asset tags is a subset of the list
+  * ``TagSuperset`` hit when asset tags is a superset of the list
+  * ``TagAny`` hit when asset tags has any intersetion with tags in assumption 
+* By Default : default asset performance if assets are not hit by any of above rules before
 
 .. code-block:: python
-   
+
    #syntax 
-   ("Pool",("Loan",<default assump>,<prepay assump>,<recovery assump>,<extra assump>)
-                                   ,<delinq assumption>
-                                   ,<defaulted assumption>)
+   ("Obligor",("ByTag",<tags>,<match rule>,<assumption>)
+              ,("ById",<ids>,<assumption>)
+              ,("ByDefault",<assumption>))
+
 
 Deal Assumption
 ----------------------------------------

@@ -139,7 +139,8 @@
                   "prinType": {
                     "tag": "Level"
                   },
-                  "prepaymentPenalty": null
+                  "prepaymentPenalty": null,
+                  "obligor": null
                 },
                 1600,
                 0.08,
