@@ -579,6 +579,11 @@ User supply a list of rules to match assets, each rule will match a set of asset
               ,("ByDefault",<assumption>))
 
 
+.. seealso::
+
+   Example :ref:`Apply Assumption with Obligor info`
+
+
 Deal Assumption
 ----------------------------------------
 
