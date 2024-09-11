@@ -1893,7 +1893,7 @@ def readPoolCf(x, lang='english'):
     cflow = x[1]
     _pool_cf_header,_,expandFlag = guess_pool_flow_header(cflow[0], lang)
     if not expandFlag:
-        r = pd.DataFrame(tz.pluck('contents',x), columns=_pool_cf_header)
+        r = pd.DataFrame(list(tz.pluck('contents',cflow)), columns=_pool_cf_header)
     else:
         r = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[None]*6) for _ in cflow]
                                                 , columns=_pool_cf_header)
