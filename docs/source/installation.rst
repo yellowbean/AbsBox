@@ -45,16 +45,6 @@ which shows current version of `absbox`
    A general rule is that the "MINOR" part shall be same. ( here the ``8`` )
    
 
-Github(Not Recommend)
----------------------------
-
-User can install from Github.com as it is actively fixing new bugs and developing new features.
-
-.. code-block:: console
-
-    pip install -U git+https://github.com/yellowbean/AbsBox.git@main
-
-
 Public Server vs Self-hosted
 -----------------------------
 

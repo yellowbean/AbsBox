@@ -1606,11 +1606,17 @@ def mkPDF(a, b, c):
             ,mkDefaultedAssumption(c)]
 
 def mkObligorStrategy(x):
+    def mkRule(x):
+        match x:
+            case ("not", t):
+                return mkTag(("TagNot",mkRule(t)))
+            case _:
+                return mkTag(x)
     match x:
         case ("ById",ids,assumps)| ("ByID",ids,assumps):
             return mkTag(("ObligorById",[[vStr(i) for i in ids],mkPDF(*assumps)]))
         case ("ByTag",tags,rule,assumps):
-            return mkTag(("ObligorByTag",[[vStr(t) for t in tags],rule,mkPDF(*assumps)]))
+            return mkTag(("ObligorByTag",[[vStr(t) for t in tags], mkRule(rule),mkPDF(*assumps)]))
         case ("ByDefault",assumps) | ("_",assumps):
             return mkTag(("ObligorByDefault",mkPDF(*assumps)))
         case _:

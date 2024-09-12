@@ -597,6 +597,7 @@ User supply a list of rules to match assets, each rule will match a set of asset
   * ``TagSubset`` hit when asset tags is a subset of the list
   * ``TagSuperset`` hit when asset tags is a superset of the list
   * ``TagAny`` hit when asset tags has any intersetion with tags in assumption 
+  * ``("not", "<Tag>")`` hit when negate the above rules
 * By Default : default asset performance if assets are not hit by any of above rules before
 
 .. code-block:: python
@@ -610,6 +611,14 @@ User supply a list of rules to match assets, each rule will match a set of asset
 .. seealso::
 
    Example :ref:`Apply Assumption with Obligor info`
+
+By Obligor Fields
+""""""""""""""""""""""""
+
+.. versionadded:: 0.29.2
+
+
+
 
 
 Deal Assumption
