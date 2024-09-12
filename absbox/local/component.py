@@ -1262,10 +1262,15 @@ def mkCapacity(x):
             raise RuntimeError(f"Failed to match {x}:mkCapacity")
 
 def mkObligor(x:dict) -> dict:
+    def mkObligorFields(y:dict) -> dict:
+        if not y:
+            return {}
+        return {k:{"Right":float(v)} if isinstance(v, (int, float)) else {"Left":v} for k,v in y.items() }
+
     return {
         "obligorId": x.get("id", None),
         "obligorTag": x.get("tag",[]),
-        "obligorFields": x.get("fields", {})
+        "obligorFields": mkObligorFields(x.get("fields", {}))
     }
 
 
@@ -1606,17 +1611,33 @@ def mkPDF(a, b, c):
             ,mkDefaultedAssumption(c)]
 
 def mkObligorStrategy(x):
-    def mkRule(x):
-        match x:
+    def mkRule(y):
+        match y:
             case ("not", t):
                 return mkTag(("TagNot",mkRule(t)))
             case _:
-                return mkTag(x)
+                return mkTag(y)
+
+    def mkFieldRule(z):
+        match z:
+            case ("not", t):
+                return mkTag(("FieldNot",mkFieldRule(t)))
+            case (f, "in", lst):
+                return mkTag(("FieldIn",[f,lst]))
+            case (f, "cmp",cmp,val):
+                return mkTag(("FieldCmp",[f,cmp,val]))
+            case (f, "range",rng,lowVal,highVal):
+                return mkTag(("FieldInRange",[f,rng,lowVal,highVal]))
+            case _:
+                raise RuntimeError(f"failed to match {z}, mkFieldRule")
+
     match x:
         case ("ById",ids,assumps)| ("ByID",ids,assumps):
             return mkTag(("ObligorById",[[vStr(i) for i in ids],mkPDF(*assumps)]))
-        case ("ByTag",tags,rule,assumps):
-            return mkTag(("ObligorByTag",[[vStr(t) for t in tags], mkRule(rule),mkPDF(*assumps)]))
+        case ("ByTag", tags, rule, assumps):
+            return mkTag(("ObligorByTag",[lmap(mkRule,tags), mkRule(rule),mkPDF(*assumps)]))
+        case ("ByField", fieldRules, assumps):
+            return mkTag(("ObligorByField",[lmap(mkFieldRule,fieldRules),mkPDF(*assumps)]))
         case ("ByDefault",assumps) | ("_",assumps):
             return mkTag(("ObligorByDefault",mkPDF(*assumps)))
         case _:
@@ -1697,16 +1718,6 @@ def mkPoolComp(asOfDate, x, mixFlag) -> dict:
         , "futureCf":mkCf(getValWithKs(x,['cashflow', '现金流归集表', '归集表'],[]))
         , "extendPeriods":mkDatePattern(getValWithKs(x,['extendBy'], "MonthEnd"))}
     return r
-
-# def mkPoolType(x: dict):
-#     ''' PoolType for running pool endpoint '''
-#     match x:
-#         case {"清单": assets, "封包日": d} | {"assets": assets, "cutoffDate": d}:
-#             _pool = {"assets": [mkAsset(a) for a in assets] , "asOfDate": d}
-#             _pool_asset_type = identify_deal_type({"pool": _pool})
-#             return mkTag((mapping[_pool_asset_type], _pool))
-#         case _:
-#             raise RuntimeError(f"Failed to match {x}:mkPool")
 
 
 def mkPool(x: dict):
