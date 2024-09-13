@@ -2110,6 +2110,14 @@ def mkFundingPlan(x:tuple):
             raise RuntimeError(f"Failed to match mkFundingPlan:{x}")
 
 
+def mkRefiPlan(x:tuple):
+    match x:
+        case ("byRate",d,accName, bndName, interestInfo):
+            return [vDate(d), mkTag(("RefiRate",[vStr(accName), vStr(bndName), mkBondRate(interestInfo) ]))]
+        case _:
+            raise RuntimeError(f"Failed to match mkRefinancePlan:{x}")
+
+
 def mkNonPerfAssumps(r, xs:list) -> dict:
     def translate(y) -> dict:
         match y:
@@ -2137,7 +2145,9 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
             case ("makeWhole", d,spd,tbl):
                 return {"makeWholeWhen": [d,spd,tbl]}
             case ("issueBond", *issuancePlan):
-                return {"issueBondSchedule": [ mkFundingPlan(p) for p in issuancePlan]  }
+                return {"issueBondSchedule": lmap(mkFundingPlan,issuancePlan)  }
+            case ("refinance", *refiPlans):
+                return {"refinance": lmap(mkRefiPlan,refiPlans)  }
     match xs:
         case None:
             return {}

@@ -751,6 +751,28 @@ assumption for revolving pool
                  ,None))
 
 
+Refinance Bonds 
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionsadd:: 0.29.3
+
+The bond's interest rate compontent can be changed at a future date. Floater rate can be changed to fix rate, or coupon rate can be changed to higher or lower rate.
+
+
+syntax:
+  * ``("refinance",<refinance 1>,<refinance 2>...)``
+  
+<refinance>
+  ``("byRate",<Date>,<AccountName>,<BondName>,<InterestInfo>)``
+
+  * <Date> : when the bond's interest rate changes
+  * <AccountName> : the account used to settle interest accrued at changing date
+  * <BondName>: which bond's interest to be changed
+  * <InterestInfo>: the new interest info of the bond, same in the bond component
+
+.. seealso::
+  :ref:`Refinance by rate example`
+
 Interest Rate
 ^^^^^^^^^^^^^^
 
