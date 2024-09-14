@@ -1575,7 +1575,7 @@ That's where we need to have a `Multi-Structs` run .
 Multi Deal Run Assumptions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. versionadd:: 0.29.5
+.. versionadded:: 0.29.5
 
 If user would like to have multiple scenarios on:
 
