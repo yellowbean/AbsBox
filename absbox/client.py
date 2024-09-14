@@ -49,6 +49,8 @@ class Endpoints(str, enum.Enum):
     """Run a single deal with multiple scenarios endpoint"""
     RunMultiDeal = "runMultiDeals"
     """Run multiple deals endpoint"""
+    RunDealByRunScenarios = "runDealByRunScenarios"
+    """Run a single deal with multiple deal run scenarios endpoint"""
     RunDate = "runDate"
     """Run Dates from a datepattern """
     Version = "version"
@@ -61,6 +63,8 @@ class RunReqType(str, enum.Enum):
     Single = "SingleRunReq"
     """ Single Deal With A Single Assumption """
     MultiScenarios = "MultiScenarioRunReq"
+    """ Single Deal With Multiple Assumptions """
+    MultiRunScenarios = "MultiRunAssumpReq"
     """ Single Deal With Multiple Assumptions """
     MultiStructs = "MultiDealRunReq"
     """ Multiple Deals With Single Assumption """
@@ -249,21 +253,29 @@ class API:
 
         """
         r = None
-        _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
 
         match Schema(str).validate(run_type):
             case "Single" | "S":
+                _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
                 r = mkTag((RunReqType.Single.value, [_deal, _perfAssump, _nonPerfAssump]))
             case "MultiScenarios" | "MS":
+                _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
                 _deal = deal.json if hasattr(deal, "json") else deal
                 mAssump = mapValsBy(perfAssump, mkAssumpType)
                 r = mkTag((RunReqType.MultiScenarios.value, [_deal, mAssump, _nonPerfAssump]))
             case "MultiStructs" | "MD" :
+                _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
                 mDeal = {k: v.json if hasattr(v, "json") else v for k, v in deal.items()}
                 _perfAssump = mkAssumpType(perfAssump)
                 r = mkTag((RunReqType.MultiStructs.value, [mDeal, _perfAssump, _nonPerfAssump]))
+            case "MultiRunScenarios" | "MRS" if isinstance(nonPerfAssump,dict):
+                _deal = deal.json if hasattr(deal, "json") else deal
+                _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
+                mRunAssump = mapValsBy(nonPerfAssump, lambda x: mkNonPerfAssumps({}, x))
+
+                r = mkTag((RunReqType.MultiRunScenarios.value, [_deal, _perfAssump, mRunAssump]))
             case _:
                 raise RuntimeError(f"Failed to match run type:{run_type}")
         try:
@@ -339,8 +351,7 @@ class API:
         url = f"{self.url}/{Endpoints.RunDeal.value}"
 
         # construct request
-        runType = "Single"
-        req = self.build_run_deal_req(runType, deal, poolAssump, runAssump)
+        req = self.build_run_deal_req("Single", deal, poolAssump, runAssump)
         if debug:
             return req
         # branching with pricing
@@ -386,8 +397,7 @@ class API:
         """
 
         url = f"{self.url}/{Endpoints.RunDealByScnearios.value}"
-        runType = "MultiScenarios"
-        req = self.build_run_deal_req(runType, deal, poolAssump, runAssump)
+        req = self.build_run_deal_req("MultiScenarios", deal, poolAssump, runAssump)
 
         if debug:
             return req
@@ -523,6 +533,53 @@ class API:
             return {k: deals[k].read(v) for k, v in result.items()}    
         else:
             return result
+
+    def runByDealScenarios(self, deal,
+                    poolAssump=None,
+                    runAssump={},
+                    read=True,
+                    showWarning=True,
+                    debug=False) -> dict :
+        """ run deal with multiple run assumption, return a map
+
+        :param deal: _description_
+        :type deal: _type_
+        :param poolAssump: _description_, defaults to None
+        :type poolAssump: dict, optional
+        :param runAssump: _description_, defaults to {}
+        :type runAssump: dict
+        :param read: if read response into dataframe, defaults to True
+        :type read: bool, optional
+        :param showWarning: if show warning messages from server, defaults to True
+        :type showWarning: bool, optional
+        :param debug: return request text instead of sending out such request, defaults to False
+        :type debug: bool, optional
+        :return: a dict with scenario names as keys
+        :rtype: dict        
+        """
+
+        url = f"{self.url}/{Endpoints.RunDealByRunScenarios.value}"
+        req = self.build_run_deal_req("MRS", deal, poolAssump, runAssump)
+
+        if debug:
+            return req
+
+        result = self._send_req(req, url, timeout=30)
+
+        if result is None or 'error' in result:
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run")
+
+        rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
+        rawWarnMsg = list(tz.concat(rawWarnMsgByScen.values()))
+        
+        if showWarning and len(rawWarnMsg)>0:
+            console.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
+
+        if read:
+            return tz.valmap(deal.read, result)
+        else:
+            return result
+
 
     def runAsset(self, date, _assets, poolAssump=None, rateAssump=None
                  , pricing=None, read=True, debug=False) -> tuple:

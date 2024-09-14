@@ -4,11 +4,6 @@ Analytics
 .. autosummary::
    :toctree: generate
 
-.. warning::
-    This page is Working in progress
-
-
-
 Setup a API
 ----------------
 
@@ -1114,7 +1109,8 @@ Pass a map to ``poolAssump`` to run multiple scenarios.
                                                   ,["2024-08-01",0.025]]})],
                           read=True)
 
-
+.. seealso:: 
+   For details on sensitivity run pls refer to :ref:`Sensitivity Analysis`
 
 Running a pool of assets 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1403,11 +1399,64 @@ There are two types of validation message
 Sensitivity Analysis
 ----------------------
 
-There are two types in sensitivity analysis in `absbox`: Either teaking on assumptions (left) or changing deal components (right)
+There are three types in sensitivity analysis in `absbox`: 
 
-.. image:: img/sensitivity_analysis.png
-  :width: 600
-  :alt: sensitivity
+* ``Pool Performance``
+* ``Deal Structure``
+* ``Deal Run Assumption``
+
+
+.. list-table:: Sensitivity Run Type
+   :header-rows: 1
+
+   * - Type
+     - Deal
+     - Pool Performance
+     - Deal Run Assumption
+     - Function
+   * - ``Pool Performance``
+     - Single
+     - ``A Map``
+     - Single
+     - ``runByScenarios()``
+   * - ``Deal Structures``
+     - ``A Map``
+     - Single
+     - Single
+     - ``runStructs()``
+   * - ``Deal Run Assumption``
+     - Single
+     - Single
+     - ``A Map``
+     - ``runByDealScenarios()``
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: which function I should use?
+    :alt: which function I should use?
+    :align: center
+
+    digraph {
+        b [shape=diamond, label="Which type sensitivity analysis?"]
+        b -> "By different pool performances?" -> "runByScenarios()"
+        b -> "By different deal components?"  -> "runStructs()"
+        b -> "By different deal run assumptions?" -> "runByDealScenarios()"
+        "runByScenarios()" -> c [color="blue"]
+        "runStructs()" -> c [color="blue"]
+        "runByDealScenarios()" -> c [color="blue"]
+        "runByScenarios()" -> d  [color="red"]
+        "runStructs()" -> d [color="red"]
+        "runByDealScenarios()" -> d [color="red"]
+
+        d [shape=diamond, label="Read result from single scenario"]
+        c [shape=diamond, label="Compare result between scenarios"]
+        c -> "plain Python keyword"
+        d -> "plain Python keyword"
+        c -> "readFlowsByScenarios()"
+        c -> "readMultiFlowsByScenarios()"
+        c -> "readFieldsByScenarios()"
+    }
+
 
 
 It is common to performn sensitivity analysis to get answers to:
@@ -1421,12 +1470,10 @@ That's where we need to have a  `Multi-Scneario` run .
 
 
 
-
-
 Multi-Scenario
 ^^^^^^^^^^^^^^^^^
 
-if passing `assumptions` with a dict. Then the key will be treated as `secnario name`, the value shall be same as single scneario assumptions.
+if passing :ref:`Asset Performance Assumption` with a dict. Then the key will be treated as `secnario name`, the value shall be same as single scneario assumptions.
 
 There are two ways to build multiple scenarios:
 
@@ -1492,29 +1539,6 @@ Start with a `base` case and nudge the assumption by `lenses` . `absbox` shipped
 `prodAssumpsBy()` will return a map with value as `pool assumption`. But the key representation is terrible, to be enhanced in future release.
 
 
-View Multi-Scenario Result
-""""""""""""""""""""""""""""""
-
-
-User shall able to access the each scenario's response by just by `scenario name`
-
-.. code-block:: python
-   
-   r["00"]
-   r["stressed"]
-
-There are couple candy function user can view the data field from all the scenarios:
-
-.. code-block:: python
-   
-   from absbox import flow_by_scenario
-
-   flow_by_scenario(rs,["pool","flow","Interest"])
-   flow_by_scenario(rs,["bonds","A1","principal"])
-   flow_by_scenario(rs,["bonds","A1", ["principal","cash"]])
-   flow_by_scenario(rs,["pricing","A1"],node="idx")
-
-
 
 
 Multi-Structs
@@ -1548,11 +1572,44 @@ That's where we need to have a `Multi-Structs` run .
   :ref:`How to structuring a deal`
 
 
+Multi Deal Run Assumptions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadd:: 0.29.5
+
+If user would like to have multiple scenarios on:
+
+* interest rate curve ?
+* call assumptions ?
+* expense projection ?
+* revolving asset quality ?
+* pricing ?
+* make whole call ?
+* refinance on bond strategy ?
+
+Just build a map with options from :ref:`Deal Assumption`
+
+.. code-block:: python
+
+  runAssumptionMap = {
+      "A":[("call",("poolBalance",200))]
+      ,"B":[("call",("poolBalance",500))]
+  }
+  
+  r = localAPI.runByDealScenarios(test01
+                                  ,runAssump=runAssumptionMap
+                                  ,read=True)
+
+.. seealso::
+   notebook example :ref:`Sensitivity on Deal Run Assumption`
 
 Retriving Results
 ^^^^^^^^^^^^^^^^^^^^^
 
 The result returned from sensitivity run is just a map, with key as identifer for each scenario, the value is the same as single run. 
+
+Plain Python Keys
+""""""""""""""""""
 
 To access same component from different sceanrio : 
 
@@ -1567,35 +1624,9 @@ To access same component from different sceanrio :
   {k: v['accounts']["reserve_account_01"] for k,v in r.items() }
 
   
+Built-in Comparision functions
+""""""""""""""""""""""""""""""""""""""
+
 .. seealso::
   There are couple built-in functions will help user to get result in easier way :ref:`Read Multiple Result Map`
-
-Plotting
--------------------------
-
-a collection of functions to plot `not-so-bad` charts with ``matplotlib``
-
-.. versionadded:: 0.23.4
-
-Plot Deal Balance Sheet
-^^^^^^^^^^^^^^^^^^^^
-* Prerequisite: user request a :ref:`Financial Reports` in deal run assumption
-
-syntax:
-  ``plot_bs(<deal after run>)``
-
-
-Plot Deal Cash Flow
-^^^^^^^^^^^^^^^^^^^^
-* Prerequisite: user request a :ref:`Financial Reports` in deal run assumption
-
-Plot Bond Flow
-^^^^^^^^^^^^^^^^^^^^
-
-* Prerequisite: user request a :ref:`Financial Reports` in deal run assumption
-
-
-Plot Bond OC
-""""""""""""""
-
 
