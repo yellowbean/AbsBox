@@ -234,7 +234,7 @@ Pool
     * ``("cumPoolCollection", None, <field1>,<field2>....)`` -> pool cumulative on <field...> fields :ref:`Pool Sources`
     * ``("cumPoolCollectionTill", None, N,<field1>,<field2>....)`` -> pool cumulative on <field...> fields till Period N :ref:`Pool Sources`
     * ``("curPoolCollection", None, <field1>,<field2>...)``   -> pool current sum of fields
-    * ``("curPoolCollectionTill", None, N,<field1>,<field2>...)``   -> pool current sum of fields till Period N
+    * ``("curPoolCollectionStats", None, N,<field1>,<field2>...)``   -> pool current sum of fields till Period N
   
 .. versionadded:: 0.24.1
 

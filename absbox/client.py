@@ -97,8 +97,8 @@ class LibraryEndpoints(str, enum.Enum):
     Run = "run"
     Data = "data"
     DataList = "data/list"
-    DataFetch = "data/fetch"
     DealFetch = "deal/fetch"
+    ReportFetch = "data/report"
 
 
 
@@ -797,7 +797,8 @@ class API:
 
 
     def fetchLibraryData(self, **q):
-        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.DataFetch.value}"
+        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.ReportFetch.value}"
+        hdrs = self.hdrs | {"Authorization": f"Bearer {self.token}"}
         # fetch type
         ## by single bond id
         ## by deal id 
@@ -805,12 +806,10 @@ class API:
 
         ## filter ,date range
 
-        result = self._send_req(json.dumps(q), deal_library_url)
+        result = self._send_req(json.dumps(q), deal_library_url, headers=hdrs)
         console.print(f"✅{MsgColor.Success.value} fetch success")
-        if ('read' in q) and (q['read'] == True):
-            return result
-        else:
-            return result
+        
+        return result
     
     def fetchLibraryDeal(self, **q):
         deal_library_url = q['deal_library']+f"/{LibraryEndpoints.DealFetch.value}"
