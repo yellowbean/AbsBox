@@ -168,6 +168,8 @@ def mkPoolSource(x):
             return "NewDelinquencies"
         case "新增损失" | "Losses":
             return "NewLosses"
+        case "余额" | "Balance":
+            return "CurBalance"
         case _ :
             raise RuntimeError(f"not match found: {x} :make Pool Source")
 
@@ -243,7 +245,7 @@ def mkDs(x):
         case ("资产池当期至", pNames, idx, *i) | ("curPoolCollectionStats", pNames, idx, *i):
             if pNames:
                 return mkTag(("PoolCurCollectionStats", [idx, lmap(mkPoolSource,i), lmap(mkPid,pNames)]))
-            return mkTag(("PoolCurCollectionStats", [idx, lmap(mkPoolSource,i), None]))
+            return mkTag(("PoolCollectionStats", [idx, lmap(mkPoolSource,i), None]))
         case ("计划资产池估值", pricingMethod, *pNames) | ("schedulePoolValuation", pricingMethod, *pNames):
             if pNames:
                 return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), lmap(mkPid,pNames)]))
