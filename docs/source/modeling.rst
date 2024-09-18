@@ -327,7 +327,10 @@ Combination Type
     * ``("min", <Formula>, <Formula>, ...)`` -> get the lower value in the list
     * ``("sum", <Formula>, <Formula>, ...)`` -> sum of formula values
     * ``("avg", <Formula>, <Formula>, ...)`` -> average of formula values
-    * ``("/", <Formula>, <Formula>, ...)`` -> divide two formulas
+    * ``("/", <Formula>, <Formula>, ...)`` -> divide two formulas (2 digtis)
+      .. versionadded:: 0.29.6
+      * ``("ratio", <Formula>, <Formula>)`` -> divide two formulas but with more precision (6 digtis)
+      * ``("avgRatio", <Formula>.....)   -> average of ratio of formula values
     * ``("abs", <Formula>)`` -> absolute value of formula value
     * ``("subtract", <Formula>, <Formula>, ...)`` -> using 1st of element to substract rest in the list
 

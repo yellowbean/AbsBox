@@ -96,6 +96,7 @@ class Generic:
         output = {}
         output['_deal'] = resp[0]
         deal_content = output['_deal']['contents']
+
         for comp_name, comp_v in read_paths.items():
             if deal_content[comp_name] is None:
                 continue

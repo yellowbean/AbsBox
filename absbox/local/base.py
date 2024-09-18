@@ -105,7 +105,7 @@ freqMap = {"每月": "Monthly", "每季度": "Quarterly", "每半年": "SemiAnnu
            ,"Weekly":"Weekly","weekly":"Weekly","每周":"Weekly","BiWeekly":"BiWeekly","biweekly":"BiWeekly","每两周":"BiWeekly"}
 
 rateLikeFormula = set(["bondFactor", "poolFactor", "cumPoolDefaultedRate","poolWaRate","bondWaRate", "资产池累计违约率", "债券系数", "资产池系数"
-                      ,"cumPoolNetLossRate","cumPoolDefaultedRateTill"])
+                      ,"cumPoolNetLossRate","cumPoolDefaultedRateTill","比例","ratio","avgRatio","平均比例"])
 intLikeFormula = set(["borrowerNumber", "monthsTillMaturity", "periodNum"])
 boolLikeFormula = set(["trigger", "事件", "isMostSenior", "最优先", "isPaidOff","清偿完毕","rateTest","allTest","anyTest","比率测试","任一测试","所有测试"
                         "isOutstanding"])
@@ -212,3 +212,4 @@ class SubAssetType(str, enum.Enum):
 
 
 
+inf = 179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540827237163350510684586298239947245938479716304835356329624224137216

@@ -461,5 +461,3 @@ def readCfFromLst(lst:list)-> pd.DataFrame:
 
 def tupleToDictWithKey(xs,key="name"):
     return dict([ (n,x|{key:n}) for (n,x) in xs ])
-
-

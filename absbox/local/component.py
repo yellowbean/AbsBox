@@ -4,6 +4,8 @@ from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, m
 from absbox.local.util import filter_by_tags, enumVals, lmap, readTagMap
 from absbox.local.base import *
 
+import sys
+
 from absbox.validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool
 from schema import Or
 from enum import Enum
@@ -170,6 +172,8 @@ def mkPoolSource(x):
             return "NewLosses"
         case "余额" | "Balance":
             return "CurBalance"
+        case "期初余额" | "BegBalance":
+            return "CurBegBalance"
         case _ :
             raise RuntimeError(f"not match found: {x} :make Pool Source")
 
@@ -364,10 +368,14 @@ def mkDs(x):
             return mkTag(("CapWith", [mkDs(ds1), mkDs(ds2)]))
         case ("/", ds1, ds2) | ("divide", ds1, ds2):
             return mkTag(("Divide", [mkDs(ds1), mkDs(ds2)]))
+        case ("比例", ds1, ds2) | ("ratio", ds1, ds2):
+            return mkTag(("DivideRatio", [mkDs(ds1), mkDs(ds2)]))
         case ("abs", ds):
             return mkTag(("Abs", mkDs(ds)))
         case ("avg", *ds) | ("平均", *ds):
             return mkTag(("Avg", [mkDs(_) for _ in ds]))
+        case ("avgRatio", *ds) | ("平均比例", *ds):
+            return mkTag(("AvgRatio", [mkDs(_) for _ in ds]))
         case _:
             raise RuntimeError(f"Failed to match DS/Formula: {x}")
 
@@ -1963,7 +1971,7 @@ def readRunSummary(x, locale) -> dict:
         df.rename(columns={"Value":ds_name},inplace=True)
         df.set_index("Date",inplace=True)
         return df
-    inspect_vars = filter_by_tags(x, enumVals(InspectTags))
+    inspect_vars = [  c & lens['contents'][2].set(sys.float_info.max) if c['contents'][2]==inf else c  for c in filter_by_tags(x, enumVals(InspectTags))  ]
     if inspect_vars:
         inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),c['contents'][2]) for c in inspect_vars ]
                                 ,columns = ["Date","DealStats","Value"])
