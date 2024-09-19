@@ -234,6 +234,8 @@ Pool
     * ``("cumPoolCollection", None, <field1>,<field2>....)`` -> pool cumulative on <field...> fields :ref:`Pool Sources`
     * ``("cumPoolCollectionTill", None, N,<field1>,<field2>....)`` -> pool cumulative on <field...> fields till Period N :ref:`Pool Sources`
     * ``("curPoolCollection", None, <field1>,<field2>...)``   -> pool current sum of fields
+
+    .. versionadded:: 0.29.6
     * ``("curPoolCollectionStats", None, N,<field1>,<field2>...)``   -> pool current sum of fields till Period N
   
 .. versionadded:: 0.24.1
@@ -328,9 +330,6 @@ Combination Type
     * ``("sum", <Formula>, <Formula>, ...)`` -> sum of formula values
     * ``("avg", <Formula>, <Formula>, ...)`` -> average of formula values
     * ``("/", <Formula>, <Formula>, ...)`` -> divide two formulas (2 digtis)
-      .. versionadded:: 0.29.6
-      * ``("ratio", <Formula>, <Formula>)`` -> divide two formulas but with more precision (6 digtis)
-      * ``("avgRatio", <Formula>.....)   -> average of ratio of formula values
     * ``("abs", <Formula>)`` -> absolute value of formula value
     * ``("subtract", <Formula>, <Formula>, ...)`` -> using 1st of element to substract rest in the list
 
@@ -342,7 +341,10 @@ Combination Type
     * ``("capWith", <Formula1> , <Formula2>)`` -> get value of <formula1> and cap with <formula2>
     * ``("constant", <Number>)`` | ``("const", <Number>)`` -> a constant value
     * ``("custom", <Name of user define data>)`` -> use a custom data
-
+    
+    .. versionadded:: 0.29.6
+    * ``("ratio", <Formula>, <Formula>)`` -> divide two formulas but with more precision (6 digtis)
+    * ``("avgRatio", <Formula>.....)``   -> average of ratio of formula values
 
 Condition
 ------------
