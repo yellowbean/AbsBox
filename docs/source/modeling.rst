@@ -238,8 +238,7 @@ Pool
     .. versionadded:: 0.29.6
     * ``("curPoolCollectionStats", None, N,<field1>,<field2>...)``   -> pool current sum of fields till Period N
   
-.. versionadded:: 0.24.1
-
+    .. versionadded:: 0.24.1
     * ``("schedulePoolValuation", <pricing method>, <pool name1>, <pool name2>..)`` -> get valuation on schedule cashflow from specific pool or all pools with :ref:`Pricing Method` 
   
 Accounts
@@ -268,8 +267,7 @@ Ledger
 
 Rate Hedge
 """"""""""""""""
-.. versionadded:: 0.23.3
-
+    .. versionadded:: 0.23.3
     * ``("rateSwapNet",<ratCapName>)`` -> get accrued cash to pay/collect of rate swap
     * ``("rateCapNet",<ratCapName>)`` -> get accrued cash to collect of rate cap
 
@@ -279,6 +277,7 @@ Integer Type
 ^^^^^^^^^^^^^^
     * ``("borrowerNumber",)`` -> number of borrower
     * ``("monthsTillMaturity","A")``  -> number of months till the maturity date of bond A
+
     .. versionadded:: 0.23.5
     * ``("periodNum",)``  -> number of pool collection periods collected during *PROJECTION*
 
@@ -293,6 +292,10 @@ Ratio Type
     * ``("poolWaRate",)`` -> weighted average pool coupon 
     * ``("bondRate","A")`` -> the bond rate of bond "A"
     * ``("bondWaRate",<Bond1>,<Bond2>...)`` -> weighted average bond coupon
+  
+    .. versionadded:: 0.29.6
+    * ``("ratio", <Formula>, <Formula>)`` -> divide two formulas but with more precision (6 digtis)
+    * ``("avgRatio", <Formula>.....)``   -> average of ratio of formula values
 
 Bool Type
 ^^^^^^^^^^
@@ -336,7 +339,10 @@ Combination Type
       * ``("-",<Formula>,<Formula>,...)``  same
     * ``("floorWith", <Formula1> , <Formula2>)`` -> get value of <formula1> and floor with <formula2>
     * ``("floorWithZero", <Formula> )`` -> get value of <formula1> and floor with 0
-    * ``("excess", <Formula>, *<Formula>)`` -> equals to ``max 0 <formula> - sum *<formula>`` ( new in 0.24.3)
+  
+    .. versionadded:: 0.24.3
+    * ``("excess", <Formula>, *<Formula>)`` -> equals to ``max 0 <formula> - sum *<formula>``
+
     * ``("floorCap", <Formula1>, <Formula2>, <Formula3> )`` -> use <Formula1> as floor, <Formula2> as cap, and use <Formula3> as value
     * ``("capWith", <Formula1> , <Formula2>)`` -> get value of <formula1> and cap with <formula2>
     * ``("constant", <Number>)`` | ``("const", <Number>)`` -> a constant value
