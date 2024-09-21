@@ -7,6 +7,39 @@ Installation
 .. warning::
   ``absbox`` is heavily using ``match clause`` which was introduced in Python 3.10. Please make sure you are using *Python3.10* and after
 
+
+User need to complete both part (Green and Blue) to run `absbox` successfully.
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: Installation Overview
+    :alt: Installation Overview
+    :align: center
+
+    digraph {
+        rankdir = LR
+        "absbox" [fillcolor=lightgreen,style=filled]
+        "fresh install" [fillcolor=lightgreen,style=filled]
+        "upgrade" [fillcolor=lightgreen,style=filled]
+
+        "Setup" -> "absbox" -> "fresh install" -> "pip install absbox"
+        
+        "absbox" -> "upgrade" -> "pip install -U absbox"
+
+        "Hastructure" [fillcolor=lightblue,style=filled]
+        "public server" [fillcolor=lightblue,style=filled]
+        "private server" [fillcolor=lightblue,style=filled]
+        "Hastructure" [fillcolor=lightblue,style=filled]
+
+        "Setup" -> "Hastructure"
+        "Hastructure" -> "public server" -> "Connect to Public URL(absbox.org)"
+        "Hastructure" -> "private server" -> "Using Docker(Ubuntu)"
+        "private server" -> "Using download binary" -> "Windows"
+        "Using download binary" -> "Mac OS"
+        "Using download binary" -> "Ubuntu"
+    }
+
+
 Using pip
 --------------
 
@@ -46,7 +79,7 @@ which shows current version of `absbox`
    
 
 Public Server vs Self-hosted
------------------------------
+-------------------------------
 
 ``absbox`` needs connecting to an ``Hastructure`` engine. User can choose a public one or use it's own if user is keen on privacy and performance.
 
@@ -128,6 +161,7 @@ Use Private/In-House Server
 
 If user want to have a self-hosted server 
   * user can build one from source code `Hastructure <https://github.com/yellowbean/Hastructure>`_
+  * or use pre-built binary from `Releases <https://github.com/yellowbean/Hastructure/releases>`_
   * or using docker by one-line solution
 
     .. code-block:: bash
