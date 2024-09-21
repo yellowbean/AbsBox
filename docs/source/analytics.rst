@@ -1248,8 +1248,36 @@ returns:
   ``Run single asset`` is a good way to test the asset performance assumption and cashflow before running the whole deal. see example: :ref:`Run Single Assets` 
 
 
-Getting cashflow
+Getting Results
 ------------------
+
+
+A `result` is returned by a `run()` call. 
+
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: cashflow result
+    :alt: cashflow result
+    :align: center
+
+    digraph {
+        rankdir = LR
+        c[label="Cashflow Result"]
+        c -> "Bonds Cashflow" -> "r['bonds']"
+        c -> "Fees Cashflow"  -> "r['fees']"
+        c -> "Account Cashflow" -> "r['accounts']"
+        c -> "Pool Cashflow" -> "r['pool']['flow']"
+        c -> "Trigger flow" -> "r['triggers']"
+        c -> "Liquidity flow" -> "r['liqProvider']"
+        c -> "RateCap/RateSwap flow" -> "r['rateSwap']"
+        "RateCap/RateSwap flow" -> "r['rateCap']"
+        c -> "Ledger flow" -> "r['ledgers']"
+    }
+
+
+Cashflow Results
+^^^^^^^^^^^^^^^^^
 
 * the `run()` function will return a dict which with keys of components like `bonds` `fees` `accounts` `pool`
 * the first argument to `run()` is an instance of `deal`
@@ -1278,7 +1306,7 @@ the `runPool()` function will return cashflow for a pool, user need to specify `
 
 
 Bond Cashflow 
-^^^^^^^^^^^^^^^^
+""""""""""""""""
 
 .. code-block:: python
 
@@ -1301,7 +1329,7 @@ User have the option to view multiple cashflow in a single dataframe,with column
 
 
 Fee Cashflow
-^^^^^^^^^^^^^^
+""""""""""""""""
 
 .. code-block:: python
 
@@ -1309,7 +1337,7 @@ Fee Cashflow
    r['fees']['trusteeFee'] 
 
 Account Cashflow
-^^^^^^^^^^^^^^^^^
+""""""""""""""""
 
 .. code-block:: python
 
@@ -1324,15 +1352,42 @@ Account Cashflow
 
 
 Pool Cashflow 
-^^^^^^^^^^^^^^^
+""""""""""""""""
 
 .. code-block:: python
 
    r['pool']['flow'] # pool cashflow 
 
 
+Non-Cashflow Results 
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``r['result']`` save the run result other than cashflow.
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: none cashflow result
+    :alt: none cashflow result
+    :align: center
+
+    digraph {
+        rankdir = LR
+        d[label="Non-Cashflow Result"]
+        d -> "Deal Status flow" -> "r['result']['status']"
+        d -> "Bond Summary" -> "r['result']['bonds']"
+        "Bond Summary" -> "r['pricing']"
+        d -> "Variable Inspect" -> "r['result']['inspect']"
+        "Variable Inspect" -> "r['result']['waterfallInspect']"
+        d -> "Deal Run Logs" -> "r['result']['logs']"
+
+        d -> "Waterfall Run" -> "r['result']['waterfall']"
+        d -> "Financial Reports" -> "r['result']['report']"
+    }
+
+
 Bond Pricing 
-^^^^^^^^^^^^^
+""""""""""""""""
+
 
 if passing `pricing` in the `run`, then response would have a key `pricing`
 
@@ -1342,13 +1397,8 @@ if passing `pricing` in the `run`, then response would have a key `pricing`
 
 
 
-Getting Results
----------------
-
-``r['result']`` save the run result other than cashflow.
-
 Deal Status Change During Run
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""
 
 it is not uncommon that `triggers` may changed deal status between `accelerated` `defaulted` `amorting` `revolving`.
 user can check the `status` chang log via :
@@ -1366,7 +1416,7 @@ or user can cross check by review the account logs by (if changing deal status w
 
 
 Variables During Waterfall 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""
 
 If there is waterfall action in the waterfall 
 
@@ -1383,7 +1433,7 @@ then the <Formula> value can be view in the ``result`` ``waterfallInspect``.
 
 
 Validation Messages
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""
 
 There are two types of validation message 
 
