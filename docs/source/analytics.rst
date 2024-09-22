@@ -1340,6 +1340,15 @@ Fee Cashflow
    r['fees'].keys() # all fee names
    r['fees']['trusteeFee'] 
 
+.. versionadded:: 0.26.3
+
+User have the option to view multiple fees cashflow in a single dataframe,with columns specified.
+
+.. code-block:: python
+
+  from absbox import readFeesCf
+
+
 Account Cashflow
 """"""""""""""""
 
@@ -1347,6 +1356,15 @@ Account Cashflow
 
    r['accounts'].keys() # all account names
    r['accounts']['acc01'] 
+
+.. versionadded:: 0.26.3
+
+User have the option to view multiple accounts cashflow in a single dataframe,with columns specified.
+
+.. code-block:: python
+
+  from absbox import readAccsCf
+
 
 
 .. note::  Getting Multiple Items in same category
