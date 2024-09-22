@@ -53,7 +53,7 @@ Using pip
     pip install absbox
 
 Upgrade `absbox` package to latest
-""""""""""""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ``absbox`` is evolving rapidly, please make sure you are using the latest one. 
 
@@ -62,7 +62,7 @@ Upgrade `absbox` package to latest
     pip install -U absbox
 
 Check version
-""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^
 
 .. code-block:: console 
 
