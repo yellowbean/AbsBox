@@ -1252,8 +1252,15 @@ Getting Results
 ------------------
 
 
-A `result` is returned by a `run()` call. 
+A `result` is returned by a `run()` call which has two components:
 
+* :ref:`Cashflow Results`
+* :ref:`Non-Cashflow Results`
+
+
+
+Cashflow Results
+^^^^^^^^^^^^^^^^^
 
 .. graphviz::
     :name: sphinx.ext.graphviz
@@ -1275,9 +1282,6 @@ A `result` is returned by a `run()` call.
         c -> "Ledger flow" -> "r['ledgers']"
     }
 
-
-Cashflow Results
-^^^^^^^^^^^^^^^^^
 
 * the `run()` function will return a dict which with keys of components like `bonds` `fees` `accounts` `pool`
 * the first argument to `run()` is an instance of `deal`
