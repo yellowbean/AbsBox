@@ -157,7 +157,7 @@ Use pre-built binary from `Releases <https://github.com/yellowbean/Hastructure/r
 Connect to a engine 
 -----------------------
 
-User just need to pass in a URL points to engine.
+Once user has installed `absbox` and get `Hastructure` running ,user just need to pass in a URL points to engine.
 
 .. code-block:: python
 
