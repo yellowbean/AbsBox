@@ -91,6 +91,29 @@ Install `Hastructure`
 
 User has mulitple options to setup ``Hastructure``, either use public ones or host internally. ``absbox`` talks to RESTful interface exposed by ``Hastructure``.
 
+
+.. note:: Which type of deployment is suitable for you?
+
+  Public Servers
+    Easy to access, not setup action required. Multiple servers globally with latest ``dev`` and ``stable`` version.
+    But there is not guarantee on the performance, networking IO and SLA, either messages transmited are not ganrantee to be safe. 
+    It is good for testing and learning.
+
+  Local binaries/executables
+    Easy to setup, just download the binary and run it. It doesn't require ``Docker`` installed and it's has all platform support (Windows/MacOS/Ubuntu).
+  
+  Docker image
+    Easy to setup, just pull the image and run it in user's own enviroment. But user need to have Docker installed. The image can be composed together with other services in user's own enviroment.
+    It is good for in-house integration.
+    
+  Local build from source
+    It's always good to have a local build, as user can have full control on the engine. But the setup requires some technical knowledge on ``Haskell``.
+    It is good for experts.
+
+
+
+
+
 .. image:: img/user_choose_server.png
   :width: 600
   :alt: user_choose_server
