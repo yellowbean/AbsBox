@@ -1131,3 +1131,45 @@ CLO features:
 
 
 
+How to use pre-built executable
+------------------------------------------------
+
+Download executable
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Go to the `Release link <https://github.com/yellowbean/Hastructure/releases>`_ and download the executable for your OS.
+2. Download the `config.yaml` as well
+
+Put both files in the same folder.
+
+Mac OS 
+^^^^^^^^
+
+Windows 
+^^^^^^^^^^^
+
+Linux/Ubuntu/Debian
+^^^^^^^^^^^^^^^^^^^^^
+
+Verify
+^^^^^^^^^
+1. The console shall show running message
+
+.. image:: img/running_console.png 
+  :width: 500
+  :alt: console_running
+
+2. open a browser or cURL to make a get request to ``http://localhost:8081/version``
+
+.. note::
+
+   The port number can be changed in `config.yaml`
+
+
+.. code-block:: bash
+
+  curl http://localhost:8081/version
+
+.. image:: img/confirm_url.png
+  :width: 300
+  :alt: server_running

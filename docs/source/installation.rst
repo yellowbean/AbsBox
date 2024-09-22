@@ -154,6 +154,10 @@ Use pre-built binary from `Releases <https://github.com/yellowbean/Hastructure/r
 - put `Config File <https://github.com/yellowbean/Hastructure/blob/master/config.yml>`_ in same folder.
 - run the executable
 
+.. seealso::
+
+    :ref:`How to use pre-built executable`
+
 Connect to a engine 
 -----------------------
 
