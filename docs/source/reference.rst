@@ -254,13 +254,16 @@ After hours, probably you have built a model (an instance of `Generic` class) wi
 The general rule to check the quality of cashflow model :
 
 1. Pool cashflow 
-   Check if the pool cashflow generated is in line with expected. The `Expected` may come from deal documents ,or other cashflow model vendors.
+
+    Check if the pool cashflow generated is in line with expected pool cashflow. The `Expected` may come from deal documents ,or other cashflow model vendors.
 
 2. Waterfall 
-   By inspecting `account trasaction` statement, you can view the waterfall actions during all the payment dates and compare with the one described in the deal documents.
+  
+    By inspecting `account trasaction` statement, you can view the waterfall actions during all the payment dates and compare with the one described in the deal documents.
 
 3. Bond cashflow
-   In deal documents, there might be `WAL` of bonds, you can price the bond in `absbox` and check the WAL from the pricing is in line with the ones in deal documents.
+   
+    In deal documents, there might be `WAL` of bonds, you can price the bond in `absbox` and check the WAL from the pricing is in line with the ones in deal documents.
 
 
 
