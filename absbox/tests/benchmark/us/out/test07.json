@@ -1128,7 +1128,8 @@
                 0
               ]
             },
-            "distAcc"
+            "distAcc",
+            null
           ]
         },
         {

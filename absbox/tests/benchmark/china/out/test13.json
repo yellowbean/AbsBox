@@ -232,7 +232,10 @@
           "contents": [
             {
               "tag": "ClearLedger",
-              "contents": "MyLedger"
+              "contents": [
+                "Credit",
+                "MyLedger"
+              ]
             },
             "\u8d26\u623702",
             "\u8d26\u623701",

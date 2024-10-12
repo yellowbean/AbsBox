@@ -2434,7 +2434,8 @@
                 0.0
               ]
             },
-            "\u6536\u5165\u5206\u8d26\u6237"
+            "\u6536\u5165\u5206\u8d26\u6237",
+            null
           ]
         },
         {
@@ -2564,7 +2565,10 @@
           "contents": [
             {
               "tag": "ClearLedger",
-              "contents": "ABCD"
+              "contents": [
+                "Credit",
+                "ABCD"
+              ]
             },
             "\u6536\u5165\u5206\u8d26\u6237",
             "\u672c\u91d1\u5206\u8d26\u6237",
