@@ -2556,14 +2556,16 @@ Accure Interest and Pay of Bond Group
   accrue interest and pay interest of bonds in a group
 
   syntax
-    ``["accrueAndPayIntByGroup", "A"]``
+    ``["accrueAndPayIntByGroup", "A", order]``
 
-    ``["accrueAndPayIntByGroup", "A", m]``
+    ``["accrueAndPayIntByGroup", "A", order, m]``
     
   `m`is just map same in the `payFee` , which has keys :
 
     * ``limit`` -> :ref:`<limit>`
     * ``support`` -> :ref:`<support>`
+
+  `order` , :ref:`<ordering>`
 
 Pay Interest to Bond Group 
   pay interest to bonds in a group via a order , :ref:`<ordering>`
