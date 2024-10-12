@@ -348,6 +348,11 @@ Combination Type
     * ``("constant", <Number>)`` | ``("const", <Number>)`` -> a constant value
     * ``("custom", <Name of user define data>)`` -> use a custom data
     
+    
+    .. versionadded:: 0.29.6
+    * ``("ratio", <Formula>, <Formula>)`` -> divide two formulas but with more precision (6 digtis)
+    * ``("avgRatio", <Formula>.....)``   -> average of ratio of formula values
+
     .. versionadded:: 0.29.6
     * ``("ratio", <Formula>, <Formula>)`` -> divide two formulas but with more precision (6 digtis)
     * ``("avgRatio", <Formula>.....)``   -> average of ratio of formula values
@@ -698,6 +703,8 @@ Deal status is a ``Tag`` to describe the current ``status`` of deal, it can be o
       PreClosing -> Revolving [label="if revolving"]
       PreClosing -> Amortizing
       Revolving -> Amortizing
+      Warehousing -> Revolving
+      Warehousing -> Amortizing
       Amortizing -> End
     }
 
@@ -709,9 +716,9 @@ The ``status`` is being used by engine to:
 Deal Status Enums
 ^^^^^^^^^^^^^^^^^^^^^
 
-``(PreClosing,"<new status>")``
+``("PreClosing","<new status>")``
   Deal is in pre-closing stage, which means the deal has not been issued yet. Make sure to include a ``new status`` which deal will enter after ``Closing Date``
-``RampUp``
+``Warehousing`` or ``("Warehousing","<new status>")``
   Deal is ramping up to build assets
 ``Revolving``
   Deal is not amortizing yet, which means the deal is still in revolving stage.
@@ -2230,7 +2237,7 @@ PayFee
     *  ``{Account}`` -> Using the available funds from a single account.
     *  ``[<Fee>]`` -> Pay the fees in the list on pro-rata basis
 
-  Using one more map to limit the amount to be paid
+  Using one extra map to limit the amount to be paid
 
   syntax
     ``["payFee", {Account}, [<Fee>], {'limit':<limit> , 'support':<supports>}]``
@@ -2241,7 +2248,7 @@ PayFee
     * ``{"balCapAmt": 500}`` ,  pay up to 500.
     * ``{"formula": <formula> }``, pay up the :ref:`Formula`
  
-    ie. ``["payFee", "CashAccount", ["ServiceFee"], {"balPct":0.1}]``
+    ie. ``["payFee", "CashAccount", ["ServiceFee"], {'limit':{"balPct":0.1}}]``
   
   * ``support`` -> :ref:`<support>`
 
@@ -2499,6 +2506,16 @@ WriteOff
     ``["writeOff", <Bond>, <Limit>]`` 
 
     The ``<Limit>`` :ref:`<limit>`
+  
+  .. versionadded:: 0.29.7
+  write off the bonds balance sequentially
+
+  syntax
+    ``["writeOff", [<Bond>]]`` 
+
+    ``["writeOffq", [<Bond>], <Limit>]`` 
+
+    The ``<Limit>`` :ref:`<limit>`
 
 FundWith
   .. versionadded:: 0.26.1
@@ -2615,8 +2632,8 @@ Buy Asset
     
     ``["buyAsset",{pricing method}, {Account}, {limit}]``
 
-    * ``{pricing method``: :ref:`Pricing Method`
-    * ``{limit}``: :ref:`<limit>`
+    * ``pricing method``: :ref:`Pricing Method`
+    * ``limit``: :ref:`<limit>`
 
 Buy Asset From/To different Pools
   .. versionadded:: 0.28.15
@@ -2625,8 +2642,8 @@ Buy Asset From/To different Pools
   syntax 
     ``[ "buyAsset2", {pricing method}, {Account}, {limit}, {revolving pool name}, {deal pool name} ]``
 
-    * ``{pricing method``: :ref:`Pricing Method`
-    * ``{limit}``: :ref:`<limit>`
+    * ``pricing method``: :ref:`Pricing Method`
+    * ``limit``: :ref:`<limit>`
 
   .. note::
     Notebook example 
@@ -2730,7 +2747,7 @@ syntax
 
   * ``["formula",<ledger name>,<Debit|Credit>,<formula>]``
 
-    The most generic booking type ,which just book a ``<formula>`` value to ledger ``<ledger name>``
+    The most generic booking type ,which just book a :ref:`Formula` value to ledger ``<ledger name>`` with either ``Debit`` or ``Credit``.  
 ..
   * ``["AccountDraw",<ledger name>]``
     It was used in ``Support``,when there is insufficent interest or fee payment from account A and account B cures the shortfall ,that amount draw from account B was call "Account Draw" and booked in the ledger.
@@ -2762,6 +2779,7 @@ examples:
     * ``{"balPct": 0.6}`` , pay up to 60% of due amount
     * ``{"balCapAmt": 500}`` ,  pay up to 500.
     * ``{"formula": <formula> }``, pay up the :ref:`Formula`
+    * ``{"clearLedger": ("Credit","myLedger")}`` , clear the ledger balance to 0 by credit the ledger
 
 
 <support>

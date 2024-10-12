@@ -120,6 +120,7 @@ Performing
   
     * ``{"CDR":0.01}`` means 1% in annualized of current balance will be defaulted at the end of each period
     * ``{"CDR":[0.01,0.02,0.04]}`` means a vector of CDR will be applied since the asset snapshot date (determined by ``remain terms``)
+    * ``{"CDRPadding":[0.01,0.02,0.04]}`` same with above but the CDR 4% will be applied to rest of periods of the asset
     * ``{"ByAmount":(2000,[500,500,1000])}`` apply a custom default amount vector.
     * ``{"DefaultAtEndByRate":(0.05,0.10)}``, will apply 5% as CDR for all periods except last period. The last period will use default CDR 10% (which start from begining day).
 
@@ -129,6 +130,7 @@ Performing
   
     * ``{"CPR":0.01}`` means 1% in annualized of current balance will be prepay at the end of each period
     * ``{"CPR":[0.01,0.02,0.04]}`` means a vector of CPR will be applied since the asset snapshot date (determined by ``remain terms``)
+    * ``{"CPRPadding":[0.01,0.02,0.04]}`` same with above but the CPR 4% will be applied to rest of periods of the asset
 
 * <Recovery Assumption>
 
@@ -182,10 +184,12 @@ Summary
         Performing -> "Recovery Assumption"
         "Default Assumption" -> "{'CDR':x}"
         "Default Assumption" -> "{'CDR':[x...]}"
+        "Default Assumption" -> "{'CDRPadding':[x...]}"
         "Default Assumption" -> "{'ByAmount':(<total>, [x...])}"
         "Default Assumption" -> "{'DefaultAtEndByRate':(x,y)}"
         "Prepayment Assumption" -> "{'CPR':x}"
         "Prepayment Assumption" -> "{'CPR':[x...]}"
+        "Prepayment Assumption" -> "{'CPRPadding':[x...]}"
         "Recovery Assumption" -> "{'Rate':x,'Lag':y}"
         "Defaulted" -> "Defaulted Assumption"
         "Defaulted Assumption" -> "{'Defaulted':[x,y,[z...]]}"
@@ -204,8 +208,8 @@ Loan
                   ,runAssump = None
                   ,read=True)
 
-* <default assump> : ``{"CDR":<%>}``
-* <prepayment assump> : ``{"CPR":<%>}``
+* <default assump> : ``{"CDR":<%>}``, can be a vector or constant value
+* <prepayment assump> : ``{"CPR":<%>}``, can be a vector or constant value
 
 
 Summary
@@ -226,7 +230,11 @@ Summary
         Performing -> "Prepayment Assumption"
         Performing -> "Recovery Assumption"
         "Prepayment Assumption" -> "{'CPR':x}"
+        "Prepayment Assumption" -> "{'CPR':[x...]}"
+        "Prepayment Assumption" -> "{'CPRPadding':[x...]}"
         "Default Assumption" -> "{'CDR':x}"
+        "Default Assumption" -> "{'CDR':[x...]}"
+        "Default Assumption" -> "{'CDRPadding':[x...]}"
         "Default Assumption" -> "{'DefaultAtEndByRate':(x,y)}"
         "Recovery Assumption" -> "{'Rate':x,'Lag':y}"
     }
@@ -1005,35 +1013,42 @@ Running
 --------------
 
 Running
-  Means sending request to backend engine server. A request has three elmenets:
+  Means sending request to backend engine server. A request has three input elmenets:
    * API instance 
    * Deal Object
    * Assumptions
 
      * Pool performance assumptions
-     * Deal assumptions (May include Interest Rate / Clean Up Call)
-
-.. graphviz::
-    :name: sphinx.ext.graphviz
-    :caption: run targets
-    :alt: run targets
-    :align: center
-
-    digraph {
-        rankdir = LR
-        b[label="What to run ?"]
-        b -> "Run Sinlge Asset"  -> "api.runAsset()"
-        b -> "Run a Pool of Assets" 
-        b -> "Run a Deal"
-        b -> "Run Multi Deals"
-        "Run a Pool of Assets"  -> "api.runPoolByScenarios()"
-        "Run a Pool of Assets"  -> "api.runPool()"
-        "Run a Deal" -> "api.runByScenarios()"
-        "Run a Deal" -> "api.run()"
-        "Run Multi Deals" -> "api.runStructs()"
-    }
+     * Deal assumptions (May include Interest Rate / Clean Up Call etc)
 
 
+.. list-table:: Run Type
+   :header-rows: 1
+
+   * - Source
+     - Response Type
+     - Function
+   * - ``Run Sinlge Asset``
+     - Single Result
+     - ``api.runAsset()``
+   * - ``Run a Pool of Assets``
+     - Single Result
+     - ``api.runPool()``
+   * - ``Run a Pool of Assets``
+     - Multiple Result
+     - ``api.runPoolByScenarios()``
+   * - ``Run a Deal``
+     - Single Result
+     - ``api.run()``
+   * - ``Run a Deal``
+     - Multiple Result
+     - ``api.runByScenarios()``
+   * - ``Run a Deal``
+     - Multiple Result
+     - ``api.runStructs()``
+   * - ``Run a Deal``
+     - Multiple Result
+     - ``api.runByDealScenarios()``
 
 
 
@@ -1262,25 +1277,40 @@ A `result` is returned by a `run()` call which has two components:
 Cashflow Results
 ^^^^^^^^^^^^^^^^^
 
-.. graphviz::
-    :name: sphinx.ext.graphviz
-    :caption: cashflow result
-    :alt: cashflow result
-    :align: center
 
-    digraph {
-        rankdir = LR
-        c[label="Cashflow Result"]
-        c -> "Bonds Cashflow" -> "r['bonds']"
-        c -> "Fees Cashflow"  -> "r['fees']"
-        c -> "Account Cashflow" -> "r['accounts']"
-        c -> "Pool Cashflow" -> "r['pool']['flow']"
-        c -> "Trigger flow" -> "r['triggers']"
-        c -> "Liquidity flow" -> "r['liqProvider']"
-        c -> "RateCap/RateSwap flow" -> "r['rateSwap']"
-        "RateCap/RateSwap flow" -> "r['rateCap']"
-        c -> "Ledger flow" -> "r['ledgers']"
-    }
+.. list-table:: Cashflow Results
+   :header-rows: 1
+
+   * - Response Component
+     - Condition
+     - Path
+   * - ``Bonds flow``
+     - /
+     - r['bonds']
+   * - ``Fees flow``
+     - /
+     - r['fees']
+   * - ``Account flow``
+     - /
+     - r['accounts']
+   * - ``Pool flow``
+     - /
+     - r['pool']['flow']
+   * - ``Trigger flow``
+     - if modeled
+     - r['triggers']
+   * - ``Liquidity flow``
+     - if modeled
+     - r['liqProvider']
+   * - ``RateSwap flow``
+     - if modeled
+     - r['rateSwap']
+   * - ``RateCap flow``
+     - if modeled
+     - r['rateCap']
+   * - ``Ledger flow``
+     - if modeled
+     - r['ledgers']
 
 
 * the `run()` function will return a dict which with keys of components like `bonds` `fees` `accounts` `pool`
@@ -1380,32 +1410,52 @@ Pool Cashflow
 
    r['pool']['flow'] # pool cashflow 
 
+.. versionadded:: 0.29.7 
+
+The ``readPoolsCf`` function can be used to view multiple pool cashflow.
+
+.. code-block:: python
+
+  from absbox import readPoolsCf
+
+  readPoolsCf(r['pool']['flow'])
+
 
 Non-Cashflow Results 
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ``r['result']`` save the run result other than cashflow.
 
-.. graphviz::
-    :name: sphinx.ext.graphviz
-    :caption: none cashflow result
-    :alt: none cashflow result
-    :align: center
+.. list-table:: Non Cashflow Results
+   :header-rows: 1
 
-    digraph {
-        rankdir = LR
-        d[label="Non-Cashflow Result"]
-        d -> "Deal Status flow" -> "r['result']['status']"
-        d -> "Bond Summary" -> "r['result']['bonds']"
-        "Bond Summary" -> "r['pricing']"
-        d -> "Variable Inspect" -> "r['result']['inspect']"
-        "Variable Inspect" -> "r['result']['waterfallInspect']"
-        d -> "Deal Run Logs" -> "r['result']['logs']"
-
-        d -> "Waterfall Run" -> "r['result']['waterfall']"
-        d -> "Financial Reports" -> "r['result']['report']"
-    }
-
+   * - Response Component
+     - Condition
+     - Path
+   * - ``Deal Status flow``
+     - /
+     - r['result']['status']
+   * - ``Bond Summary``
+     - /
+     - r['result']['bonds']
+   * - ``Bond Pricing``
+     - if `pricing` in deal assumption
+     - r['pricing']
+   * - ``Variable Inspect``
+     - if `inspect` in deal assumption
+     - r['result']['inspect']
+   * - ``Variable Inspect``
+     - if `inspect` in deal waterfall
+     - r['result']['waterfallInspect']
+   * - ``Deal Run Logs``
+     - /
+     - r['result']['logs']
+   * - ``Waterfall Run``
+     - /
+     - r['result']['waterfall']
+   * - ``Financial Reports``
+     - if `reports` in deal assumption
+     - r['result']['report']
 
 Bond Pricing 
 """"""""""""""""
@@ -1471,11 +1521,12 @@ There are two types of validation message
 Sensitivity Analysis
 ----------------------
 
-There are three types in sensitivity analysis in `absbox`: 
+There are four types in sensitivity analysis in `absbox`: 
 
 * ``Pool Performance``
 * ``Deal Structure``
 * ``Deal Run Assumption``
+* A combination of above
 
 
 .. list-table:: Sensitivity Run Type
@@ -1501,6 +1552,13 @@ There are three types in sensitivity analysis in `absbox`:
      - Single
      - ``A Map``
      - ``runByDealScenarios()``
+   * - ``Combination``
+     - ``A Map``
+     - ``A Map``
+     - ``A Map``
+     - ``runByCombo()``
+
+``runByCombo()`` is introduced after version ``0.29.7``
 
 .. graphviz::
     :name: sphinx.ext.graphviz
@@ -1513,12 +1571,16 @@ There are three types in sensitivity analysis in `absbox`:
         b -> "By different pool performances?" -> "runByScenarios()"
         b -> "By different deal components?"  -> "runStructs()"
         b -> "By different deal run assumptions?" -> "runByDealScenarios()"
+        b -> "By combination of deal struct/pool performance/run assumption" -> "runByCombo()"
+
         "runByScenarios()" -> c [color="blue"]
         "runStructs()" -> c [color="blue"]
         "runByDealScenarios()" -> c [color="blue"]
         "runByScenarios()" -> d  [color="red"]
         "runStructs()" -> d [color="red"]
         "runByDealScenarios()" -> d [color="red"]
+        "runByCombo()" -> d [color="red"]
+        "runByCombo()" -> c [color="blue"]
 
         d [shape=diamond, label="Read result from single scenario"]
         c [shape=diamond, label="Compare result between scenarios"]

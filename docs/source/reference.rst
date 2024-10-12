@@ -36,6 +36,8 @@ Videos
      - https://youtu.be/HwcsA_zIKr0
    * - 301 - Sensitivity Analysis
      - TBD
+   * - 302 - Structuring
+     - TBD
 
 
 

@@ -7,3 +7,4 @@ Set Assumptions
    ObligorTag
    ObligorField
    MultiRunAssumption
+   comboSensitivity
