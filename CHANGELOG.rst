@@ -3,6 +3,12 @@ Changelogs
 
 .. towncrier release notes start
 
+`0.29.9 <https://github.com/yellowbean/AbsBox/tree/0.29.9>`_ - 2024-10-13
+-------------------------------------------------------------------------
+
+No significant changes.
+
+
 `0.29.6 <https://github.com/yellowbean/AbsBox/tree/0.29.6>`_ - 2024-09-18
 -------------------------------------------------------------------------
 
