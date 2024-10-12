@@ -106,6 +106,24 @@ def readAccsCf(aMap, popColumns=["memo"]) -> pd.DataFrame:
     df.columns = header
     return df
 
+def readPoolsCf(pMap) -> pd.DataFrame:
+    ''' read a map of pools in dataframes to a single dataframe, with key as 1st level index'''
+
+    if isinstance(pMap, pd.DataFrame):
+        return pMap
+
+    pNames = pMap & lens.Keys().collect()
+    pFlows = pMap & lens.Values().collect()
+    pColumns = pMap & lens.Values().F(lambda x:x.columns.to_list()).collect()
+    
+    headers = tz.concat([  [ (k,c) for c in cs]  for k,cs in zip(pNames,pColumns)])
+    
+    headerIndex = pd.MultiIndex.from_tuples(headers, names=["Pool", "Field"])
+
+    df = pd.concat(pFlows,axis=1)
+    df.columns = headerIndex
+    return df
+
 def readFlowsByScenarios(rs:dict, path, fullName=True) -> pd.DataFrame:
     "read time-series balance flow from multi scenario or mult-structs"
     

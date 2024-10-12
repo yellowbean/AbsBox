@@ -488,13 +488,15 @@ def mkAccTxn(xs: list):
         return [mkTag(("AccTxn", x)) for x in xs]
 
 
-def mkAcc(an, x):
+def mkAcc(an, x=None):
     match x:
         case {"余额": b, "类型": t, "计息": i, "记录": tx} | {"balance": b, "type": t, "interest": i, "txn": tx}:
             return {"accBalance": vNum(b), "accName": vStr(an), "accType": mkAccType(t), "accInterest": mkAccInt(i), "accStmt": mkAccTxn(tx)}
 
         case {"余额": b} | {"balance": b}:
             return mkAcc(vStr(an), x | {"计息": x.get("计息", None), "interest": x.get("interest", None), "记录": x.get("记录", None), "txn": x.get("txn", None), "类型": x.get("类型", None), "type": x.get("type", None)})
+        case None:
+            return mkAcc(vStr(an), {"balance": 0})
         case _:
             raise RuntimeError(f"Failed to match account: {an},{x}")
 
@@ -644,8 +646,8 @@ def mkLimit(x:dict):
            return mkTag(("DueCapAmt", vNum(amt)))
        case {"公式": formula} | {"formula": formula}:
            return mkTag(("DS", mkDs(formula)))
-       case {"冲销":an} | {"clearLedger": an}:
-           return mkTag(("ClearLedger", vStr(an)))
+       case {"冲销":(dr, an)} | {"clearLedger": (dr, an)}:
+           return mkTag(("ClearLedger", [dr, vStr(an)]))
        case {"簿记":an} | {"bookLedger": an}:
            return mkTag(("BookLedger", vStr(an)))
        case {"系数":[limit, factor]} | {"multiple":[limit, factor]}:
@@ -937,9 +939,12 @@ def mkAction(x:list):
         case ["计提支付利息","组",source, target, o] | ["accrueAndPayIntByGroup", source, target,o]:
             byOrder = mkOrder(o)
             return mkTag(("AccrueAndPayIntGroup", [None, vStr(source), vStr(target),byOrder,None]))
-        case ["减记本金", target, l] | ["writeOff", target, l]:
+        case ["减记本金", target, l] | ["writeOff", target, l] if isinstance(target, str):
             limit = mkLimit(l) if l else None
             return mkTag(("WriteOff", [limit, vStr(target)]))
+        case ["减记本金", targets, l] | ["writeOff", targets, l] if isinstance(targets, list):
+            limit = mkLimit(l) if l else None
+            return mkTag(("WriteOffBySeq", [limit, vList(targets,str)]))
         case ["募集本金", source, target, l] | ["fundWith", source, target, l]:
             limit = mkLimit(l) if l else None
             return mkTag(("FundWith", [limit, vStr(source), vStr(target)]))
@@ -952,8 +957,10 @@ def mkAction(x:list):
             return mkTag(("PayIntResidual", [l, vStr(source), vStr(target)]))
         case ["支付收益", source, target] | ["payIntResidual", source, target]:
             return mkTag(("PayIntResidual", [None, vStr(source), vStr(target)]))
+        case ["出售资产", liq, target, pName] | ["sellAsset", liq, target, pName]:
+            return mkTag(("LiquidatePool", [mkLiqMethod(liq), vStr(target), mkPid(pName)]))
         case ["出售资产", liq, target] | ["sellAsset", liq, target]:
-            return mkTag(("LiquidatePool", [mkLiqMethod(liq), vStr(target)]))
+            return mkTag(("LiquidatePool", [mkLiqMethod(liq), vStr(target), None]))
         case ["流动性支持", source, liqType, target, limit] | ["liqSupport", source, liqType, target, limit]:
             return mkTag(("LiqSupport", [mkLimit(limit), vStr(source), mkLiqDrawType(liqType), vStr(target)]))
         case ["流动性支持", source, liqType, target] | ["liqSupport", source, liqType, target]:
@@ -1006,6 +1013,10 @@ def mkStatus(x: tuple|str):
     match x:
         case "摊销" | "Amortizing" | "摊还":
             return mkTag(("Amortizing"))
+        case "Warehousing" | "储备":
+            return mkTag(("Warehousing", None))
+        case ("Warehousing", st) | ("储备", st):
+            return mkTag(("Warehousing", mkStatus(st)))
         case "循环" | "Revolving":
             return mkTag(("Revolving"))
         case "RampUp":
@@ -1478,6 +1489,8 @@ def mkAssumpDefault(x):
     match x:
         case {"CDR": r} if isinstance(r, list):
             return mkTag(("DefaultVec", vList(r, numVal)))
+        case {"CDRPadding": r} if isinstance(r, list):
+            return mkTag(("DefaultVecPadding", vList(r, numVal)))
         case {"CDR": r}:
             return mkTag(("DefaultCDR", vNum(r)))
         case {"ByAmount": (bal, rs)} | {"ByAmt": (bal, rs)}:
@@ -1486,6 +1499,8 @@ def mkAssumpDefault(x):
             return mkTag(("DefaultAtEnd"))
         case {"DefaultAtEndByRate":(r1,r2)}:
             return mkTag(("DefaultAtEndByRate", [vNum(r1), vNum(r2)]))
+        case {"StressByCurve": [curve, assump]}:
+            return mkTag(("DefaultStressByTs", [ mkRateTs(curve), mkAssumpDefault(assump)]))
         case _ :
             raise RuntimeError(f"failed to match {x}")
 
@@ -1495,8 +1510,12 @@ def mkAssumpPrepay(x):
     match x:
         case {"CPR": r} if isinstance(r, list):
             return mkTag(("PrepaymentVec", vList(r, numVal)))
+        case {"CPRPadding": r} if isinstance(r, list):
+            return mkTag(("PrepaymentVecPadding", vList(r, numVal)))
         case {"CPR": r}:
             return mkTag(("PrepaymentCPR", vNum(r)))
+        case {"StressByCurve": [curve, assump]}:
+            return mkTag(("PrepayStressByTs", [ mkRateTs(curve), mkAssumpPrepay(assump)]))
         case _ :
             raise RuntimeError(f"failed to match {x}")
 
@@ -1805,13 +1824,15 @@ def mkLiqProvider(n: str, x: dict):
     if r is not None:
        return opt_fields | r 
 
-def mkLedger(n: str, x: dict):
+def mkLedger(n: str, x: dict=None):
     ''' Build ledger '''
     match x:
         case {"balance":bal} | {"余额":bal}:
             return {"ledgName":vStr(n),"ledgBalance":vNum(bal),"ledgStmt":None}
         case {"balance":bal,"txn":tx} | {"余额":bal, "记录":tx}:
             return {"ledgName":vStr(n),"ledgBalance":vNum(bal),"ledgStmt":mkAccTxn(tx)}
+        case None:
+            return {"ledgName":vStr(n),"ledgBalance":0,"ledgStmt":None}
         case _:
             raise RuntimeError(f"Failed to match Ledger:{n},{x}")
 

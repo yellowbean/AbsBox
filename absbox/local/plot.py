@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
-from absbox.local.util import guess_locale, aggStmtByDate, consolStmtByDate
+from absbox.local.util import guess_locale
 #from itertools import reduce
 from functools import reduce
 import numpy as np

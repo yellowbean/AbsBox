@@ -51,6 +51,8 @@ class Endpoints(str, enum.Enum):
     """Run multiple deals endpoint"""
     RunDealByRunScenarios = "runDealByRunScenarios"
     """Run a single deal with multiple deal run scenarios endpoint"""
+    RunByCombo = "runByCombo"
+    """Run mulitple sensitivities"""
     RunDate = "runDate"
     """Run Dates from a datepattern """
     Version = "version"
@@ -72,6 +74,8 @@ class RunReqType(str, enum.Enum):
     """ Single Pool With Single Assumption """
     MultiPoolScenarios = "MultiScenarioRunPoolReq"
     """ Single Pool With Multiple Assumptions """
+    ComboSensitivity = "MultiComboReq"
+    """ Multiple sensitivities """
 
 
 class RunResp(int, enum.Enum):
@@ -274,8 +278,16 @@ class API:
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
                 mRunAssump = mapValsBy(nonPerfAssump, lambda x: mkNonPerfAssumps({}, x))
-
                 r = mkTag((RunReqType.MultiRunScenarios.value, [_deal, _perfAssump, mRunAssump]))
+            case "ComboSensitivity" | "CS" if isinstance(nonPerfAssump,dict) and isinstance(perfAssump,dict) and isinstance(deal,dict):
+                mDeal = {k: v.json if hasattr(v, "json") else v for k, v in deal.items()}
+                mAssump = mapValsBy(perfAssump, mkAssumpType)
+                if mAssump == {}:
+                    mAssump = {"Empty": None}
+                mRunAssump = mapValsBy(nonPerfAssump, lambda x: mkNonPerfAssumps({}, x))
+                if mRunAssump == {}:
+                    mRunAssump = {"Empty":{}}
+                r = mkTag((RunReqType.ComboSensitivity.value, [mDeal, mAssump, mRunAssump]))
             case _:
                 raise RuntimeError(f"Failed to match run type:{run_type}")
         try:
@@ -463,7 +475,7 @@ class API:
             return result & lens.Values().Values().modify(self.read_single)
         return result
 
-    def runPool(self, pool, poolAssump=None, rateAssump=None, read=True, debug=False) -> tuple:
+    def runPool(self, pool, poolAssump=None, rateAssump=None, read=True, debug=False, **kwargs) -> tuple:
         """perform pool run with pool and rate assumptions
 
         :param pool: a pool object
@@ -490,7 +502,7 @@ class API:
         if debug:
             return req
 
-        result = self._send_req(req, url)
+        result = self._send_req(req, url, **kwargs)
 
         if read:
             return result & lens.Values().modify(self.read_single)
@@ -577,6 +589,63 @@ class API:
 
         if read:
             return tz.valmap(deal.read, result)
+        else:
+            return result
+
+    def runByCombo(self, 
+                    dealMap, 
+                    poolAssump={}, 
+                    runAssump={}, 
+                    read=True, showWarning=True, debug=False) -> dict:
+        """ run mulitple deals with multiple pool assumption/ with multiple run assumption, return a map 
+        
+        :param dealMap: a dict of deals
+        :type dealMap: _type_
+        :param poolAssump: a dict of pool assumptions, defaults to {}
+        :type poolAssump: dict, optional
+        :param runAssump: a dict of run assumptions, defaults to {}
+        :type runAssump: dict, optional
+        :param read: if read response into dataframe, defaults to True
+        :type read: bool, optional
+        :param showWarning: if show warning messages from server, defaults to True
+        :type showWarning: bool, optional
+        :param debug: return request text instead of sending out such request, defaults to False
+        :type debug: bool, optional
+        """
+
+        url = f"{self.url}/{Endpoints.RunByCombo.value}"
+
+        if len(dealMap) == 0:
+            raise AbsboxError(f"❌{MsgColor.Error.value}No deals found in dealMap,at least one deal is required")
+
+        if "^" in " ".join(tz.concatv(dealMap.keys(),poolAssump.keys(),runAssump.keys())):
+            raise AbsboxError(f"❌{MsgColor.Error.value}Deal name should not contain '^' ")
+
+        req = self.build_run_deal_req("CS", dealMap, poolAssump, runAssump)
+
+        if debug:
+            return req
+        
+        result = self._send_req(req, url, timeout=30)
+
+        if result is None or 'error' in result or result == []:
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run, but got {result}")
+
+        assert isinstance(result, dict), f"Result should be a dict but got {type(result)}, {result}"
+
+        rawWarnMsgByScen = {"^".join(k): [f"{MsgColor.Warning.value}{_['contents']}" 
+                                for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] 
+                                    for k, v in result.items()}
+
+        rawWarnMsg = list(tz.concat(rawWarnMsgByScen.values()))
+        
+        if showWarning and len(rawWarnMsg)>0:
+            console.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
+
+        if read:
+            return {
+                tuple(k.split("^")): dealMap[k.split("^")[0]].read(v) for k,v in result.items()
+            }
         else:
             return result
 
@@ -823,7 +892,7 @@ class API:
 
 
     def _send_req(self, _req, _url: str, timeout=10, headers={})-> dict | None:
-        """common function send request to server
+        """generic function send request to server
 
         :meta private:
         :param _req: request body

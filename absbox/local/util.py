@@ -83,7 +83,7 @@ def mkTbl(n, vs):
 
 
 mkRatioTs = functools.partial(mkTs, "RatioCurve")
-mkRateTs = functools.partial(mkTs, "RateCurve")
+mkRateTs = functools.partial(mkTs, "IRateCurve")
 mkBalTs = functools.partial(mkTs, "BalanceCurve")
 mkFloatTs = functools.partial(mkTs, "FloatCurve")
 
@@ -112,14 +112,6 @@ def unifyTs(xs):
                                                 , on=[_index_name]), xs)
     
     return r.sort_index()
-
-
-def consolStmtByDate(s):
-    return s.groupby("日期").last()
-
-
-def aggStmtByDate(s):
-    return s.groupby("日期").sum()
 
 
 def aggCFby(_df, interval, cols):
