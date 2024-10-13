@@ -138,6 +138,8 @@ Performing
     
     * ``{"Rate":0.7,"Lag":18}`` means 70% of current balance will be recovered at 18 periods after defaulted date
 
+
+
 Non-Performing
 """"""""""""""""""""
 
@@ -209,7 +211,9 @@ Loan
                   ,read=True)
 
 * <default assump> : ``{"CDR":<%>}``, can be a vector or constant value
+* <default assump> : ``{"CDRPadding":<%>}``, can be a vector or constant value, with last element till end of the asset
 * <prepayment assump> : ``{"CPR":<%>}``, can be a vector or constant value
+* <prepayment assump> : ``{"CPRPadding":<%>}``, can be a vector or constant value , with last element till end of the asset
 
 
 Summary
@@ -355,30 +359,46 @@ Summary
 Extra Stress 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Users are enable to apply:
+Supported Asset Class:
 
-* apply extra haircut by percentage to pool cashflow
-* apply time series stress on prepay or default curve
+*  :ref:`Mortgage` 
+*  :ref:`Loan`
+*  :ref:`Installment`
+*  :ref:`Receivable`
 
-.. warning::
-    Extra stress only supports `Mortgage` assumption
+.. versionadded:: 0.29.9
+
+user can specify a time series stress curve on prepay or default curve
+
+syntax:
+  
+  ``("StressByCurve",[<stress curve>,<assumption>])``
+  
+    * ``<stress curve>`` : a list of [date,rate] pairs
+    * ``<assumption>`` : the assumption to apply when the curve is active
+
 
 .. code-block:: python
 
-   r = localAPI.run(deal
-                  ,poolAssump = ("Pool",("Mortgage",{"CDR":0.01}
-                                                   ,{"CPR":0.01}
-                                                   ,None
-                                                   ,{"defaultFactor":[["2020-10-01",1.05]
-                                                                      ,["2022-10-01",1.15]]
-                                                     ,"prepayFactor":[["2020-10-01",1.05]
-                                                                      ,["2022-10-01",1.15]]
-                                                     ,"haircuts":[("Interest",0.05)]})
-                                          ,None
-                                          ,None)
-                  ,runAssump = None
-                  ,read=True)
+    # stress default curve
+    defAssump = {"CDR":0.017}
+    stressCurve = [["2020-10-01",1.0],["2023-03-01",4.0]]
+    stressDef = {"StressByCurve":[stressCurve,defAssump]}
 
+    p = localAPI.runPool(myPool,poolAssump=("Pool",("Mortgage",stressDef ,None,None,None)
+                                                  ,None
+                                                  ,None)
+                        ,read=True)
+
+    # stress prepay curve
+    ppyAssump = {"CPR":0.017}
+    stressCurve = [["2020-10-01",1.0],["2023-03-01",4.0]]
+    stressPpy = {"StressByCurve":[stressCurve,ppyAssump]}
+
+    p = localAPI.runPool(myPool,poolAssump=("Pool",("Mortgage",None ,stressPpy,None,None)
+                                                  ,None
+                                                  ,None)
+                        ,read=True)
 
 
 Lease
