@@ -286,6 +286,7 @@ Ratio Type
 ^^^^^^^^^^^^
     * ``("bondFactor",)`` -> factor of bond
     * ``("poolFactor",)`` -> factor of pool
+    * ``("poolFactor",<PoolID>)`` -> factor of pool with pool id
     * ``("cumPoolDefaultedRate",)`` -> cumulative default rate of pool
     * ``("cumPoolDefaultedRateTill",n)`` -> cumulative default rate of pool at `N` period. ( -1 means period before last period)
     * ``("cumPoolNetLossRate",)`` -> cumulative loss rate of pool
