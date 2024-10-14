@@ -152,10 +152,10 @@ dealStatusLog = {'cn': [china_date, "旧状态", "新状态"], 'en': [english_da
 dealStatusMap = {"en": {'amort': "Amortizing", 'def': "Defaulted", 'acc': "Accelerated", 'end': "Ended",
                         'called': "Called",
                         'pre': "PreClosing",'revol':"Revolving"
-                        ,'ramp':"RampUp"}
+                        ,'warehousing':"Warehousing"}
                 , "cn": {'amort': "摊销", 'def': "违约", 'acc': "加速清偿", 'end': "结束", 'pre': "设计","revol":"循环"
                         ,'called':"清仓回购"
-                        ,'ramp':"RampUp"}}
+                        ,'warehousing':"Warehousing"}}
 
 cfIndexMap = {'cn':"日期",'en':english_date,"english":english_date,"chinese":"日期"}
 

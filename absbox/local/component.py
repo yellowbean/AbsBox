@@ -1050,8 +1050,8 @@ def readStatus(x: dict, locale: str):
             return m[locale]['revol']
         case {"tag": "Called"}:
             return m[locale]['called']
-        case {"tag": "RampUp"}:
-            return m[locale]['ramp']
+        case {"tag": "Warehousing"}:
+            return m[locale]['warehousing']
         case _:
             raise RuntimeError(
                 f"Failed to read deal status:{x} with locale: {locale}")
@@ -1124,6 +1124,7 @@ def mkWaterfall(r, x):
         "加速清偿": "DealAccelerated",
         "违约": "DealDefaulted",
         "未设立": "PreClosing",
+        "储备": "Warehousing",
     }
     if len(x) == 0:
         return tz.valmap(list, r)
@@ -1136,6 +1137,8 @@ def mkWaterfall(r, x):
             _w_tag = f"DistributionDay (DealDefaulted Nothing)"
         case "Revolving" | "循环" | "revolving" | ("兑付日", "循环") :
             _w_tag = f"DistributionDay Revolving"
+        case ("兑付日","储备") | ("DistributionDay", "Warehousing"):
+            _w_tag = f"DistributionDay (Warehousing Nothing)"
         case ("兑付日", _st) | ("amortizing", _st):
             _w_tag = f"DistributionDay {mapping.get(_st, _st)}"
         case "兑付日" | "未违约" | "amortizing" | "Amortizing" | "摊销":
@@ -1148,9 +1151,11 @@ def mkWaterfall(r, x):
             _w_tag = f"OnClosingDay"
         case "默认" | "default":
             _w_tag = f"DefaultDistribution"
+        # case "储备" | "Warehousing" | ('Warehousing', None):
+        #     _w_tag = f"Warehousing Nothing"
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkWaterfall with key {_k}")
-    #r[_w_tag] = [mkAction(_a) for _a in _v]
+    
     r[_w_tag] = lmap(mkAction, _v)
     return mkWaterfall(r, x)
 
