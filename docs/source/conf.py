@@ -9,8 +9,8 @@ project = 'absbox'
 copyright = '2024, Xiaoyu Zhang'
 author = 'Xiaoyu Zhang'
 
-release = "0.28.17"
-release = "0.28.17"
+release = "0.29.9"
+release = "0.29.9"
 
 # -- General configuration
 
@@ -27,7 +27,8 @@ extensions = [
     'sphinx_changelog',
     #'autoapi.extension'
     #'nbsphinx'
-    'myst_nb'
+    'myst_nb',
+    'sphinxcontrib.googleanalytics'
 ]
 
 graphviz_output_format = 'svg'
@@ -74,3 +75,6 @@ html_theme = 'sphinx_rtd_theme'
 
 # -- Options for EPUB output
 epub_show_urls = 'footnote'
+
+
+googleanalytics_id = 'G-C0JWMTTLRN'
