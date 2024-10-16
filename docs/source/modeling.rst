@@ -2624,7 +2624,11 @@ Liquidation
   sell the assets and deposit the proceeds to the account
    
   syntax
-    ``["sellAsset", {pricing method}, {Account}]``
+    ``["sellAsset", {pricing method}, {Account}]`` , liquidate all pools
+    
+
+    .. versionadded:: 0.29.9
+    ``["sellAsset", {pricing method}, {Account}, [{PoolId}]]`` , liquidate pools in the list
       
 Buy Asset 
   use cash from an account to buy assets.
