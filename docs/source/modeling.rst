@@ -2630,6 +2630,11 @@ Liquidation
     .. versionadded:: 0.29.9
     ``["sellAsset", {pricing method}, {Account}, [{PoolId}]]`` , liquidate pools in the list
       
+  .. note::
+    After version 0.29.11
+    
+    :ref:`Liquidate Pools`
+    
 Buy Asset 
   use cash from an account to buy assets.
   
