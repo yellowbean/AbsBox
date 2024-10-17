@@ -957,8 +957,8 @@ def mkAction(x:list):
             return mkTag(("PayIntResidual", [l, vStr(source), vStr(target)]))
         case ["支付收益", source, target] | ["payIntResidual", source, target]:
             return mkTag(("PayIntResidual", [None, vStr(source), vStr(target)]))
-        case ["出售资产", liq, target, pName] | ["sellAsset", liq, target, pName]:
-            return mkTag(("LiquidatePool", [mkLiqMethod(liq), vStr(target), mkPid(pName)]))
+        case ["出售资产", liq, target, pNames] | ["sellAsset", liq, target, pNames]:
+            return mkTag(("LiquidatePool", [mkLiqMethod(liq), vStr(target), lmap(mkPid,pNames)]))
         case ["出售资产", liq, target] | ["sellAsset", liq, target]:
             return mkTag(("LiquidatePool", [mkLiqMethod(liq), vStr(target), None]))
         case ["流动性支持", source, liqType, target, limit] | ["liqSupport", source, liqType, target, limit]:
