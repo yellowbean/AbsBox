@@ -2617,6 +2617,25 @@ Transfer
     * ``{"reserve":"gap"}`` -> transfer till reserve amount of *target* account is met
     * ``{"reserve":"excess"}`` -> transfer till reserve amount of *source* account is met
 
+
+TransferMultiple
+  .. versionadded:: 0.29.13
+  transfer mulitiple accounts to the other account
+
+  syntax
+    ``["transferMultiple", [AccountName], AccountName]``
+    ``["transferM", [AccountName], AccountName]``
+  
+  or with optional a limit to EACH source account
+
+  syntax 
+    ``["transferMultiple", [(AccountName,<limit>)], AccountName]``
+    ``["transferM", [(AccountName,<limit>)], AccountName]``
+
+  .. note::
+
+    :ref:`Transfer Multiple Account Example`
+
 Buy & Sell Assets 
 ^^^^^^^^^^^^^^^^^^^^^^^
 

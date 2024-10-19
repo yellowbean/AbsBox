@@ -846,6 +846,11 @@ def mkAction(x:list):
             return mkTag(("Transfer", [mkLimit(m), vStr(source), vStr(target), None]))
         case ["账户转移", source, target] | ["transfer", source, target]:
             return mkTag(("Transfer", [None, vStr(source), vStr(target), None]))
+        case ["批量账户转移", sources, target] | ["transferMultiple", sources, target] | ["transferM", sources, target]:
+            if isinstance(sources, list) and len(sources[0])==2:
+                return mkTag(("TransferMultiple", [ [(mkLimit(m), vStr(source)) for (source,m) in sources], vStr(target), None]))
+            else:
+                return mkTag(("TransferMultiple", [ [(None, vStr(source)) for source in sources], vStr(target), None]))
         case ["簿记", bookType] | ["bookBy", bookType]:
             return mkTag(("BookBy", mkBookType(bookType)))
         case ["计提费用", *feeNames] | ["calcFee", *feeNames]:

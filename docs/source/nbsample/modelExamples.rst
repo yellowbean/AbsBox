@@ -12,3 +12,4 @@ Model Examples
    revolving_buy_multiple_pools
    IntroWaterfall
    sellAssets
+   trasnferMultiple
