@@ -5747,7 +5747,7 @@
                 "2026-06-30",
                 0.61,
                 0.61,
-                "<Liquidation>"
+                "<Liquidation:>"
               ]
             },
             {
@@ -10389,7 +10389,8 @@
           },
           "asOfDate": "2022-06-30",
           "issuanceStat": {
-            "IssuanceBalance": 4057999932.7
+            "IssuanceBalance": 4057999932.7,
+            "RuntimeCurrentPoolBalance": 0
           },
           "extendPeriods": {
             "tag": "MonthEnd"

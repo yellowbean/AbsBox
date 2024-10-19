@@ -37447,7 +37447,8 @@
           },
           "asOfDate": "2022-10-02",
           "issuanceStat": {
-            "IssuanceBalance": 11439328599.28
+            "IssuanceBalance": 11439328599.28,
+            "RuntimeCurrentPoolBalance": 0
           },
           "extendPeriods": {
             "tag": "MonthEnd"

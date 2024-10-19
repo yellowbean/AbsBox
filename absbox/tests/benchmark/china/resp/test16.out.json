@@ -4742,7 +4742,8 @@
           },
           "asOfDate": "2021-03-31",
           "issuanceStat": {
-            "IssuanceBalance": 140
+            "IssuanceBalance": 140,
+            "RuntimeCurrentPoolBalance": 0
           },
           "extendPeriods": {
             "tag": "MonthEnd"

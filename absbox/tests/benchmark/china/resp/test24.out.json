@@ -5972,7 +5972,7 @@
                 "2027-09-30",
                 0.37,
                 0.37,
-                "<Liquidation>"
+                "<Liquidation:>"
               ]
             },
             {
@@ -11971,7 +11971,8 @@
           },
           "asOfDate": "2022-09-30",
           "issuanceStat": {
-            "IssuanceBalance": 8000000001.8
+            "IssuanceBalance": 8000000001.8,
+            "RuntimeCurrentPoolBalance": 0
           },
           "extendPeriods": {
             "tag": "MonthEnd"

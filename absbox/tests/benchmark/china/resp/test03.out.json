@@ -1157,7 +1157,7 @@
                 "2023-01-31",
                 0,
                 0,
-                "<Liquidation>"
+                "<Liquidation:>"
               ]
             },
             {
@@ -2204,7 +2204,8 @@
           },
           "asOfDate": "2021-03-01",
           "issuanceStat": {
-            "IssuanceBalance": 180
+            "IssuanceBalance": 180,
+            "RuntimeCurrentPoolBalance": 0
           },
           "extendPeriods": {
             "tag": "MonthEnd"

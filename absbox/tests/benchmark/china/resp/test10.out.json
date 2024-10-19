@@ -1301,7 +1301,9 @@
             ]
           },
           "asOfDate": "2021-02-28",
-          "issuanceStat": null,
+          "issuanceStat": {
+            "RuntimeCurrentPoolBalance": 70.96
+          },
           "extendPeriods": {
             "tag": "MonthEnd"
           }
