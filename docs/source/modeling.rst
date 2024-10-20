@@ -85,11 +85,13 @@ To model them via sequential parameter ( *Not Recommend* ):
         ,<Fee Info>
         ,<Waterfall Info>
         ,<Collection Rule>
-        ,<Call settings>
         ,<Liquidation facilities>
-        ,<Custom data/formula>
+        ,<Interest Rate Swap>
         ,<Triggers>
         ,<Deal Status>
+        ,<Custom data> # optional
+        ,<Ledgers> # optional
+        ,<Rate Caps> # optional
     )
 
 .. _Generic ABS:
@@ -2514,7 +2516,7 @@ WriteOff
   syntax
     ``["writeOff", [<Bond>]]`` 
 
-    ``["writeOffq", [<Bond>], <Limit>]`` 
+    ``["writeOff", [<Bond>], <Limit>]`` 
 
     The ``<Limit>`` :ref:`<limit>`
 
