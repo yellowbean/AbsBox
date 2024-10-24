@@ -1,7 +1,7 @@
 from absbox.local.util import mkTag, mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
 from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
-from absbox.local.util import filter_by_tags, enumVals, lmap, readTagMap
+from absbox.local.util import filter_by_tags, enumVals, lmap, readTagMap, patchDicts
 from absbox.local.base import *
 
 import sys
@@ -694,10 +694,12 @@ def mkLiqRepayType(x):
     match x:
         case "余额" | "bal" | "balance":
             return mkTag(("LiqBal"))
-        case "费用" | "premium":
+        case "费用" | "premium" | "fee":
             return mkTag(("LiqPremium"))
         case "利息" | "int" | "interest":
             return mkTag(("LiqInt"))
+        case x if isinstance(x, list):
+            return mkTag(("LiqRepayTypes", lmap(mkLiqRepayType, x)))
         case _:
             raise RuntimeError(f"Failed to match :{x}:Liquidation Repay Type")
 
@@ -770,7 +772,7 @@ def mkRateCap(x):
 
 def mkRateType(x):
     match x :
-        case {"fix":r} | {"固定":r} | ["fix", r] | ["固定", r]:
+        case {"fix":r} | {"固定":r} | ["fix", r] | ["固定", r] | ("fix", r) | ("固定", r):
             return mkTag(("Fix", [DC.DC_ACT_365F.value, vNum(r)]))
         case {"floater":(idx, spd), "rate":r, "reset":dp, **p} | \
             {"浮动":(idx, spd), "利率":r, "重置":dp, **p}:
@@ -1156,8 +1158,8 @@ def mkWaterfall(r, x):
             _w_tag = f"OnClosingDay"
         case "默认" | "default":
             _w_tag = f"DefaultDistribution"
-        # case "储备" | "Warehousing" | ('Warehousing', None):
-        #     _w_tag = f"Warehousing Nothing"
+        case "储备" | "Warehousing" | ('Warehousing', None):
+            _w_tag = f"Warehousing Nothing"
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkWaterfall with key {_k}")
     
@@ -1797,42 +1799,37 @@ def mkLiqProviderType(x):
         
 
 def mkLiqProvider(n: str, x: dict):
-    opt_fields = {"liqCredit":None,"liqDueInt":0,"liqDuePremium":0
-                 ,"liqRate":None,"liqPremiumRate":None,"liqStmt":None
-                 ,"liqBalance":0,"liqRateType":None,"liqPremiumRateType":None
-                 ,"liqDueIntDate":None,"liqEnds":None}
-
     x_transformed = renameKs(x,[("已提供","liqBalance"),("应付利息","liqDueInt"),("应付费用","liqDuePremium")
-                                ,("利率","liqRate"),("费率","liqPremiumRate"),("记录","liqStmt"),
+                                ,("利率","liqRate"),("费率","liqPremiumRate"),("记录","liqStmt")
+                                ,("name","liqName"),("type","liqType")
+                                ,("credit","liqCredit")
+                                ,("dueInt","liqDueInt"),("duePremium","liqDuePremium")
+                                ,("rate","liqRate"),("fee","liqPremiumRate")
+                                ,("rateType","liqRateType"),("feeType","liqPremiumRateType")
+                                ,("dueIntDate","liqDueIntDate")
+                                ,("balance","liqBalance")
+                                ,("end","liqEnds"),("start","liqStart")
+                                ,("stmt","liqStmt")
                                 ]
                                 ,opt_key=True)
-    r = None
-    match x_transformed :
-        case {"类型": "无限制", "起始日": _sd, **p} | {"type": "Unlimited", "start": _sd, **p}:
-            r = {"liqName": n, "liqType": mkLiqProviderType({})
-                ,"liqBalance": p.get("balance",0), "liqStart": _sd
-                ,"liqRateType": mkRateType(p.get("rate",None))
-                ,"liqRate": p.get("liqRate",None)
-                ,"liqPremiumRateType": mkRateType(p.get("fee",None))
-                } 
-        case {"类型": _sp, "额度": _ab, "起始日": _sd, **p} \
-                | {"type": _sp, "lineOfCredit": _ab, "start": _sd, **p}:
-            r = {"liqName": n, "liqType": mkLiqProviderType(_sp)
-                ,"liqBalance": _ab,  "liqStart": _sd
-                ,"liqRateType": mkRateType(p.get("rate",None))
-                ,"liqPremiumRateType": mkRateType(p.get("fee",None))
-                } 
-        case {"额度": _ab, "起始日": _sd, **p} | {"lineOfCredit": _ab, "start": _sd, **p}:
-            r = {"liqName": n, "liqType": mkTag(("FixSupport",_ab))
-                ,"liqBalance": _ab,  "liqStart": _sd
-                ,"liqRateType": mkRateType(p.get("rate",None))
-                ,"liqPremiumRateType": mkRateType(p.get("fee",None))
-                }
-        case _:
-            raise RuntimeError(f"Failed to match LiqProvider:{x}")
 
-    if r is not None:
-       return opt_fields | r 
+    r = {
+        "liqName": vStr(n),
+        "liqType": mkLiqProviderType(x_transformed["liqType"]),
+        "liqBalance":(x_transformed.get("liqBalance",0)),
+        "liqCredit":(x_transformed.get("liqCredit",None)),
+        "liqRateType": mkRateType(x_transformed.get("liqRateType",None)),
+        "liqPremiumRateType": mkRateType(x_transformed.get("liqPremiumRateType",None)),
+        "liqRate":(x_transformed.get("liqRate",None)),
+        "liqPremiumRate":(x_transformed.get("liqPremiumRate",None)),
+        "liqDueIntDate":(x_transformed.get("liqDueIntDate",None)),
+        "liqDueInt":(x_transformed.get("liqDueInt",0)),
+        "liqDuePremium":(x_transformed.get("liqDuePremium",0)),
+        "liqStart":(x_transformed["liqStart"]),
+        "liqEnds":(x_transformed.get("liqEnds",None)),
+        "liqStmt": mkAccTxn(x_transformed.get("liqStmt",None))
+    }
+    return r
 
 def mkLedger(n: str, x: dict=None):
     ''' Build ledger '''
@@ -2158,6 +2155,14 @@ def mkRefiPlan(x:tuple):
         case _:
             raise RuntimeError(f"Failed to match mkRefinancePlan:{x}")
 
+def mkInspect(x):
+    match x:
+        case (dp,ds) if isinstance(ds, tuple):
+            return mkTag(("InspectPt",[mkDatePattern(dp),mkDs(ds)]))
+        case (dp,ds) if isinstance(ds, list):
+            return mkTag(("InspectRpt",[mkDatePattern(dp),lmap(mkDs,ds)]))
+        case _:
+            raise RuntimeError(f"Failed to match mkInspect:{x}")
 
 def mkNonPerfAssumps(r, xs:list) -> dict:
     def translate(y) -> dict:
@@ -2175,7 +2180,8 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
             case ("interest", *ints):
                 return {"interest":[mkRateAssumption(_) for _ in ints]}
             case ("inspect", *tps):
-                return {"inspectOn":[ (mkDatePattern(dp),mkDs(ds)) for (dp, ds) in tps]}
+                # return {"inspectOn":[ (mkDatePattern(dp),mkDs(ds)) for (dp, ds) in tps]}
+                return {"inspectOn": lmap(mkInspect,tps)}
             case ("report", m):
                 interval = m['dates']
                 return {"buildFinancialReport":mkDatePattern(interval)}

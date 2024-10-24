@@ -40,25 +40,17 @@ def filter_by_tags(xs: list, tags: list) -> list:
 
 def readTagStr(x: str) -> str:
     x = json.loads(x.replace("'", "\"").replace("True", "true").replace("False", "false").replace("None","null"))
-    match x:
-        case {"tag": _t, "contents": None}:
-            return f"<{_t}>"
-        case {"tag": _t, "contents": _c} if isinstance(_c, list):
-            _cs = [str(_) for _ in _c]
-            return f"<{_t}:{','.join(_cs)}>"
-        case {"tag": _t}:
-            return f"<{_t}>"
-        case _ :
-            return f"<{x}>"
+    return readTagMap(x)
 
 def readTagMap(x:dict) -> str:
     match x:
         case {"tag": _t, "contents": None}:
             return f"<{_t}>"
         case {"tag": _t, "contents": _c} if isinstance(_c, list):
-            _cs = [str(_) for _ in _c]
-            return f"<{_t}:{','.join([ readTagMap(_) for _ in _cs])}>"
-        case {"tag": _t,"contents":_c}:
+            return f"<{_t}:{','.join([ readTagMap(_) for _ in _c])}>"
+        case {"tag": _t,"contents":_c} if isinstance(_c, str):
+            return f"<{_t}:{_c}>"
+        case {"tag": _t,"contents":_c} if isinstance(_c, dict):
             return f"<{_t}:{readTagMap(_c)}>"
         case {"tag": _t}:
             return f"<{_t}>"
@@ -453,3 +445,13 @@ def readCfFromLst(lst:list)-> pd.DataFrame:
 
 def tupleToDictWithKey(xs,key="name"):
     return dict([ (n,x|{key:n}) for (n,x) in xs ])
+
+
+def patchDicts(dict1:dict,dict2:dict)-> dict:
+    """
+    Merge two dictionaries, if a key exists in both dictionaries,use the value from dict2
+    if key only exists in either one, use the only one value
+    """
+    return tz.merge_with(lambda xs: xs[1] if len(xs)==2 else xs[0]
+                         ,dict1
+                         ,dict2)

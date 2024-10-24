@@ -4,7 +4,7 @@ from lenses import lens
 from functools import reduce
 #from itertools import reduce
 from absbox.validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool
-
+from absbox import unifyTs
 
 def readToCf(xs, header=None, idx=None, sort_index=False) -> pd.DataFrame:
     ''' input with flow type json, return a dataframe '''
@@ -123,6 +123,11 @@ def readPoolsCf(pMap) -> pd.DataFrame:
     df = pd.concat(pFlows,axis=1)
     df.columns = headerIndex
     return df
+
+def readInspect(i:dict) -> pd.DataFrame:
+    u = unifyTs(i)
+    return u
+
 
 def readFlowsByScenarios(rs:dict, path, fullName=True) -> pd.DataFrame:
     "read time-series balance flow from multi scenario or mult-structs"
