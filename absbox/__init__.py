@@ -15,6 +15,7 @@ from absbox.validation import *
 from absbox.local.chart import viz
 from importlib.metadata import version
 from absbox.local.cf import readBondsCf,readToCf,readFeesCf,readAccsCf,readPoolsCf,readFlowsByScenarios,readMultiFlowsByScenarios,readFieldsByScenarios
+from absbox.local.cf import readInspect
 
 import absbox.examples as examples
 

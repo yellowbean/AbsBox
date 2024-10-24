@@ -406,6 +406,21 @@ def mkPre(p):
             return mkTag(("Any", [mkPre(p) for p in _p]))
         case ["非", _p] | ["not", _p]:
             return mkTag(("IfNot", mkPre(p)))
+
+        case ["date", "between" ,rngType, d1, d2] | ["date","><",rngType, d1, d2]:
+            return mkTag(("IfDateBetween", [rngType, vDate(d1), vDate(d2)]))
+        case ["date", "in", *vs]:
+            return mkTag(("IfDateIn", [vDate(v) for v in vs]))
+        case ["date", op, v]:
+            return mkTag(("IfDate", [op_map[op], vDate(v)]))
+
+        case ["period", "between", rngType, d1, d2] | ["period", "><", rngType, d1, d2]:
+            return mkTag(("IfIntBetween", [mkDs(("periodNum",)), rngType, vNum(d1), vNum(d2)]))
+        case ["period", "in", *vs]:
+            return mkTag(("IfIntIn", [mkDs(("periodNum",)), [vNum(v) for v in vs]]))
+        case ["period", op, v]:
+            return mkTag(("IfInt", [op_map[op], mkDs(("periodNum",)), vNum(v)]))
+
         case [ds, "=", 0]:
             return mkTag(("IfZero", mkDs(ds)))
         case [ds, b] | [ds, b] if isinstance(b, bool):

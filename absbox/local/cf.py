@@ -124,9 +124,18 @@ def readPoolsCf(pMap) -> pd.DataFrame:
     df.columns = headerIndex
     return df
 
-def readInspect(i:dict) -> pd.DataFrame:
-    u = unifyTs(i)
-    return u
+def readInspect(r:dict) -> pd.DataFrame:
+    """ read inspect result from waterfall and run assumption input , return a joined dataframe ordered by date"""
+    i = r['inspect']
+    u = unifyTs(i.values())
+
+    w = r['waterfallInspect'].to_records()
+    wdf = tz.pipe(tz.groupby(lambda x:tz.nth(2,x), w)
+            ,lambda m: tz.valmap(lambda xs: [ (_[1],_[4]) for _ in xs],m)
+            ,lambda m: tz.valmap(lambda xs: pd.DataFrame(xs, columns =['Date', 'val']).set_index('Date'),m)
+            ,lambda m: {k:v.rename({"val":k},axis=1) for k,v in m.items() }
+         )
+    return pd.concat([u,*wdf.values()],axis=1).sort_index()
 
 
 def readFlowsByScenarios(rs:dict, path, fullName=True) -> pd.DataFrame:
