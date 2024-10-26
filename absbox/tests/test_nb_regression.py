@@ -4,7 +4,7 @@ try:
     from importlib_resources import files
 except ImportError:
     from importlib.resources import files
-from pytest_notebook import example_nbs
+# from pytest_notebook import example_nbs
 from pytest_notebook.nb_regression import NBRegressionFixture
 
 #sys.path.prepend(os.path.abspath("absbox"))
