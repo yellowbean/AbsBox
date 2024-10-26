@@ -13,4 +13,5 @@ more_itertools
 pandas
 python-dateutil
 sphinx_changelog
+pytest-notebook
 sphinxcontrib-googleanalytics
