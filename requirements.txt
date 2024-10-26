@@ -13,3 +13,4 @@ graphviz
 dateparser
 pyxirr
 more-itertools
+pytest-notebook
