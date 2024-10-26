@@ -822,7 +822,12 @@ Inspection
 ^^^^^^^^^^^^^^
 Transparency matters ! For the users who are not satisfied with cashflow numbers but also having curiosity of the intermediary numbers, like `bond balance`, `pool factor` .
 
-Users are able to query values from any point of time ,using syntax ``(<DatePattern>,<Formula>)``
+Users are able to query values from any point of time ,using 
+
+syntax:
+  * ``(<DatePattern>,<Formula>)``
+  .. versionadded:: 0.29.14
+  * ``(<DatePattern>,[<Formula>,<Formula>...])``  
 
 * any point of time -> annoate by :ref:`DatePattern`
 * values -> annoate by :ref:`Formula`
@@ -860,13 +865,20 @@ To view these data as map, with formula as key and a dataframe with time series 
     # a dataframe
     r['result']['inspect']['<CurrentBondBalance>'] 
 
+    # join all vars into a single dataframe
+    
+    
+
 But, the values are a dataframe with single column, how to view all the variables in a single dataframe ? Here is the answer :
 
 .. code-block:: python
    
-   from absbox import unifyTs
+   from absbox import unifyTs,readInspect
 
    unifyTs(r['result']['inspect'].values())
+
+   # .. versionadded:: 0.29.15, it will show vars from 'inspect' and 'inspectWaterfall'
+   readInspect(r['result'])
 
 
 .. image:: img/inspect_unified.png

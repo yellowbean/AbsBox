@@ -402,6 +402,23 @@ Date Based Condition
 * ``[">",date]`` -> after certain date
 * ``["<=",date]`` -> On or beore certain date
 * ``[">=",date]`` -> On or after certain Date
+  
+.. versionadded:: 0.29.14
+
+* ``["date", "between", rangeType, date1, date2]`` -> between date1 and date2 with :ref:`Range Type`
+* ``["date", "><", rangeType, date1, date2]`` -> same but less key strike
+* ``["date", "in", date1 ,date 2...]`` -> if in the list of dates
+* ``["date", ">", <date> ]`` -> if not in the list of dates
+
+Integer Based Condition
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. versionadded:: 0.29.14
+
+* ``["period", ">", N]`` -> if period number is greater than N
+* ``["period", "bewteen", rangeType, N1, N2]`` -> if period number is between N1 and N2 with :ref:`Range Type`
+* ``["period", "><", rangeType, N1, N2]`` -> same but less key strike
+* ``["period", "in", N1, N2...]`` -> if period number is in the list of N1, N2...
+
 
 Deal Status 
 ^^^^^^^^^^^^^^^^^^^^
@@ -570,6 +587,14 @@ Pool Sources
 * ``Defaults`` 
 * ``Delinquencies``
 * ``Losses``
+
+Range Type
+^^^^^^^^^^^^^
+
+* ``"II"`` -> inclusive and inclusive
+* ``"EI"`` -> exclusive and inclusive
+* ``"IE"`` -> inclusive and exclusive
+* ``"EE"`` -> exclusive and exclusive
 
 
 Components
@@ -2651,6 +2676,18 @@ Liquidation
     .. versionadded:: 0.29.9
     ``["sellAsset", {pricing method}, {Account}, [{PoolId}]]`` , liquidate pools in the list
       
+  Pricing Method:
+    * ``"PvRate"`` : sell the assets with price of PV of asset or defaulted price
+    * ``"Current|Defaulted"`` : sell the assets with price of Current price or defaulted price
+
+  .. code-block:: python 
+
+    ["sellAsset", ["PvRate", 0.05], "acc01"] 
+    # PV of future cashflow with 5% discount rate
+    
+    ["sellAsset", ["Current|Defaulted", 0.9, 0.2], "acc01"] 
+    # 90% of current performing balance and 20% un-recovered defaulted balance
+
   .. note::
     After version 0.29.11
     
@@ -2689,6 +2726,12 @@ Liquidtiy Facility
 
 ``Liquidity Facility`` behaves like a 3rd party entity which support the cashflow distirbution in case of shortage. It can deposit cash to account via ``liqSupport``, with optinal a ``<limit>``.
 
+
+As return, ``Liquidity Facility`` will receive :
+* interest payment from the line of credit drawed
+* fee payment from the line of credit un-drawed
+
+
 Draw Cash to Account
   syntax
     ``["liqSupport", <liqProvider>, "account", <Account Name>, <Limit>]``
@@ -2715,9 +2758,16 @@ Liquidity Repay
 
 Compensation 
   Use all cash from the account and pay back to liquidity provider as compensation,no limit amount.
-  
+
   syntax 
     ``["liqRepayResidual", <Account>, <liqProvider>]``
+
+Accrue interest & fee
+  Accrue interest base on the oustanding balance and fee base on the line of credit amount un-drawed.
+
+  syntax:
+    ``["liqAccrue", <liqProvider>]``
+  
 
 Conditional Action
 ^^^^^^^^^^^^^^^^^^^^
@@ -3103,10 +3153,14 @@ If there is a shortage on fee or interest or principal, user can setup rules to 
 
 common properites
   * ``start`` -> when the liquidity provider start to be effective
-  * ``lineOfCredit`` -> current available credit to draw, served as base to calculate premium fee
+  * ``credit`` -> current available credit to draw, served as base to calculate premium fee
   * ``balance`` -> current balance to be paid back to provider, served as base to calculate interest
+  * ``type`` -> type of liquidity provider, :ref:`Different types of line of credit`
+  * ``creditCalc`` -> whether include due interest/due premium in credit calculation
   * ``rate`` -> interest rate to be used on ``balance``
-  * ``fee`` ->  premium fee to be used on ``lineOfCredit``
+  * ``fee`` ->  premium fee to be used on ``credit``
+  * ``rateType`` -> type of interest rate, :ref:`Interest`
+  * ``feeType`` -> type of premium fee, :ref:`Interest`
 
 Different types of line of credit
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -3158,7 +3212,23 @@ Formula-based Line of Credit
            ,"pct":<Percentage>}
   ,"start": <Date>}
 
+Liquidity Provider(Facility) Example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. code-block:: python
+
+  {"warehouse":{
+    "credit" : 2000
+    ,"balance":300
+    ,"type": {"total": 4000}
+    ,"creditCalc":"IncludeDueInt"
+    ,"start": "2021-06-15"
+    ,"rateType": ("fix", 0.05)
+    ,"feeType": ("fix", 0.03)
+    ,"rate":0.03
+    ,"fee":0.01
+    }
+  }
 
 Interest Rate Hedge 
 ---------------------

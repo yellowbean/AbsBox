@@ -742,6 +742,13 @@ Inspect Free formulas within waterfall distribution
   * Free formula in **Waterfall** 
       formula value was evaluated at **Point of time** on the location in the waterfall. The value may changes if futhur actions were taken in the waterfall in that day.
 
+Joint Inspection Reader
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 0.29.13
+
+User can inspect the variables in *BOTH* `Projection` and `Waterfall` via function ``readInspect(r['result'])``
+
 
 Which waterfalls has been run?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -757,8 +764,6 @@ User can inspect the waterfalls has been run via:
 .. image:: img/waterfallResult.png
   :width: 350
   :alt: waterfall_result
-
-
 
 
 Visualize the cash `flow`

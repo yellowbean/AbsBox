@@ -995,8 +995,8 @@ def mkAction(x:list):
             return mkTag(("LiqYield", [None, vStr(source), vStr(target)]))
         case ["流动性支持报酬", source, target, limit] | ["liqRepayResidual", source, target, limit]:
             return mkTag(("LiqYield", [mkLimit(limit), vStr(source), vStr(target)]))
-        case ["流动性支持计提", target] | ["liqAccrue", target]:
-            return mkTag(("LiqAccrue", vStr(target)))
+        case ["流动性支持计提", *target] | ["liqAccrue", *target]:
+            return mkTag(("LiqAccrue", vList(target,str)))
         ## Rate Swap
         case ["结算", acc, swapName] | ["settleSwap", acc, swapName]:
             return mkTag(("SwapSettle", [vStr(acc), vStr(swapName)]))
@@ -1825,6 +1825,7 @@ def mkLiqProvider(n: str, x: dict):
                                 ,("balance","liqBalance")
                                 ,("end","liqEnds"),("start","liqStart")
                                 ,("stmt","liqStmt")
+                                ,("creditCalc","liqCreditCalc")
                                 ]
                                 ,opt_key=True)
 
@@ -1833,6 +1834,7 @@ def mkLiqProvider(n: str, x: dict):
         "liqType": mkLiqProviderType(x_transformed["liqType"]),
         "liqBalance":(x_transformed.get("liqBalance",0)),
         "liqCredit":(x_transformed.get("liqCredit",None)),
+        "liqCreditCalc":(x_transformed.get("liqCreditCalc",None)),
         "liqRateType": mkRateType(x_transformed.get("liqRateType",None)),
         "liqPremiumRateType": mkRateType(x_transformed.get("liqPremiumRateType",None)),
         "liqRate":(x_transformed.get("liqRate",None)),
