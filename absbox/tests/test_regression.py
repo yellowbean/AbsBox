@@ -45,7 +45,7 @@ def read_test_cases():
 
 
 def translate(d, folder, o):
-    print(f"Translating>>{d}>>{o}")
+    print(f"Translating>> {d} >> {o} ")
     benchfile = os.path.join(this_file, "benchmark", folder, "out", o)
     if not os.path.exists(benchfile) or os.stat(benchfile).st_size < 10 :
         print(f"Skipping:{benchfile}")
@@ -59,6 +59,7 @@ def translate(d, folder, o):
             json.dump(d.json, newbench, indent=2)
         logging.info(f"Create new case for {o}")
     else:
+        print(f"Comparing with benchmark file:{benchfile}")
         with open(benchfile, 'r') as ofile:
             try:
                 benchmark_out = json.load(ofile)
@@ -81,11 +82,13 @@ def test_translate():
         translate(v, output_folder, test_py.replace(".py", ".json"))
 
 def run_deal(input_folder, pair):
+    
     input_req_folder = os.path.join(input_folder,"out")
     input_scen_folder = os.path.join(input_folder,"scenario")
     input_resp_folder = os.path.join(input_folder,"resp")
+
     print("Select server to run")
-    test_server = config["test_server"] #https://deal-bench.xyz/api/run_deal2" 
+    test_server = config["test_server"]
     if 'TEST_RUN_SERVER' in os.environ and os.environ['TEST_RUN_SERVER'] != "" :
         print("Using Custom Server")
         logging.info(f"Using Env Server {os.environ['TEST_RUN_SERVER']}")

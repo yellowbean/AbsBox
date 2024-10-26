@@ -1137,6 +1137,7 @@
           },
           "liqBalance": 0,
           "liqCredit": null,
+          "liqCreditCalc": null,
           "liqRateType": null,
           "liqPremiumRateType": null,
           "liqRate": null,
@@ -1144,7 +1145,7 @@
           "liqDueIntDate": null,
           "liqDueInt": 0,
           "liqDuePremium": 0,
-          "liqStart": "2022-09-30",
+          "liqStart": "2022-06-01",
           "liqEnds": null,
           "liqStmt": null
         }

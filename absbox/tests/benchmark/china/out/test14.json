@@ -382,17 +382,6 @@
     "triggers": null,
     "liqProvider": {
       "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8": {
-        "liqCredit": null,
-        "liqDueInt": 0,
-        "liqDuePremium": 0,
-        "liqRate": null,
-        "liqPremiumRate": null,
-        "liqStmt": null,
-        "liqBalance": 10,
-        "liqRateType": null,
-        "liqPremiumRateType": null,
-        "liqDueIntDate": null,
-        "liqEnds": null,
         "liqName": "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8",
         "liqType": {
           "tag": "ReplenishSupport",
@@ -403,7 +392,19 @@
             10
           ]
         },
-        "liqStart": "2021-06-15"
+        "liqBalance": 0,
+        "liqCredit": 10,
+        "liqCreditCalc": null,
+        "liqRateType": null,
+        "liqPremiumRateType": null,
+        "liqRate": null,
+        "liqPremiumRate": null,
+        "liqDueIntDate": null,
+        "liqDueInt": 0,
+        "liqDuePremium": 0,
+        "liqStart": "2021-06-15",
+        "liqEnds": null,
+        "liqStmt": null
       }
     },
     "ledgers": null

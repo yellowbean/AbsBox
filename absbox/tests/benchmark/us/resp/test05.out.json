@@ -175,7 +175,9 @@
           },
           {
             "tag": "LiqAccrue",
-            "contents": "insuranceProvider"
+            "contents": [
+              "insuranceProvider"
+            ]
           },
           {
             "tag": "LiqSupport",
@@ -321,11 +323,11 @@
         "insuranceProvider": {
           "liqName": "insuranceProvider",
           "liqType": {
-            "tag": "FixSupport",
-            "contents": 100
+            "tag": "UnLimit"
           },
-          "liqBalance": 100,
+          "liqBalance": 0,
           "liqCredit": null,
+          "liqCreditCalc": null,
           "liqRateType": null,
           "liqPremiumRateType": null,
           "liqRate": null,

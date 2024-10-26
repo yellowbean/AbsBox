@@ -1807,6 +1807,8 @@ def mkLiqProviderType(x):
             return mkTag(("ReplenishSupport", [mkDatePattern(dp), amt]))
         case {"公式": ds, "系数":pct} | {"formula":ds, "pct":pct}:
             return mkTag(("ByPct", [mkDs(ds), pct]))
+        case "unlimit" | "无限额":
+            return mkTag(("UnLimit"))
         case {}:
             return mkTag(("UnLimit"))
         case _:

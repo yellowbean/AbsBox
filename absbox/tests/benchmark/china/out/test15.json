@@ -1177,22 +1177,23 @@
     "triggers": null,
     "liqProvider": {
       "\u53d1\u8d77\u4eba": {
-        "liqCredit": null,
-        "liqDueInt": 0,
-        "liqDuePremium": 0,
-        "liqRate": null,
-        "liqPremiumRate": null,
-        "liqStmt": null,
-        "liqBalance": 0,
-        "liqRateType": null,
-        "liqPremiumRateType": null,
-        "liqDueIntDate": null,
-        "liqEnds": null,
         "liqName": "\u53d1\u8d77\u4eba",
         "liqType": {
           "tag": "UnLimit"
         },
-        "liqStart": "2022-09-30"
+        "liqBalance": 0,
+        "liqCredit": null,
+        "liqCreditCalc": null,
+        "liqRateType": null,
+        "liqPremiumRateType": null,
+        "liqRate": null,
+        "liqPremiumRate": null,
+        "liqDueIntDate": null,
+        "liqDueInt": 0,
+        "liqDuePremium": 0,
+        "liqStart": "2022-06-01",
+        "liqEnds": null,
+        "liqStmt": null
       }
     },
     "ledgers": null

@@ -327,22 +327,23 @@
     "triggers": null,
     "liqProvider": {
       "insuranceProvider": {
-        "liqCredit": null,
-        "liqDueInt": 0,
-        "liqDuePremium": 0,
-        "liqRate": null,
-        "liqPremiumRate": null,
-        "liqStmt": null,
-        "liqBalance": 100,
-        "liqRateType": null,
-        "liqPremiumRateType": null,
-        "liqDueIntDate": null,
-        "liqEnds": null,
         "liqName": "insuranceProvider",
         "liqType": {
           "tag": "UnLimit"
         },
-        "liqStart": "2021-06-15"
+        "liqBalance": 0,
+        "liqCredit": null,
+        "liqCreditCalc": null,
+        "liqRateType": null,
+        "liqPremiumRateType": null,
+        "liqRate": null,
+        "liqPremiumRate": null,
+        "liqDueIntDate": null,
+        "liqDueInt": 0,
+        "liqDuePremium": 0,
+        "liqStart": "2021-06-15",
+        "liqEnds": null,
+        "liqStmt": null
       }
     },
     "ledgers": null
