@@ -880,11 +880,15 @@ But, the values are a dataframe with single column, how to view all the variable
    # .. versionadded:: 0.29.15, it will show vars from 'inspect' and 'inspectWaterfall'
    readInspect(r['result'])
 
+.. note::
+
+  * ``readInspect`` is the prefer way, it shows the data in a easy way which include both `inspect` and `inspectWaterfall` data.
+
+
 
 .. image:: img/inspect_unified.png
   :width: 400
   :alt: inspect_unified
-
 
 
 
