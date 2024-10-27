@@ -799,6 +799,11 @@ def mkRateType(x):
             mf, mc, mrnd = tz.get(["floor", "cap", "rounding"], p, None)
             dc = p.get("dayCount", DC.DC_ACT_365F.value)
             return mkTag(("Floater", [dc, vStr(idx), vNum(spd), vNum(r), mkDatePattern(dp), mf, mc, mrnd]))
+        case ("浮动", r, {"基准":idx, "利差":spd, "重置频率":dp, **p}) | \
+             ("floater", r, {"index":idx, "spread":spd, "reset":dp, **p}) :
+            mf, mc, mrnd = tz.get(["floor", "cap", "rounding"], p, None)
+            dc = p.get("dayCount", DC.DC_ACT_365F.value)
+            return mkTag(("Floater", [dc, vStr(idx), vNum(spd), vNum(r), mkDatePattern(dp), mf, mc, mrnd]))
         case None:
             return None
         case _ :
@@ -2196,7 +2201,7 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
                 return {"revolving":mkTag(("AvailableAssets", [mkRevolvingPool(rPool), mkAssumpType(rPerf)]))}
             case ("revolving", rPoolPerfMap) if isinstance(rPoolPerfMap, dict):
                 return {"revolving":mkTag(("AvailableAssetsBy", {k: [mkRevolvingPool(vPool),mkAssumpType(vAssump)]  for (k,(vPool,vAssump)) in rPoolPerfMap.items()}))}
-            case ("interest", *ints):
+            case ("interest", *ints) | ("rate", *ints):
                 return {"interest":[mkRateAssumption(_) for _ in ints]}
             case ("inspect", *tps):
                 # return {"inspectOn":[ (mkDatePattern(dp),mkDs(ds)) for (dp, ds) in tps]}
