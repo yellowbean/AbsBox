@@ -3150,6 +3150,7 @@ Liquidity Provider
 `Liquidity Provider` is an external entity which can be used as a line of credit/insuer. 
 
 If there is a shortage on fee or interest or principal, user can setup rules to draw cash from the `Liquidity Provider`  and deposity cash to accounts.
+The optional attributes of ``fee`` and ``rate`` can be used to model service fee or interest to be charged.
 
 common properites
   * ``start`` -> when the liquidity provider start to be effective
@@ -3170,7 +3171,7 @@ There are couple types available:
 Unlimit Liquidity 
 """"""""""""""""""""
 
-It provides unlimit liquidity.
+It provides unlimit liquidity. There is unlimited of cash can be drawn out of it.
 
 .. code-block:: python 
 
@@ -3180,7 +3181,7 @@ It provides unlimit liquidity.
 Fix Support
 """"""""""""""""""""
 
-It provides liquidity up to a fix amount of cash
+It provides liquidity up to a fix amount of cash with a cap
 
 .. code-block:: python 
 
@@ -3204,6 +3205,7 @@ The line of credit will be reset periodically.
 Formula-based Line of Credit
 """"""""""""""""""""""""""""""""
 
+The line of credit is determined by a ``<Formula>``.
 
 .. code-block:: python 
 
