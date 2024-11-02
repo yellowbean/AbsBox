@@ -126,10 +126,13 @@ def readPoolsCf(pMap) -> pd.DataFrame:
 
 def readInspect(r:dict) -> pd.DataFrame:
     """ read inspect result from waterfall and run assumption input , return a joined dataframe ordered by date"""
-    i = r['inspect']
-    u = unifyTs(i.values())
+    if 'inspect' in r:
+        i = r['inspect']
+        u = unifyTs(i.values())
+    else:
+        u = pd.DataFrame()
 
-    w = r['waterfallInspect'].to_records() if r['waterfallInspect'] else []
+    w = r['waterfallInspect'].to_records() if 'waterfallInspect' in r else []
     wdf = tz.pipe(tz.groupby(lambda x:tz.nth(2,x), w)
             ,lambda m: tz.valmap(lambda xs: [ (_[1],_[4]) for _ in xs],m)
             ,lambda m: tz.valmap(lambda xs: pd.DataFrame(xs, columns =['Date', 'val']).set_index('Date'),m)
