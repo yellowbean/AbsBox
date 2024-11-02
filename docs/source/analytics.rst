@@ -883,6 +883,7 @@ But, the values are a dataframe with single column, how to view all the variable
 .. note::
 
   * ``readInspect`` is the prefer way, it shows the data in a easy way which include both `inspect` and `inspectWaterfall` data.
+  * Notebook Exmaple :ref:`Inspect Example`
 
 
 

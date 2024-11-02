@@ -5,5 +5,6 @@ Debug Examples
     :maxdepth: 0
 
    debug_sample
+   InspectSample
 
    
