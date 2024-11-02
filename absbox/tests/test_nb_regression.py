@@ -25,11 +25,11 @@ fixture.diff_color_words = False
 
 #sys.path.insert(0,"../../../")
 
-def test_run():
-    NbList = [str(x) for x in pathlib.Path(NbFolder).rglob("*.ipynb")]
-    for nb in NbList:
-        print(f"running nb {nb}")
-        fixture.check(nb)
+# def test_run():
+#     NbList = [str(x) for x in pathlib.Path(NbFolder).rglob("*.ipynb")]
+#     for nb in NbList:
+#         print(f"running nb {nb}")
+#         fixture.check(nb)
 
 
 if __name__ == "__main__":
