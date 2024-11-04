@@ -739,7 +739,35 @@ Let's build some fancy call condition with a :ref:`Formula` value less than a th
             [("substract",("poolWaRate",),("bondWaRate","A1","A2","B")), "<", 0.01]
             )
   )
- 
+
+.. versionadded:: 0.30.7 
+
+New ``callWhen`` was introduced, which has two options:
+
+* ``onDates``, the :ref:`Condition` will be tested on each date described by :ref:`DatePattern`
+* ``if``, the :ref:`Condition` will be tested on waterfall payment date.  
+
+Any :ref:`Condition` triggered will fire the `cleanUp` waterfall actions and ends the deal run.
+
+.. code-block:: python
+
+   ("callWhen", ("onDates", <DatePattern>, <Condition 1>, <Condition 2>...))
+   ("callWhen", ("if", <Condition 1>, <Condition 2>...))
+
+
+   ("callWhen", ("if", <Condition 1>, <Condition 2>...)
+              , ("onDates", <DatePattern>, <Condition 1>, <Condition 2>...)
+   )
+
+   ("callWhen", ("if", <Condition 1>, <Condition 2>...)
+              , ("onDates", <DatePattern 1>, <Condition 1>, <Condition 2>...)
+              , ("onDates", <DatePattern 2>, <Condition 3>, <Condition 4>...)
+   )
+
+.. note::
+
+   Example :ref:`Test Calls`
+
 .. note::
    *Why Call is an assumption ?*
 

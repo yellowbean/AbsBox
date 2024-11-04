@@ -1493,8 +1493,8 @@ def identify_deal_type(x):
 
 
 
-def mkCallOptions(x):
-    ''' Build call options '''
+def mkCallOptionsLegacy(x):
+    ''' Build call options (legacy) '''
     match x:
         case {"资产池余额": bal} | {"poolBalance": bal} | ("poolBalance", bal):
             return mkTag(("PoolBalance", vNum(bal)))
@@ -1509,11 +1509,11 @@ def mkCallOptions(x):
         case ("判断", p) | ("条件", p) | ("if", p) | ("condition", p):
             return mkTag(("Pre", mkPre(p)))
         case {"任意满足": xs} | {"or": xs} | ("any", *xs) | ("or", *xs):
-            return mkTag(("Or", lmap(mkCallOptions, xs)))
+            return mkTag(("Or", lmap(mkCallOptionsLegacy, xs)))
         case {"全部满足": xs} | {"and": xs} | ("all", *xs) | ("all", *xs):
-            return mkTag(("And", lmap(mkCallOptions, xs)))
+            return mkTag(("And", lmap(mkCallOptionsLegacy, xs)))
         case _:
-            raise RuntimeError(f"Failed to match {x}:mkCallOptions")
+            raise RuntimeError(f"Failed to match {x}:mkCallOptionsLegacy")
 
 
 def mkAssumpDefault(x):
@@ -2187,6 +2187,26 @@ def mkInspect(x):
             return mkTag(("InspectRpt",[mkDatePattern(dp),lmap(mkDs,ds)]))
         case _:
             raise RuntimeError(f"Failed to match mkInspect:{x}")
+# data CallOpt = LegacyOpts [C.CallOption]                 -- ^ legacy support
+#              | Predicate [Pre]                           -- ^ default test call for each pay day, keep backward compatible
+#              | CallOnDates DatePattern [Pre]             -- ^ test call at end of day
+#              deriving (Show, Generic, Read, Ord, Eq)
+# 
+# data NonPerfAssumption = NonPerfAssumption {
+#   stopRunBy :: Maybe Date                                    -- ^ optional stop day,which will stop cashflow projection
+#   ,projectedExpense :: Maybe [(FeeName,Ts)]                  -- ^ optional expense projection
+#   ,callWhen :: Maybe [CallOpt]           
+
+
+def mkCallOptions(x):
+    match x:
+        case ("onDates", dp, *pres):
+            return mkTag(("CallOnDates", [mkDatePattern(dp), lmap(mkPre,pres)]))
+        case ("if", *pres) | ("condition", *pres):
+            return mkTag(("CallPredicate", lmap(mkPre,pres)))
+        case _:
+            raise RunTimeError(f"Failed to make call options: {x}")
+
 
 def mkNonPerfAssumps(r, xs:list) -> dict:
     def translate(y) -> dict:
@@ -2196,7 +2216,9 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
             case ("estimateExpense", *projectExps):
                 return {"projectedExpense":[(vStr(fn),mkTs("BalanceCurve",ts)) for (fn, ts) in projectExps]}
             case ("call", *opts):
-                return {"callWhen":[mkCallOptions(opt) for opt in opts]}
+                return {"callWhen":[mkTag(("LegacyOpts", lmap(mkCallOptionsLegacy, opts)))]}
+            case ("callWhen", *opts):
+                return {"callWhen": lmap(mkCallOptions, opts)}
             case ("revolving", rPool, rPerf):
                 return {"revolving":mkTag(("AvailableAssets", [mkRevolvingPool(rPool), mkAssumpType(rPerf)]))}
             case ("revolving", rPoolPerfMap) if isinstance(rPoolPerfMap, dict):
@@ -2204,7 +2226,6 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
             case ("interest", *ints) | ("rate", *ints):
                 return {"interest":[mkRateAssumption(_) for _ in ints]}
             case ("inspect", *tps):
-                # return {"inspectOn":[ (mkDatePattern(dp),mkDs(ds)) for (dp, ds) in tps]}
                 return {"inspectOn": lmap(mkInspect,tps)}
             case ("report", m):
                 interval = m['dates']

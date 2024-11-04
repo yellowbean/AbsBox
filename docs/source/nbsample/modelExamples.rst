@@ -13,3 +13,4 @@ Model Examples
    IntroWaterfall
    sellAssets
    trasnferMultiple
+   testCalls
