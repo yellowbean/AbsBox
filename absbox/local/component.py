@@ -58,7 +58,7 @@ def mkDatePattern(x):
             return mkTag(("EndsAt", ["Exc", vDate(_d), mkDatePattern(dp) ]))
         case ["<=", _d, dp] :
             return mkTag(("EndsAt", ["Inc", vDate(_d), mkDatePattern(dp) ]))
-        case ["Exclude", _d, _dps] | ["ExcludeDatePattern", _d, _dps] | ["排除", _d, _dps]:
+        case ["Exclude", _d, _dps] | ["ExcludeDatePattern", _d, _dps] | ["排除", _d, _dps] | ["-", _d, _dps]:
             return mkTag(("Exclude", [mkDatePattern(_d), [mkDatePattern(_) for _ in _dps]]))
         case ["Offset", _dp, n] | ["OffsetDateDattern", _dp, n] | ["平移", _dp, n]:
             return mkTag(("OffsetBy", [mkDatePattern(_dp), vInt(n)]))
