@@ -832,6 +832,9 @@ set interest rate assumptions for cashflow projection. It can be either a flat r
 syntax:
   * ``("interest",(<index>, rate))``
   * ``("interest",(<index>, rateCurve))``
+  .. versionadded:: 0.30.8
+  * ``("rate",(<index>, rate))``
+  * ``("rate",(<index>, rateCurve))``
   
 
 .. code-block:: python
@@ -865,6 +868,7 @@ syntax:
 
    ("inspect",("MonthEnd",("poolBalance",))
              ,("QuarterFirst",("bondBalance",))
+             ,("QuarterEnd",[ ("bondBalance",), ("bondFactor",)])
              ,....)
 
    r = localAPI.run(test01

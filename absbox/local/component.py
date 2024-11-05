@@ -48,12 +48,16 @@ def mkDatePattern(x):
             return mkTag(("EveryNMonth", [vDate(d), vInt(n)]))
         case ["Weekday", n] if n >= 0 and n <= 6:
             return mkTag(("Weekday", vInt(n)))
-        case ["All", *_dps] | ["AllDatePattern", *_dps]:
+        case ["All", *_dps] | ["AllDatePattern", *_dps] | ["+", *_dps]:
             return mkTag(("AllDatePattern", lmap(mkDatePattern, _dps)))
         case [">", _d, dp] | ["After", _d, dp] | ["之后", _d, dp]:
-            return mkTag(("StartsExclusive", [vDate(_d), mkDatePattern(dp) ]))
+            return mkTag(("StartsAt", ["Exc", vDate(_d), mkDatePattern(dp) ]))
+        case [">=", _d, dp] :
+            return mkTag(("StartsAt", ["Inc", vDate(_d), mkDatePattern(dp) ]))
         case ["<", _d, dp] | ["Before", _d, dp] | ["之前", _d, dp]:
-            return mkTag(("EndsExclusive", [vDate(_d), mkDatePattern(dp) ]))
+            return mkTag(("EndsAt", ["Exc", vDate(_d), mkDatePattern(dp) ]))
+        case ["<=", _d, dp] :
+            return mkTag(("EndsAt", ["Inc", vDate(_d), mkDatePattern(dp) ]))
         case ["Exclude", _d, _dps] | ["ExcludeDatePattern", _d, _dps] | ["排除", _d, _dps]:
             return mkTag(("Exclude", [mkDatePattern(_d), [mkDatePattern(_) for _ in _dps]]))
         case ["Offset", _dp, n] | ["OffsetDateDattern", _dp, n] | ["平移", _dp, n]:
@@ -256,6 +260,8 @@ def mkDs(x):
             if pNames:
                 return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), lmap(mkPid,pNames)]))
             return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), None]))
+        case ("债券系数", bn) | ("bondFactor", bn):
+            return mkTag(("BondFactorOf", bn))
         case ("债券系数",) | ("bondFactor",):
             return mkTag("BondFactor")
         case ("资产池系数", *pNames) | ("poolFactor", *pNames):

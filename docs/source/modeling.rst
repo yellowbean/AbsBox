@@ -196,10 +196,19 @@ Composite ``<DatePattern>``
 DatePatterns can be composed together:
 
 * ``["After","YYYY-MM-DD",<datepattern>]`` -> a ``<datapattern>`` after "YYYY-MM-DD"(exclusive)
-* ``[">","YYYY-MM-DD",<datepattern>]`` -> a ``<datapattern>`` after "YYYY-MM-DD"(exclusive)
 * ``["AllDatePattern",<datepattern1>,<datepattern2>.....]`` -> a union set of date pattern during the projection, like sum of dates
 * ``["ExcludeDatePattern",<datepattern1>,<datepattern2>.....]`` -> build dates from 1st ``<datepattern1>`` and exclude dates from ``<datepattern2>,<datepattern3>``... 
 * ``["OffsetDateDattern",<datepattern>,N]`` ->  build dates from ``<datepattern>`` and offset days by N ( positive N move dates to future) , negative N will move dates to past ) 
+
+.. versionadded:: 0.30.8
+
+* ``[">","YYYY-MM-DD",<datepattern>]`` -> a ``<datapattern>`` after "YYYY-MM-DD"(exclusive)
+* ``[">=","YYYY-MM-DD",<datepattern>]`` -> a ``<datapattern>`` after "YYYY-MM-DD"(inclusive)
+* ``["<","YYYY-MM-DD",<datepattern>]`` -> a ``<datapattern>`` before "YYYY-MM-DD"(exclusive)
+* ``["<=","YYYY-MM-DD",<datepattern>]`` -> a ``<datapattern>`` before "YYYY-MM-DD"(inclusive)
+* ``["+",<datepattern1>,<datepattern2>.....]`` -> a union set of date pattern during the projection, like sum of dates
+* ``["-",<datepattern1>,<datepattern2>.....]`` -> build dates from 1st ``<datepattern1>`` and exclude dates from ``<datepattern2>,<datepattern3>``... 
+
 
 Formula 
 ---------
@@ -216,7 +225,6 @@ Bond
     * ``("bondBalance","A","B"...)`` -> sum of balance of bond A and bond B
     * ``("originalBondBalance",)`` -> bond balance at issuance
     * ``("originalBondBalance","A","B")`` -> bond balance at issuance of "A" and "B" 
-    * ``("bondFactor",)``  -> bond factor
     * ``("bondDueInt","A","B")``  -> bond due interest for bond A and bond B
     * ``("bondDueIntOverInt","A","B")``  -> bond due interest over interest for bond A and bond B
     * ``("bondDueIntTotal","A","B")`` -> sum of interest due and interest over interest for bond A and bond B
@@ -287,7 +295,7 @@ Integer Type
 
 Ratio Type
 ^^^^^^^^^^^^
-    * ``("bondFactor",)`` -> factor of bond
+    * ``("bondFactor",)``  -> bond factor
     * ``("poolFactor",)`` -> factor of pool
     * ``("poolFactor",<PoolID>)`` -> factor of pool with pool id
     * ``("cumPoolDefaultedRate",)`` -> cumulative default rate of pool
@@ -301,6 +309,9 @@ Ratio Type
     * ``("ratio", <Formula>, <Formula>)`` -> divide two formulas but with more precision (6 digtis)
     * ``("avgRatio", <Formula>.....)``   -> average of ratio of formula values
 
+    .. versionadded:: 0.30.8
+    * ``("bondFactor","A")``  -> bond factor for bond "A"
+
 Bool Type
 ^^^^^^^^^^
     * ``("trigger", loc ,<trigger name>)`` -> status of trigger with name ``<trigger name>`` at :ref:`Trigger Locations`
@@ -313,12 +324,13 @@ Bool Type
     .. versionadded:: 0.23.4
     * ``("isPaidOff", "A", "B", "C"...)`` -> True if all "A","B","C" bonds are paid off
     
-    .. versionadded:: 0.28.10
-    * ``("isOutstanding", "A", "B", "C"...)`` -> True if all "A","B","C" bonds are ALL active
-
     .. versionadded:: 0.26.1
     * ``("hasPassedMaturity","A","B"...)`` -> Ture if all bonds are passed expected maturity date
     * ``("not",<Formula>)`` -> opposite of the boolean formula
+    
+    .. versionadded:: 0.28.10
+    * ``("isOutstanding", "A", "B", "C"...)`` -> True if all "A","B","C" bonds are ALL active
+
 
 
 Or `formula` can be an arithmetic calculation on itselfies.
