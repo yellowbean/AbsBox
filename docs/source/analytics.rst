@@ -939,9 +939,9 @@ to view results
 
 .. code-block:: python 
 
-   r['results']['report']['balanceSheet']
+   r['result']['report']['balanceSheet']
 
-   r['results']['report']['cash']
+   r['result']['report']['cash']
 
 Pricing
 ^^^^^^^^^^^
@@ -1805,6 +1805,14 @@ Just build a map with options from :ref:`Deal Assumption`
 
 .. seealso::
    notebook example :ref:`Sensitivity on Deal Run Assumption`
+
+
+Combo Sensitivity Run
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+In combination of above three.
+
+
 
 Retriving Results
 ^^^^^^^^^^^^^^^^^^^^^
