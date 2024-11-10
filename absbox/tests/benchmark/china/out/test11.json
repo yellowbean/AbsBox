@@ -219,10 +219,10 @@
           "tag": "BankAccount",
           "contents": [
             0.03,
-            "2021-06-15",
             {
               "tag": "MonthEnd"
-            }
+            },
+            "2021-06-15"
           ]
         },
         "accStmt": null
@@ -232,14 +232,13 @@
         "accName": "\u8d26\u623702",
         "accType": null,
         "accInterest": {
-          "tag": "InvestmentAccount",
+          "tag": "BankAccount",
           "contents": [
             "LPR5Y",
-            0.01,
-            "2021-06-15",
             {
               "tag": "MonthEnd"
-            }
+            },
+            "2021-06-15"
           ]
         },
         "accStmt": null

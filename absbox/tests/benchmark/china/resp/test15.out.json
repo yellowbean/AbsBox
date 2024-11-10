@@ -38,10 +38,10 @@
             "tag": "BankAccount",
             "contents": [
               0.04,
-              "2022-09-30",
               {
                 "tag": "QuarterEnd"
-              }
+              },
+              "2022-09-30"
             ]
           },
           "accType": {
