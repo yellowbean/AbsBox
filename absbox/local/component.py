@@ -14,7 +14,6 @@ import functools
 import logging
 import toolz as tz
 from lenses import lens
-
 import pandas as pd
 
 numVal = Or(float,int)
@@ -48,7 +47,7 @@ def mkDatePattern(x):
             return mkTag(("EveryNMonth", [vDate(d), vInt(n)]))
         case ["Weekday", n] if n >= 0 and n <= 6:
             return mkTag(("Weekday", vInt(n)))
-        case ["All", *_dps] | ["AllDatePattern", *_dps] | ["+", *_dps]:
+        case ["all", *_dps] | ["All", *_dps] | ["AllDatePattern", *_dps] | ["+", *_dps]:
             return mkTag(("AllDatePattern", lmap(mkDatePattern, _dps)))
         case [">", _d, dp] | ["After", _d, dp] | ["之后", _d, dp]:
             return mkTag(("StartsAt", ["Exc", vDate(_d), mkDatePattern(dp) ]))
@@ -450,12 +449,14 @@ def mkPre(p):
 
 def mkAccInt(x):
     match x:
-        case {"周期": _dp, "利率": idx, "利差": spd, "最近结息日": lsd} \
-                | {"period": _dp,  "index": idx, "spread": spd, "lastSettleDate": lsd}:
-            return mkTag(("InvestmentAccount", [idx, spd, lsd, mkDatePattern(_dp)]))
+        case {"周期": _dp, "重置周期":_dp2, "参考利率": idx, "利差": spd, "最近结息日": lsd,"利率": r} \
+                | {"period": _dp,"reset": _dp2,  "index": idx, "spread": spd, "lastSettleDate": lsd
+                   ,"rate": r}:
+            return mkTag(("InvestmentAccount", [idx, spd, mkDatePattern(_dp)
+                                                ,mkDatePattern(_dp2), lsd, r]))
         case {"周期": _dp, "利率": br, "最近结息日": lsd} \
                 | {"period": _dp, "rate": br, "lastSettleDate": lsd}:
-            return mkTag(("BankAccount", [br, lsd, mkDatePattern(_dp)]))
+            return mkTag(("BankAccount", [br, mkDatePattern(_dp), lsd]))
         case None:
             return None
         case _:
@@ -517,7 +518,10 @@ def mkAcc(an, x=None):
             return {"accBalance": vNum(b), "accName": vStr(an), "accType": mkAccType(t), "accInterest": mkAccInt(i), "accStmt": mkAccTxn(tx)}
 
         case {"余额": b} | {"balance": b}:
-            return mkAcc(vStr(an), x | {"计息": x.get("计息", None), "interest": x.get("interest", None), "记录": x.get("记录", None), "txn": x.get("txn", None), "类型": x.get("类型", None), "type": x.get("type", None)})
+            extraFields = [ (_, None) for _ in ["计息","interest","类型","type","记录","txn"] ]
+            extraInfo = subMap(x, extraFields)
+            # extraInfo = {"计息": x.get("计息", None), "interest": x.get("interest", None), "记录": x.get("记录", None), "txn": x.get("txn", None), "类型": x.get("类型", None), "type": x.get("type", None)}
+            return mkAcc(vStr(an), x | extraInfo)
         case None:
             return mkAcc(vStr(an), {"balance": 0})
         case _:
@@ -604,6 +608,7 @@ def mkBnd(bn, x:dict):
     lastAccrueDate = getValWithKs(x, ["计提日", "lastAccrueDate"])
     lastIntPayDate = getValWithKs(x, ["付息日", "lastIntPayDate"])
     dueInt = getValWithKs(x, ["应付利息", "dueInt"], defaultReturn=0)
+    duePrin = getValWithKs(x, ["应付本金", "duePrin"], defaultReturn=0)
     dueIntOverInt = getValWithKs(x, ["拖欠利息", "dueIntOverInt"], defaultReturn=0)
     mSt = earlyReturnNone(mkStepUp, getValWithKs(x, ["调息", "stepUp"], defaultReturn=None))
     match x:
@@ -612,14 +617,14 @@ def mkBnd(bn, x:dict):
             return {"bndName": vStr(bn), "bndBalance": bndBalance, "bndRate": bndRate
                     , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
-                    , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntOverInt":dueIntOverInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
+                    , "bndDuePrin": duePrin, "bndDueInt": dueInt, "bndDueIntOverInt":dueIntOverInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
                     , "bndLastIntPayDate": lastIntPayDate}
         case {"初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
              {"originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
             return {"bndName": vStr(bn), "bndBalance": originBalance, "bndRate": originRate
                     , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
-                    , "bndDuePrin": 0, "bndDueInt": dueInt, "bndDueIntOverInt":dueIntOverInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
+                    , "bndDuePrin": duePrin, "bndDueInt": dueInt, "bndDueIntOverInt":dueIntOverInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
                     , "bndLastIntPayDate": lastIntPayDate}
         case _:
             raise RuntimeError(f"Failed to match bond:{bn},{x}:mkBnd")
@@ -641,14 +646,6 @@ def mkLiqMethod(x):
             return mkTag(("PvByRef", mkDs(r)))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkLiqMethod")
-
-
-def mkPDA(x):
-    match x:
-        case {"公式": ds} | {"formula": ds}:
-            return mkTag(("DS", mkDs(ds)))
-        case _:
-            raise RuntimeError(f"Failed to match {x}:mkPDA")
 
 
 def mkAccountCapType(x):
@@ -1106,18 +1103,6 @@ def mkThreshold(x):
             raise RuntimeError(f"Failed to match :{x}:mkThreshold")
 
 
-def _rateTypeDs(x):
-    h = x[0]
-    if h in set(["资产池累积违约率"
-                 , "cumPoolDefaultedRate"
-                 , "债券系数"
-                 , "bondFactor"
-                 , "资产池系数"
-                 , "poolFactor"]):
-        return True
-    return False
-
-
 def mkTrigger(x: dict):
     match x:
         case {"condition":p, "effects":e, "status":st, "curable":c} | {"条件":p, "效果":e, "状态":st, "重置":c}:
@@ -1137,13 +1122,13 @@ def mkTriggerEffect(x):
             return mkTag(("DealStatusTo", mkStatus(s)))
         case ("动作", *actions) | ("actions", *actions):
             return mkTag(("RunActions", lmap(mkAction, actions)))
-        case ["计提费用", *fn] | ["accrueFees", *fn]:
+        case ["计提费用", *fn] | ["accrueFees", *fn] | ("accrueFees", *fn):
             return mkTag(("DoAccrueFee", vList(fn, str)))
         case ["新增事件", trg] | ["newTrigger", trg]: # not implementd in Hastructure
             return mkTag(("AddTrigger", mkTrigger(trg)))
-        case ["新储备目标", accName, newReserve] | ["newReserveBalance", accName, newReserve]:
+        case ["新储备目标", accName, newReserve] | ["newReserveBalance", accName, newReserve] | ("newReserveBalance", accName, newReserve):
             return mkTag(("ChangeReserveBalance", [vStr(accName), mkAccType(newReserve)]))
-        case ["结果", *efs] | ["Effects", *efs]:
+        case ["结果", *efs] | ["Effects", *efs] | ("Effects", *efs):
             return mkTag(("TriggerEffects", [mkTriggerEffect(e) for e in efs]))
         case None:
             return mkTag(("DoNothing"))
@@ -2065,51 +2050,72 @@ def readRunSummary(x, locale) -> dict:
         r['waterfall'] = pd.DataFrame(data = [ [c['contents'][0],readTagMap(c['contents'][1])] for c in waterfall_logs ]
                                         ,columns = ["Date","Waterfall Location"])
 
-
     # build financial reports
-    def mapItem(z):
-        match z:
-            case {"tag":"Item","contents":[accName,accBal]}:
-                return {accName:accBal}
-            case {"tag":"ParentItem","contents":[accName,subItems]}:
-                items = map(mapItem, subItems)
-                return {accName : items}
+    def buildTree(x:dict):
+        def lookParent(x:dict):
+           match x:
+               case {'tag': 'ParentItem', 'contents': [itemName, []]}:
+                   return {itemName:0}
+               case {'tag':'ParentItem','contents':[itemName, v]}:
+                   subBranchNum = len(v)
+                   subVals_ = [ lookParent(_) for _ in v ]
+                   subVals = reduce(lambda d1, d2: d1 | d2, subVals_)
+                   return {itemName: subVals}
+               case {'tag':'Item', 'contents':[itemName,itemValue]}:
+                   return {itemName:itemValue}
+               case _:
+                   return {}
 
-    def buildBalanceSheet(bsData):
-        bsRptDate = bsData.pop("reportDate")
-        bs = mapListValBy(bsData, mapItem)
-        return mapValsBy(bs, uplift_m_list) | {"reportDate":bsRptDate}
+        match x:
+             case {'tag': 'ParentItem', 'contents': [itemName, []]}:
+                 return {itemName: 0}
+             case {'tag':'ParentItem','contents':[itemName, v]}:
+                 subVals = reduce(lambda d1, d2: d1 | d2, [ lookParent(_) for _ in v ]) 
+                 return {itemName: subVals}
+             case {'tag':'Item', 'contents':[itemName,itemValue]}:
+                 return {itemName: itemValue}
+             case _:
+                 return {}
 
-    def buildBsType(yname, y:dict)-> pd.DataFrame:
-        mi = pd.MultiIndex.from_product([[yname],y.keys()])
-        d = y.values()
-        return pd.DataFrame(d, index=mi).T
-    
-    def buildBS(bs):
-        bs_df = pd.concat([  buildBsType(k,v)  for k,v in bs.items() if k!="reportDate"],axis=1)
-        bs_df['reportDate'] = bs['reportDate']
-        return bs_df.set_index("reportDate")
+    def buildBalanceSheet(bsData, rptDate):
+        comp = ["asset","liability","equity"]
+        x = reduce(lambda d1, d2: d1 | d2, [ bsData[_] & lens.modify(buildTree) for _ in comp ]) 
+        x = pd.json_normalize(x | {"date":rptDate})
+        x.columns = pd.MultiIndex.from_tuples([tuple(col.split(".")) for col in x.columns])
+        x.set_index("date")
+        return x[["Asset","Liability","Net Asset"]]
+ 
+    def buildCashReport(cashData, begDate, endDate, missingFields):
+        comp = ["inflow","outflow","net"]
+        x = reduce(lambda d1, d2: d1 | d2, [ cashData[_] & lens.modify(buildTree) for _ in comp ])
+        x = {k: {} if (v==0 and k!="Net Cash") else v for k,v in x.items() }
+        x = {k: missingFields[k] | v if k!="Net Cash" else v for k,v in x.items() }
+        x = pd.json_normalize(x | {"startDate":begDate,"endDate":endDate})
+        x.columns = pd.MultiIndex.from_tuples([tuple(col.split(".")) for col in x.columns])
+        x.set_index(["startDate","endDate"])
+        return x[["startDate","endDate","Inflow","Outflow","Net Cash"]]
 
-    def buildCashReport(cashData):
-        sd = cashData.pop('startDate')
-        ed = cashData.pop('endDate')
-        net = cashData.pop('net')
-        cashList = mapListValBy(cashData, mapItem)
-        cashMap = {k:uplift_m_list(v) for k,v in cashList.items() }
-        cashMap = pd.concat([  buildBsType(k,v) for k,v in cashMap.items() ],axis=1)
-        cashMap['startDate'] = sd
-        cashMap['endDate'] = ed
-        cashMap['Net'] = net
-        return cashMap.set_index(["startDate","endDate"])
+    def patchMissingField(_rpts):
+        comp = ["inflow","outflow","net"]
+        x = [ reduce(lambda d1, d2: d1 | d2, [ rpt[_] & lens.modify(buildTree) for _ in comp ]) 
+              for rpt in _rpts ]
+        x = [ tz.valmap(lambda v: set(v.keys()) if isinstance(v,dict) else set([]),_) for _ in x ]
+        x = tz.merge_with(lambda vs: reduce(lambda x,y: x|y,vs), *x)
+        x = tz.valmap(lambda d: {_:0 for _ in d} ,x)
+        return x
 
-    balanceSheetIdx = 2
-    cashReportIdx = 3
+    [ beginDateIdx, endDateIdx, balanceSheetIdx, cashReportIdx ] = [ 0, 1, 2, 3 ]
     rpts = [ _['contents'] for  _ in  (filter_by_tags(x, ["FinancialReport"])) ]
+    
     if rpts:
         r['report'] = {}
-        r['report']['balanceSheet'] = pd.concat([buildBS(buildBalanceSheet(rpt[balanceSheetIdx])) for rpt in rpts])
-        r['report']['cash'] = pd.concat([buildCashReport(rpt[cashReportIdx]) for rpt in rpts])[["inflow","outflow","Net"]]
-    
+        r['report']['balanceSheet'] = pd.concat([(buildBalanceSheet(rpt[balanceSheetIdx],rpt[endDateIdx])) for rpt in rpts])
+       
+        cashReportRaw = [ rpt[cashReportIdx] for rpt in rpts ]
+        cfAllFieldsMap = tz.dissoc(patchMissingField(cashReportRaw), "Net Cash")
+        cfRpts = [buildCashReport(rpt[cashReportIdx],rpt[beginDateIdx],rpt[endDateIdx],cfAllFieldsMap)
+                  for rpt in rpts]
+        r['report']['cash'] = pd.concat(cfRpts)
 
     return r
 

@@ -42,6 +42,7 @@ def readTagStr(x: str) -> str:
     x = json.loads(x.replace("'", "\"").replace("True", "true").replace("False", "false").replace("None","null"))
     return readTagMap(x)
 
+
 def readTagMap(x:dict) -> str:
     match x:
         case {"tag": _t, "contents": None}:
@@ -56,7 +57,6 @@ def readTagMap(x:dict) -> str:
             return f"<{_t}>"
         case _ :
             return f"<{x}>"
-
 
 def readTag(x: dict):
     return f"<{x['tag']}:{','.join(x['contents'])}>"
@@ -135,10 +135,6 @@ def str2date(x: str):
 def normDate(x: str):
     if len(x) == 8:
         return f"{x[:4]}-{x[4:6]}-{x[6:8]}"
-
-
-def daysBetween(sd, ed):
-    return (ed - sd).days
 
 
 def guess_locale(x):
