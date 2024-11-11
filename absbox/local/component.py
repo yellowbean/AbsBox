@@ -2080,20 +2080,22 @@ def readRunSummary(x, locale) -> dict:
     def buildBalanceSheet(bsData, rptDate):
         comp = ["asset","liability","equity"]
         x = reduce(lambda d1, d2: d1 | d2, [ bsData[_] & lens.modify(buildTree) for _ in comp ]) 
-        x = pd.json_normalize(x | {"date":rptDate})
-        x.columns = pd.MultiIndex.from_tuples([tuple(col.split(".")) for col in x.columns])
-        x.set_index("date")
-        return x[["Asset","Liability","Net Asset"]]
+        x = pd.json_normalize(x | {"date":rptDate}, sep="&")
+        x.columns = pd.MultiIndex.from_tuples([tuple(col.split("&")) for col in x.columns])
+        x.set_index("date",inplace=True)
+        return x[["Asset", "Liability", "Net Asset"]]
  
     def buildCashReport(cashData, begDate, endDate, missingFields):
         comp = ["inflow","outflow","net"]
         x = reduce(lambda d1, d2: d1 | d2, [ cashData[_] & lens.modify(buildTree) for _ in comp ])
         x = {k: {} if (v==0 and k!="Net Cash") else v for k,v in x.items() }
         x = {k: missingFields[k] | v if k!="Net Cash" else v for k,v in x.items() }
-        x = pd.json_normalize(x | {"startDate":begDate,"endDate":endDate})
-        x.columns = pd.MultiIndex.from_tuples([tuple(col.split(".")) for col in x.columns])
-        x.set_index(["startDate","endDate"])
-        return x[["startDate","endDate","Inflow","Outflow","Net Cash"]]
+        # x = pd.json_normalize(x | {"startDate":begDate,"endDate":endDate})
+        x = pd.json_normalize(x,sep="&")
+        x.columns = pd.MultiIndex.from_tuples([tuple(col.split("&")) for col in x.columns])
+        x.set_index([pd.Index([begDate],name="startDate")
+                     ,pd.Index([endDate],name="endDate")], inplace=True)
+        return x[["Inflow", "Outflow", "Net Cash"]]
 
     def patchMissingField(_rpts):
         comp = ["inflow","outflow","net"]
@@ -2109,7 +2111,11 @@ def readRunSummary(x, locale) -> dict:
     
     if rpts:
         r['report'] = {}
-        r['report']['balanceSheet'] = pd.concat([(buildBalanceSheet(rpt[balanceSheetIdx],rpt[endDateIdx])) for rpt in rpts])
+        bsReportList = [(buildBalanceSheet(rpt[balanceSheetIdx],rpt[endDateIdx]))
+                                                 for rpt in rpts]
+        bsReport = pd.concat(bsReportList)
+        bsReport.index = [ _[0] for _ in bsReport.index ] 
+        r['report']['balanceSheet'] = bsReport
        
         cashReportRaw = [ rpt[cashReportIdx] for rpt in rpts ]
         cfAllFieldsMap = tz.dissoc(patchMissingField(cashReportRaw), "Net Cash")
