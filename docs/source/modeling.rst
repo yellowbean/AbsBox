@@ -1856,9 +1856,15 @@ Fix rate syntax:
   ``{"period": <date Pattern>, "rate": <number>, "lastSettleDate":<date>}``
 
 Floater rate syntax: 
-  ``{"period": <date Pattern>, "index": <index name>, "spread": <number>, "lastSettleDate":<date>}``
+  ``{"period": <date Pattern>, "reset": <date pattern>, "index": <index name>, "spread": <number>, "rate":<rate>, "lastSettleDate":<date>}``
   
-  Make sure there the index rate curve is supplied in the assumption.
+Make sure there the index rate curve is supplied in the assumption.
+
+Fields:
+  * ``period`` : interest sweep day
+  * ``reset`` : index reset day
+  * ``rate`` : current interest rate being used
+  * ``lastSettleDate`` : last interest calculation day
 
 
 .. code-block:: python
@@ -1874,6 +1880,8 @@ Floater rate syntax:
                     ,"interest":{"period":"QuarterEnd"
                                  ,"index":"SOFR3M"
                                  ,"spread":0.001
+                                 ,"reset":"QuarterEnd"
+                                 ,"rate": 0.03
                                  ,"lastSettleDate":"2022-11-02"}})
 
 
