@@ -25774,7 +25774,7 @@
             "bndStepUp": null,
             "bndBalance": 0,
             "bndRate": 0.07,
-            "bndDuePrin": -100,
+            "bndDuePrin": -80,
             "bndDueInt": 0,
             "bndDueIntOverInt": 0,
             "bndDueIntDate": "2022-12-26",
@@ -32975,7 +32975,7 @@
             "bndStepUp": null,
             "bndBalance": 40,
             "bndRate": 0.08,
-            "bndDuePrin": 0,
+            "bndDuePrin": 40,
             "bndDueInt": 0.49,
             "bndDueIntOverInt": 0,
             "bndDueIntDate": "2021-06-26",
@@ -33720,7 +33720,7 @@
                   "contents": [
                     "2021-06-26",
                     true,
-                    "<Tag:Right (20 % 1) G 0.00>"
+                    "<Tag:Right 20.0 G 0.00>"
                   ]
                 }
               ]

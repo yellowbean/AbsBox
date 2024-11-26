@@ -211,8 +211,8 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2021-05-26",
-                  4.47,
-                  -0.78,
+                  4.55,
+                  -0.7,
                   "<PayInt:A1>"
                 ]
               },
@@ -221,7 +221,7 @@
                 "contents": [
                   "2021-05-26",
                   0,
-                  -4.47,
+                  -4.55,
                   "<PayPrin:A1>"
                 ]
               },
@@ -292,8 +292,8 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2021-07-26",
-                  4.04,
-                  -1.16,
+                  4.21,
+                  -0.99,
                   "<PayInt:A1>"
                 ]
               },
@@ -302,7 +302,7 @@
                 "contents": [
                   "2021-07-26",
                   0,
-                  -4.04,
+                  -4.21,
                   "<PayPrin:A1>"
                 ]
               },
@@ -373,8 +373,8 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2022-03-26",
-                  29.42,
-                  -4.66,
+                  30.3,
+                  -3.78,
                   "<PayInt:A1>"
                 ]
               },
@@ -383,7 +383,7 @@
                 "contents": [
                   "2022-03-26",
                   0,
-                  -29.42,
+                  -30.3,
                   "<PayPrin:A1>"
                 ]
               },
@@ -499,9 +499,9 @@
               ]
             },
             "bndStepUp": null,
-            "bndBalance": 100,
+            "bndBalance": 50.83,
             "bndRate": 0.07,
-            "bndDuePrin": 0,
+            "bndDuePrin": 50.83,
             "bndDueInt": 0,
             "bndDueIntOverInt": 0,
             "bndDueIntDate": "2022-03-26",
@@ -512,14 +512,14 @@
                 "tag": "BondTxn",
                 "contents": [
                   "2021-04-15",
-                  100,
+                  89.89,
                   0.59,
-                  0,
+                  10.11,
                   0.07,
-                  0.59,
+                  10.7,
                   0,
                   0,
-                  1.0,
+                  0.8989,
                   [
                     "<PayInt:A1>",
                     "<PayPrin:A1>"
@@ -530,14 +530,14 @@
                 "tag": "BondTxn",
                 "contents": [
                   "2021-05-26",
-                  100,
-                  0.78,
-                  0,
+                  85.34,
+                  0.7,
+                  4.55,
                   0.07,
-                  0.78,
+                  5.25,
                   0,
                   0,
-                  1.0,
+                  0.8534,
                   [
                     "<PayInt:A1>",
                     "<PayPrin:A1>"
@@ -548,14 +548,14 @@
                 "tag": "BondTxn",
                 "contents": [
                   "2021-07-26",
-                  100,
-                  1.16,
-                  0,
+                  81.13,
+                  0.99,
+                  4.21,
                   0.07,
-                  1.16,
+                  5.2,
                   0,
                   0,
-                  1.0,
+                  0.8113,
                   [
                     "<PayInt:A1>",
                     "<PayPrin:A1>"
@@ -566,14 +566,14 @@
                 "tag": "BondTxn",
                 "contents": [
                   "2022-03-26",
-                  100,
-                  4.66,
-                  0,
+                  50.83,
+                  3.78,
+                  30.3,
                   0.07,
-                  4.66,
+                  34.08,
                   0,
                   0,
-                  1.0,
+                  0.5083,
                   [
                     "<PayInt:A1>",
                     "<PayPrin:A1>"
@@ -607,7 +607,7 @@
             "bndStepUp": null,
             "bndBalance": 20,
             "bndRate": 0,
-            "bndDuePrin": 0,
+            "bndDuePrin": 20,
             "bndDueInt": 0,
             "bndDueIntOverInt": 0,
             "bndDueIntDate": null,
@@ -1542,7 +1542,7 @@
         "tag": "BondOutstanding",
         "contents": [
           "A1",
-          100,
+          50.83,
           100
         ]
       },

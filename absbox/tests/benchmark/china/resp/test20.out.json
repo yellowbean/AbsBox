@@ -1984,8 +1984,8 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2023-06-26",
-                  492.56,
-                  -0.59,
+                  493.15,
+                  0,
                   "<PayInt:A1>"
                 ]
               },
@@ -1993,18 +1993,18 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2023-06-26",
-                  392.56,
-                  -100,
-                  "<PayPrin:A1>"
+                  493.15,
+                  0,
+                  "<PayPrin:>"
                 ]
               },
               {
                 "tag": "AccTxn",
                 "contents": [
                   "2023-06-26",
-                  372.56,
-                  -20,
-                  "<PayPrin:B>"
+                  493.15,
+                  0,
+                  "<PayPrin:>"
                 ]
               },
               {
@@ -2012,7 +2012,7 @@
                 "contents": [
                   "2023-06-26",
                   0,
-                  -372.56,
+                  -493.15,
                   "<PayYield:B>"
                 ]
               },
@@ -2065,8 +2065,8 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2023-07-26",
-                  509.01,
-                  -0.57,
+                  509.58,
+                  0,
                   "<PayInt:A1>"
                 ]
               },
@@ -2074,18 +2074,18 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2023-07-26",
-                  409.01,
-                  -100,
-                  "<PayPrin:A1>"
+                  509.58,
+                  0,
+                  "<PayPrin:>"
                 ]
               },
               {
                 "tag": "AccTxn",
                 "contents": [
                   "2023-07-26",
-                  389.01,
-                  -20,
-                  "<PayPrin:B>"
+                  509.58,
+                  0,
+                  "<PayPrin:>"
                 ]
               },
               {
@@ -2093,7 +2093,7 @@
                 "contents": [
                   "2023-07-26",
                   0,
-                  -389.01,
+                  -509.58,
                   "<PayYield:B>"
                 ]
               },
@@ -2146,8 +2146,8 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2023-08-26",
-                  492.56,
-                  -0.59,
+                  493.15,
+                  0,
                   "<PayInt:A1>"
                 ]
               },
@@ -2155,18 +2155,18 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2023-08-26",
-                  392.56,
-                  -100,
-                  "<PayPrin:A1>"
+                  493.15,
+                  0,
+                  "<PayPrin:>"
                 ]
               },
               {
                 "tag": "AccTxn",
                 "contents": [
                   "2023-08-26",
-                  372.56,
-                  -20,
-                  "<PayPrin:B>"
+                  493.15,
+                  0,
+                  "<PayPrin:>"
                 ]
               },
               {
@@ -2174,7 +2174,7 @@
                 "contents": [
                   "2023-08-26",
                   0,
-                  -372.56,
+                  -493.15,
                   "<PayYield:B>"
                 ]
               },
@@ -2227,8 +2227,8 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2023-09-26",
-                  120508.99,
-                  -0.59,
+                  120509.58,
+                  0,
                   "<PayInt:A1>"
                 ]
               },
@@ -2236,18 +2236,18 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2023-09-26",
-                  120408.99,
-                  -100,
-                  "<PayPrin:A1>"
+                  120509.58,
+                  0,
+                  "<PayPrin:>"
                 ]
               },
               {
                 "tag": "AccTxn",
                 "contents": [
                   "2023-09-26",
-                  120388.99,
-                  -20,
-                  "<PayPrin:B>"
+                  120509.58,
+                  0,
+                  "<PayPrin:>"
                 ]
               },
               {
@@ -2255,7 +2255,7 @@
                 "contents": [
                   "2023-09-26",
                   0,
-                  -120388.99,
+                  -120509.58,
                   "<PayYield:B>"
                 ]
               }
@@ -2572,13 +2572,13 @@
               ]
             },
             "bndStepUp": null,
-            "bndBalance": 100,
+            "bndBalance": 0,
             "bndRate": 0.07,
             "bndDuePrin": 0,
             "bndDueInt": 0,
             "bndDueIntOverInt": 0,
-            "bndDueIntDate": "2023-09-26",
-            "bndLastIntPay": "2023-09-26",
+            "bndDueIntDate": "2023-05-26",
+            "bndLastIntPay": "2023-05-26",
             "bndLastPrinPay": null,
             "bndStmt": [
               {
@@ -2981,86 +2981,14 @@
                 "tag": "BondTxn",
                 "contents": [
                   "2023-05-26",
-                  100,
+                  0,
                   13.5,
-                  0,
-                  0.07,
-                  13.5,
-                  0,
-                  0,
-                  1.0,
-                  [
-                    "<PayInt:A1>",
-                    "<PayPrin:A1>"
-                  ]
-                ]
-              },
-              {
-                "tag": "BondTxn",
-                "contents": [
-                  "2023-06-26",
                   100,
-                  0.59,
-                  0,
                   0.07,
-                  0.59,
+                  113.5,
                   0,
                   0,
-                  1.0,
-                  [
-                    "<PayInt:A1>",
-                    "<PayPrin:A1>"
-                  ]
-                ]
-              },
-              {
-                "tag": "BondTxn",
-                "contents": [
-                  "2023-07-26",
-                  100,
-                  0.57,
-                  0,
-                  0.07,
-                  0.57,
-                  0,
-                  0,
-                  1.0,
-                  [
-                    "<PayInt:A1>",
-                    "<PayPrin:A1>"
-                  ]
-                ]
-              },
-              {
-                "tag": "BondTxn",
-                "contents": [
-                  "2023-08-26",
-                  100,
-                  0.59,
-                  0,
-                  0.07,
-                  0.59,
-                  0,
-                  0,
-                  1.0,
-                  [
-                    "<PayInt:A1>",
-                    "<PayPrin:A1>"
-                  ]
-                ]
-              },
-              {
-                "tag": "BondTxn",
-                "contents": [
-                  "2023-09-26",
-                  100,
-                  0.59,
-                  0,
-                  0.07,
-                  0.59,
-                  0,
-                  0,
-                  1.0,
+                  0.0,
                   [
                     "<PayInt:A1>",
                     "<PayPrin:A1>"
@@ -3092,7 +3020,7 @@
               ]
             },
             "bndStepUp": null,
-            "bndBalance": 20,
+            "bndBalance": 0,
             "bndRate": 0,
             "bndDuePrin": 0,
             "bndDueInt": 0,
@@ -3501,14 +3429,14 @@
                 "tag": "BondTxn",
                 "contents": [
                   "2023-05-26",
+                  0,
+                  366.08,
                   20,
-                  366.08,
+                  0,
+                  386.08,
                   0,
                   0,
-                  366.08,
-                  0,
-                  0,
-                  0.2,
+                  0.0,
                   [
                     "<PayPrin:B>",
                     "<PayYield:B>"
@@ -3519,72 +3447,60 @@
                 "tag": "BondTxn",
                 "contents": [
                   "2023-06-26",
-                  20,
-                  372.56,
+                  0,
+                  493.15,
                   0,
                   0,
-                  372.56,
+                  493.15,
                   0,
                   0,
-                  0.2,
-                  [
-                    "<PayPrin:B>",
-                    "<PayYield:B>"
-                  ]
+                  0.0,
+                  "<PayYield:B>"
                 ]
               },
               {
                 "tag": "BondTxn",
                 "contents": [
                   "2023-07-26",
-                  20,
-                  389.01,
+                  0,
+                  509.58,
                   0,
                   0,
-                  389.01,
+                  509.58,
                   0,
                   0,
-                  0.2,
-                  [
-                    "<PayPrin:B>",
-                    "<PayYield:B>"
-                  ]
+                  0.0,
+                  "<PayYield:B>"
                 ]
               },
               {
                 "tag": "BondTxn",
                 "contents": [
                   "2023-08-26",
-                  20,
-                  372.56,
+                  0,
+                  493.15,
                   0,
                   0,
-                  372.56,
+                  493.15,
                   0,
                   0,
-                  0.2,
-                  [
-                    "<PayPrin:B>",
-                    "<PayYield:B>"
-                  ]
+                  0.0,
+                  "<PayYield:B>"
                 ]
               },
               {
                 "tag": "BondTxn",
                 "contents": [
                   "2023-09-26",
-                  20,
-                  120388.99,
+                  0,
+                  120509.58,
                   0,
                   0,
-                  120388.99,
+                  120509.58,
                   0,
                   0,
-                  0.2,
-                  [
-                    "<PayPrin:B>",
-                    "<PayYield:B>"
-                  ]
+                  0.0,
+                  "<PayYield:B>"
                 ]
               }
             ]
@@ -5025,7 +4941,7 @@
         "tag": "BondOutstanding",
         "contents": [
           "A1",
-          100,
+          0,
           100
         ]
       },
@@ -5033,17 +4949,9 @@
         "tag": "BondOutstanding",
         "contents": [
           "B",
-          20,
+          0,
           20
         ]
-      },
-      {
-        "tag": "WarningMsg",
-        "contents": "Bond A1 is not paid off"
-      },
-      {
-        "tag": "WarningMsg",
-        "contents": "Bond B is not paid off"
       },
       {
         "tag": "DealStatusChangeTo",

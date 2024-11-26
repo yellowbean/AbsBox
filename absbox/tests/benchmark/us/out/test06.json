@@ -153,7 +153,7 @@
                 "tag": "Max",
                 "contents": [
                   {
-                    "tag": "Subtract",
+                    "tag": "Substract",
                     "contents": [
                       {
                         "tag": "CurrentDueBondInt",
