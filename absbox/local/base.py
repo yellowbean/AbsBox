@@ -104,8 +104,9 @@ datePattern = {"月末": "MonthEnd", "季度末": "QuarterEnd", "年末": "YearE
 freqMap = {"每月": "Monthly", "每季度": "Quarterly", "每半年": "SemiAnnually", "每年": "Annually", "Monthly": "Monthly", "Quarterly": "Quarterly", "SemiAnnually": "SemiAnnually", "Annually": "Annually", "monthly": "Monthly", "quarterly": "Quarterly", "semiAnnually": "SemiAnnually", "annually": "Annually" 
            ,"Weekly":"Weekly","weekly":"Weekly","每周":"Weekly","BiWeekly":"BiWeekly","biweekly":"BiWeekly","每两周":"BiWeekly"}
 
-rateLikeFormula = set(["bondFactor", "poolFactor", "cumPoolDefaultedRate","poolWaRate","bondWaRate", "资产池累计违约率", "债券系数", "资产池系数"
-                      ,"cumPoolNetLossRate","cumPoolDefaultedRateTill","比例","ratio","avgRatio","平均比例"])
+rateLikeFormula = set(["bondFactor", "bondFactorOf", "poolFactor", "cumPoolDefaultedRate","poolWaRate","bondWaRate", "资产池累计违约率", "债券系数", "资产池系数"
+                      ,"cumPoolNetLossRate","cumPoolDefaultedRateTill","比例","ratio","avgRatio"
+                      ,"平均比例"])
 intLikeFormula = set(["borrowerNumber", "monthsTillMaturity", "periodNum"])
 boolLikeFormula = set(["trigger", "事件", "isMostSenior", "最优先", "isPaidOff","清偿完毕","rateTest","allTest","anyTest","比率测试","任一测试","所有测试"
                         "isOutstanding"])
@@ -120,10 +121,10 @@ chinaDealCycle = {"回收后":"EndCollection"
                  ,"分配中":"InWF"}
 
 englishDealCycle = {"BeforeCollect":"EndCollection"
-                 ,"AfterCollect":"EndCollectionWF"
-                 ,"BeforeDistribution":"BeginDistributionWF"
-                 ,"AfterDistribution":"EndDistributionWF"
-                 ,"InDistribution":"InWF"}
+                   ,"AfterCollect":"EndCollectionWF"
+                   ,"BeforeDistribution":"BeginDistributionWF"
+                   ,"AfterDistribution":"EndDistributionWF"
+                   ,"InDistribution":"InWF"}
 
 dealCycleMap = chinaDealCycle | englishDealCycle
 

@@ -372,9 +372,10 @@ class API:
         else:
             result = self._send_req(req, url, timeout=30)
 
-        if result is None or 'error' in result:
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run")
-
+        if result is None or 'error' in result or 'Left' in result:
+            leftVal = result.get("Left","")
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+        result = result['Right']
         rawWarnMsg = map( lambda x:f"{MsgColor.Warning.value}{x['contents']}", filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg)))
         if rawWarnMsg and showWarning:
             console.print("Warning Message from server:\n"+"\n".join(list(rawWarnMsg)))
@@ -419,8 +420,10 @@ class API:
         else:
             result = self._send_req(req, url, timeout=30)
 
-        if result is None or 'error' in result:
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run")
+        if result is None or 'error' in result or 'Left' in result:
+            leftVal = result.get("Left","")
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+        result = result['Right']
 
         rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
         rawWarnMsg = list(tz.concat(rawWarnMsgByScen.values()))
@@ -470,6 +473,11 @@ class API:
             return req
 
         result = self._send_req(req, url)
+        
+        if result is None or 'error' in result or 'Left' in result:
+            leftVal = result.get("Left","")
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+        result = result['Right']
 
         if read:
             return result & lens.Values().Values().modify(self.read_single)
@@ -504,6 +512,11 @@ class API:
 
         result = self._send_req(req, url, **kwargs)
 
+        if result is None or 'error' in result or 'Left' in result:
+            leftVal = result.get("Left","")
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+        result = result['Right']
+        
         if read:
             return result & lens.Values().modify(self.read_single)
         else:
@@ -541,6 +554,12 @@ class API:
         if debug:
             return req
         result = self._send_req(req, url)
+
+        if result is None or 'error' in result or 'Left' in result:
+            leftVal = result.get("Left","")
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+        result = result['Right']
+        
         if read:
             return {k: deals[k].read(v) for k, v in result.items()}    
         else:
@@ -578,8 +597,10 @@ class API:
 
         result = self._send_req(req, url, timeout=30)
 
-        if result is None or 'error' in result:
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run")
+        if result is None or 'error' in result or 'Left' in result:
+            leftVal = result.get("Left","")
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+        result = result['Right']
 
         rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
         rawWarnMsg = list(tz.concat(rawWarnMsgByScen.values()))
@@ -628,8 +649,10 @@ class API:
         
         result = self._send_req(req, url, timeout=30)
 
-        if result is None or 'error' in result or result == []:
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run, but got {result}")
+        if result is None or 'error' in result or 'Left' in result:
+            leftVal = result.get("Left","")
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+        result = result['Right']
 
         assert isinstance(result, dict), f"Result should be a dict but got {type(result)}, {result}"
 
@@ -694,6 +717,12 @@ class API:
             return req
         
         result = self._send_req(req, url)
+
+        if result is None or 'error' in result or 'Left' in result:
+            leftVal = result.get("Left","")
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+        
+        result = result['Right']
         if read:
             return readResult(result)
         else:

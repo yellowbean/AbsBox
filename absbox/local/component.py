@@ -327,7 +327,7 @@ def mkDs(x):
             return mkTag(("BondTxnAmt", [bns, cmt]))
         case ("账户变动总额", cmt, *ans) | ("accountTxnAmount", cmt, *ans) | ("accountTxnAmt", cmt, *ans):
             return mkTag(("AccTxnAmt", [ans, cmt]))
-        case ("系数", ds, f) | ("factor", ds, f) | ("*", ds, f) if isinstance(f, float):
+        case ("系数", ds, f) | ("factor", ds, f) | ("*", ds, f) if isinstance(f, (int,float)):
             return mkTag(("Factor", [mkDs(ds), f]))
         case ("*", *ds):
             return mkTag(("Multiply", lmap(mkDs, ds)))
@@ -342,9 +342,11 @@ def mkDs(x):
         case ("常数", n) | ("constant", n) | ("const", n):
             return mkTag(("Constant", n))
         case ("储备账户缺口", *accs) | ("reserveGap", *accs):
-            return mkTag(("ReserveAccGap", accs))
+            return mkTag(("ReserveGap", accs))
         case ("储备账户盈余", *accs) | ("reserveExcess", *accs):
             return mkTag(("ReserveExcess", accs))
+        case ("储备账户目标", *accs) | ("reserveTarget", *accs):
+            return mkTag(("ReserveBalance", accs))
         case ("最优先", bn, bns) | ("isMostSenior", bn, bns):
             return mkTag(("IsMostSenior", bn, bns))
         case ("清偿完毕", *bns) | ("isPaidOff", *bns):
@@ -388,7 +390,6 @@ def mkDs(x):
 
 
 def mkCurve(tag, xs):
-    
     return mkTag((tag, xs))
 
 
@@ -516,11 +517,9 @@ def mkAcc(an, x=None):
     match x:
         case {"余额": b, "类型": t, "计息": i, "记录": tx} | {"balance": b, "type": t, "interest": i, "txn": tx}:
             return {"accBalance": vNum(b), "accName": vStr(an), "accType": mkAccType(t), "accInterest": mkAccInt(i), "accStmt": mkAccTxn(tx)}
-
         case {"余额": b} | {"balance": b}:
             extraFields = [ (_, None) for _ in ["计息","interest","类型","type","记录","txn"] ]
             extraInfo = subMap(x, extraFields)
-            # extraInfo = {"计息": x.get("计息", None), "interest": x.get("interest", None), "记录": x.get("记录", None), "txn": x.get("txn", None), "类型": x.get("类型", None), "type": x.get("type", None)}
             return mkAcc(vStr(an), x | extraInfo)
         case None:
             return mkAcc(vStr(an), {"balance": 0})
@@ -664,7 +663,7 @@ def mkLimit(x:dict):
            return mkTag(("DuePct", vFloat(pct)))
        case {"金额上限": amt} | {"balCapAmt": amt}:
            return mkTag(("DueCapAmt", vNum(amt)))
-       case {"公式": formula} | {"formula": formula}:
+       case {"公式": formula} | {"formula": formula} | {"DS": formula}:
            return mkTag(("DS", mkDs(formula)))
        case {"冲销":(dr, an)} | {"clearLedger": (dr, an)}:
            return mkTag(("ClearLedger", [dr, vStr(an)]))
@@ -672,10 +671,12 @@ def mkLimit(x:dict):
            return mkTag(("BookLedger", vStr(an)))
        case {"系数":[limit, factor]} | {"multiple":[limit, factor]}:
            return mkTag(("Multiple", [mkLimit(limit), vNum(factor)]))
-       case {"储备":"缺口"} | {"reserve":"gap"} :
-           return mkTag(("TillTarget"))
-       case {"储备":"盈余"} | {"reserve":"excess"} :
-           return mkTag(("TillSource"))
+       # case {"储备":"缺口"} | {"reserve":"gap"} :
+       #     # fill the gap, depreciated
+       #     return mkTag(("ReserveGap","A"))
+       # case {"储备":"盈余"} | {"reserve":"excess"} :
+       #     # till the reserve level, depreciated
+       #     return mkTag(("ReserveExcess","A"))
        case None:
            return None
        case _:
@@ -870,7 +871,13 @@ def mkAction(x:list):
         
     match x:
         case ["账户转移", source, target, m] | ["transfer", source, target, m]:
-            return mkTag(("Transfer", [mkLimit(m), vStr(source), vStr(target), None]))
+            match m:
+                case {"reserve": "gap"} | {"储备":"缺口"}:
+                    return mkTag(("Transfer", [ mkLimit({"DS":("reserveGap", target)}) , vStr(source), vStr(target), None]))
+                case {"reserve": "excess"} | {"储备":"盈余"}:
+                    return mkTag(("Transfer", [ mkLimit({"DS":("reserveExcess", target)}) , vStr(source), vStr(target), None]))
+                case _ :
+                    return mkTag(("Transfer", [mkLimit(m), vStr(source), vStr(target), None]))
         case ["账户转移", source, target] | ["transfer", source, target]:
             return mkTag(("Transfer", [None, vStr(source), vStr(target), None]))
         case ["批量账户转移", sources, target] | ["transferMultiple", sources, target] | ["transferM", sources, target]:

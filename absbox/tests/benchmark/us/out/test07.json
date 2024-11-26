@@ -1287,7 +1287,13 @@
                 "tag": "Transfer",
                 "contents": [
                   {
-                    "tag": "TillTarget"
+                    "tag": "DS",
+                    "contents": {
+                      "tag": "ReserveGap",
+                      "contents": [
+                        "cashReserve"
+                      ]
+                    }
                   },
                   "distAcc",
                   "cashReserve",

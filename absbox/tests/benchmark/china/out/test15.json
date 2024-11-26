@@ -705,7 +705,7 @@
             {
               "tag": "DS",
               "contents": {
-                "tag": "ReserveAccGap",
+                "tag": "ReserveGap",
                 "contents": [
                   "\u4e00\u822c\u51c6\u5907\u91d1\u8d26\u6237"
                 ]
@@ -779,7 +779,13 @@
           "tag": "Transfer",
           "contents": [
             {
-              "tag": "TillTarget"
+              "tag": "DS",
+              "contents": {
+                "tag": "ReserveGap",
+                "contents": [
+                  "\u4e00\u822c\u51c6\u5907\u91d1\u8d26\u6237"
+                ]
+              }
             },
             "\u7ecf\u8425\u8d26\u6237",
             "\u4e00\u822c\u51c6\u5907\u91d1\u8d26\u6237",

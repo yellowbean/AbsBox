@@ -253,18 +253,23 @@ Pool
     * ``("schedulePoolValuation", <pricing method>, <pool name1>, <pool name2>..)`` -> get valuation on schedule cashflow from specific pool or all pools with :ref:`Pricing Method` 
   
 Accounts
-"""""""
+"""""""""""""
     * ``("accountBalance",)`` -> sum of all account balance
     * ``("accountBalance","A","B")`` -> sum of account balance for "A" and "B"
     * ``("reserveGap","A","B")`` -> sum of shortfall of reserve amount of specified accounts
     * ``("reserveExcess","A","B")`` -> sum of excess of reserve amount of specified accounts
     * ``("accountTxnAmt",None,"A")`` -> total transaction amount of account "A"
     * ``("accountTxnAmt","<tag>","A")`` -> total transaction amount tagged with ``<tag>`` of account "A"
+
+    .. versionadded:: 0.40.1
+    * ``("reserveTarget","A","B"..)`` -> target balance of account "A" and "B"
+
 Expense
 """"""""""
     * ``("feeDue","F1","F2")`` -> sum of fee due for fee "F1","F2"
     * ``("lastFeePaid","F1","F2")`` -> sum of fee last paid for fee "F1","F2"
     * ``("feeTxnAmt",None,"A")`` -> total transaction amount of fee "A"
+
 LiquidationProvider 
 """"""""""""""""""""""""
     * ``("liqCredit","F1","F2")`` -> sum of credit available from "F1" "F2"
@@ -2662,6 +2667,13 @@ Transfer
     * ``{"balCapAmt":100}`` -> transfer up to 100
     * ``{"balPct":0.1}`` -> transfer up to 10% of source account 
     * ``{"formula":<formula>}`` -> transfer up to the value of :ref:`Formula`
+    * ``{"DS":<formula>}`` -> same as <formula>
+
+
+    .. deprecated:: 0.40.1
+    
+    User can just use <formula> to replace ``{"DS":('reserveGap',"A")}`` ``{"DS":('reserveExcess',"A")}``
+
     * ``{"reserve":"gap"}`` -> transfer till reserve amount of *target* account is met
     * ``{"reserve":"excess"}`` -> transfer till reserve amount of *source* account is met
 

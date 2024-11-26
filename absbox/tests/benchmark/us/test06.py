@@ -33,7 +33,7 @@ test01 = Generic(
          ,["liqSupport", "insuranceProvider","account","acc01"
            ,{"formula":
              ("Max"
-             ,("substract",("bondDueInt","A1","B"),("accountBalance","acc01"))
+             ,("-",("bondDueInt","A1","B"),("accountBalance","acc01"))
              ,("constant",0.0))}]
          ,["accrueAndPayInt","acc01",["A1","B"]]
          ,["payPrin","acc02",["A1"]]

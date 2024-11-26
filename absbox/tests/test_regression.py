@@ -141,20 +141,23 @@ def run_deal(input_folder, pair):
                 with open(local_bench_file,'r') as eout: # expected output 
                     print(f"reading resp for {local_bench_file}")
                     local_result = json.load(eout)
-                    assert isinstance(local_result, list), f"{dinput}: local result is not list but {local_result.keys()},{local_result['error']},{req}"
-                    assert isinstance(s_result, list), f"{dinput}: server result is not list but {s_result}"
-                    if local_result[1] != s_result[1]:
+                    assert "Right" in local_result, f"{dinput}:Left error : {local_result['Left']}"
+
+                    print(local_result.keys())
+                    print(s_result.keys())
+
+                    if local_result['Right'][1] != s_result['Right'][1]:
                         print(f"Pool Flow Is Not matching => {dinput}")
-                        min_length = min([len(local_result[1]), len(s_result[1])])
+                        min_length = min([len(local_result['Right'][1]), len(s_result['Right'][1])])
                         for i in range(min_length):
-                            if local_result[1][i] != s_result[1][i]:
+                            if local_result['Right'][1][i] != s_result['Right'][1][i]:
                                 print(f"diff at=> {i}")
                                 print(f"bench:{local_result[1][i]}")
                                 print(f"test:{s_result[1][i]}")
                                 break
 
-                    local_result_content = local_result[0]['contents']
-                    s_result_content = s_result[0]['contents']
+                    local_result_content = local_result['Right'][0]['contents']
+                    s_result_content = s_result['Right'][0]['contents']
                     if not local_result_content['waterfall']==s_result_content['waterfall']:
                         local_keys = local_result_content['waterfall'].keys()
                         server_keys = s_result_content['waterfall'].keys()
@@ -168,8 +171,8 @@ def run_deal(input_folder, pair):
                     if local_result_content['bonds']!=s_result_content['bonds']:
                         print("Bonds are not matching")
                         for bn,bv in local_result_content['bonds'].items():
-                            assert 'bonds' in s_result[0]['contents'],f"No bonds in server resp, with key -> {s_result[0]['contents'].keys()}"
-                            if s_result[0]['contents']['bonds'][bn]!=bv:
+                            assert 'bonds' in s_result['Right'][0]['contents'],f"No bonds in server resp, with key -> {s_result[0]['contents'].keys()}"
+                            if s_result['Right'][0]['contents']['bonds'][bn]!=bv:
                                 print(f"Bond {bn} is not matching")
                                 print(DeepDiff(s_result_content['bonds'][bn], bv))
 

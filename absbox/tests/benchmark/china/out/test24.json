@@ -1269,7 +1269,13 @@
                 "tag": "Transfer",
                 "contents": [
                   {
-                    "tag": "TillTarget"
+                    "tag": "DS",
+                    "contents": {
+                      "tag": "ReserveGap",
+                      "contents": [
+                        "\u73b0\u91d1\u50a8\u5907\u5206\u8d26\u6237"
+                      ]
+                    }
                   },
                   "\u5206\u914d\u5206\u8d26\u6237",
                   "\u73b0\u91d1\u50a8\u5907\u5206\u8d26\u6237",

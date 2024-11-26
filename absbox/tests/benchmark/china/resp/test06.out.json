@@ -1,560 +1,562 @@
-[
-  {
-    "tag": "MDeal",
-    "contents": {
-      "name": "\u5efa\u51432017\u5e74\u7b2c\u4e94\u671f\u4e2a\u4eba\u4f4f\u623f\u62b5\u62bc\u8d37\u6b3e\u8d44\u4ea7\u652f\u6301\u8bc1\u5238",
-      "status": {
-        "tag": "Amortizing"
-      },
-      "dates": {
-        "tag": "CurrentDates",
-        "contents": [
-          [
-            "2022-06-30",
-            "2022-07-26"
-          ],
-          null,
-          "2060-12-01",
-          [
-            "2022-07-31",
-            {
-              "tag": "MonthEnd"
-            }
-          ],
-          [
-            "2022-08-26",
-            {
-              "tag": "DayOfMonth",
-              "contents": 26
-            }
+{
+  "Right": [
+    {
+      "tag": "MDeal",
+      "contents": {
+        "name": "\u5efa\u51432017\u5e74\u7b2c\u4e94\u671f\u4e2a\u4eba\u4f4f\u623f\u62b5\u62bc\u8d37\u6b3e\u8d44\u4ea7\u652f\u6301\u8bc1\u5238",
+        "status": {
+          "tag": "Amortizing"
+        },
+        "dates": {
+          "tag": "CurrentDates",
+          "contents": [
+            [
+              "2022-06-30",
+              "2022-07-26"
+            ],
+            null,
+            "2060-12-01",
+            [
+              "2022-07-31",
+              {
+                "tag": "MonthEnd"
+              }
+            ],
+            [
+              "2022-08-26",
+              {
+                "tag": "DayOfMonth",
+                "contents": 26
+              }
+            ]
           ]
-        ]
-      },
-      "accounts": {
-        "\u6536\u5165\u5206\u8d26\u6237": {
-          "accBalance": 0,
-          "accName": "\u6536\u5165\u5206\u8d26\u6237",
-          "accInterest": null,
-          "accType": null,
-          "accStmt": null
         },
-        "\u672c\u91d1\u5206\u8d26\u6237": {
-          "accBalance": 0,
-          "accName": "\u672c\u91d1\u5206\u8d26\u6237",
-          "accInterest": null,
-          "accType": null,
-          "accStmt": null
-        }
-      },
-      "fees": {
-        "\u589e\u503c\u7a0e": {
-          "feeName": "\u589e\u503c\u7a0e",
-          "feeType": {
-            "tag": "TargetBalanceFee",
-            "contents": [
-              {
-                "tag": "Factor",
-                "contents": [
-                  {
-                    "tag": "PoolCumCollection",
-                    "contents": [
-                      [
-                        "CollectedInterest"
-                      ],
-                      null
-                    ]
-                  },
-                  {
-                    "numerator": 163,
-                    "denominator": 5000
-                  }
-                ]
-              },
-              {
-                "tag": "FeeTxnAmt",
-                "contents": [
-                  [
-                    "\u589e\u503c\u7a0e"
-                  ],
-                  null
-                ]
-              }
-            ]
+        "accounts": {
+          "\u6536\u5165\u5206\u8d26\u6237": {
+            "accBalance": 0,
+            "accName": "\u6536\u5165\u5206\u8d26\u6237",
+            "accInterest": null,
+            "accType": null,
+            "accStmt": null
           },
-          "feeStart": "2022-06-30",
-          "feeDue": 0,
-          "feeDueDate": null,
-          "feeArrears": 0,
-          "feeLastPaidDay": null,
-          "feeStmt": null
+          "\u672c\u91d1\u5206\u8d26\u6237": {
+            "accBalance": 0,
+            "accName": "\u672c\u91d1\u5206\u8d26\u6237",
+            "accInterest": null,
+            "accType": null,
+            "accStmt": null
+          }
         },
-        "\u62a5\u9500": {
-          "feeName": "\u62a5\u9500",
-          "feeType": {
-            "tag": "RecurFee",
-            "contents": [
-              {
-                "tag": "MonthFirst"
-              },
-              60000
-            ]
-          },
-          "feeStart": "2022-06-30",
-          "feeDue": 0,
-          "feeDueDate": null,
-          "feeArrears": 0,
-          "feeLastPaidDay": null,
-          "feeStmt": null
-        },
-        "\u670d\u52a1\u5546\u8d39\u7528": {
-          "feeName": "\u670d\u52a1\u5546\u8d39\u7528",
-          "feeType": {
-            "tag": "AnnualRateFee",
-            "contents": [
-              {
-                "tag": "CurrentPoolBalance",
-                "contents": null
-              },
-              {
-                "tag": "Constant",
-                "contents": {
-                  "numerator": 3,
-                  "denominator": 2500
-                }
-              }
-            ]
-          },
-          "feeStart": "2022-06-30",
-          "feeDue": 0,
-          "feeDueDate": null,
-          "feeArrears": 0,
-          "feeLastPaidDay": null,
-          "feeStmt": null
-        }
-      },
-      "bonds": {
-        "A1": {
-          "tag": "Bond",
-          "bndName": "A1",
-          "bndType": {
-            "tag": "Sequential"
-          },
-          "bndOriginInfo": {
-            "originBalance": 2903000000,
-            "originDate": "2020-01-03",
-            "originRate": {
-              "numerator": 51,
-              "denominator": 1000
-            },
-            "maturityDate": null
-          },
-          "bndInterestInfo": {
-            "tag": "Floater",
-            "contents": [
-              0.051,
-              "LPR5Y",
-              0.012,
-              {
-                "tag": "MonthDayOfYear",
-                "contents": [
-                  3,
-                  1
-                ]
-              },
-              "DC_ACT_365F",
-              null,
-              null
-            ]
-          },
-          "bndStepUp": null,
-          "bndBalance": 0,
-          "bndRate": 0.051,
-          "bndDuePrin": 0,
-          "bndDueInt": 0,
-          "bndDueIntOverInt": 0,
-          "bndDueIntDate": null,
-          "bndLastIntPay": null,
-          "bndLastPrinPay": null,
-          "bndStmt": null
-        },
-        "A2": {
-          "tag": "Bond",
-          "bndName": "A2",
-          "bndType": {
-            "tag": "Sequential"
-          },
-          "bndOriginInfo": {
-            "originBalance": 2903000000,
-            "originDate": "2020-01-03",
-            "originRate": {
-              "numerator": 51,
-              "denominator": 1000
-            },
-            "maturityDate": null
-          },
-          "bndInterestInfo": {
-            "tag": "Floater",
-            "contents": [
-              0.051,
-              "LPR5Y",
-              0.012,
-              {
-                "tag": "MonthDayOfYear",
-                "contents": [
-                  3,
-                  1
-                ]
-              },
-              "DC_ACT_365F",
-              null,
-              null
-            ]
-          },
-          "bndStepUp": null,
-          "bndBalance": 0,
-          "bndRate": 0.051,
-          "bndDuePrin": 0,
-          "bndDueInt": 0,
-          "bndDueIntOverInt": 0,
-          "bndDueIntDate": null,
-          "bndLastIntPay": null,
-          "bndLastPrinPay": null,
-          "bndStmt": null
-        },
-        "A3": {
-          "tag": "Bond",
-          "bndName": "A3",
-          "bndType": {
-            "tag": "Sequential"
-          },
-          "bndOriginInfo": {
-            "originBalance": 2903000000,
-            "originDate": "2020-01-03",
-            "originRate": {
-              "numerator": 51,
-              "denominator": 1000
-            },
-            "maturityDate": null
-          },
-          "bndInterestInfo": {
-            "tag": "Floater",
-            "contents": [
-              0.051,
-              "LPR5Y",
-              0.02,
-              {
-                "tag": "MonthDayOfYear",
-                "contents": [
-                  3,
-                  1
-                ]
-              },
-              "DC_ACT_365F",
-              null,
-              null
-            ]
-          },
-          "bndStepUp": null,
-          "bndBalance": 1456725400,
-          "bndRate": 0.051,
-          "bndDuePrin": 0,
-          "bndDueInt": 0,
-          "bndDueIntOverInt": 0,
-          "bndDueIntDate": null,
-          "bndLastIntPay": null,
-          "bndLastPrinPay": null,
-          "bndStmt": null
-        },
-        "\u6b21\u7ea7": {
-          "tag": "Bond",
-          "bndName": "\u6b21\u7ea7",
-          "bndType": {
-            "tag": "Equity"
-          },
-          "bndOriginInfo": {
-            "originBalance": 795626718.16,
-            "originDate": "2020-01-03",
-            "originRate": {
-              "numerator": 0,
-              "denominator": 1
-            },
-            "maturityDate": null
-          },
-          "bndInterestInfo": {
-            "tag": "Fix",
-            "contents": [
-              0,
-              "DC_ACT_365F"
-            ]
-          },
-          "bndStepUp": null,
-          "bndBalance": 795626718.16,
-          "bndRate": 0,
-          "bndDuePrin": 0,
-          "bndDueInt": 0,
-          "bndDueIntOverInt": 0,
-          "bndDueIntDate": null,
-          "bndLastIntPay": null,
-          "bndLastPrinPay": null,
-          "bndStmt": null
-        }
-      },
-      "pool": {
-        "tag": "SoloPool",
-        "contents": {
-          "assets": [
-            {
-              "tag": "Mortgage",
+        "fees": {
+          "\u589e\u503c\u7a0e": {
+            "feeName": "\u589e\u503c\u7a0e",
+            "feeType": {
+              "tag": "TargetBalanceFee",
               "contents": [
                 {
-                  "tag": "MortgageOriginalInfo",
-                  "originBalance": 120,
-                  "originRate": {
-                    "tag": "Floater",
-                    "contents": [
-                      "DC_ACT_365F",
-                      "LPR5Y",
-                      0.01,
-                      0.085,
-                      {
-                        "tag": "MonthEnd"
-                      },
-                      null,
-                      null,
-                      null
-                    ]
-                  },
-                  "originTerm": 209,
-                  "period": "Monthly",
-                  "startDate": "2013-04-28",
-                  "prinType": {
-                    "tag": "Even"
-                  },
-                  "prepaymentPenalty": null,
-                  "obligor": null
+                  "tag": "Factor",
+                  "contents": [
+                    {
+                      "tag": "PoolCumCollection",
+                      "contents": [
+                        [
+                          "CollectedInterest"
+                        ],
+                        null
+                      ]
+                    },
+                    {
+                      "numerator": 163,
+                      "denominator": 5000
+                    }
+                  ]
                 },
-                2261042196.13,
-                0.0444,
-                106,
-                null,
                 {
-                  "tag": "Current"
+                  "tag": "FeeTxnAmt",
+                  "contents": [
+                    [
+                      "\u589e\u503c\u7a0e"
+                    ],
+                    null
+                  ]
                 }
+              ]
+            },
+            "feeStart": "2022-06-30",
+            "feeDue": 0,
+            "feeDueDate": null,
+            "feeArrears": 0,
+            "feeLastPaidDay": null,
+            "feeStmt": null
+          },
+          "\u62a5\u9500": {
+            "feeName": "\u62a5\u9500",
+            "feeType": {
+              "tag": "RecurFee",
+              "contents": [
+                {
+                  "tag": "MonthFirst"
+                },
+                60000
+              ]
+            },
+            "feeStart": "2022-06-30",
+            "feeDue": 0,
+            "feeDueDate": null,
+            "feeArrears": 0,
+            "feeLastPaidDay": null,
+            "feeStmt": null
+          },
+          "\u670d\u52a1\u5546\u8d39\u7528": {
+            "feeName": "\u670d\u52a1\u5546\u8d39\u7528",
+            "feeType": {
+              "tag": "AnnualRateFee",
+              "contents": [
+                {
+                  "tag": "CurrentPoolBalance",
+                  "contents": null
+                },
+                {
+                  "tag": "Constant",
+                  "contents": {
+                    "numerator": 3,
+                    "denominator": 2500
+                  }
+                }
+              ]
+            },
+            "feeStart": "2022-06-30",
+            "feeDue": 0,
+            "feeDueDate": null,
+            "feeArrears": 0,
+            "feeLastPaidDay": null,
+            "feeStmt": null
+          }
+        },
+        "bonds": {
+          "A1": {
+            "tag": "Bond",
+            "bndName": "A1",
+            "bndType": {
+              "tag": "Sequential"
+            },
+            "bndOriginInfo": {
+              "originBalance": 2903000000,
+              "originDate": "2020-01-03",
+              "originRate": {
+                "numerator": 51,
+                "denominator": 1000
+              },
+              "maturityDate": null
+            },
+            "bndInterestInfo": {
+              "tag": "Floater",
+              "contents": [
+                0.051,
+                "LPR5Y",
+                0.012,
+                {
+                  "tag": "MonthDayOfYear",
+                  "contents": [
+                    3,
+                    1
+                  ]
+                },
+                "DC_ACT_365F",
+                null,
+                null
+              ]
+            },
+            "bndStepUp": null,
+            "bndBalance": 0,
+            "bndRate": 0.051,
+            "bndDuePrin": 0,
+            "bndDueInt": 0,
+            "bndDueIntOverInt": 0,
+            "bndDueIntDate": null,
+            "bndLastIntPay": null,
+            "bndLastPrinPay": null,
+            "bndStmt": null
+          },
+          "A2": {
+            "tag": "Bond",
+            "bndName": "A2",
+            "bndType": {
+              "tag": "Sequential"
+            },
+            "bndOriginInfo": {
+              "originBalance": 2903000000,
+              "originDate": "2020-01-03",
+              "originRate": {
+                "numerator": 51,
+                "denominator": 1000
+              },
+              "maturityDate": null
+            },
+            "bndInterestInfo": {
+              "tag": "Floater",
+              "contents": [
+                0.051,
+                "LPR5Y",
+                0.012,
+                {
+                  "tag": "MonthDayOfYear",
+                  "contents": [
+                    3,
+                    1
+                  ]
+                },
+                "DC_ACT_365F",
+                null,
+                null
+              ]
+            },
+            "bndStepUp": null,
+            "bndBalance": 0,
+            "bndRate": 0.051,
+            "bndDuePrin": 0,
+            "bndDueInt": 0,
+            "bndDueIntOverInt": 0,
+            "bndDueIntDate": null,
+            "bndLastIntPay": null,
+            "bndLastPrinPay": null,
+            "bndStmt": null
+          },
+          "A3": {
+            "tag": "Bond",
+            "bndName": "A3",
+            "bndType": {
+              "tag": "Sequential"
+            },
+            "bndOriginInfo": {
+              "originBalance": 2903000000,
+              "originDate": "2020-01-03",
+              "originRate": {
+                "numerator": 51,
+                "denominator": 1000
+              },
+              "maturityDate": null
+            },
+            "bndInterestInfo": {
+              "tag": "Floater",
+              "contents": [
+                0.051,
+                "LPR5Y",
+                0.02,
+                {
+                  "tag": "MonthDayOfYear",
+                  "contents": [
+                    3,
+                    1
+                  ]
+                },
+                "DC_ACT_365F",
+                null,
+                null
+              ]
+            },
+            "bndStepUp": null,
+            "bndBalance": 1456725400,
+            "bndRate": 0.051,
+            "bndDuePrin": 0,
+            "bndDueInt": 0,
+            "bndDueIntOverInt": 0,
+            "bndDueIntDate": null,
+            "bndLastIntPay": null,
+            "bndLastPrinPay": null,
+            "bndStmt": null
+          },
+          "\u6b21\u7ea7": {
+            "tag": "Bond",
+            "bndName": "\u6b21\u7ea7",
+            "bndType": {
+              "tag": "Equity"
+            },
+            "bndOriginInfo": {
+              "originBalance": 795626718.16,
+              "originDate": "2020-01-03",
+              "originRate": {
+                "numerator": 0,
+                "denominator": 1
+              },
+              "maturityDate": null
+            },
+            "bndInterestInfo": {
+              "tag": "Fix",
+              "contents": [
+                0,
+                "DC_ACT_365F"
+              ]
+            },
+            "bndStepUp": null,
+            "bndBalance": 795626718.16,
+            "bndRate": 0,
+            "bndDuePrin": 0,
+            "bndDueInt": 0,
+            "bndDueIntOverInt": 0,
+            "bndDueIntDate": null,
+            "bndLastIntPay": null,
+            "bndLastPrinPay": null,
+            "bndStmt": null
+          }
+        },
+        "pool": {
+          "tag": "SoloPool",
+          "contents": {
+            "assets": [
+              {
+                "tag": "Mortgage",
+                "contents": [
+                  {
+                    "tag": "MortgageOriginalInfo",
+                    "originBalance": 120,
+                    "originRate": {
+                      "tag": "Floater",
+                      "contents": [
+                        "DC_ACT_365F",
+                        "LPR5Y",
+                        0.01,
+                        0.085,
+                        {
+                          "tag": "MonthEnd"
+                        },
+                        null,
+                        null,
+                        null
+                      ]
+                    },
+                    "originTerm": 209,
+                    "period": "Monthly",
+                    "startDate": "2013-04-28",
+                    "prinType": {
+                      "tag": "Even"
+                    },
+                    "prepaymentPenalty": null,
+                    "obligor": null
+                  },
+                  2261042196.13,
+                  0.0444,
+                  106,
+                  null,
+                  {
+                    "tag": "Current"
+                  }
+                ]
+              }
+            ],
+            "futureCf": null,
+            "futureScheduleCf": null,
+            "asOfDate": "2022-06-30",
+            "issuanceStat": null,
+            "extendPeriods": {
+              "tag": "MonthEnd"
+            }
+          }
+        },
+        "waterfall": {
+          "EndOfPoolCollection": [
+            {
+              "tag": "CalcFee",
+              "contents": [
+                "\u589e\u503c\u7a0e"
               ]
             }
           ],
-          "futureCf": null,
-          "futureScheduleCf": null,
-          "asOfDate": "2022-06-30",
-          "issuanceStat": null,
-          "extendPeriods": {
-            "tag": "MonthEnd"
-          }
-        }
-      },
-      "waterfall": {
-        "EndOfPoolCollection": [
-          {
-            "tag": "CalcFee",
-            "contents": [
-              "\u589e\u503c\u7a0e"
-            ]
-          }
-        ],
-        "DistributionDay Amortizing": [
-          {
-            "tag": "PayFee",
-            "contents": [
-              null,
-              "\u6536\u5165\u5206\u8d26\u6237",
-              [
-                "\u670d\u52a1\u5546\u8d39\u7528"
-              ],
-              null
-            ]
-          },
-          {
-            "tag": "PayFee",
-            "contents": [
-              null,
-              "\u6536\u5165\u5206\u8d26\u6237",
-              [
-                "\u62a5\u9500"
-              ],
-              null
-            ]
-          },
-          {
-            "tag": "AccrueAndPayInt",
-            "contents": [
-              null,
-              "\u6536\u5165\u5206\u8d26\u6237",
-              [
-                "A1",
-                "A2",
-                "A3"
-              ],
-              null
-            ]
-          },
-          {
-            "tag": "PayFee",
-            "contents": [
-              null,
-              "\u6536\u5165\u5206\u8d26\u6237",
-              [
-                "\u670d\u52a1\u5546\u8d39\u7528"
-              ],
-              null
-            ]
-          },
-          {
-            "tag": "PayFee",
-            "contents": [
-              null,
-              "\u6536\u5165\u5206\u8d26\u6237",
-              [
-                "\u62a5\u9500"
-              ],
-              null
-            ]
-          },
-          {
-            "tag": "Transfer",
-            "contents": [
-              null,
-              "\u6536\u5165\u5206\u8d26\u6237",
-              "\u672c\u91d1\u5206\u8d26\u6237",
-              null
-            ]
-          },
-          {
-            "tag": "PayPrin",
-            "contents": [
-              null,
-              "\u672c\u91d1\u5206\u8d26\u6237",
-              [
-                "A1"
-              ],
-              null
-            ]
-          },
-          {
-            "tag": "PayPrin",
-            "contents": [
-              null,
-              "\u672c\u91d1\u5206\u8d26\u6237",
-              [
-                "A2"
-              ],
-              null
-            ]
-          },
-          {
-            "tag": "PayPrin",
-            "contents": [
-              null,
-              "\u672c\u91d1\u5206\u8d26\u6237",
-              [
-                "A3"
-              ],
-              null
-            ]
-          },
-          {
-            "tag": "PayPrin",
-            "contents": [
-              null,
-              "\u672c\u91d1\u5206\u8d26\u6237",
-              [
+          "DistributionDay Amortizing": [
+            {
+              "tag": "PayFee",
+              "contents": [
+                null,
+                "\u6536\u5165\u5206\u8d26\u6237",
+                [
+                  "\u670d\u52a1\u5546\u8d39\u7528"
+                ],
+                null
+              ]
+            },
+            {
+              "tag": "PayFee",
+              "contents": [
+                null,
+                "\u6536\u5165\u5206\u8d26\u6237",
+                [
+                  "\u62a5\u9500"
+                ],
+                null
+              ]
+            },
+            {
+              "tag": "AccrueAndPayInt",
+              "contents": [
+                null,
+                "\u6536\u5165\u5206\u8d26\u6237",
+                [
+                  "A1",
+                  "A2",
+                  "A3"
+                ],
+                null
+              ]
+            },
+            {
+              "tag": "PayFee",
+              "contents": [
+                null,
+                "\u6536\u5165\u5206\u8d26\u6237",
+                [
+                  "\u670d\u52a1\u5546\u8d39\u7528"
+                ],
+                null
+              ]
+            },
+            {
+              "tag": "PayFee",
+              "contents": [
+                null,
+                "\u6536\u5165\u5206\u8d26\u6237",
+                [
+                  "\u62a5\u9500"
+                ],
+                null
+              ]
+            },
+            {
+              "tag": "Transfer",
+              "contents": [
+                null,
+                "\u6536\u5165\u5206\u8d26\u6237",
+                "\u672c\u91d1\u5206\u8d26\u6237",
+                null
+              ]
+            },
+            {
+              "tag": "PayPrin",
+              "contents": [
+                null,
+                "\u672c\u91d1\u5206\u8d26\u6237",
+                [
+                  "A1"
+                ],
+                null
+              ]
+            },
+            {
+              "tag": "PayPrin",
+              "contents": [
+                null,
+                "\u672c\u91d1\u5206\u8d26\u6237",
+                [
+                  "A2"
+                ],
+                null
+              ]
+            },
+            {
+              "tag": "PayPrin",
+              "contents": [
+                null,
+                "\u672c\u91d1\u5206\u8d26\u6237",
+                [
+                  "A3"
+                ],
+                null
+              ]
+            },
+            {
+              "tag": "PayPrin",
+              "contents": [
+                null,
+                "\u672c\u91d1\u5206\u8d26\u6237",
+                [
+                  "\u6b21\u7ea7"
+                ],
+                null
+              ]
+            },
+            {
+              "tag": "PayIntResidual",
+              "contents": [
+                null,
+                "\u672c\u91d1\u5206\u8d26\u6237",
                 "\u6b21\u7ea7"
-              ],
-              null
+              ]
+            }
+          ],
+          "CleanUp": [
+            {
+              "tag": "LiquidatePool",
+              "contents": [
+                {
+                  "tag": "BalanceFactor",
+                  "contents": [
+                    {
+                      "numerator": 1,
+                      "denominator": 1
+                    },
+                    {
+                      "numerator": 0,
+                      "denominator": 1
+                    }
+                  ]
+                },
+                "\u6536\u5165\u5206\u8d26\u6237",
+                null
+              ]
+            }
+          ]
+        },
+        "collects": [
+          {
+            "tag": "Collect",
+            "contents": [
+              null,
+              "CollectedInterest",
+              "\u6536\u5165\u5206\u8d26\u6237"
             ]
           },
           {
-            "tag": "PayIntResidual",
+            "tag": "Collect",
             "contents": [
               null,
-              "\u672c\u91d1\u5206\u8d26\u6237",
-              "\u6b21\u7ea7"
+              "CollectedPrincipal",
+              "\u672c\u91d1\u5206\u8d26\u6237"
+            ]
+          },
+          {
+            "tag": "Collect",
+            "contents": [
+              null,
+              "CollectedPrepayment",
+              "\u672c\u91d1\u5206\u8d26\u6237"
+            ]
+          },
+          {
+            "tag": "Collect",
+            "contents": [
+              null,
+              "CollectedRecoveries",
+              "\u672c\u91d1\u5206\u8d26\u6237"
             ]
           }
         ],
-        "CleanUp": [
-          {
-            "tag": "LiquidatePool",
-            "contents": [
-              {
-                "tag": "BalanceFactor",
-                "contents": [
-                  {
-                    "numerator": 1,
-                    "denominator": 1
-                  },
-                  {
-                    "numerator": 0,
-                    "denominator": 1
-                  }
-                ]
-              },
-              "\u6536\u5165\u5206\u8d26\u6237",
-              null
-            ]
-          }
-        ]
-      },
-      "collects": [
-        {
-          "tag": "Collect",
-          "contents": [
-            null,
-            "CollectedInterest",
-            "\u6536\u5165\u5206\u8d26\u6237"
-          ]
-        },
-        {
-          "tag": "Collect",
-          "contents": [
-            null,
-            "CollectedPrincipal",
-            "\u672c\u91d1\u5206\u8d26\u6237"
-          ]
-        },
-        {
-          "tag": "Collect",
-          "contents": [
-            null,
-            "CollectedPrepayment",
-            "\u672c\u91d1\u5206\u8d26\u6237"
-          ]
-        },
-        {
-          "tag": "Collect",
-          "contents": [
-            null,
-            "CollectedRecoveries",
-            "\u672c\u91d1\u5206\u8d26\u6237"
-          ]
-        }
-      ],
-      "call": null,
-      "liqProvider": null,
-      "rateSwap": null,
-      "rateCap": null,
-      "currencySwap": null,
-      "custom": null,
-      "triggers": null,
-      "overrides": null,
-      "ledgers": null
-    }
-  },
-  null,
-  [
-    {
-      "tag": "ErrorMsg",
-      "contents": "Issuance balance not found for a Ongoing Deal"
-    }
-  ],
-  null
-]
+        "call": null,
+        "liqProvider": null,
+        "rateSwap": null,
+        "rateCap": null,
+        "currencySwap": null,
+        "custom": null,
+        "triggers": null,
+        "overrides": null,
+        "ledgers": null
+      }
+    },
+    null,
+    [
+      {
+        "tag": "ErrorMsg",
+        "contents": "Issuance balance not found for a Ongoing Deal"
+      }
+    ],
+    null
+  ]
+}
