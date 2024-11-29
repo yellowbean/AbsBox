@@ -33,6 +33,7 @@ dependencies = [
     "lenses",
     "graphviz",
     "schema",
+    "htpy",
     "dateparser",
     "pyxirr",
     "more-itertools"
