@@ -17,6 +17,8 @@ from importlib.metadata import version
 from absbox.local.cf import readBondsCf,readToCf,readFeesCf,readAccsCf,readPoolsCf,readFlowsByScenarios,readMultiFlowsByScenarios,readFieldsByScenarios
 from absbox.local.cf import readInspect
 
+from absbox.report import toHtml,OutputType
+
 import absbox.examples as examples
 
 __version__ = version("absbox")

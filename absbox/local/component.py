@@ -1044,6 +1044,8 @@ def mkAction(x:list):
         ## Inspect
         case ["查看", comment, *ds] | ["inspect", comment, *ds]:
             return mkTag(("WatchVal", [comment, lmap(mkDs, ds)]))
+        case []:
+            return mkTag(("Placeholder",[]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkAction")
 

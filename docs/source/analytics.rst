@@ -1353,6 +1353,7 @@ A `result` is returned by a `run()` call which has two components:
 
 * :ref:`Cashflow Results`
 * :ref:`Non-Cashflow Results`
+* :ref:`All-In-One HTML report`
 
 
 
@@ -1598,6 +1599,31 @@ There are two types of validation message
    
   r['result']['logs']
 
+
+All-In-One HTML report
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. versionadded:: 0.40.2
+
+In a single deal cashflow run, if user get a result object via a `read=True`, then there is a candy function `toHtml()` will help to dump all cashflow and summaries to a single HTML file.
+
+With a simple table of content , user can easily navigate to components of interset to inspect with.
+
+
+.. code-block:: python
+   
+  from absbox import toHtml,OutputType
+
+  toHtml(r,"testOutHtml.html")
+  
+  toHtml(r,"testOutHtml.html",style=OutputType.Anchor)
+
+
+If user are running with multi-scenario , just supply with a key 
+
+
+.. code-block:: python
+   
+  toHtml(r['scen01'],"testOutHtml.html",style=OutputType.Anchor)
 
 
 Sensitivity Analysis
