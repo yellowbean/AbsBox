@@ -5,7 +5,7 @@ import json, enum, os, pathlib, re
 from htpy import body, h1, head, html, li, title, ul, div, span, h3, h2, a
 from markupsafe import Markup
 from absbox import readInspect
-from absbox import readBondsCf,readFeesCf,readAccsCf
+from absbox import readBondsCf,readFeesCf,readAccsCf,readPoolsCf
 
 
 class OutputType(int, enum.Enum):
@@ -25,8 +25,7 @@ def singleToMap(x,defaultName = "Consol")->dict:
 def mapToList(m:dict,anchor=False):
     m2 = {}
     if not anchor:
-        m2 = {h3[k]:div[Markup(v.to_html())]
-                for k,v in m.items() }
+        m2 = {h3[k]:div[Markup(v.to_html())] for k,v in m.items() }
     else:
         m2 = {h3(id=f"anchor-{anchor}-{k}")[k]:div[Markup(v.to_html())]
                 for k,v in m.items() }
@@ -62,7 +61,7 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
     
     # read joint cashflows 
     seciont4 = [ div[ h2(id=f"anchor-{_t}")[_t],Markup(x.to_html()) ]
-                for (_t,x) in [("MultiFee",readFeesCf(feeDf)),("MultiBond",readBondsCf(bondDf,popColumns=[])),("MultiAccounts",readAccsCf(accDf))]
+                for (_t,x) in [("MultiFee",readFeesCf(feeDf)),("MultiBond",readBondsCf(bondDf,popColumns=[])),("MultiAccounts",readAccsCf(accDf)),("MultiPools", readPoolsCf(poolDf))]
             ]
 
     c = html[
