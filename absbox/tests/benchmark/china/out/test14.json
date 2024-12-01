@@ -31,46 +31,48 @@
       }
     },
     "pool": {
-      "tag": "SoloPool",
+      "tag": "MultiPool",
       "contents": {
-        "assets": [
-          {
-            "tag": "Mortgage",
-            "contents": [
-              {
-                "originBalance": 120,
-                "originRate": {
-                  "tag": "Fix",
-                  "contents": [
-                    "DC_ACT_365F",
-                    0.15
-                  ]
+        "PoolConsol": {
+          "assets": [
+            {
+              "tag": "Mortgage",
+              "contents": [
+                {
+                  "originBalance": 120,
+                  "originRate": {
+                    "tag": "Fix",
+                    "contents": [
+                      "DC_ACT_365F",
+                      0.15
+                    ]
+                  },
+                  "originTerm": 30,
+                  "period": "Monthly",
+                  "startDate": "2021-05-01",
+                  "prinType": {
+                    "tag": "Level"
+                  },
+                  "prepaymentPenalty": null,
+                  "obligor": null,
+                  "tag": "MortgageOriginalInfo"
                 },
-                "originTerm": 30,
-                "period": "Monthly",
-                "startDate": "2021-05-01",
-                "prinType": {
-                  "tag": "Level"
-                },
-                "prepaymentPenalty": null,
-                "obligor": null,
-                "tag": "MortgageOriginalInfo"
-              },
-              120,
-              0.45,
-              20,
-              null,
-              {
-                "tag": "Current"
-              }
-            ]
+                120,
+                0.45,
+                20,
+                null,
+                {
+                  "tag": "Current"
+                }
+              ]
+            }
+          ],
+          "asOfDate": "2021-06-30",
+          "issuanceStat": null,
+          "futureCf": null,
+          "extendPeriods": {
+            "tag": "MonthEnd"
           }
-        ],
-        "asOfDate": "2021-06-30",
-        "issuanceStat": null,
-        "futureCf": null,
-        "extendPeriods": {
-          "tag": "MonthEnd"
         }
       }
     },

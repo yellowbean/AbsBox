@@ -30,54 +30,56 @@
       "tag": "Amortizing"
     },
     "pool": {
-      "tag": "SoloPool",
+      "tag": "MultiPool",
       "contents": {
-        "assets": [
-          {
-            "tag": "Mortgage",
-            "contents": [
-              {
-                "originBalance": 120,
-                "originRate": {
-                  "tag": "Floater",
-                  "contents": [
-                    "DC_ACT_365F",
-                    "LPR5Y",
-                    0.01,
-                    0.085,
-                    {
-                      "tag": "MonthEnd"
-                    },
-                    null,
-                    null,
-                    null
-                  ]
+        "PoolConsol": {
+          "assets": [
+            {
+              "tag": "Mortgage",
+              "contents": [
+                {
+                  "originBalance": 120,
+                  "originRate": {
+                    "tag": "Floater",
+                    "contents": [
+                      "DC_ACT_365F",
+                      "LPR5Y",
+                      0.01,
+                      0.085,
+                      {
+                        "tag": "MonthEnd"
+                      },
+                      null,
+                      null,
+                      null
+                    ]
+                  },
+                  "originTerm": 209,
+                  "period": "Monthly",
+                  "startDate": "2013-04-28",
+                  "prinType": {
+                    "tag": "Even"
+                  },
+                  "prepaymentPenalty": null,
+                  "obligor": null,
+                  "tag": "MortgageOriginalInfo"
                 },
-                "originTerm": 209,
-                "period": "Monthly",
-                "startDate": "2013-04-28",
-                "prinType": {
-                  "tag": "Even"
-                },
-                "prepaymentPenalty": null,
-                "obligor": null,
-                "tag": "MortgageOriginalInfo"
-              },
-              2261042196.13,
-              0.0444,
-              106,
-              null,
-              {
-                "tag": "Current"
-              }
-            ]
+                2261042196.13,
+                0.0444,
+                106,
+                null,
+                {
+                  "tag": "Current"
+                }
+              ]
+            }
+          ],
+          "asOfDate": "2022-06-30",
+          "issuanceStat": null,
+          "futureCf": null,
+          "extendPeriods": {
+            "tag": "MonthEnd"
           }
-        ],
-        "asOfDate": "2022-06-30",
-        "issuanceStat": null,
-        "futureCf": null,
-        "extendPeriods": {
-          "tag": "MonthEnd"
         }
       }
     },

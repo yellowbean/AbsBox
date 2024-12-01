@@ -1472,27 +1472,28 @@ def identify_deal_type(x):
             case _:
                 raise RuntimeError(f"Failed to identify deal type {z}")
     y = None
-    #if query(x, ["pool","tag"])=='SoloPool':
-    if tz.get_in(["pool","tag"], x)=='SoloPool':
-        return id_by_pool_assets(x["pool"]['contents'])
-    elif "pool" in x and set(x.keys()) == {"pool"}:
-        return id_by_pool_assets(x['pool'])
-    elif "pool" in x and x["pool"]['tag']=='MultiPool':
-        assetTags = lens['pool']['contents'].Values()['assets'][0]['tag'].collect()(x)
-        if len(set(assetTags))>1:
-            return "UDeal"
-        else:
-            return id_by_pool_assets(list(x["pool"]['contents'].values())[0])
-    elif "ResecDeal" == x['pool']['tag']:
-        vs = [ v['deal'] for k,v in x["pool"]['contents'].items() ]
-        assetTypes = set(map(identify_deal_type, vs))
-        if len(assetTypes)>1:
-            return "UDeal"
-        else:
-            return list(assetTypes)[0]
-    else:
-        raise RuntimeError(f"Failed to match pool type {x}")
+    match x:
+        case {"pool":{"tag":"MultiPool","contents":{"PoolConsol":{"assets":[]}}}} if len(x['pool']['contents']['PoolConsol']['futureCf'])>0:
+            return id_by_pool_assets(x['pool']['contents']['PoolConsol'])
+        case {"pool":{"tag":"MultiPool","contents":{"PoolConsol":{"assets":assetList}}}} if len(assetList) > 1: 
+            return id_by_pool_assets(x['pool']['contents']['PoolConsol'])
+        case {"pool":{"tag":"MultiPool","contents":poolMap}}:
+            pools = list(map(id_by_pool_assets, poolMap & lens.Values().collect()))
 
+            if len(set(pools))>1:
+                return "UDeal"
+            else:
+                return pools[0]
+        case {"pool":{"tag":"ResecDeal"}}:
+            vs = [ v['deal'] for k,v in x["pool"]['contents'].items() ]
+            assetTypes = set(map(identify_deal_type, vs))
+            if len(assetTypes)>1:
+                return "UDeal"
+            else:
+                print(assetTypes, "<<<")
+                return list(assetTypes)[0]
+        case _:
+            raise RuntimeError(f"Failed to match pool type {x}")
 
 
 def mkCallOptionsLegacy(x):
@@ -1763,14 +1764,29 @@ def mkRevolvingPool(x):
 
 
 def mkPoolType(assetDate, x, mixedFlag) -> dict:
-    if 'assets' in x or "清单" in x or "归集表" in x:
-        return mkTag(("SoloPool" ,mkPoolComp(vDate(assetDate), x, False)))
-    elif 'deals' in x and isinstance(x['deals'],dict):
-        return mkTag(("ResecDeal",{f"{dealObj.json['contents']['name']}:{bn}:{sd}:{str(pct)}": \
-                                    {"deal":dealObj.json['contents'],"future":None,"futureScheduleCf":None,"issuanceStat":None}\
-                                      for ((bn,pct,sd),dealObj) in x['deals'].items()} ))
-    else:
-        return mkTag(("MultiPool" ,{f"PoolName:{k}":mkPoolComp(vDate(assetDate),v,mixedFlag) for (k,v) in x.items()}))
+    # try:
+    #     if 'assets' in x or "清单" in x or "归集表" in x:
+    #         return mkTag(("MultiPool" ,{"PoolConsol":mkPoolComp(vDate(assetDate), x, False)}))
+    #     elif 'deals' in x and isinstance(x['deals'],dict):
+    #         return mkTag(("ResecDeal",{f"{dealObj.json['contents']['name']}:{bn}:{sd}:{str(pct)}": \
+    #                                     {"deal":dealObj.json['contents'],"future":None,"futureScheduleCf":None,"issuanceStat":None}\
+    #                                       for ((bn,pct,sd),dealObj) in x['deals'].items()} ))
+    #     else:
+    #         return mkTag(("MultiPool" ,{f"PoolName:{k}":mkPoolComp(vDate(assetDate),v,mixedFlag) for (k,v) in x.items()}))
+    # except Exception as e:
+    #     print("Error in mk pool type",e)
+
+    match x:
+        case {"assets": y} | {"清单": y} | {"归集表": y}: 
+            return mkTag(("MultiPool" ,{"PoolConsol":mkPoolComp(vDate(assetDate), x, False)}))
+        case {"deals": y} if isinstance(y, dict):
+            return mkTag(("ResecDeal",{f"{dealObj.json['contents']['name']}:{bn}:{sd}:{str(pct)}": \
+                                        {"deal":dealObj.json['contents'],"future":None,"futureScheduleCf":None,"issuanceStat":None}\
+                                          for ((bn,pct,sd),dealObj) in x['deals'].items()} ))
+        case x if all([ isinstance(_,dict) for _ in x.values() ]):
+            return mkTag(("MultiPool" ,{f"PoolName:{k}":mkPoolComp(vDate(assetDate),v,mixedFlag) for (k,v) in x.items()}))
+        case _ :
+            raise RuntimeError("Failed to match pool type ",x)
 
 
 def mkPoolComp(asOfDate, x, mixFlag) -> dict:

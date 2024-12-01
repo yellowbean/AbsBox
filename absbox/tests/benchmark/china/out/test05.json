@@ -31,77 +31,79 @@
       }
     },
     "pool": {
-      "tag": "SoloPool",
+      "tag": "MultiPool",
       "contents": {
-        "assets": [
-          {
-            "tag": "Mortgage",
-            "contents": [
-              {
-                "originBalance": 9961626400,
-                "originRate": {
-                  "tag": "Fix",
-                  "contents": [
-                    "DC_ACT_365F",
-                    0.0485
-                  ]
+        "PoolConsol": {
+          "assets": [
+            {
+              "tag": "Mortgage",
+              "contents": [
+                {
+                  "originBalance": 9961626400,
+                  "originRate": {
+                    "tag": "Fix",
+                    "contents": [
+                      "DC_ACT_365F",
+                      0.0485
+                    ]
+                  },
+                  "originTerm": 218,
+                  "period": "Monthly",
+                  "startDate": "2020-06-01",
+                  "prinType": {
+                    "tag": "Level"
+                  },
+                  "prepaymentPenalty": null,
+                  "obligor": null,
+                  "tag": "MortgageOriginalInfo"
                 },
-                "originTerm": 218,
-                "period": "Monthly",
-                "startDate": "2020-06-01",
-                "prinType": {
-                  "tag": "Level"
+                7596981800,
+                0.0495,
+                165,
+                null,
+                {
+                  "tag": "Current"
+                }
+              ]
+            },
+            {
+              "tag": "Mortgage",
+              "contents": [
+                {
+                  "originBalance": 3309774500.0,
+                  "originRate": {
+                    "tag": "Fix",
+                    "contents": [
+                      "DC_ACT_365F",
+                      0.0485
+                    ]
+                  },
+                  "originTerm": 218,
+                  "period": "Monthly",
+                  "startDate": "2020-06-01",
+                  "prinType": {
+                    "tag": "Even"
+                  },
+                  "prepaymentPenalty": null,
+                  "obligor": null,
+                  "tag": "MortgageOriginalInfo"
                 },
-                "prepaymentPenalty": null,
-                "obligor": null,
-                "tag": "MortgageOriginalInfo"
-              },
-              7596981800,
-              0.0495,
-              165,
-              null,
-              {
-                "tag": "Current"
-              }
-            ]
-          },
-          {
-            "tag": "Mortgage",
-            "contents": [
-              {
-                "originBalance": 3309774500.0,
-                "originRate": {
-                  "tag": "Fix",
-                  "contents": [
-                    "DC_ACT_365F",
-                    0.0485
-                  ]
-                },
-                "originTerm": 218,
-                "period": "Monthly",
-                "startDate": "2020-06-01",
-                "prinType": {
-                  "tag": "Even"
-                },
-                "prepaymentPenalty": null,
-                "obligor": null,
-                "tag": "MortgageOriginalInfo"
-              },
-              2397902000.0,
-              0.0495,
-              165,
-              null,
-              {
-                "tag": "Current"
-              }
-            ]
+                2397902000.0,
+                0.0495,
+                165,
+                null,
+                {
+                  "tag": "Current"
+                }
+              ]
+            }
+          ],
+          "asOfDate": "2021-03-01",
+          "issuanceStat": null,
+          "futureCf": null,
+          "extendPeriods": {
+            "tag": "MonthEnd"
           }
-        ],
-        "asOfDate": "2021-03-01",
-        "issuanceStat": null,
-        "futureCf": null,
-        "extendPeriods": {
-          "tag": "MonthEnd"
         }
       }
     },
