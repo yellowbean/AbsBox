@@ -281,6 +281,11 @@ Ledger
     * ``("ledgerTxnAmount","L1")`` -> sum of ledger transaction 
     * ``("ledgerTxnAmount","L1",<comment>)`` -> sum of ledger transaction with <comment>
 
+    .. versionadded:: 0.40.5
+    * ``("ledgerBalance","Debit","L1","L2"..)`` -> sum of ledger balance of Debit
+    * ``("ledgerBalance","Credit","L1","L2"..)`` -> sum of ledger balance of Credit
+
+
 Rate Hedge
 """"""""""""""""
     .. versionadded:: 0.23.3
@@ -2871,11 +2876,11 @@ This action would book a transaction to the ledger
 syntax
   .. code-block:: python
 
-    ["bookBy",<bookType>]
+    ["bookBy", <bookType>]
 
 ``bookType``
 
-  * ``["PDL",<default>,[(<ledger name>,<cap>)....] ]``
+  * ``["PDL",<Debit|Credit>,<default>,[(<ledger name>,<cap>)....] ]``
   
     Typically this was used to model `Principal Deficiency Ledger`.
 

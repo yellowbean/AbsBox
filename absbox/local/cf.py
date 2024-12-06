@@ -1,7 +1,8 @@
 import pandas as pd
 import toolz as tz
 from lenses import lens
-from absbox.validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool
+from absbox.validation import vInt, vDate, vFloat, vBool
+from absbox.validation import vDict, vList, vStr, vNum
 from absbox import unifyTs
 
 
@@ -22,7 +23,8 @@ def readToCf(xs, header=None, idx=None, sort_index=False) -> pd.DataFrame:
 
     return r
 
-# TODO probably a perf enhancement
+
+# a slice performance gain on this function
 def buildDaySeq(_df):
     """  https://stackoverflow.com/questions/23435270/add-a-sequential-counter-column-on-groups-to-a-pandas-dataframe """
     df = _df.reset_index()
@@ -39,16 +41,18 @@ def buildDaySeq2(_df):
 
 
 def filterCols(xs, columnsToKeep):
-    return [ _[columnsToKeep]  for _ in xs ]
+    return [_[columnsToKeep] for _ in xs]
+
 
 def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注","应付利息","罚息","intDue","intOverInt"]) -> pd.DataFrame:
-    def isBondGroup(k,v) -> bool:
+    def isBondGroup(k, v) -> bool:
         if isinstance(k,str) and isinstance(v,dict):
             return True
         else:
             return False
+
     def hasBondGroup():
-        _r = [ isBondGroup(k,v) for k,v in bMap.items()]
+        _r = [ isBondGroup(k, v) for k, v in bMap.items()]
         return any(_r)
     def filterCols(x:dict, columnsToKeep) -> pd.DataFrame:
         return lens.Recur(pd.DataFrame).modify(lambda z: z[columnsToKeep])(x)
@@ -163,7 +167,7 @@ def readMultiFlowsByScenarios(rs:dict, _path, fullName=True) -> pd.DataFrame:
     scenarioNames = list(flows.keys())
     header = pd.MultiIndex.from_product([ scenarioNames ,vCols], names =['Scenario',"Field"])
 
-    df = pd.concat(list(flows.values()) ,axis=1)
+    df = pd.concat(list(flows.values()), axis=1)
     df.columns = header
     return df
 
@@ -181,16 +185,3 @@ def readFieldsByScenarios(rs:dict, path, extractor, flip=False) -> pd.DataFrame:
     else:
         r = tz.valmap(lambda x: x.loc.__getitem__(extractor), tbls)
     return pd.DataFrame.from_dict(r)
-
-
-def diff(rs:dict,removeSame=True) -> dict:
-    "show difference of multi-run result"
-    comparePath = [
-        ["bonds"],
-        ["accounts"],
-        ["fees"],
-        ["pool","flow"],
-        ["triggers"],
-        ["ledgers"],
-    ]
-    

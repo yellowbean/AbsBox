@@ -279,6 +279,8 @@ def mkDs(x):
             return mkTag("AllAccBalance")
         case ("账户余额", *ans) | ("accountBalance", *ans):
             return mkTag(("AccBalance", vList(ans, str)))
+        case ("账簿余额", dr, *ans) | ("ledgerBalance", dr, *ans) if dr in ["Credit","Debit","借方","贷方"]:
+            return mkTag(("LedgerBalanceBy", [dr, vList(ans, str)]))
         case ("账簿余额", *ans) | ("ledgerBalance", *ans):
             return mkTag(("LedgerBalance", vList(ans, str)))
         case ("账簿发生额", lns, cmt) | ("ledgerTxnAmount", lns, cmt):
@@ -665,8 +667,6 @@ def mkLimit(x:dict):
             return mkTag(("DueCapAmt", vNum(amt)))
         case {"公式": formula} | {"formula": formula} | {"DS": formula} | {"ds": formula}:
             return mkTag(("DS", mkDs(formula)))
-        case {"系数":[limit, factor]} | {"multiple":[limit, factor]}:
-            return mkTag(("Multiple", [mkLimit(limit), vNum(factor)]))
         case None:
             return None
         case _:
@@ -816,15 +816,12 @@ def mkBookType(x: list):
     """Make bookType """
     match x:
         case ["PDL", dr, defaults, ledgers] | ["pdl", dr, defaults, ledgers]:
-            return mkTag(("PDL", [dr , mkDs(defaults)
+            return mkTag(("PDL", [dr, mkDs(defaults)
                                   , [[ln, mkDs(ds)] for ln, ds in ledgers]]))
-        case ["AccountDraw", ledger] | ['accountDraw', ledger]:
-            return mkTag(("ByAccountDraw", vStr(ledger)))
-        case ["ByFormula", ledger, dr, ds] | ['formula', ledger, dr, ds]:
+        case ["ds", ledger, dr, ds] | ["ByFormula", ledger, dr, ds] | ['formula', ledger, dr, ds]:
             return mkTag(("ByDS", [vStr(ledger), dr, mkDs(ds)]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkBookType")
-
 
 
 def mkSupport(x:list):

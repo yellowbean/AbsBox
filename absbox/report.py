@@ -5,7 +5,7 @@ import json, enum, os, pathlib, re
 from htpy import body, h1, head, html, li, title, ul, div, span, h3, h2, a
 from markupsafe import Markup
 from absbox import readInspect
-from absbox import readBondsCf,readFeesCf,readAccsCf,readPoolsCf
+from absbox import readBondsCf,readFeesCf,readAccsCf,readPoolsCf,readLedgers
 
 
 class OutputType(int, enum.Enum):
@@ -42,6 +42,7 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
     accDf = r['accounts']
     feeDf = r['fees']
     bondDf = r['bonds']
+    ledgerDf = r.get("ledgers",{})
 
     section1 = [ div[ h2(id=f"anchor-{_t}")[_t],mapToList(x,anchor=_t) ]
                 for (_t,x) in [("Pool",poolDf),("Fee",feeDf),("Bond",bondDf),("Accounts",accDf)]
@@ -61,7 +62,13 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
     
     # read joint cashflows 
     seciont4 = [ div[ h2(id=f"anchor-{_t}")[_t],Markup(x.to_html()) ]
-                for (_t,x) in [("MultiFee",readFeesCf(feeDf)),("MultiBond",readBondsCf(bondDf,popColumns=[])),("MultiAccounts",readAccsCf(accDf)),("MultiPools", readPoolsCf(poolDf))]
+                for (_t,x) in [("MultiFee",readFeesCf(feeDf))
+                               ,("MultiBond",readBondsCf(bondDf,popColumns=[]))
+                               ,("MultiAccounts",readAccsCf(accDf))
+                               ,("MultiPools", readPoolsCf(poolDf))
+                               ,("MultiLedger", readLedgers(ledgerDf))
+
+                               ]
             ]
 
     c = html[
@@ -81,6 +88,10 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
 
 
         c &= lens._children[1]._children.modify(lambda xs: tuple([div(id="toc")[div["Table Of Content"],hrefs]])+xs)
-
+    
+    absPath = None
     with open(p, 'wb') as f:
         f.write(c.encode())
+        absPath = os.path.abspath(os.path.join(os.getcwd(),p))
+
+    return absPath

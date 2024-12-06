@@ -1570,6 +1570,21 @@ or user can cross check by review the account logs by (if changing deal status w
    r["accounts"]["<account name>"].loc["<date after deal status change>"]
 
 
+Ledgers 
+""""""""""""""""""""""""
+
+.. versionadded:: 0.40.5
+
+Read all ``ledgers`` in a joint dataframe
+
+
+.. code-block:: python
+   
+  from absbox import readLedgers
+
+  readLedgers(r['ledgers'])
+
+
 Variables During Waterfall 
 """"""""""""""""""""""""""""""""
 
@@ -1580,12 +1595,20 @@ If there is waterfall action in the waterfall
   ,["inspect","BeforePayInt bond:A1",("bondDueInt","A1")]
 
 
-then the <Formula> value can be view in the ``result`` ``waterfallInspect``.
+then the :ref:`Formula` value can be view in the ``result`` ``waterfallInspect``.
 
 .. code-block:: python
    
   r['result']['waterfallInspect']
 
+
+User can read a join dataframe from built-in function ``readInspect``
+
+.. code-block:: python
+   
+  from absbox import readInspect
+  
+  readInspect(r['result'])
 
 Validation Messages
 """"""""""""""""""""""""""""""""
