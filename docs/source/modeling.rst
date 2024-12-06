@@ -2552,7 +2552,7 @@ PayPrintWithDue
 
 WriteOff
   .. versionadded:: 0.26.1
-  write off the bond balance ,with option to set a limit amount to write off
+  write off the bond balance
 
   syntax
     ``["writeOff", <Bond>]`` 
@@ -2562,6 +2562,7 @@ WriteOff
     The ``<Limit>`` :ref:`<limit>`
   
   .. versionadded:: 0.29.7
+  
   write off the bonds balance sequentially
 
   syntax
@@ -2570,6 +2571,14 @@ WriteOff
     ``["writeOff", [<Bond>], <Limit>]`` 
 
     The ``<Limit>`` :ref:`<limit>`
+
+WirteOffAndBook
+  .. versionadded:: 0.40.5
+  write off the bond and book the ledger
+
+  syntax
+    ``["writeOff", <Bond>, <Limit>, "book", <Direction>, <Ledger>]`` 
+    ``["writeOff", [<Bond>], <Limit>, "book", <Direction>, <Ledger>]`` 
 
 FundWith
   .. versionadded:: 0.26.1
@@ -2695,6 +2704,18 @@ TransferMultiple
   .. note::
 
     :ref:`Transfer Multiple Account Example`
+
+TransferAndBook
+  .. versionadded:: 0.40.5
+  transfer cash from source account to target account, book the ledger with transfer amount
+
+  syntax
+    ``["transfer", {Account}, {Account}, <limit>, "book", <Direction>, {Ledger}]``
+  
+  * transfer funds to the other account by ``<Limit>``
+  * <Direction> either "Credit" or "Debit"
+  * <Ledger> , name of ledger to book  
+
 
 Buy & Sell Assets 
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -2895,7 +2916,6 @@ examples:
     * ``{"balPct": 0.6}`` , pay up to 60% of due amount
     * ``{"balCapAmt": 500}`` ,  pay up to 500.
     * ``{"formula": <formula> }``, pay up the :ref:`Formula`
-    * ``{"clearLedger": ("Credit","myLedger")}`` , clear the ledger balance to 0 by credit the ledger
 
 
 <support>

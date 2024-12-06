@@ -74,7 +74,6 @@ class SPV:
                                 for ln,lo in self.流动性支持.items() } if self.流动性支持 else None,
             "ledgers": {ln: mkLedger(ln, v) for ln,v in self.科目.items()} if self.科目 else None
         }
-        
         _dealType = identify_deal_type(_r)
 
         return mkTag((_dealType,_r))

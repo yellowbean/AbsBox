@@ -659,42 +659,38 @@ def mkAccountCapType(x):
 
 def mkLimit(x:dict):
     match x:
-       case {"余额百分比": pct} | {"balPct": pct}:
-           return mkTag(("DuePct", vFloat(pct)))
-       case {"金额上限": amt} | {"balCapAmt": amt}:
-           return mkTag(("DueCapAmt", vNum(amt)))
-       case {"公式": formula} | {"formula": formula} | {"DS": formula}:
-           return mkTag(("DS", mkDs(formula)))
-       case {"冲销":(dr, an)} | {"clearLedger": (dr, an)}:
-           return mkTag(("ClearLedger", [dr, vStr(an)]))
-       case {"簿记":an} | {"bookLedger": an}:
-           return mkTag(("BookLedger", vStr(an)))
-       case {"系数":[limit, factor]} | {"multiple":[limit, factor]}:
-           return mkTag(("Multiple", [mkLimit(limit), vNum(factor)]))
-       # case {"储备":"缺口"} | {"reserve":"gap"} :
-       #     # fill the gap, depreciated
-       #     return mkTag(("ReserveGap","A"))
-       # case {"储备":"盈余"} | {"reserve":"excess"} :
-       #     # till the reserve level, depreciated
-       #     return mkTag(("ReserveExcess","A"))
-       case None:
-           return None
-       case _:
-           raise RuntimeError(f"Failed to match :{x}:mkLimit")
+        case {"余额百分比": pct} | {"balPct": pct}:
+            return mkTag(("DuePct", vFloat(pct)))
+        case {"金额上限": amt} | {"balCapAmt": amt}:
+            return mkTag(("DueCapAmt", vNum(amt)))
+        case {"公式": formula} | {"formula": formula} | {"DS": formula} | {"ds": formula}:
+            return mkTag(("DS", mkDs(formula)))
+        case {"系数":[limit, factor]} | {"multiple":[limit, factor]}:
+            return mkTag(("Multiple", [mkLimit(limit), vNum(factor)]))
+        case None:
+            return None
+        case _:
+            raise RuntimeError(f"Failed to match :{x}:mkLimit")
 
 
 def mkComment(x):
     match x:
-        case {"payInt":bns}:
-            return mkTag(("PayInt",bns))
-        case {"payYield":bn}:
-            return mkTag(("PayYield",bn))
-        case {"transfer":[a1,a2]}:
-            return mkTag(("Transfer",[a1,a2]))
-        case {"transfer":[a1,a2,limit]}:
-            return mkTag(("TransferBy",[a1,a2,limit]))
-        case {"direction":d}:
-            return mkTag(("TxnDirection",d))
+        case {"payInt": bns}:
+            return mkTag(("PayInt", bns))
+        case {"payYield": bn}:
+            return mkTag(("PayYield", bn))
+        case {"payPrin": bns}:
+            return mkTag(("PayPrin", bns))
+        case {"payGroupPrin": bns}:
+            return mkTag(("PayGroupPrin", bns))
+        case {"payGroupInt": bns}:
+            return mkTag(("PayGroupInt", bns))
+        case {"transfer": [a1, a2]}:
+            return mkTag(("Transfer", [a1, a2]))
+        case {"transfer": [a1, a2, limit]}:
+            return mkTag(("TransferBy", [a1, a2, limit]))
+        case {"direction": d}:
+            return mkTag(("TxnDirection", d))
 
 
 def mkLiqDrawType(x):
@@ -817,11 +813,11 @@ def mkRateType(x):
 
 
 def mkBookType(x: list):
+    """Make bookType """
     match x:
-        case ["PDL", defaults, ledgers] | ["pdl", defaults, ledgers]:
-            return mkTag(("PDL",[mkDs(defaults)
-                                 ,[[ln, mkDs(ds)] 
-                                   for ln, ds in ledgers]]))
+        case ["PDL", dr, defaults, ledgers] | ["pdl", dr, defaults, ledgers]:
+            return mkTag(("PDL", [dr , mkDs(defaults)
+                                  , [[ln, mkDs(ds)] for ln, ds in ledgers]]))
         case ["AccountDraw", ledger] | ['accountDraw', ledger]:
             return mkTag(("ByAccountDraw", vStr(ledger)))
         case ["ByFormula", ledger, dr, ds] | ['formula', ledger, dr, ds]:
@@ -870,18 +866,22 @@ def mkAction(x:list):
         return (limit, support)
         
     match x:
+        case ["账户转移", source, target, m,"簿记",dr, ln] | ["transfer", source, target, m, "book", dr, ln]:
+            return mkTag(("TransferAndBook", [ mkLimit(m), vStr(source), vStr(target)
+                                              ,(dr, ln)
+                                              , None]))
         case ["账户转移", source, target, m] | ["transfer", source, target, m]:
             match m:
                 case {"reserve": "gap"} | {"储备":"缺口"}:
                     return mkTag(("Transfer", [ mkLimit({"DS":("reserveGap", target)}) , vStr(source), vStr(target), None]))
-                case {"reserve": "excess"} | {"储备":"盈余"}:
+                case {"reserve": "excess"} | {"储备": "盈余"}:
                     return mkTag(("Transfer", [ mkLimit({"DS":("reserveExcess", target)}) , vStr(source), vStr(target), None]))
                 case _ :
-                    return mkTag(("Transfer", [mkLimit(m), vStr(source), vStr(target), None]))
+                    return mkTag(("Transfer", [ mkLimit(m), vStr(source), vStr(target), None]))
         case ["账户转移", source, target] | ["transfer", source, target]:
             return mkTag(("Transfer", [None, vStr(source), vStr(target), None]))
         case ["批量账户转移", sources, target] | ["transferMultiple", sources, target] | ["transferM", sources, target]:
-            if isinstance(sources, list) and len(sources[0])==2:
+            if isinstance(sources, list) and len(sources[0]) == 2:
                 return mkTag(("TransferMultiple", [ [(mkLimit(m), vStr(source)) for (source,m) in sources], vStr(target), None]))
             else:
                 return mkTag(("TransferMultiple", [ [(None, vStr(source)) for source in sources], vStr(target), None]))
@@ -978,9 +978,15 @@ def mkAction(x:list):
         case ["计提支付利息","组",source, target, o] | ["accrueAndPayIntByGroup", source, target,o]:
             byOrder = mkOrder(o)
             return mkTag(("AccrueAndPayIntGroup", [None, vStr(source), vStr(target),byOrder,None]))
+        case ["减记本金", target, l, "簿记", dr, ln] | ["writeOff", target, l, "book", dr, ln] if isinstance(target, str):
+            limit = mkLimit(l) if l else None
+            return mkTag(("WriteOffAndBook", [limit, vStr(target), (dr,ln)]))
         case ["减记本金", target, l] | ["writeOff", target, l] if isinstance(target, str):
             limit = mkLimit(l) if l else None
             return mkTag(("WriteOff", [limit, vStr(target)]))
+        case ["减记本金", targets, l, "簿记", dr, ln] | ["writeOff", targets, l, "book", dr, ln] if isinstance(targets, list):
+            limit = mkLimit(l) if l else None
+            return mkTag(("WriteOffBySeqAndBook", [limit, vList(targets,str),(dr, ln)]))
         case ["减记本金", targets, l] | ["writeOff", targets, l] if isinstance(targets, list):
             limit = mkLimit(l) if l else None
             return mkTag(("WriteOffBySeq", [limit, vList(targets,str)]))
