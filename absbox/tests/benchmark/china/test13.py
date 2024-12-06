@@ -36,7 +36,7 @@ test01 = SPV(
                     ,("账户余额","账户02"))}]
          ,["支付费用","账户02",['信托费用']]
          ,["计提支付利息","账户02",["A1"]]
-         ,["transfer",'账户02','账户01',{"ds":("ledgerBalance","Debit","MyLedger")},"book","Credit","MyLedger"} ]
+         ,["transfer",'账户02','账户01',{"ds":("ledgerBalance","Debit","MyLedger")},"book","Credit","MyLedger"]
          ,["支付本金","账户01",["A1"]]
          ,["支付本金","账户01",["B"]]
          ,["支付收益","账户01","B"]
