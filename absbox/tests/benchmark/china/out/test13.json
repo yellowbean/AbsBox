@@ -141,6 +141,7 @@
           "contents": {
             "tag": "PDL",
             "contents": [
+              "Debit",
               {
                 "tag": "CumulativePoolDefaultedBalance",
                 "contents": null
@@ -230,17 +231,26 @@
           ]
         },
         {
-          "tag": "Transfer",
+          "tag": "TransferAndBook",
           "contents": [
             {
-              "tag": "ClearLedger",
-              "contents": [
-                "Credit",
-                "MyLedger"
-              ]
+              "tag": "DS",
+              "contents": {
+                "tag": "LedgerBalanceBy",
+                "contents": [
+                  "Debit",
+                  [
+                    "MyLedger"
+                  ]
+                ]
+              }
             },
             "\u8d26\u623702",
             "\u8d26\u623701",
+            [
+              "Credit",
+              "MyLedger"
+            ],
             null
           ]
         },
