@@ -75,7 +75,10 @@
             }
           ],
           "asOfDate": "2022-06-30",
-          "issuanceStat": null,
+          "issuanceStat": {
+            "IssuanceBalance": 7573626700,
+            "HistoryDefaults": 81403764.08
+          },
           "futureCf": null,
           "extendPeriods": {
             "tag": "MonthEnd"

@@ -816,8 +816,7 @@ def mkBookType(x: list):
     """Make bookType """
     match x:
         case ["PDL", dr, defaults, ledgers] | ["pdl", dr, defaults, ledgers]:
-            return mkTag(("PDL", [dr, mkDs(defaults)
-                                  , [[ln, mkDs(ds)] for ln, ds in ledgers]]))
+            return mkTag(("PDL", [dr, mkDs(defaults), [[ln, mkDs(ds)] for ln, ds in ledgers]]))
         case ["ds", ledger, dr, ds] | ["ByFormula", ledger, dr, ds] | ['formula', ledger, dr, ds]:
             return mkTag(("ByDS", [vStr(ledger), dr, mkDs(ds)]))
         case _:
@@ -865,7 +864,7 @@ def mkAction(x:list):
     match x:
         case ["账户转移", source, target, m,"簿记",dr, ln] | ["transfer", source, target, m, "book", dr, ln]:
             return mkTag(("TransferAndBook", [ mkLimit(m), vStr(source), vStr(target)
-                                              ,(dr, ln)
+                                              ,[dr, ln]
                                               , None]))
         case ["账户转移", source, target, m] | ["transfer", source, target, m]:
             match m:
@@ -1796,7 +1795,7 @@ def mkPoolComp(asOfDate, x, mixFlag) -> dict:
     assetFactory = mkAsset if (not mixFlag) else mkAssetUnion
     r = {"assets": [assetFactory(y) for y in getValWithKs(x, ['assets', "清单"],defaultReturn=[])]
         , "asOfDate": asOfDate
-        , "issuanceStat": getValWithKs(x,["issuanceStat", "统计"])
+        , "issuanceStat": getValWithKs(x,["issuanceStat", "统计", "发行","Issuance"])
         , "futureCf":mkCf(getValWithKs(x,['cashflow', '现金流归集表', '归集表'],[]))
         , "extendPeriods":mkDatePattern(getValWithKs(x,['extendBy'], "MonthEnd"))}
     return r

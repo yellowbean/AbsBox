@@ -35,7 +35,9 @@
         "PoolConsol": {
           "assets": [],
           "asOfDate": "2022-09-30",
-          "issuanceStat": null,
+          "issuanceStat": {
+            "\u8d44\u4ea7\u6c60\u89c4\u6a21": 9179540189.72
+          },
           "futureCf": {
             "tag": "CashFlowFrame",
             "contents": [
