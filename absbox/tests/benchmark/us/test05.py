@@ -32,8 +32,8 @@ test01 = Generic(
     ,{"amortizing":[
          ["calcInt","A1"]
          ,["liqAccrue","insuranceProvider"]
-         ,["liqSupport", "insuranceProvider","interest","A1"]
-         ,["liqSupport", "insuranceProvider","interest","B"]
+         ,["liqSupport", "insuranceProvider","interest",["A1"]]
+         ,["liqSupport", "insuranceProvider","interest",["B"]]
          ,["accrueAndPayInt","acc01",["A1","B"]]
          ,["payPrin","acc02",["A1"]]
          ,["payPrin","acc02",["B"]]

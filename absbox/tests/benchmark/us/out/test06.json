@@ -181,7 +181,9 @@
             },
             "insuranceProvider",
             "LiqToAcc",
-            "acc01"
+            [
+              "acc01"
+            ]
           ]
         },
         {

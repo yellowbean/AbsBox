@@ -184,6 +184,7 @@ Use pre-built binary from `Releases <https://github.com/yellowbean/Hastructure/r
 Connect to a engine 
 -----------------------
 
+
 Once user has installed `absbox` and get `Hastructure` running ,user just need to pass in a URL points to engine.
 
 .. code-block:: python
@@ -196,7 +197,8 @@ Once user has installed `absbox` and get `Hastructure` running ,user just need t
 
 
 Engine Shortcut
-""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^
+
 .. versionadded:: 0.26.7
 
 Since version ``0.26.7``, ``absbox`` ships with a shortcut to connect public/test engines.
@@ -217,7 +219,8 @@ Since version ``0.26.7``, ``absbox`` ships with a shortcut to connect public/tes
 
 
 Auto Connect Best Fit Engine
-""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 The function ``PickApiFrom`` will try to connect to the best fit engine from the list of APIs.
 
@@ -233,6 +236,5 @@ If ``absbox`` is version ``0.28.5``, it will find first engine with version ``0.
   listOfApis = [EnginePath.PROD,EnginePath.DEV,"http://your_own_server:8081"]
 
   api = PickApiFrom(listOfApis,check=False,lang='english')
-
 
 

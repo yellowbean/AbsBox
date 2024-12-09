@@ -158,7 +158,9 @@
             null,
             "insuranceProvider",
             "LiqToBondInt",
-            "A1"
+            [
+              "A1"
+            ]
           ]
         },
         {
@@ -167,7 +169,9 @@
             null,
             "insuranceProvider",
             "LiqToBondInt",
-            "B"
+            [
+              "B"
+            ]
           ]
         },
         {

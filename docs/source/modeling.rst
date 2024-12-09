@@ -219,6 +219,7 @@ Structured product is using ``formula`` to define the amount of account transfer
 
 Balance Type 
 ^^^^^^^^^^^^^^
+
 Bond 
 """""""
     * ``("bondBalance",)`` -> sum of all bond balance
@@ -233,6 +234,7 @@ Bond
     * ``("behindTargetBalance","A")``  -> difference of target balance with current balance for the bond A
     * ``("bondTxnAmt", None,"A")``  -> Total transaction amount of bond 'A'
     * ``("bondTxnAmt", "<PayInt:A>","A")``  -> Total transaction amount of interest payment bond 'A'
+
 Pool 
 """""""
     * ``("poolBalance",)``  -> current pool balance
@@ -2002,7 +2004,7 @@ syntax
 Interest Over Interest
 """"""""""""""""""""""""""
 
-.. versionadd:: 0.28.1
+.. versionadded:: 0.28.1
 
 when `calcInt` was performed, the bond will auto accrue interest over interest if the bond has due interest.
 
@@ -2597,7 +2599,7 @@ FundWith
     The ``<Limit>`` :ref:`<limit>`
 
 Calc Bond Principal Due 
-  .. versinoadded:: 0.27.32
+  .. versionadded:: 0.27.32
   calculate the principal due amount 
 
   syntax 
@@ -2793,19 +2795,18 @@ As return, ``Liquidity Facility`` will receive :
 
 Draw Cash to Account
   syntax
-    ``["liqSupport", <liqProvider>, "account", <Account Name>, <Limit>]``
+    ``["liqSupport", <liqProvider>, "account", [<Account Name>], <Limit>]``
   
 Pay fee 
   syntax
-    ``["liqSupport", <liqProvider>, "fee", <Fee Name>, <Limit>]``
+    ``["liqSupport", <liqProvider>, "fee", [<Fee Name>], <Limit>]``
   
 Pay interest/principal to bond
   pay principal or interest to bond.
 
   syntax
-    ``["liqSupport", <liqProvider>, "interest", <Bond Name>, <Limit>]``
+    ``["liqSupport", <liqProvider>, "interest", [<Bond Name>], <Limit>]``
 
-    ``["liqSupport", <liqProvider>, "principal", <Bond Name>, <Limit>]``
 
 Liquidity Repay 
   pay back to liquidity provider till its oustanding balance is 0
@@ -2886,6 +2887,19 @@ syntax
 
     * ``<default>`` -> definition of `default` of asset balance, ``("cumPoolDefaultedBalance",)``
     * ``[("Bond-B-Ledger",("bondBalance","B"))...]`` -> book the defaults with cap of ``current balance`` of tranche B to `Ledger`: "Bond-B-Ledger"
+    
+    A typical example will be: ``Book 50% of new defaults in current pool collction period, pdl-B first then pdl-A, with cap to balance of bond B and A``
+
+    .. code-block:: python 
+
+      "endOfCollection":[
+           ["bookBy",["PDL","Debit"
+                      ,("factor",("curPoolCollection", None,"Defaults"),0.5)
+                      ,[("pdl-B",("bondBalance","B"))
+                        ,("pdl-A",("bondBalance","A-1"))]
+           ]]
+      ]
+
 
   * ``["formula",<ledger name>,<Debit|Credit>,<formula>]``
 
@@ -3666,7 +3680,7 @@ the core concept of ``Yield Supplement Overcollateralization`` is
 * subtract the two value, that's amount can be used to paid off to ensure a senior tranche is safe comparing to balance of pool
 * usually , there is a constant OC% needed to inflat the OC over adjusted pool balance.
 
-.. versiondadded:: 0.24.1
+.. versionadded:: 0.24.1
 
 .. literalinclude:: deal_sample/ysoc.py
    :language: python
@@ -3677,7 +3691,7 @@ the core concept of ``Yield Supplement Overcollateralization`` is
 Expenses Sample
 -------------------
 
-.. versiondadded:: 0.23.5
+.. versionadded:: 0.23.5
 
 * fix amount of fee for each collection period
 * fee by a table,lookup by a formula

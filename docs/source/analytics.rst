@@ -463,9 +463,9 @@ syntax
                          ,assets
                          ,poolAssump=myAssump
                          ,read=True)
+
 Summary 
 """"""""""
-
 
 .. graphviz::
     :name: sphinx.ext.graphviz
@@ -805,7 +805,7 @@ assumption for revolving pool
 Refinance Bonds 
 ^^^^^^^^^^^^^^^^^^^^^^
 
-.. versionsadd:: 0.29.3
+.. versionadded:: 0.29.3
 
 The bond's interest rate compontent can be changed at a future date. Floater rate can be changed to fix rate, or coupon rate can be changed to higher or lower rate.
 
@@ -832,7 +832,9 @@ set interest rate assumptions for cashflow projection. It can be either a flat r
 syntax:
   * ``("interest",(<index>, rate))``
   * ``("interest",(<index>, rateCurve))``
+
   .. versionadded:: 0.30.8
+
   * ``("rate",(<index>, rate))``
   * ``("rate",(<index>, rateCurve))``
   
