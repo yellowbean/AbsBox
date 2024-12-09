@@ -1002,10 +1002,10 @@ def mkAction(x:list):
             return mkTag(("LiquidatePool", [mkLiqMethod(liq), vStr(target), lmap(mkPid,pNames)]))
         case ["出售资产", liq, target] | ["sellAsset", liq, target]:
             return mkTag(("LiquidatePool", [mkLiqMethod(liq), vStr(target), None]))
-        case ["流动性支持", source, liqType, target, limit] | ["liqSupport", source, liqType, target, limit]:
-            return mkTag(("LiqSupport", [mkLimit(limit), vStr(source), mkLiqDrawType(liqType), vStr(target)]))
-        case ["流动性支持", source, liqType, target] | ["liqSupport", source, liqType, target]:
-            return mkTag(("LiqSupport", [None, vStr(source), mkLiqDrawType(liqType), vStr(target)]))
+        case ["流动性支持", source, liqType, targets, limit] | ["liqSupport", source, liqType, targets, limit]:
+            return mkTag(("LiqSupport", [mkLimit(limit), vStr(source), mkLiqDrawType(liqType), vList(targets,str)]))
+        case ["流动性支持", source, liqType, targets] | ["liqSupport", source, liqType, targets]:
+            return mkTag(("LiqSupport", [None, vStr(source), mkLiqDrawType(liqType), vList(targets,str)]))
         case ["流动性支持偿还", rpt, source, target] | ["liqRepay", rpt, source, target]:
             return mkTag(("LiqRepay", [None, mkLiqRepayType(rpt), vStr(source), vStr(target)]))
         case ["流动性支持偿还", rpt, source, target, limit] | ["liqRepay", rpt, source, target, limit]:

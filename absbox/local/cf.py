@@ -94,27 +94,37 @@ def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注","应�
     return df.sort_index()
 
 
+def patchMissingIndex(df,idx:set):
+    curIdx = set(df.index.values.tolist())
+    missingIdx = idx - curIdx
+    return df.reindex(df.index.values.tolist()+list(missingIdx)).sort_index()
+
 def buildJointCf(m:dict, popColumns=[]) -> pd.DataFrame:
     fullColumns = list(m.values())[0].columns.to_list()
     columns = list(filter(lambda x: x not in set(popColumns), fullColumns))
     accNames = list(m.keys())
     accVals = [buildDaySeq(av) for av in list(m.values())]
-    r = pd.concat(accVals, axis=1, keys=tuple(accNames))
+
+    accIndex = set(tz.concat([ a.index.values.tolist() for a in accVals]))
+
+    accVals2 = [patchMissingIndex(av,accIndex) for av in accVals]
+    
+    r = pd.concat(accVals2, axis=1, keys=tuple(accNames))
     if popColumns:
         return r.xs(slice(*columns), level=1, axis=1, drop_level=False)
     return r
 
 
 def readAccsCf(aMap, popColumns=["memo"]) -> pd.DataFrame:
-    return buildJointCf(aMap, popColumns=["memo"])
+    return buildJointCf(aMap, popColumns=popColumns)
 
 
 def readFeesCf(fMap, popColumns=["due","剩余支付"]) -> pd.DataFrame:
-    return buildJointCf(fMap, popColumns=["due","剩余支付"])
+    return buildJointCf(fMap, popColumns=popColumns)
 
 
 def readLedgers(lMap, **k) -> pd.DataFrame:
-    return buildJointCf(lMap, popColumns=[])
+    return buildJointCf(lMap, **k)
 
 
 def readPoolsCf(pMap) -> pd.DataFrame:
