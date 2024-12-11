@@ -2857,18 +2857,18 @@ There are two types of `Conditional Action`, which are same in with "IF" / "IF-E
 Change Deal Status
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-.. versionadded:: 0.40.6
-
-``changeStatus``
-
-This action will assign a new status to the deal, with optional a ``Condition``.
 
 
-syntax
-  .. code-block:: python 
+Change Deal Status
+  .. versionadded:: 0.40.6
 
-  ["changeStatus",<Deal Status>]
-  ["changeStatus",<Condition>,<Deal Status>]
+  This action will assign a new status to the deal, with optional a ``Condition``.
+
+  syntax
+    .. code-block:: python 
+
+      ["changeStatus",<Deal Status>]
+      ["changeStatusIf",<Condition>,<Deal Status>]
 
 
 Inspect Variables during waterfall 

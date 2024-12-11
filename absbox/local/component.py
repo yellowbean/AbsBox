@@ -1039,14 +1039,13 @@ def mkAction(x:list):
         ### Revolving buy with all cash and source/target pool 
         case ["购买资产2", liq, source, _limit, sPool, mPn] | ["buyAsset2", liq, source, _limit, sPool, mPn ]:
             return mkTag(("BuyAssetFrom", [mkLimit(_limit), mkLiqMethod(liq), vStr(source), sPool, mkPid(mPn)]))
-        
         ## Trigger
         case ["更新事件", trgName] | ["runTriggers", *trgName] | ["runTrigger", *trgName]:
             return mkTag(("RunTrigger", ["InWF", vList(trgName, str)]))
         ## Inspect
         case ["查看", comment, *ds] | ["inspect", comment, *ds]:
-            return mkTag(("WatchVal", [comment, lmap(mkDs, ds)]))
-        case ["更改状态", p, st] | ["changeStatus", p, st]:
+            return mkTag(("WatchVal", [vStr(comment), lmap(mkDs, ds)]))
+        case ["更改状态", p, st] | ["changeStatusIf", p, st]:
             return mkTag(("ChangeStatus",[mkPre(p), mkStatus(st)]))
         case ["更改状态", st] | ["changeStatus", st]:
             return mkTag(("ChangeStatus",[None, mkStatus(st)]))

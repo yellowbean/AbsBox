@@ -28,11 +28,11 @@ def mapToList(m:dict, title_=h3, anchor=False):
 
 def buildSection(lst:list, title_=(h2,h3), anchor=False):
     return [ div[ title_[0](id=f"anchor-{_t}")[_t], mapToList(x, anchor=_t)] 
-               for (_t, x) in lst]
+            for (_t, x) in lst]
 
 def buildSectionFlat(lst:list, title_=h2, anchor=False):
     return [ div[ title_(id=f"anchor-{_t}")[_t],Markup(x.to_html())] 
-               for (_t, x) in lst if x is not None]
+            for (_t, x) in lst if x is not None]
 
 def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
     """
@@ -43,7 +43,7 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
     bondGrpDf = ("BondGroup", 
                  tz.pipe(tz.valfilter(lambda x: not isinstance(x, pd.DataFrame), r['bonds'])
                          ,lambda x : {f"{k}-{k2}":v2 for k,v in x.items()
-                                         for k2,v2 in v.items()}
+                                        for k2,v2 in v.items()}
                          )
                 )
 
