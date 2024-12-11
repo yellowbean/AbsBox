@@ -2854,6 +2854,23 @@ There are two types of `Conditional Action`, which are same in with "IF" / "IF-E
               ]
 
 
+Change Deal Status
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 0.40.6
+
+``changeStatus``
+
+This action will assign a new status to the deal, with optional a ``Condition``.
+
+
+syntax
+  .. code-block:: python 
+
+  ["changeStatus",<Deal Status>]
+  ["changeStatus",<Condition>,<Deal Status>]
+
+
 Inspect Variables during waterfall 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -3663,7 +3680,7 @@ Book Ledger
 
 * User can book a formula based value to ledger 
 * query the ledger balance via formula ``("ledgerBalance","<ledgerName>")`` 
-  * it can be reference in all places in waterfall/trigger/accounts which are applicable to :ref:`<Formla>`
+  * it can be reference in all places in waterfall/trigger/accounts which are applicable to :ref:`Formula`
 
 .. literalinclude:: deal_sample/book.py
    :language: python

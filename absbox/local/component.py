@@ -1046,6 +1046,10 @@ def mkAction(x:list):
         ## Inspect
         case ["查看", comment, *ds] | ["inspect", comment, *ds]:
             return mkTag(("WatchVal", [comment, lmap(mkDs, ds)]))
+        case ["更改状态", p, st] | ["changeStatus", p, st]:
+            return mkTag(("ChangeStatus",[mkPre(p), mkStatus(st)]))
+        case ["更改状态", st] | ["changeStatus", st]:
+            return mkTag(("ChangeStatus",[None, mkStatus(st)]))
         case []:
             return mkTag(("Placeholder",[]))
         case _:
@@ -2031,9 +2035,9 @@ def readRunSummary(x, locale) -> dict:
 
     r['bonds'] = bndSummary
     ## Build status change logs
-    status_change_logs = [(_['contents'][0], readStatus(_['contents'][1], locale), readStatus(_['contents'][2], locale))
+    status_change_logs = [(_['contents'][0], readStatus(_['contents'][1], locale), readStatus(_['contents'][2], locale), _['contents'][3])
                           for _ in filter_by_tags(x, ["DealStatusChangeTo"])]
-    deal_ended_log = [ (_['contents'][0],"DealEnd",_['contents'][1]) for _ in filter_by_tags(x, ["EndRun"])]
+    deal_ended_log = [ (_['contents'][0],"","DealEnd",_['contents'][1]) for _ in filter_by_tags(x, ["EndRun"])]
     r['status'] = pd.DataFrame(data=status_change_logs+deal_ended_log, columns=dealStatusLog[locale])
 
     # inspection variables

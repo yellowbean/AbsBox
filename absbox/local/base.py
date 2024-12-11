@@ -148,7 +148,8 @@ validCutoffFields = {
     ,"累计违约余额":"HistoryDefaults"
 }
 
-dealStatusLog = {'cn': [china_date, "旧状态", "新状态"], 'en': [english_date, "From", "To"]}
+dealStatusLog = {'cn': [china_date, "旧状态", "新状态", "备注"]
+                 ,'en': [english_date, "From", "To", "Comment"]}
 
 dealStatusMap = {"en": {'amort': "Amortizing", 'def': "Defaulted", 'acc': "Accelerated", 'end': "Ended",
                         'called': "Called",

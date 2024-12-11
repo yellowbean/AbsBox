@@ -100,6 +100,8 @@ def patchMissingIndex(df,idx:set):
     return df.reindex(df.index.values.tolist()+list(missingIdx)).sort_index()
 
 def buildJointCf(m:dict, popColumns=[]) -> pd.DataFrame:
+    if len(m)==0:
+        return pd.DataFrame()
     fullColumns = list(m.values())[0].columns.to_list()
     columns = list(filter(lambda x: x not in set(popColumns), fullColumns))
     accNames = list(m.keys())
@@ -141,6 +143,17 @@ def readPoolsCf(pMap) -> pd.DataFrame:
     df = pd.concat(pFlows,axis=1)
     df.columns = headerIndex
     return df
+
+def readTriggers(tMap) -> pd.DataFrame:
+    ''' read a map of triggers in dataframes to a single dataframe, with key as 1st level index'''
+    if tMap == {} or tMap is None:
+        return pd.DataFrame()
+    t = tz.pipe({k:v for k,v in tMap.items() if v}
+                ,lambda x: tz.valmap(buildJointCf, x)
+                ,lambda x: tz.valfilter( lambda y: not y.empty ,x))
+    tKeys = t.keys()
+    tVals = t.values()
+    return pd.concat(list(tVals), axis=1, keys=tuple(tKeys))
 
 
 def readInspect(r:dict) -> pd.DataFrame:
