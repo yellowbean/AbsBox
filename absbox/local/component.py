@@ -1851,7 +1851,7 @@ def mkLiqProviderType(x):
             return mkTag(("ReplenishSupport", [mkDatePattern(dp), amt]))
         case {"公式": ds, "系数":pct} | {"formula":ds, "pct":pct}:
             return mkTag(("ByPct", [mkDs(ds), pct]))
-        case "unlimit" | "无限额":
+        case "unlimit" | "无限额" | "Unlimit" :
             return mkTag(("UnLimit"))
         case {}:
             return mkTag(("UnLimit"))
@@ -2256,15 +2256,6 @@ def mkInspect(x):
             return mkTag(("InspectRpt",[mkDatePattern(dp),lmap(mkDs,ds)]))
         case _:
             raise RuntimeError(f"Failed to match mkInspect:{x}")
-# data CallOpt = LegacyOpts [C.CallOption]                 -- ^ legacy support
-#              | Predicate [Pre]                           -- ^ default test call for each pay day, keep backward compatible
-#              | CallOnDates DatePattern [Pre]             -- ^ test call at end of day
-#              deriving (Show, Generic, Read, Ord, Eq)
-# 
-# data NonPerfAssumption = NonPerfAssumption {
-#   stopRunBy :: Maybe Date                                    -- ^ optional stop day,which will stop cashflow projection
-#   ,projectedExpense :: Maybe [(FeeName,Ts)]                  -- ^ optional expense projection
-#   ,callWhen :: Maybe [CallOpt]           
 
 
 def mkCallOptions(x):
@@ -2274,7 +2265,7 @@ def mkCallOptions(x):
         case ("if", *pres) | ("condition", *pres):
             return mkTag(("CallPredicate", lmap(mkPre,pres)))
         case _:
-            raise RunTimeError(f"Failed to make call options: {x}")
+            raise RuntimeError(f"Failed to make call options: {x}")
 
 
 def mkNonPerfAssumps(r, xs:list) -> dict:
