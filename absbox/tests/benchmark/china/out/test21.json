@@ -99,7 +99,7 @@
             }
           ],
           "asOfDate": "2021-03-31",
-          "issuanceStat": null,
+          "issuanceStat": {},
           "futureCf": null,
           "extendPeriods": {
             "tag": "MonthEnd"

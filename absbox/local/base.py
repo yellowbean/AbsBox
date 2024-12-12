@@ -143,7 +143,7 @@ accountHeader = {
 
 validCutoffFields = {
     "资产池规模": "IssuanceBalance"
-    ,"IssuanceBalance": "IssuanceBalance"
+    ,"发行规模": "IssuanceBalance"
     ,"CumulativeDefaults":"HistoryDefaults"
     ,"累计违约余额":"HistoryDefaults"
 }

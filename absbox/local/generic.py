@@ -70,7 +70,7 @@ class Generic:
             "custom": tz.valmap(mkCustom, self.custom) if self.custom else None,
             "triggers": renameKs2({k: {_k: mkTrigger(_v) for (_k,_v) in v.items() } for (k, v) in self.trigger.items()},englishDealCycle) if self.trigger else None,
             "liqProvider": {ln: mkLiqProvider(ln, lo | {"start":lastCloseDate} ) 
-                               for ln,lo in self.liqFacility.items() } if self.liqFacility else None,
+                            for ln,lo in self.liqFacility.items() } if self.liqFacility else None,
             "ledgers": {ln: mkLedger(ln, v) for ln,v in self.ledgers.items()} if self.ledgers else None
         }
 

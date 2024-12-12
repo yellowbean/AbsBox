@@ -79,16 +79,7 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
                                ,("MultiLedger", readLedgers(ledgerDf[1]))
                                ,("MultiTrigger", readTriggers(r.get("triggers",{})))
                                ])
-    # section 5
-    #triggerDf = ("Trigger", r.get("triggers",{}))
-    #section5 = [ div[ h2(id=f"anchor-{_t}")[_t]
-    #                 , [ div[ h3(id=f"anchor-{_t}-{k}")[k]
-    #                         #, div[">",list(v.items())]
-    #                         ,buildSection([ (j,k)  for j,k in v.items()], title_=(h4,h5), anchor=f"{_t}-{k}")
-    #                         ]
-    #                     for k,v in x.items() if v is not None]
-    #                 ]
-    #                for (_t, x) in [triggerDf] if x is not None]
+
 
     dealName = r['_deal']['contents']['name']
     c = html[

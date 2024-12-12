@@ -68,7 +68,7 @@
             }
           ],
           "asOfDate": "2022-10-02",
-          "issuanceStat": null,
+          "issuanceStat": {},
           "futureCf": null,
           "extendPeriods": {
             "tag": "MonthEnd"

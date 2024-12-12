@@ -1,7 +1,7 @@
 from absbox.local.util import mkTag, mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
 from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
-from absbox.local.util import filter_by_tags, enumVals, lmap, readTagMap, patchDicts
+from absbox.local.util import filter_by_tags, enumVals, lmap, readTagMap, patchDicts,updateKs
 from absbox.local.base import *
 
 import sys
@@ -1193,6 +1193,7 @@ def mkWaterfall(r, x):
     r[_w_tag] = lmap(mkAction, _v)
     return mkWaterfall(r, x)
 
+
 def mkRoundingType(x):
     match x:
         case ["floor", r]:
@@ -1201,6 +1202,7 @@ def mkRoundingType(x):
             return mkTag(("RoundCeil", r))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkRoundingType")
+
 
 def mkAssetRate(x):
     match x:
@@ -1297,6 +1299,7 @@ def mkAccRule(x):
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkAccRule")
 
+
 def mkInvoiceFeeType(x):
     match x :
         case ("Fixed", amt) | ("固定", amt):
@@ -1312,6 +1315,7 @@ def mkInvoiceFeeType(x):
         case _:
             raise RuntimeError(f"Failed to match {x}:mkInvoiceFeeType")
 
+
 def mkCapacity(x):
     match x: 
         case ("固定", c) | ("Fixed", c):
@@ -1320,6 +1324,7 @@ def mkCapacity(x):
             return mkTag(("CapacityByTerm", cs))
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkCapacity")
+
 
 def mkObligor(x:dict) -> dict:
     def mkObligorFields(y:dict) -> dict:
@@ -1462,7 +1467,7 @@ def identify_deal_type(x):
                 return "MDeal"
             case {"assets": [], "futureCf": cfs} if cfs['contents'][1][0]['tag'] == 'MortgageFlow':
                 return "MDeal"
-            case {"assets": [{'tag': 'Installment'}, *rest]}:
+            case {"assets": [{'tag': 'Installment'}, *rest]} :
                 return "IDeal"
             case {"assets": [{'tag': 'Lease'}, *rest]} | {"assets": [{'tag': 'RegularLease'}, *rest]}:
                 return "RDeal"
@@ -1474,28 +1479,34 @@ def identify_deal_type(x):
                 return "VDeal"
             case {"assets": [{'tag': 'ProjectedFlowMix'}, *rest]} | {"assets": [{'tag': 'ProjectedFlowMixFloater'}, *rest]}:
                 return "PDeal"
+            case {"assets": [{'tag': 'IL'}, *rest]} | {"assets": [{'tag': 'MO'}, *rest]} | \
+                {"assets": [{'tag': 'LO'}, *rest]} | {"assets": [{'tag': 'LS'}, *rest]} | \
+                {"assets": [{'tag': 'FA'}, *rest]} | {"assets": [{'tag': 'RE'}, *rest]} | \
+                {"assets": [{'tag': 'PF'}, *rest]} :
+                return "UDeal"
             case _:
-                raise RuntimeError(f"Failed to identify deal type {z}")
+                raise RuntimeError(f"Failed to identify pool type {z}")
     y = None
     match x:
+        # single pool
         case {"pool":{"tag":"MultiPool","contents":{"PoolConsol":{"assets":[]}}}} if len(x['pool']['contents']['PoolConsol']['futureCf'])>0:
             return id_by_pool_assets(x['pool']['contents']['PoolConsol'])
         case {"pool":{"tag":"MultiPool","contents":{"PoolConsol":{"assets":assetList}}}} if len(assetList) > 1: 
             return id_by_pool_assets(x['pool']['contents']['PoolConsol'])
+        # multiple pools        
         case {"pool":{"tag":"MultiPool","contents":poolMap}}:
             pools = list(map(id_by_pool_assets, poolMap & lens.Values().collect()))
-
             if len(set(pools))>1:
                 return "UDeal"
             else:
                 return pools[0]
+        # resec deals
         case {"pool":{"tag":"ResecDeal"}}:
             vs = [ v['deal'] for k,v in x["pool"]['contents'].items() ]
             assetTypes = set(map(identify_deal_type, vs))
             if len(assetTypes)>1:
                 return "UDeal"
             else:
-                print(assetTypes, "<<<")
                 return list(assetTypes)[0]
         case _:
             raise RuntimeError(f"Failed to match pool type {x}")
@@ -1789,25 +1800,30 @@ def mkPoolType(assetDate, x, mixedFlag) -> dict:
                                         {"deal":dealObj.json['contents'],"future":None,"futureScheduleCf":None,"issuanceStat":None}\
                                           for ((bn,pct,sd),dealObj) in x['deals'].items()} ))
         case x if all([ isinstance(_,dict) for _ in x.values() ]):
-            return mkTag(("MultiPool" ,{f"PoolName:{k}":mkPoolComp(vDate(assetDate),v,mixedFlag) for (k,v) in x.items()}))
+            return mkTag(("MultiPool" 
+                        ,{f"PoolName:{k}":mkPoolComp(vDate(assetDate),v,mixedFlag) 
+                            for (k,v) in x.items()})
+                        )
         case _ :
             raise RuntimeError("Failed to match pool type ",x)
 
 
 def mkPoolComp(asOfDate, x, mixFlag) -> dict:
-    assetFactory = mkAsset if (not mixFlag) else mkAssetUnion
-    r = {"assets": [assetFactory(y) for y in getValWithKs(x, ['assets', "清单"],defaultReturn=[])]
+    assetFactory = mkAssetUnion if mixFlag else mkAsset
+    r = {"assets": [assetFactory(y) for y in getValWithKs(x, ['assets', "清单"], defaultReturn=[])]
         , "asOfDate": asOfDate
-        , "issuanceStat": getValWithKs(x,["issuanceStat", "统计", "发行","Issuance"])
-        , "futureCf":mkCf(getValWithKs(x,['cashflow', '现金流归集表', '归集表'],[]))
-        , "extendPeriods":mkDatePattern(getValWithKs(x,['extendBy'], "MonthEnd"))}
+        , "issuanceStat": tz.pipe(getValWithKs(x, ["issuanceStat", "统计", "发行", "Issuance"],defaultReturn={})
+                                , lambda y: updateKs(y, validCutoffFields)  
+                                )
+        , "futureCf":mkCf(getValWithKs(x, ['cashflow', '现金流归集表', '归集表'], []))
+        , "extendPeriods":mkDatePattern(getValWithKs(x, ['extendBy'], "MonthEnd"))}
     return r
 
 
 def mkPool(x: dict):
     mapping = {"LDeal": "LPool", "MDeal": "MPool",
                "IDeal": "IPool", "RDeal": "RPool", "FDeal":"FPool",
-               "VDeal": "VPool", "UDeal":"UPool"}
+               "VDeal": "VPool", "UDeal": "UPool"}
     match x:
         case {"清单": assets, "封包日": d} | {"assets": assets, "cutoffDate": d}:
             _pool = {"assets": [mkAsset(a) for a in assets] , "asOfDate": d}
@@ -1898,7 +1914,8 @@ def mkCf(x:list):
     else:
         cfs = [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None,None])) for _x in x]
         return mkTag(("CashFlowFrame", [[0,"1900-01-01",None],cfs]))
-    
+
+
 def mkCashFlowFrame(x):
     """ Make cashflow frame """ 
     flows = x.get("flows",[])
@@ -2208,6 +2225,7 @@ def mkRateAssumption(x):
         case _ :
             raise RuntimeError(f"Failed to match RateAssumption:{x}")
 
+
 def mkFundingPlan(x:tuple):
     # IssueBondEvent mPre bondName accountName Bond mFormula mFormula
     match x:
@@ -2228,6 +2246,7 @@ def mkRefiPlan(x:tuple):
             return [vDate(d), mkTag(("RefiRate",[vStr(accName), vStr(bndName), mkBondRate(interestInfo) ]))]
         case _:
             raise RuntimeError(f"Failed to match mkRefinancePlan:{x}")
+
 
 def mkInspect(x):
     match x:

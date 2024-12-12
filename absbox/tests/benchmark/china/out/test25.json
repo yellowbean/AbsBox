@@ -36,7 +36,7 @@
           "assets": [],
           "asOfDate": "2023-05-31",
           "issuanceStat": {
-            "\u8d44\u4ea7\u6c60\u89c4\u6a21": 3345673979.83
+            "IssuanceBalance": 3345673979.83
           },
           "futureCf": {
             "tag": "CashFlowFrame",

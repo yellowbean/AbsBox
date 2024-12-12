@@ -37,7 +37,7 @@
           "assets": [],
           "asOfDate": "2022-06-30",
           "issuanceStat": {
-            "\u8d44\u4ea7\u6c60\u89c4\u6a21": 4057999932.76
+            "IssuanceBalance": 4057999932.76
           },
           "futureCf": {
             "tag": "CashFlowFrame",

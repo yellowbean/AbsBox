@@ -211,13 +211,19 @@ def applyFnToKey(m: dict, f, k, applyNone=False):
     return m
 
 
-def renameKs2(m: dict, kmapping):
+def renameKs2(m: dict, kmapping:dict) -> dict:
     ''' Given a map, rename ks from a key-mapping '''
     assert isinstance(m, dict), "M is not a map"
     assert isinstance(kmapping, dict), f"Mapping is not a map: {kmapping}"
     assert set(m.keys()).issubset(set(kmapping.keys())), f"{m.keys()} not in {kmapping.keys()}"
     return {kmapping[k]: v for k, v in m.items()}
 
+def updateKs(m: dict, kmapping:dict) -> dict:
+    ''' Given a map, update ks from a key-mapping '''
+    assert isinstance(m, dict), "M is not a map"
+    assert isinstance(kmapping, dict), f"Mapping is not a map: {kmapping}"
+
+    return {kmapping.get(k,k):v for k,v in m.items()}
 
 def ensure100(xs, msg=""):
     assert sum(xs) == 1.0, f"Doesn't not sum up 100%: {msg}"
@@ -436,8 +442,10 @@ def enumVals(e) -> list:
     ''' return a list of enum values '''
     return [_.value for _ in [*e]]
 
+
 def readCfFromLst(lst:list)-> pd.DataFrame:
     return None
+
 
 def tupleToDictWithKey(xs,key="name"):
     return dict([ (n,x|{key:n}) for (n,x) in xs ])
