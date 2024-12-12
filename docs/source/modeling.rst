@@ -3264,7 +3264,7 @@ It provides unlimit liquidity. There is unlimited of cash can be drawn out of it
 
 .. code-block:: python 
 
-  {"type" : "Unlimited"
+  {"type" : "Unlimit"
   ,"start": <Date>}
 
 Fix Support
