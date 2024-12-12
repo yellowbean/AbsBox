@@ -1715,7 +1715,7 @@ def mkObligorStrategy(x):
         case ("ById",ids,assumps)| ("ByID",ids,assumps):
             return mkTag(("ObligorById",[[vStr(i) for i in ids],mkPDF(*assumps)]))
         case ("ByTag", tags, rule, assumps):
-            return mkTag(("ObligorByTag",[lmap(mkRule,tags), mkRule(rule),mkPDF(*assumps)]))
+            return mkTag(("ObligorByTag",[tags, mkRule(rule),mkPDF(*assumps)]))
         case ("ByField", fieldRules, assumps):
             return mkTag(("ObligorByField",[lmap(mkFieldRule,fieldRules),mkPDF(*assumps)]))
         case ("ByDefault",assumps) | ("_",assumps):
