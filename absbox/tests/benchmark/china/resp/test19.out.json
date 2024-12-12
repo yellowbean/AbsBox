@@ -34313,7 +34313,8 @@
           },
           {
             "tag": "Amortizing"
-          }
+          },
+          "By Deal Close"
         ]
       },
       {
@@ -34335,7 +34336,8 @@
           {
             "tag": "DealAccelerated",
             "contents": null
-          }
+          },
+          "By trigger"
         ]
       },
       {
