@@ -1119,13 +1119,15 @@ def mkThreshold(x):
 
 def mkTrigger(x: dict):
     match x:
-        case {"condition":p, "effects":e, "status":st, "curable":c} | {"条件":p, "效果":e, "状态":st, "重置":c}:
+        case {"condition":p, "effects":e} | {"条件":p, "效果":e}:
             triggerName = getValWithKs(x,["name", "名称"],defaultReturn="")
+            status = getValWithKs(x,["status", "状态"],defaultReturn=False)
+            curable = getValWithKs(x,["curable", "重置"],defaultReturn=False)
             return {"trgName":triggerName
                     ,"trgCondition":mkPre(p)
                     ,"trgEffects":mkTriggerEffect(e)
-                    ,"trgStatus":st
-                    ,"trgCurable":vBool(c)}
+                    ,"trgStatus":vBool(status)
+                    ,"trgCurable":vBool(curable)}
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkTrigger")
 
