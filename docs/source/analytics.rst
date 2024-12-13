@@ -783,9 +783,12 @@ pool of revolving assets
     :code:`["constant",asset1,asset2....]`
 
     there are three types of revolving pools:
-      * constant : assets in the pool will not change after buy
-      * static : assets size will be shrink after buy
-      * curve : assets available for bought will be determined by a time based curve
+      * ``constant`` : assets in the pool will not change after buy
+      * ``static`` : assets size will be shrink after buy
+      * ``curve`` : assets available for bought will be determined by a time based curve
+
+
+
 
 assumption for revolving pool
     :code:`<same as pool performance>` 
@@ -800,6 +803,27 @@ assumption for revolving pool
        ,("Pool",("Mortgage",{"CDR":0.07},None,None,None)
                  ,None
                  ,None))
+
+User has the option to set multiple revovling pool in assumption  which represents different characteristics of assets to buy.
+
+.. code-block:: python
+
+  ("revolving"
+      ,{"rA":(["constant",revol_asset1]
+              ,("Pool",("Mortgage",{"CDR":0.07},None,None,None)
+                        ,None
+                        ,None)),
+        "rB":(["constant",revol_asset2]
+              ,("Pool",("Mortgage",{"CDR":0.03},None,None,None)
+                        ,None
+                        ,None)), 
+        "rC":(["constant",revol_asset3]
+              ,("Pool",("Mortgage",{"CDR":0.01},None,None,None)
+                        ,None
+                        ,None)),  
+      }
+  )
+
 
 
 Refinance Bonds 
