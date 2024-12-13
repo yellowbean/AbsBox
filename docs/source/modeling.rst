@@ -3008,8 +3008,8 @@ There are 4 fields in ``Triggers``:
 
   * ``Condition`` -> it will fire the trigger effects, when :ref:`Condition` is met
   * ``Effects`` -> what would happen if the trigger is fired
-  * ``Status`` -> it is triggered or not 
-  * ``Curable`` -> whether the trigger is curable
+  * ``Status`` -> it is triggered or not (if missing, default is False)
+  * ``Curable`` -> whether the trigger is curable (if missing, default is False)
 
 Syntax of trigger
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -3024,7 +3024,9 @@ it is a must to specify :ref:`Trigger Locations`
       ,"effects":..
       ,"status":..
       ,"curable":..}
-      ......
+    {"triggerName2WithDefaultValue":
+      {"condition":..
+      ,"effects":..}
     }
   ,"AfterCollect": # optional
     {}
@@ -3039,7 +3041,7 @@ it is a must to specify :ref:`Trigger Locations`
   * ``AfterCollect``
   * ``BeforeDistribution`` 
   * ``AfterDistribution``
-  * during the waterfall
+  * ``during the waterfall``
 
 When to run trigger
 ^^^^^^^^^^^^^^^^^^^^^^
