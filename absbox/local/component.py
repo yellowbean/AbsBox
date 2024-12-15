@@ -279,7 +279,7 @@ def mkDs(x):
             return mkTag("AllAccBalance")
         case ("账户余额", *ans) | ("accountBalance", *ans):
             return mkTag(("AccBalance", vList(ans, str)))
-        case ("账簿余额", dr, *ans) | ("ledgerBalance", dr, *ans) if dr in ["Credit","Debit","借方","贷方"]:
+        case ("账簿余额", dr, *ans) | ("ledgerBalance", dr, *ans) if dr in bookDirection.keys():
             return mkTag(("LedgerBalanceBy", [dr, vList(ans, str)]))
         case ("账簿余额", *ans) | ("ledgerBalance", *ans):
             return mkTag(("LedgerBalance", vList(ans, str)))
@@ -825,8 +825,8 @@ def mkBookType(x: list):
 
 def mkSupport(x:list):
     match x:
-        case ["account", accName, mBookType] | ["suppportAccount", accName, mBookType] | ["支持账户", accName, mBookType]:
-            return mkTag(("SupportAccount", [vStr(accName), mkBookType(mBookType)]))
+        case ["account", accName, (direction,ledgerName)] | ["suppportAccount", accName, (direction,ledgerName)] | ["支持账户", accName, (direction,ledgerName)] if direction in bookDirection.keys():
+            return mkTag(("SupportAccount", [vStr(accName), [vStr(bookDirection["direction"]),vStr(ledgerName)]]))
         case ["account", accName] | ["suppportAccount", accName] | ["支持账户", accName]:
             return mkTag(("SupportAccount", [vStr(accName), None]))
         case ["facility", liqName] | ["suppportFacility", liqName] | ["支持机构", liqName]:
@@ -1063,7 +1063,7 @@ def mkStatus(x: tuple|str):
             return mkTag(("Warehousing", None))
         case ("Warehousing", st) | ("储备", st):
             return mkTag(("Warehousing", mkStatus(st)))
-        case "循环" | "Revolving":
+        case "循环" | "Revolving" | "revolving":
             return mkTag(("Revolving"))
         case "RampUp":
             return mkTag(("RampUp"))
@@ -1837,11 +1837,11 @@ def mkPool(x: dict):
 
 def mkCustom(x: dict):
     match x:
-        case {"常量": n} | {"Constant": n}:
+        case {"常量": n} | {"Constant": n} | {"const": n}:
             return mkTag(("CustomConstant", n))
-        case {"余额曲线": ts} | {"BalanceCurve": ts}:
+        case {"余额曲线": ts} | {"BalanceCurve": ts} | {"curve": ts}:
             return mkTag(("CustomCurve", mkTs("BalanceCurve", ts)))
-        case {"公式": ds} | {"Formula": ds}:
+        case {"公式": ds} | {"Formula": ds} | {"ds": ds}:
             return mkTag(("CustomDS", mkDs(ds)))
 
 
@@ -2012,6 +2012,8 @@ def readPricingResult(x, locale) -> dict | None:
 def readPoolCf(x, lang='english'):
     r = None
     cflow = x[1]
+    if not cflow:
+        return pd.DataFrame()
     _pool_cf_header,_,expandFlag = guess_pool_flow_header(cflow[0], lang)
     if not expandFlag:
         r = pd.DataFrame(list(tz.pluck('contents',cflow)), columns=_pool_cf_header)
@@ -2229,8 +2231,9 @@ def mkRateAssumption(x):
 
 
 def mkFundingPlan(x:tuple):
-    # IssueBondEvent mPre bondName accountName Bond mFormula mFormula
     match x:
+        case ("bond", d, p, bName, accName, bal):
+            return [vDate(d), mkTag(("FundingBondEvent",[earlyReturnNone(mkPre,p),vStr(bName),vStr(accName),vNum(bal)]))] 
         case (d,p,bName,accName,bnd,mBal,mRate):
             return [vDate(d), mkTag(("IssueBondEvent",[earlyReturnNone(mkPre,p),vStr(bName),vStr(accName)
                                                        ,mkBnd(bnd["name"],bnd|{"startDate":vDate(d)})|{"tag":"Bond"}

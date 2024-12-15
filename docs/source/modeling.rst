@@ -1706,7 +1706,7 @@ The rule was defined as a *List*, each element is a *List* with 2 elements.
   * if it is just an `account name`,then 100% of ``Proceeds`` will be flowed into that account
 
 syntax
-  * ``[<Proceeds from pool>, <Account to be depsit>]``
+  * ``[<Proceeds from pool>, <Account to be deposit>]``
   * ``[<Proceeds from pool>, [<Allocation ration1>,<Account01>],[<Allocation ration2>,<Account02>]... ]``
 
 
@@ -1721,6 +1721,18 @@ exmaple:
     ,["CollectedPrepayment","acc01"] 
     # 100% of prepayment will be allocated to acc01
     ,["CollectedRecoveries","acc01"]]
+
+Collect Proceeds from multiple pools
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+syntax
+  * ``[ [<Pool Name>],<Proceeds from pool>, <Account to be deposit>]``
+
+for example:
+
+.. code-block:: python 
+
+  ["pool_A","pool_B","pool_C"],"CollectedCash","acc01"]
 
 
 
@@ -2502,7 +2514,7 @@ PayPrin
 
     ``["payPrin", {Account}, [<Bonds>], m ]``      # pay bond via pro-rata basis
     
-    `m`is just map same in the `payFee` , which has keys :
+    ``m``is just map same in the ``payFee`` , which has keys :
 
       * ``limit`` -> :ref:`<limit>`
       * ``support`` -> :ref:`<support>`
@@ -2527,7 +2539,7 @@ PayPrinBySeq
   syntax
     ``["payPrinBySeq", {Account}, [<Bonds>], m ]``  # pay bonds by sequential, with optional cap in `m` ,:ref:`PayBond Sequential`
 
-    `m`is just map same in the `payFee` , which has keys :
+    ``m``is just map same in the ``payFee`` , which has keys :
 
       * ``limit`` -> :ref:`<limit>`
       * ``support`` -> :ref:`<support>`
@@ -2607,7 +2619,7 @@ Calc Bond Principal Due
     
     ``["calcBondPrin", <Account>, [<Bond>], m ]``
     
-    `m`is just map same in the `payFee` , which has keys :
+    ``m``is just map same in the ``payFee`` , which has keys :
 
       * ``limit`` -> :ref:`<limit>`
       * ``support`` -> :ref:`<support>`
@@ -2630,7 +2642,7 @@ Accure Interest and Pay of Bond Group
 
     ``["accrueAndPayIntByGroup", "A", order, m]``
     
-  `m`is just map same in the `payFee` , which has keys :
+  ``m``is just map same in the ``payFee`` , which has keys :
 
     * ``limit`` -> :ref:`<limit>`
     * ``support`` -> :ref:`<support>`
@@ -2645,7 +2657,7 @@ Pay Interest to Bond Group
 
     ``["payIntByGroup", "A", order, m]``
     
-  `m`is just map same in the `payFee` , which has keys :
+  ``m``is just map same in the ``payFee`` , which has keys :
 
     * ``limit`` -> :ref:`<limit>`
     * ``support`` -> :ref:`<support>`
@@ -2658,7 +2670,7 @@ Pay Principal to Bond Group
     
     ``["payPrinByGroup", "A", order, m]``
     
-  `m`is just map same in the `payFee` , which has keys :
+  ``m``is just map same in the ``payFee`` , which has keys :
 
     * ``limit`` -> :ref:`<limit>`
     * ``support`` -> :ref:`<support>`
@@ -2974,6 +2986,9 @@ examples:
     * supported by accounts : 
     
       *  ``["account","accountName"]``
+    * supported by accounts and book ledger: 
+    
+      *  ``["account","accountName",("Debit","ledgerName")]``
     * supported by liquidity provider: 
     
       *  ``["facility","liquidity provider name"]``

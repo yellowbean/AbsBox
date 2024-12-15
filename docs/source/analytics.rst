@@ -1062,6 +1062,18 @@ syntax
 Issue Bonds (Master Trust & Warehousing)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. list-table:: bond financing type
+   :header-rows: 1
+
+   * - Financing type
+     - Use case
+   * - ``fundingPlan(bond group)``
+     - insert new bonds to bond group
+   * - ``dynamic fundingPlan``
+     - insert new bonds to bond group,but with a optional condition and optional balance/rate
+   * - ``fundingPlan(single bond)``
+     - change balance size of existing bond with optional condition
+
 .. versionadded:: 0.28.9
 
 In the `Master Trust` or `Warehousing Funding` structure, the deal shall able to raise extra funds and create a new liability.
@@ -1069,19 +1081,35 @@ In the `Master Trust` or `Warehousing Funding` structure, the deal shall able to
 syntax
   ``("issueBond",<fundingPlan 1>,<fundingPlan 2>....)``
 
-fundingPlan
+
+.. graphviz::
+    :name: sphinx.ext.graphviz
+    :caption: funding-plan-type
+    :alt: funding-plan-type
+    :align: center
+    
+    digraph {
+        rankdir = LR
+        "IssueBond" -> "fundingPlan(bond group)"
+        "IssueBond" -> "dynamic fundingPlan"
+        "IssueBond" -> "fundingPlan(single bond)"
+    }
+
+
+fundingPlan(bond group)
   ``(<date of issuance>,<bond group name>,<account name>,<bond detail>)``
 
-.. versionadded:: 0.29.1
+
 
 dynamic fundingPlan
-  ``(<date of issuance>,<condition> , <bond group name>,<account name>,<bond detail>,<balance override>,<rate override>)``
+  .. versionadded:: 0.29.1
+  ``(<date of issuance>, <condition> , <bond group name>, <account name>, <bond detail>, <balance override>, <rate override>)``
+
+  same as ``fundingPlan`` but with an extra condition to check if the bond can be issued via a :ref:`Condition`
 
   * ``<condition>`` : a :ref:`Condition` to check if the bond should be issued
   * ``<balance override>`` : a :ref:`Formula` to override the balance of the bond
   * ``<rate override>`` : a :ref:`Formula` to override the rate of the bond
-  
-
 
 .. warning::
   In the ``bond detail``, share same syntax of :ref:`Bonds/Tranches` , but require extra field ``name``.
@@ -1111,6 +1139,20 @@ dynamic fundingPlan
 .. seealso::
   
   Example :ref:`Master Trust Example` 
+
+fundingPlan(single bond)
+  .. versionadded:: 0.40.8
+  funding a bond by increase the balance and deposit proceed to account
+  
+  ``("bond",<date of funding>,<Condition|None>, <bond name>, <account name>,<amount>)``
+
+
+.. code-block:: python
+
+  fundingPlan = [["2025-07-31",30000],["2025-12-31",5000] ]
+  
+  fundingPlanAssump = ("issueBond", *[ ("bond", x, None, "A1", "acc01", y) for (x,y) in fundingPlan ])
+
 
 
 
