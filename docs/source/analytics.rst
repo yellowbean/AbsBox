@@ -1066,12 +1066,16 @@ Issue Bonds (Master Trust & Warehousing)
    :header-rows: 1
 
    * - Financing type
+     - New Bond Created
      - Use case
    * - ``fundingPlan(bond group)``
+     - Yes
      - insert new bonds to bond group
    * - ``dynamic fundingPlan``
+     - Yes
      - insert new bonds to bond group,but with a optional condition and optional balance/rate
    * - ``fundingPlan(single bond)``
+     - No
      - change balance size of existing bond with optional condition
 
 .. versionadded:: 0.28.9
@@ -1090,9 +1094,9 @@ syntax
     
     digraph {
         rankdir = LR
-        "IssueBond" -> "fundingPlan(bond group)"
-        "IssueBond" -> "dynamic fundingPlan"
-        "IssueBond" -> "fundingPlan(single bond)"
+        "IssueBond" -> "fundingPlan(bond group)" -> "New Bond Created"
+        "IssueBond" -> "dynamic fundingPlan" -> "New Bond Created"
+        "IssueBond" -> "fundingPlan(single bond)" -> "Existing Bond size Increased"
     }
 
 
@@ -1691,8 +1695,11 @@ There are two types of validation message
   r['result']['logs']
 
 
-All-In-One HTML report
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+All-In-One HTML&Excel report
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+HTML Report
+""""""""""""
 .. versionadded:: 0.40.2
 
 In a single deal cashflow run, if user get a result object via a `read=True`, then there is a candy function `toHtml()` will help to dump all cashflow and summaries to a single HTML file.
@@ -1715,6 +1722,16 @@ If user are running with multi-scenario , just supply with a key
 .. code-block:: python
    
   toHtml(r['scen01'],"testOutHtml.html",style=OutputType.Anchor)
+
+Excel Report
+""""""""""""""""
+.. versionadded:: 0.40.8
+
+.. code-block:: python
+   
+  from absbox import toExcel
+
+  toExcel(r,"test.xlsx")
 
 
 Sensitivity Analysis

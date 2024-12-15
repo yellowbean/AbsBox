@@ -6,7 +6,7 @@ from htpy import body, h1, head, html, li, title, ul, div, span, h3, h2, a, h4,h
 from markupsafe import Markup
 from absbox import readInspect
 from absbox import readBondsCf,readFeesCf,readAccsCf,readPoolsCf,readLedgers,readTriggers
-
+import xlsxwriter
 
 class OutputType(int, enum.Enum):
     """Internal
@@ -34,6 +34,38 @@ def buildSectionFlat(lst:list, title_=h2, anchor=False):
     return [ div[ title_(id=f"anchor-{_t}")[_t],Markup(x.to_html())] 
             for (_t, x) in lst if x is not None]
 
+
+def consolResp(r:dict):
+    bondDf = ("Bond", tz.valfilter(lambda x: isinstance(x, pd.DataFrame), r['bonds']))
+    bondGrpDf = ("BondGroup", 
+                  tz.pipe(tz.valfilter(lambda x: not isinstance(x, pd.DataFrame), r['bonds'])
+                          ,lambda x : {f"{k}-{k2}":v2 for k,v in x.items()
+                                         for k2,v2 in v.items()}))
+    poolDf = ("Pool", r['pool']['flow'])
+    accDf = ("Accounts", r['accounts'])
+    feeDf = ("Fee", r['fees'])
+
+    reportDf = ("Finanical Reports", r['result'].get('report', {}))
+    
+    results = dict([("Status",r['result']['status'])
+                    ,("Pricing",r["pricing"])
+                    ,("Bond Summary",r['result']['bonds'])
+                    ,("Log",r['result']['logs'])
+                    ,("Waterfall",r['result']['waterfall'])
+                    ,("Inspect",readInspect(r['result']))])
+    
+
+    jointDfs =[("MultiFee",readFeesCf(feeDf[1]))
+               ,("MultiBond",readBondsCf(bondDf[1],popColumns=[]))
+               ,("MultiAccounts",readAccsCf(accDf[1]))
+               ,("MultiPools", readPoolsCf(poolDf[1]))
+               ,("MultiLedger", readLedgers(r.get("ledgers",{})))
+               ,("MultiTrigger", readTriggers(r.get("triggers",{})))]
+    return dict(
+        [bondDf]+[bondGrpDf]+[poolDf]+[accDf]+[feeDf]\
+        +[reportDf]+[("result",results)]+[ (x[0],{x[0]:x[1]}) for x in jointDfs ]
+    )
+
 def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
     """
     r : must be a result from "read=True"
@@ -53,8 +85,6 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
     poolDf = ("Pool", r['pool']['flow'])
     accDf = ("Accounts", r['accounts'])
     feeDf = ("Fee", r['fees'])
-    #section1 = [div[h2(id=f"anchor-{_t}")[_t], mapToList(x, anchor=_t)]
-    #            for (_t, x) in [poolDf, feeDf, accDf]]
     section1 = buildSection([poolDf, feeDf, accDf])
 
     # section 2
@@ -106,3 +136,44 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
         absPath = os.path.abspath(os.path.join(os.getcwd(),p))
 
     return absPath
+
+
+def toExcel(r:dict, p:str,exlude=[],headerFormat={'bold': True, 'bg_color': '#9fdd92','align':'center'}):
+    x = consolResp(r)
+
+    def annotateLoc(m:dict, skip=3):
+        assert isinstance(m, dict),"annotateLoc must be a dict"
+        if not m:
+            return {}
+        _r = {}
+        beginRow = skip
+        for k,v in m.items():
+            if (v is None) or v.empty:
+                continue
+            _r[k] = beginRow
+            beginRow += v.index.size + skip
+        return _r
+
+    locMap = tz.valmap(annotateLoc, x)
+
+    with pd.ExcelWriter(p, mode='w', engine='xlsxwriter') as writer: 
+        workbook = writer.book
+        hFormat = workbook.add_format(headerFormat)
+        for cat, m in x.items():
+            if cat in exlude:
+                continue
+            workbook.add_worksheet(cat)
+            currentSheet = writer.sheets[cat]
+            for k,v in m.items():
+                if v is None:
+                    continue
+                if v.empty:
+                    continue
+                currentSheet.write(locMap[cat][k]-1, 0, k, hFormat)
+                v.to_excel(writer, sheet_name=cat, startrow=locMap[cat][k])
+            currentSheet.autofit()
+
+    return os.path.abspath(os.path.join(os.getcwd(),p))
+
+
+

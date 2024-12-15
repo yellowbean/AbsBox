@@ -36,7 +36,8 @@ dependencies = [
     "htpy",
     "dateparser",
     "pyxirr",
-    "more-itertools"
+    "more-itertools",
+    "xlsxwriter"
 ]
 
 keywords = ["cashflow", "abs", "mbs", "cashflow model", "rmbs" ,"clo", "cashflow engine","structuring", "srt"]
