@@ -1725,13 +1725,22 @@ If user are running with multi-scenario , just supply with a key
 
 Excel Report
 """"""""""""""""
-.. versionadded:: 0.40.8
+.. versionadded:: 0.40.9
 
 .. code-block:: python
    
   from absbox import toExcel
 
   toExcel(r,"test.xlsx")
+
+
+User who persues aesthetics may set extra format style. (ref:https://xlsxwriter.readthedocs.io/format.html)
+
+
+.. code-block:: python
+
+  toExcel(r,"test.xlsx", headerFormat={'bold': True, 'font_color': 'black', 'bg_color': '#000080'})
+
 
 
 Sensitivity Analysis
