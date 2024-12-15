@@ -67,7 +67,7 @@ test = [
     "jsondiff",
     "deepdiff",
     "ipykernel",
-    "pytest-notebook"
+    "pytest-notebook",
 ]
 
 [tool.towncrier]
