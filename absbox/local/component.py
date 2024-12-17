@@ -299,6 +299,8 @@ def mkDs(x):
             return mkTag(("LastBondPrinPaid", vList(bnds, str)))
         case ("债券低于目标余额", bn) | ("behindTargetBalance", bn):
             return mkTag(("BondBalanceGap", vStr(bn)))
+        case ("累积募资", *bnds) | ("totalFunded", *bnds):
+            return mkTag(("BondTotalFunding", vList(bnds,str)))
         case ("已提供流动性", *liqName) | ("liqBalance", *liqName):
             return mkTag(("LiqBalance", liqName))
         case ("流动性额度", *liqName) | ("liqCredit", *liqName):
@@ -1022,9 +1024,9 @@ def mkAction(x:list):
         ## Rate Cap
         case ["利率结算", acc, capName] | ["settleCap", acc, capName]:
             return mkTag(("CollectRateCap", [vStr(acc), vStr(capName)]))
-        case ["条件执行", pre, *actions] | ["If", pre, *actions]:
+        case ["条件执行", pre, *actions] | ["If", pre, *actions] | ["if", pre, *actions] :
             return mkTag(("ActionWithPre", [mkPre(pre), lmap(mkAction,actions)]))
-        case ["条件执行2", pre, actions1, actions2] | ["IfElse", pre, actions1, actions2]:
+        case ["条件执行2", pre, actions1, actions2] | ["IfElse", pre, actions1, actions2] | ["ifelse", pre, actions1, actions2]:
             return mkTag(("ActionWithPre2", [mkPre(pre), lmap(mkAction,actions1), lmap(mkAction,actions2)]))
         ## Revolving buy
         ### Revolving buy with optional limit and target pool

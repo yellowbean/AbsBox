@@ -235,6 +235,9 @@ Bond
     * ``("bondTxnAmt", None,"A")``  -> Total transaction amount of bond 'A'
     * ``("bondTxnAmt", "<PayInt:A>","A")``  -> Total transaction amount of interest payment bond 'A'
 
+    .. versionadded:: 0.40.9
+    * ``("totalFunded","A","B")``  -> sum of funded amount for bond A and bond B
+    
 Pool 
 """""""
     * ``("poolBalance",)``  -> current pool balance
@@ -946,6 +949,10 @@ syntax
    ("VAT"
      ,{"type":{"targetBalanceFee":[("poolBalance",),("bondBalance",)]))
 
+   # the fee is total funded amount * 1%
+   ("upfrontFee"
+     ,{"type":{"targetBalanceFee":[ ("*", ("totalFunded","A1","E"),0.01)
+                                     , ("feeTxnAmt",None,"upfrontFee") ]}})
 
 fee by collection periods
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

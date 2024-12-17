@@ -141,6 +141,8 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
 def toExcel(r:dict, p:str,exlude=[],headerFormat={'bold': True, 'bg_color': '#9fdd92','align':'center'}):
     x = consolResp(r)
 
+    #filter out empty in m
+
     def annotateLoc(m:dict, skip=3):
         assert isinstance(m, dict),"annotateLoc must be a dict"
         if not m:
