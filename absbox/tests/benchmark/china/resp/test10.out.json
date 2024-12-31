@@ -626,10 +626,7 @@
                   0,
                   0,
                   0.2,
-                  [
-                    "<PayPrin:B>",
-                    "<PayYield:B>"
-                  ]
+                  "<PayYield:B>"
                 ]
               },
               {
@@ -644,10 +641,7 @@
                   0,
                   0,
                   0.2,
-                  [
-                    "<PayPrin:B>",
-                    "<PayYield:B>"
-                  ]
+                  "<PayYield:B>"
                 ]
               },
               {
@@ -662,10 +656,7 @@
                   0,
                   0,
                   0.2,
-                  [
-                    "<PayPrin:B>",
-                    "<PayYield:B>"
-                  ]
+                  "<PayYield:B>"
                 ]
               },
               {
@@ -680,10 +671,7 @@
                   0,
                   0,
                   0.2,
-                  [
-                    "<PayPrin:B>",
-                    "<PayYield:B>"
-                  ]
+                  "<PayYield:B>"
                 ]
               }
             ]
