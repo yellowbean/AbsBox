@@ -20,6 +20,9 @@ def readBondStmt(respBond):
         case {'tag':'Bond', **singleBndMap }:
             bStmt = mapNone(singleBndMap.get('bndStmt',[]),[])
             return pd.DataFrame(list(tz.pluck("contents", bStmt)), columns=english_bondflow_fields).set_index("date")
+        case {'tag':'MultiIntBond', **singleBndMap }:
+            bStmt = mapNone(singleBndMap.get('bndStmt',[]),[])
+            return pd.DataFrame(list(tz.pluck("contents", bStmt)), columns=english_bondflow_fields).set_index("date")
         case _:
             raise RuntimeError("Failed to read bond flow from resp",respBond)
 

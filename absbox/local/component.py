@@ -6,7 +6,7 @@ from absbox.local.base import *
 
 import sys
 
-from absbox.validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool
+from absbox.validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple
 from schema import Or
 from enum import Enum
 import itertools
@@ -186,212 +186,218 @@ def mkPoolSource(x):
 @functools.lru_cache(maxsize=128)
 def mkDs(x):
     "Making Deal Stats"
-    match x:
-        case ("债券余额",) | ("bondBalance",):
-            return mkTag("CurrentBondBalance")
-        case ("债券余额", *bnds) | ("bondBalance", *bnds):
-            return mkTag(("CurrentBondBalanceOf", vList(bnds, str)))
-        case ("债券应付本金", *bnds) | ("bondDuePrin", *bnds):
-            return mkTag(("BondDuePrin", vList(bnds, str)))
-        case ("初始债券余额",*bnds) | ("originalBondBalance",*bnds):
-            if bnds:
-                return mkTag(("OriginalBondBalanceOf", vList(bnds, str)))
-            return mkTag("OriginalBondBalance")
-        case ("到期月份", bn) | ("monthsTillMaturity", bn):
-            return mkTag(("MonthsTillMaturity", vStr(bn)))
-        case ("资产池余额", *pNames) | ("poolBalance", *pNames):
-            if pNames:
-                return mkTag(("CurrentPoolBalance", lmap(mkPid,pNames)))
-            return mkTag(("CurrentPoolBalance", None))
-        case ("资产池期初余额", *pNames) | ("poolBegBalance", *pNames):
-            if pNames:
-                return mkTag(("CurrentPoolBegBalance", lmap(mkPid,pNames)))
-            return mkTag(("CurrentPoolBegBalance", None))
-        case ("初始资产池余额", *pNames) | ("originalPoolBalance", *pNames):
-            if pNames:
-                return mkTag(("OriginalPoolBalance", lmap(mkPid,pNames)))
-            return mkTag(("OriginalPoolBalance", None))
-        case ("资产池违约余额", *pNames) | ("currentPoolDefaultedBalance", *pNames): #DEPRECATE
-            if pNames:
-                return mkTag(("CurrentPoolDefaultedBalance", lmap(mkPid, pNames)))
-            return mkTag(("CurrentPoolDefaultedBalance", None))
-        case ("资产池累计违约余额", *pNames) | ("cumPoolDefaultedBalance", *pNames): #DEPRECATE
-            if pNames:
-                return mkTag(("CumulativePoolDefaultedBalance",lmap(mkPid, pNames)))
-            return mkTag(("CumulativePoolDefaultedBalance", None))
-        case ("资产池累计违约率", *pNames) | ("cumPoolDefaultedRate", *pNames):  # DEPRECATE
-            if pNames:
-                return mkTag(("CumulativePoolDefaultedRate", lmap(mkPid,pNames)))
-            return mkTag(("CumulativePoolDefaultedRate", None))
-        case ("资产池累计违约率", n, *pNames) | ("cumPoolDefaultedRateTill", n, *pNames): # DEPRECATE
-            if pNames:
-                return mkTag(("CumulativePoolDefaultedRateTill", [n,lmap(mkPid,pNames)]))
-            return mkTag(("CumulativePoolDefaultedRateTill", [n,None]))
-        case ("资产池累计损失余额", *pNames) | ("cumPoolNetLoss", *pNames): # DEPRECATE
-            if pNames:
-                return mkTag(("CumulativeNetLoss", lmap(mkPid, pNames)))
-            return mkTag(("CumulativeNetLoss", None))
-        case ("资产池累计损失率",*pNames) | ("cumPoolNetLossRate",*pNames): # DEPRECATE
-            if pNames:
-                return mkTag(("CumulativeNetLossRatio", lmap(mkPid,pNames)))
-            return mkTag(("CumulativeNetLossRatio", None))
-        case ("资产池累计回收额",*pNames) | ("cumPoolRecoveries", *pNames): # DEPRECATE
-            if pNames:
-                return mkTag(("CumulativePoolRecoveriesBalance",lmap(mkPid,pNames)))
-            return mkTag(("CumulativePoolRecoveriesBalance",None))
-        case ("资产池累计", pNames, *i) | ("cumPoolCollection", pNames, *i):
-            if pNames:
-                return mkTag(("PoolCumCollection", [lmap(mkPoolSource,i) ,lmap(mkPid,pNames)]))
-            return mkTag(("PoolCumCollection", [lmap(mkPoolSource,i), None]))
-        case ("资产池累计至", pNames, idx, *i) | ("cumPoolCollectionTill", pNames, idx, *i):
-            if pNames:
-                return mkTag(("PoolCumCollectionTill", [idx, lmap(mkPoolSource,i) ,lmap(mkPid,pNames)] ))
-            return mkTag(("PoolCumCollectionTill", [idx, lmap(mkPoolSource,i), None] ))
-        case ("资产池当期", pNames, *i) | ("curPoolCollection", pNames, *i):
-            if pNames:
-                return mkTag(("PoolCurCollection", [lmap(mkPoolSource,i), lmap(mkPid,pNames)]))
-            return mkTag(("PoolCurCollection", [lmap(mkPoolSource,i), None]))
-        case ("资产池当期至", pNames, idx, *i) | ("curPoolCollectionStats", pNames, idx, *i):
-            if pNames:
-                return mkTag(("PoolCurCollectionStats", [idx, lmap(mkPoolSource,i), lmap(mkPid,pNames)]))
-            return mkTag(("PoolCollectionStats", [idx, lmap(mkPoolSource,i), None]))
-        case ("计划资产池估值", pricingMethod, *pNames) | ("schedulePoolValuation", pricingMethod, *pNames):
-            if pNames:
-                return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), lmap(mkPid,pNames)]))
-            return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), None]))
-        case ("债券系数", bn) | ("bondFactor", bn):
-            return mkTag(("BondFactorOf", bn))
-        case ("债券系数",) | ("bondFactor",):
-            return mkTag("BondFactor")
-        case ("资产池系数", *pNames) | ("poolFactor", *pNames):
-            if pNames:
-                return mkTag(("PoolFactor", lmap(mkPid,pNames)))
-            return mkTag(("PoolFactor", None))
-        case ("债券利率", bn) | ("bondRate", bn):
-            return mkTag(("BondRate", vStr(bn)))
-        case ("债券加权利率", *bn) | ("bondWaRate", *bn):
-            return mkTag(("BondWaRate", vList(bn, str)))
-        case ("资产池利率", *pNames) | ("poolWaRate", *pNames):
-            if pNames:
-                return mkTag(("PoolWaRate", lmap(mkPid, pNames)))
-            return mkTag(("PoolWaRate", None))
-        case ("所有账户余额",) | ("accountBalance"):
-            return mkTag("AllAccBalance")
-        case ("账户余额", *ans) | ("accountBalance", *ans):
-            return mkTag(("AccBalance", vList(ans, str)))
-        case ("账簿余额", dr, *ans) | ("ledgerBalance", dr, *ans) if dr in bookDirection.keys():
-            return mkTag(("LedgerBalanceBy", [dr, vList(ans, str)]))
-        case ("账簿余额", *ans) | ("ledgerBalance", *ans):
-            return mkTag(("LedgerBalance", vList(ans, str)))
-        case ("账簿发生额", lns, cmt) | ("ledgerTxnAmount", lns, cmt):
-            return mkTag(("LedgerTxnAmt", [vStr(lns), mkComment(cmt)]))
-        case ("账簿发生额", lns) | ("ledgerTxnAmount", lns):
-            return mkTag(("LedgerTxnAmt", [vStr(lns), None]))
-        case ("债券待付利息", *bnds) | ("bondDueInt", *bnds):
-            return mkTag(("CurrentDueBondInt", vList(bnds, str)))
-        case ("债券待付罚息", *bnds) | ("bondDueIntOverInt", *bnds):
-            return mkTag(("CurrentDueBondIntOverInt", vList(bnds, str)))
-        case ("债券待付合计利息", *bnds) | ("bondDueIntTotal", *bnds):
-            return mkTag(("CurrentDueBondIntTotal", vList(bnds, str)))
-        case ("债券当期已付利息", *bnds) | ("lastBondIntPaid", *bnds):
-            return mkTag(("LastBondIntPaid", vList(bnds, str)))
-        case ("债券当期已付本金", *bnds) | ("lastBondPrinPaid", *bnds):
-            return mkTag(("LastBondPrinPaid", vList(bnds, str)))
-        case ("债券低于目标余额", bn) | ("behindTargetBalance", bn):
-            return mkTag(("BondBalanceGap", vStr(bn)))
-        case ("累积募资", *bnds) | ("totalFunded", *bnds):
-            return mkTag(("BondTotalFunding", vList(bnds,str)))
-        case ("已提供流动性", *liqName) | ("liqBalance", *liqName):
-            return mkTag(("LiqBalance", liqName))
-        case ("流动性额度", *liqName) | ("liqCredit", *liqName):
-            return mkTag(("LiqCredit", liqName))
-        case ("rateCapNet", n):
-            return mkTag(("RateCapNet", n))
-        case ("rateSwapNet", n):
-            return mkTag(("RateSwapNet", n))
-        case ("债务人数量", *pNames) | ("borrowerNumber", *pNames):
-            if pNames:
-                return mkTag(("CurrentPoolBorrowerNum", lmap(mkPid, pNames)))
-            return mkTag(("CurrentPoolBorrowerNum"))
-        case ("期数",) | ("periodNum",):
-            return mkTag(("ProjCollectPeriodNum"))
-        case ("事件", loc, idx) | ("trigger", loc, idx):
-            if not loc in dealCycleMap:
-                raise RuntimeError(f" {loc} not in map {dealCycleMap}")
-            return mkTag(("TriggersStatus", [dealCycleMap[loc], idx]))
-        case ("阶段", st) | ("status", st):
-            return mkTag(("IsDealStatus", mkStatus(st)))
-        case ("待付费用", *fns) | ("feeDue", *fns):
-            return mkTag(("CurrentDueFee", fns))
-        case ("已付费用", *fns) | ("lastFeePaid", *fns):
-            return mkTag(("LastFeePaid", fns))
-        case ("费用支付总额", cmt, *fns) | ("feeTxnAmount", cmt, *fns) | ("feeTxnAmt", cmt, *fns):
-            return mkTag(("FeeTxnAmt", [fns, cmt]))
-        case ("债券支付总额", cmt, *bns) | ("bondTxnAmount", cmt, *bns) | ("bondTxnAmt", cmt, *bns):
-            return mkTag(("BondTxnAmt", [bns, cmt]))
-        case ("账户变动总额", cmt, *ans) | ("accountTxnAmount", cmt, *ans) | ("accountTxnAmt", cmt, *ans):
-            return mkTag(("AccTxnAmt", [ans, cmt]))
-        case ("系数", ds, f) | ("factor", ds, f) | ("*", ds, f) if isinstance(f, (int,float)):
-            return mkTag(("Factor", [mkDs(ds), f]))
-        case ("*", *ds):
-            return mkTag(("Multiply", lmap(mkDs, ds)))
-        case ("Min", *ds) | ("min", *ds):
-            return mkTag(("Min", lmap(mkDs, ds)))
-        case ("Max", *ds) | ("max", *ds):
-            return mkTag(("Max", lmap(mkDs, ds)))
-        case ("合计", *ds) | ("sum", *ds) | ("+", *ds):
-            return mkTag(("Sum", lmap(mkDs, ds)))
-        case ("差额", *ds) | ("substract", *ds) | ("subtract", *ds) | ("-", *ds):
-            return mkTag(("Substract", lmap(mkDs, ds)))
-        case ("常数", n) | ("constant", n) | ("const", n):
-            return mkTag(("Constant", n))
-        case ("储备账户缺口", *accs) | ("reserveGap", *accs):
-            return mkTag(("ReserveGap", accs))
-        case ("储备账户盈余", *accs) | ("reserveExcess", *accs):
-            return mkTag(("ReserveExcess", accs))
-        case ("储备账户目标", *accs) | ("reserveTarget", *accs):
-            return mkTag(("ReserveBalance", accs))
-        case ("最优先", bn, bns) | ("isMostSenior", bn, bns):
-            return mkTag(("IsMostSenior", bn, bns))
-        case ("清偿完毕", *bns) | ("isPaidOff", *bns):
-            return mkTag(("IsPaidOff", bns))
-        case ("isOutstanding", *bns):
-            return mkTag(("IsOutstanding", bns))
-        case ("逾期", *bns) | ("hasPassedMaturity", *bns):
-            return mkTag(("HasPassedMaturity",bns))
-        case ("比率测试", ds, op, r) | ("rateTest", ds, op, r):
-            return mkTag(("TestRate", [mkDs(ds), op_map[op], r]))
-        case ("所有测试", b, *ds) | ("allTest", b, *ds):
-            return mkTag(("TestAll", [b, [mkDs(_) for _ in ds]]))
-        case ("非", ds) | ("not", ds):
-            return mkTag(("TestNot", mkDs(ds)))
-        case ("任一测试", b, *ds) | ("anyTest", b, *ds):
-            return mkTag(("TestAny", [b, [mkDs(_) for _ in ds]]))
-        case ("自定义", n) | ("custom", n):
-            return mkTag(("UseCustomData", n))
-        case ("区间内", floor, cap, s) | ("floorCap", floor, cap, s):
-            return mkTag(("FloorAndCap", [floor, cap, s]))
-        case ("floorWith", ds1, ds2):
-            return mkTag(("FloorWith", [mkDs(ds1), mkDs(ds2)]))
-        case ("floorWithZero", ds1):
-            return mkTag(("FloorWithZero", mkDs(ds1)))
-        case ("excess", ds1, *dss) | ("超额", ds1, *dss):
-            return mkTag(("Excess", [mkDs(ds1)]+[mkDs(_) for _ in dss]))
-        case ("capWith", ds1, ds2):
-            return mkTag(("CapWith", [mkDs(ds1), mkDs(ds2)]))
-        case ("/", ds1, ds2) | ("divide", ds1, ds2):
-            return mkTag(("Divide", [mkDs(ds1), mkDs(ds2)]))
-        case ("比例", ds1, ds2) | ("ratio", ds1, ds2):
-            return mkTag(("DivideRatio", [mkDs(ds1), mkDs(ds2)]))
-        case ("abs", ds):
-            return mkTag(("Abs", mkDs(ds)))
-        case ("avg", *ds) | ("平均", *ds):
-            return mkTag(("Avg", [mkDs(_) for _ in ds]))
-        case ("avgRatio", *ds) | ("平均比例", *ds):
-            return mkTag(("AvgRatio", [mkDs(_) for _ in ds]))
-        case _:
-            raise RuntimeError(f"Failed to match DS/Formula: {x}")
-
+    try:
+        match x:
+            case ("债券余额",) | ("bondBalance",):
+                return mkTag("CurrentBondBalance")
+            case ("债券余额", *bnds) | ("bondBalance", *bnds):
+                return mkTag(("CurrentBondBalanceOf", vList(bnds, str)))
+            case ("债券应付本金", *bnds) | ("bondDuePrin", *bnds):
+                return mkTag(("BondDuePrin", vList(bnds, str)))
+            case ("初始债券余额",*bnds) | ("originalBondBalance",*bnds):
+                if bnds:
+                    return mkTag(("OriginalBondBalanceOf", vList(bnds, str)))
+                return mkTag("OriginalBondBalance")
+            case ("到期月份", bn) | ("monthsTillMaturity", bn):
+                return mkTag(("MonthsTillMaturity", vStr(bn)))
+            case ("资产池余额", *pNames) | ("poolBalance", *pNames):
+                if pNames:
+                    return mkTag(("CurrentPoolBalance", lmap(mkPid,pNames)))
+                return mkTag(("CurrentPoolBalance", None))
+            case ("资产池期初余额", *pNames) | ("poolBegBalance", *pNames):
+                if pNames:
+                    return mkTag(("CurrentPoolBegBalance", lmap(mkPid,pNames)))
+                return mkTag(("CurrentPoolBegBalance", None))
+            case ("初始资产池余额", *pNames) | ("originalPoolBalance", *pNames):
+                if pNames:
+                    return mkTag(("OriginalPoolBalance", lmap(mkPid,pNames)))
+                return mkTag(("OriginalPoolBalance", None))
+            case ("资产池违约余额", *pNames) | ("currentPoolDefaultedBalance", *pNames): #DEPRECATE
+                if pNames:
+                    return mkTag(("CurrentPoolDefaultedBalance", lmap(mkPid, pNames)))
+                return mkTag(("CurrentPoolDefaultedBalance", None))
+            case ("资产池累计违约余额", *pNames) | ("cumPoolDefaultedBalance", *pNames): #DEPRECATE
+                if pNames:
+                    return mkTag(("CumulativePoolDefaultedBalance",lmap(mkPid, pNames)))
+                return mkTag(("CumulativePoolDefaultedBalance", None))
+            case ("资产池累计违约率", *pNames) | ("cumPoolDefaultedRate", *pNames):  # DEPRECATE
+                if pNames:
+                    return mkTag(("CumulativePoolDefaultedRate", lmap(mkPid,pNames)))
+                return mkTag(("CumulativePoolDefaultedRate", None))
+            case ("资产池累计违约率", n, *pNames) | ("cumPoolDefaultedRateTill", n, *pNames): # DEPRECATE
+                if pNames:
+                    return mkTag(("CumulativePoolDefaultedRateTill", [n,lmap(mkPid,pNames)]))
+                return mkTag(("CumulativePoolDefaultedRateTill", [n,None]))
+            case ("资产池累计损失余额", *pNames) | ("cumPoolNetLoss", *pNames): # DEPRECATE
+                if pNames:
+                    return mkTag(("CumulativeNetLoss", lmap(mkPid, pNames)))
+                return mkTag(("CumulativeNetLoss", None))
+            case ("资产池累计损失率",*pNames) | ("cumPoolNetLossRate",*pNames): # DEPRECATE
+                if pNames:
+                    return mkTag(("CumulativeNetLossRatio", lmap(mkPid,pNames)))
+                return mkTag(("CumulativeNetLossRatio", None))
+            case ("资产池累计回收额",*pNames) | ("cumPoolRecoveries", *pNames): # DEPRECATE
+                if pNames:
+                    return mkTag(("CumulativePoolRecoveriesBalance",lmap(mkPid,pNames)))
+                return mkTag(("CumulativePoolRecoveriesBalance",None))
+            case ("资产池累计", pNames, *i) | ("cumPoolCollection", pNames, *i):
+                if pNames:
+                    return mkTag(("PoolCumCollection", [lmap(mkPoolSource,i) ,lmap(mkPid,pNames)]))
+                return mkTag(("PoolCumCollection", [lmap(mkPoolSource,i), None]))
+            case ("资产池累计至", pNames, idx, *i) | ("cumPoolCollectionTill", pNames, idx, *i):
+                if pNames:
+                    return mkTag(("PoolCumCollectionTill", [idx, lmap(mkPoolSource,i) ,lmap(mkPid,pNames)] ))
+                return mkTag(("PoolCumCollectionTill", [idx, lmap(mkPoolSource,i), None] ))
+            case ("资产池当期", pNames, *i) | ("curPoolCollection", pNames, *i):
+                if pNames:
+                    return mkTag(("PoolCurCollection", [lmap(mkPoolSource,i), lmap(mkPid,pNames)]))
+                return mkTag(("PoolCurCollection", [lmap(mkPoolSource,i), None]))
+            case ("资产池当期至", pNames, idx, *i) | ("curPoolCollectionStats", pNames, idx, *i):
+                if pNames:
+                    return mkTag(("PoolCurCollectionStats", [idx, lmap(mkPoolSource,i), lmap(mkPid,pNames)]))
+                return mkTag(("PoolCollectionStats", [idx, lmap(mkPoolSource,i), None]))
+            case ("计划资产池估值", pricingMethod, *pNames) | ("schedulePoolValuation", pricingMethod, *pNames):
+                if pNames:
+                    return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), lmap(mkPid,pNames)]))
+                return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), None]))
+            case ("债券系数", bn) | ("bondFactor", bn):
+                return mkTag(("BondFactorOf", bn))
+            case ("债券系数",) | ("bondFactor",):
+                return mkTag("BondFactor")
+            case ("资产池系数", *pNames) | ("poolFactor", *pNames):
+                if pNames:
+                    return mkTag(("PoolFactor", lmap(mkPid,pNames)))
+                return mkTag(("PoolFactor", None))
+            case ("债券利率", bn) | ("bondRate", bn):
+                return mkTag(("BondRate", vStr(bn)))
+            case ("债券加权利率", *bn) | ("bondWaRate", *bn):
+                return mkTag(("BondWaRate", vList(bn, str)))
+            case ("资产池利率", *pNames) | ("poolWaRate", *pNames):
+                if pNames:
+                    return mkTag(("PoolWaRate", lmap(mkPid, pNames)))
+                return mkTag(("PoolWaRate", None))
+            case ("所有账户余额",) | ("accountBalance"):
+                return mkTag("AllAccBalance")
+            case ("账户余额", *ans) | ("accountBalance", *ans):
+                return mkTag(("AccBalance", vList(ans, str)))
+            case ("账簿余额", dr, *ans) | ("ledgerBalance", dr, *ans) if dr in bookDirection.keys():
+                return mkTag(("LedgerBalanceBy", [dr, vList(ans, str)]))
+            case ("账簿余额", *ans) | ("ledgerBalance", *ans):
+                return mkTag(("LedgerBalance", vList(ans, str)))
+            case ("账簿发生额", lns, cmt) | ("ledgerTxnAmount", lns, cmt):
+                return mkTag(("LedgerTxnAmt", [vStr(lns), mkComment(cmt)]))
+            case ("账簿发生额", lns) | ("ledgerTxnAmount", lns):
+                return mkTag(("LedgerTxnAmt", [vStr(lns), None]))
+            case ("bondDueIntByIndex", idx, *bnds) if isinstance(idx, int):
+                return mkTag(("CurrentDueBondIntAt", [vInt(idx),vList(bnds, str)]))
+            case ("bondDueIntOverIntByIndex", idx, *bnds) if isinstance(idx, int):
+                return mkTag(("CurrentDueBondIntOverIntAt", [vInt(idx),vList(bnds, str)]))
+            case ("债券待付利息", *bnds) | ("bondDueInt", *bnds):
+                return mkTag(("CurrentDueBondInt", vList(bnds, str)))
+            case ("债券待付罚息", *bnds) | ("bondDueIntOverInt", *bnds):
+                return mkTag(("CurrentDueBondIntOverInt", vList(bnds, str)))
+            case ("债券待付合计利息", *bnds) | ("bondDueIntTotal", *bnds):
+                return mkTag(("CurrentDueBondIntTotal", vList(bnds, str)))
+            case ("债券当期已付利息", *bnds) | ("lastBondIntPaid", *bnds):
+                return mkTag(("LastBondIntPaid", vList(bnds, str)))
+            case ("债券当期已付本金", *bnds) | ("lastBondPrinPaid", *bnds):
+                return mkTag(("LastBondPrinPaid", vList(bnds, str)))
+            case ("债券低于目标余额", bn) | ("behindTargetBalance", bn):
+                return mkTag(("BondBalanceGap", vStr(bn)))
+            case ("累积募资", *bnds) | ("totalFunded", *bnds):
+                return mkTag(("BondTotalFunding", vList(bnds,str)))
+            case ("已提供流动性", *liqName) | ("liqBalance", *liqName):
+                return mkTag(("LiqBalance", liqName))
+            case ("流动性额度", *liqName) | ("liqCredit", *liqName):
+                return mkTag(("LiqCredit", liqName))
+            case ("rateCapNet", n):
+                return mkTag(("RateCapNet", n))
+            case ("rateSwapNet", n):
+                return mkTag(("RateSwapNet", n))
+            case ("债务人数量", *pNames) | ("borrowerNumber", *pNames):
+                if pNames:
+                    return mkTag(("CurrentPoolBorrowerNum", lmap(mkPid, pNames)))
+                return mkTag(("CurrentPoolBorrowerNum"))
+            case ("期数",) | ("periodNum",):
+                return mkTag(("ProjCollectPeriodNum"))
+            case ("事件", loc, idx) | ("trigger", loc, idx):
+                if not loc in dealCycleMap:
+                    raise RuntimeError(f" {loc} not in map {dealCycleMap}")
+                return mkTag(("TriggersStatus", [dealCycleMap[loc], idx]))
+            case ("阶段", st) | ("status", st):
+                return mkTag(("IsDealStatus", mkStatus(st)))
+            case ("待付费用", *fns) | ("feeDue", *fns):
+                return mkTag(("CurrentDueFee", fns))
+            case ("已付费用", *fns) | ("lastFeePaid", *fns):
+                return mkTag(("LastFeePaid", fns))
+            case ("费用支付总额", cmt, *fns) | ("feeTxnAmount", cmt, *fns) | ("feeTxnAmt", cmt, *fns):
+                return mkTag(("FeeTxnAmt", [fns, cmt]))
+            case ("债券支付总额", cmt, *bns) | ("bondTxnAmount", cmt, *bns) | ("bondTxnAmt", cmt, *bns):
+                return mkTag(("BondTxnAmt", [bns, cmt]))
+            case ("账户变动总额", cmt, *ans) | ("accountTxnAmount", cmt, *ans) | ("accountTxnAmt", cmt, *ans):
+                return mkTag(("AccTxnAmt", [ans, cmt]))
+            case ("系数", ds, f) | ("factor", ds, f) | ("*", ds, f) if isinstance(f, (int,float)):
+                return mkTag(("Factor", [mkDs(ds), f]))
+            case ("*", *ds):
+                return mkTag(("Multiply", lmap(mkDs, ds)))
+            case ("Min", *ds) | ("min", *ds):
+                return mkTag(("Min", lmap(mkDs, ds)))
+            case ("Max", *ds) | ("max", *ds):
+                return mkTag(("Max", lmap(mkDs, ds)))
+            case ("合计", *ds) | ("sum", *ds) | ("+", *ds):
+                return mkTag(("Sum", lmap(mkDs, ds)))
+            case ("差额", *ds) | ("substract", *ds) | ("subtract", *ds) | ("-", *ds):
+                return mkTag(("Substract", lmap(mkDs, ds)))
+            case ("常数", n) | ("constant", n) | ("const", n):
+                return mkTag(("Constant", n))
+            case ("储备账户缺口", *accs) | ("reserveGap", *accs):
+                return mkTag(("ReserveGap", accs))
+            case ("储备账户盈余", *accs) | ("reserveExcess", *accs):
+                return mkTag(("ReserveExcess", accs))
+            case ("储备账户目标", *accs) | ("reserveTarget", *accs):
+                return mkTag(("ReserveBalance", accs))
+            case ("最优先", bn, bns) | ("isMostSenior", bn, bns):
+                return mkTag(("IsMostSenior", [bn, bns]))
+            case ("清偿完毕", *bns) | ("isPaidOff", *bns):
+                return mkTag(("IsPaidOff", bns))
+            case ("isOutstanding", *bns):
+                return mkTag(("IsOutstanding", bns))
+            case ("逾期", *bns) | ("hasPassedMaturity", *bns):
+                return mkTag(("HasPassedMaturity",bns))
+            case ("比率测试", ds, op, r) | ("rateTest", ds, op, r):
+                return mkTag(("TestRate", [mkDs(ds), op_map[op], r]))
+            case ("所有测试", b, *ds) | ("allTest", b, *ds):
+                return mkTag(("TestAll", [b, [mkDs(_) for _ in ds]]))
+            case ("非", ds) | ("not", ds):
+                return mkTag(("TestNot", mkDs(ds)))
+            case ("任一测试", b, *ds) | ("anyTest", b, *ds):
+                return mkTag(("TestAny", [b, [mkDs(_) for _ in ds]]))
+            case ("自定义", n) | ("custom", n):
+                return mkTag(("UseCustomData", n))
+            case ("区间内", floor, cap, s) | ("floorCap", floor, cap, s):
+                return mkTag(("FloorAndCap", [floor, cap, s]))
+            case ("floorWith", ds1, ds2):
+                return mkTag(("FloorWith", [mkDs(ds1), mkDs(ds2)]))
+            case ("floorWithZero", ds1):
+                return mkTag(("FloorWithZero", mkDs(ds1)))
+            case ("excess", ds1, *dss) | ("超额", ds1, *dss):
+                return mkTag(("Excess", [mkDs(ds1)]+[mkDs(_) for _ in dss]))
+            case ("capWith", ds1, ds2):
+                return mkTag(("CapWith", [mkDs(ds1), mkDs(ds2)]))
+            case ("/", ds1, ds2) | ("divide", ds1, ds2):
+                return mkTag(("Divide", [mkDs(ds1), mkDs(ds2)]))
+            case ("比例", ds1, ds2) | ("ratio", ds1, ds2):
+                return mkTag(("DivideRatio", [mkDs(ds1), mkDs(ds2)]))
+            case ("abs", ds):
+                return mkTag(("Abs", mkDs(ds)))
+            case ("avg", *ds) | ("平均", *ds):
+                return mkTag(("Avg", [mkDs(_) for _ in ds]))
+            case ("avgRatio", *ds) | ("平均比例", *ds):
+                return mkTag(("AvgRatio", [mkDs(_) for _ in ds]))
+            case _:
+                raise RuntimeError(f"Failed to match DS/Formula: {x}")
+    except TypeError as e:
+        raise RuntimeError(f"Failed to match DS/Formula: {x}", e)
 
 def mkCurve(tag, xs):
     return mkTag((tag, xs))
@@ -408,49 +414,49 @@ def mkPre(p):
                 return "IfInt"
             case _:
                 return "If"
+    try:
+        match p:
+            case ["状态", _st] | ["status", _st]:
+                return mkTag(("IfDealStatus", mkStatus(_st)))
+            case ["同时满足", *_p] | ["同时", *_p] | ["all", *_p]:
+                return mkTag(("All", [mkPre(p) for p in _p]))
+            case ["任一满足", *_p] | ["任一", *_p] | ["any", *_p]:
+                return mkTag(("Any", [mkPre(p) for p in _p]))
+            case ["非", _p] | ["not", _p]:
+                return mkTag(("IfNot", mkPre(_p)))
+            case ["date", "between" ,rngType, d1, d2] | ["date","><",rngType, d1, d2]:
+                return mkTag(("IfDateBetween", [rngType, vDate(d1), vDate(d2)]))
+            case ["date", "in", *vs]:
+                return mkTag(("IfDateIn", [vDate(v) for v in vs]))
+            case ["date", op, v]:
+                return mkTag(("IfDate", [op_map[op], vDate(v)]))
 
-    match p:
-        case ["状态", _st] | ["status", _st]:
-            return mkTag(("IfDealStatus", mkStatus(_st)))
-        case ["同时满足", *_p] | ["同时", *_p] | ["all", *_p]:
-            return mkTag(("All", [mkPre(p) for p in _p]))
-        case ["任一满足", *_p] | ["任一", *_p] | ["any", *_p]:
-            return mkTag(("Any", [mkPre(p) for p in _p]))
-        case ["非", _p] | ["not", _p]:
-            return mkTag(("IfNot", mkPre(p)))
+            case ["period", "between", rngType, d1, d2] | ["period", "><", rngType, d1, d2]:
+                return mkTag(("IfIntBetween", [mkDs(("periodNum",)), rngType, vNum(d1), vNum(d2)]))
+            case ["period", "in", *vs]:
+                return mkTag(("IfIntIn", [mkDs(("periodNum",)), [vNum(v) for v in vs]]))
+            case ["period", op, v]:
+                return mkTag(("IfInt", [op_map[op], mkDs(("periodNum",)), vNum(v)]))
 
-        case ["date", "between" ,rngType, d1, d2] | ["date","><",rngType, d1, d2]:
-            return mkTag(("IfDateBetween", [rngType, vDate(d1), vDate(d2)]))
-        case ["date", "in", *vs]:
-            return mkTag(("IfDateIn", [vDate(v) for v in vs]))
-        case ["date", op, v]:
-            return mkTag(("IfDate", [op_map[op], vDate(v)]))
-
-        case ["period", "between", rngType, d1, d2] | ["period", "><", rngType, d1, d2]:
-            return mkTag(("IfIntBetween", [mkDs(("periodNum",)), rngType, vNum(d1), vNum(d2)]))
-        case ["period", "in", *vs]:
-            return mkTag(("IfIntIn", [mkDs(("periodNum",)), [vNum(v) for v in vs]]))
-        case ["period", op, v]:
-            return mkTag(("IfInt", [op_map[op], mkDs(("periodNum",)), vNum(v)]))
-
-        case [ds, "=", 0]:
-            return mkTag(("IfZero", mkDs(ds)))
-        case [ds, b] | [ds, b] if isinstance(b, bool):
-            return mkTag(("IfBool", [mkDs(ds), b]))
-        case [ds1, op, ds2] if (isinstance(ds1, tuple) and isinstance(ds2, tuple)):
-            q = queryType(ds1)
-            return mkTag((f"{q}2", [op_map[op], mkDs(ds1), mkDs(ds2)]))
-        case [ds, op, curve] if isinstance(curve, list):
-            q = queryType(ds)
-            return mkTag((f"{q}Curve", [op_map[op], mkDs(ds), mkCurve("ThresholdCurve", curve)]))
-        case [ds, op, n]:
-            q = queryType(ds)
-            return mkTag((q, [op_map[op], mkDs(ds), n]))
-        case [op, _d]:
-            return mkTag(("IfDate", [op_map[op], _d]))
-        case _:
-            raise RuntimeError(f"Failed to match on Pre: {p}")
-
+            case [ds, "=", 0]:
+                return mkTag(("IfZero", mkDs(ds)))
+            case [ds, b] if isinstance(b, bool):
+                return mkTag(("IfBool", [mkDs(ds), b]))
+            case [ds1, op, ds2] if (isinstance(ds1, tuple) and isinstance(ds2, tuple)):
+                q = queryType(ds1)
+                return mkTag((f"{q}2", [op_map[op], mkDs(ds1), mkDs(ds2)]))
+            case [ds, op, curve] if isinstance(curve, list):
+                q = queryType(ds)
+                return mkTag((f"{q}Curve", [op_map[op], mkDs(ds), mkCurve("ThresholdCurve", curve)]))
+            case [ds, op, n]:
+                q = queryType(ds)
+                return mkTag((q, [op_map[op], mkDs(ds), n]))
+            case [op, _d]:
+                return mkTag(("IfDate", [op_map[op], _d]))
+            case _:
+                raise RuntimeError(f"Failed to match on Pre: {p}")
+    except TypeError as e:
+        raise RuntimeError(f"Failed to match on Pre: {p}", e)
 
 def mkAccInt(x):
     match x:
@@ -527,6 +533,8 @@ def mkAcc(an, x=None):
             return mkAcc(vStr(an), x | extraInfo)
         case None:
             return mkAcc(vStr(an), {"balance": 0})
+        case {} :
+            return mkAcc(vStr(an), {"balance": 0})
         case _:
             raise RuntimeError(f"Failed to match account: {an},{x}")
 
@@ -535,11 +543,11 @@ def mkBondType(x):
     match x:
         case {"固定摊还": schedule} | {"PAC": schedule}:
             return mkTag(("PAC", mkTag(("BalanceCurve", schedule))))
-        case {"过手摊还": None} | {"Sequential": None}:
+        case {"过手摊还": None} | {"Sequential": None} | "Sequential" | "过手摊还":
             return mkTag(("Sequential"))
         case {"锁定摊还": _after} | {"Lockout": _after}:
             return mkTag(("Lockout", vDate(_after)))
-        case {"权益": _} | {"Equity": _}:
+        case {"权益": _} | {"Equity": _} | "Equity" | "权益":
             return mkTag(("Equity"))
         case _:
             raise RuntimeError(f"Failed to match bond type: {x}")
@@ -554,22 +562,33 @@ def mkBondIoItype(x):
             raise RuntimeError(f"Failed to match bond IoI type:{x}")
 
 
-def mkBondRate(x):
+def mkBondRate(x:dict)->dict:
     match x:
+        # floater rate with daycount
         case {"浮动": [r, _index, Spread, resetInterval], "日历": dc} | \
-                {"floater": [r, _index, Spread, resetInterval], "dayCount": dc}:
+                {"floater": [r, _index, Spread, resetInterval], "dayCount": dc} | \
+                ("floater", (r, _index, Spread, resetInterval), dc) :
             return mkTag(("Floater", [r, _index, Spread, mkDatePattern(resetInterval), dc, None, None]))
+        # floater rate with default daycount
         case {"浮动": [r, _index, Spread, resetInterval]} | \
-             {"floater": [r, _index, Spread, resetInterval]} :
-            return mkBondRate(x | {"日历": DC.DC_ACT_365F.value, "dayCount": DC.DC_ACT_365F.value})
+             {"floater": [r, _index, Spread, resetInterval]} | \
+             ("floater", (r, _index, Spread, resetInterval)) :
+            return mkTag(("Floater", [r, _index, Spread, mkDatePattern(resetInterval), DC.DC_ACT_365F.value, None, None]))
+        # fix rate with day count
         case {"固定": _rate, "日历": dc} | {"fix": _rate, "dayCount": dc}:
             return mkTag(("Fix", [vNum(_rate), dc]))
-        case {"固定": _rate} | {"Fixed": _rate} | {"fix": _rate}:
+        # fix rate with day count
+        case ("fix", _rate, dc) | ["fix", _rate, dc]:
+            return mkTag(("Fix", [vNum(_rate), dc]))
+        # fix rate with default day count
+        case {"固定": _rate} | {"Fixed": _rate} | {"fix": _rate} | ("fix", _rate) | ["fix", _rate]:
             return mkTag(("Fix", [vNum(_rate), DC.DC_ACT_365F.value]))
         case {"期间收益": _yield} | {"interimYield": _yield}:
             return mkTag(("InterestByYield", vNum(_yield)))
+        # rate with cap
         case ("上限", cap, br) | ("cap", cap, br):
             return mkTag(("CapRate", [mkBondRate(br), vNum(cap)]))
+        # rate with floor
         case ("下限", floor, br) | ("floor", floor, br):
             return mkTag(("FloorRate", [mkBondRate(br), vNum(floor)]))
         case ("罚息", pRateInfo,bRateInfo) | ("withIntOverInt", pRateInfo, bRateInfo):
@@ -587,20 +606,22 @@ def mkStepUp(x):
         case _:
             raise RuntimeError(f"Failed to match bond step up type:{x}")
 
+
 def mkBndComp(bn,bo):
     """ Make bond component, accept a tuple with (bond name, bond map) or (bond group name, bond map) """
     def itlookslikeaBond(bm:dict):
         try:
             mkBnd("whatever",bm)
         except Exception as e:
+            print("mkbnd",e)
             return False
         return True
 
     match (bn,bo):
         case (bn, bnd) if itlookslikeaBond(bnd): # single bond
-            return mkBnd(bn, bnd) | {"tag":"Bond"}
+            return mkBnd(bn, bnd)
         case (bondGroupName, bndMap) : # bond group
-            return mkTag(("BondGroup", {k:mkBnd(k,v) | {"tag":"Bond"} for k,v in bndMap.items() }))
+            return mkTag(("BondGroup", {k:mkBnd(k,v) for k,v in bndMap.items() }))
         case _ :
             raise RuntimeError(f"Failed to match bond component")
 
@@ -613,23 +634,53 @@ def mkBnd(bn, x:dict):
     dueInt = getValWithKs(x, ["应付利息", "dueInt"], defaultReturn=0)
     duePrin = getValWithKs(x, ["应付本金", "duePrin"], defaultReturn=0)
     dueIntOverInt = getValWithKs(x, ["拖欠利息", "dueIntOverInt"], defaultReturn=0)
-    mSt = earlyReturnNone(mkStepUp, getValWithKs(x, ["调息", "stepUp"], defaultReturn=None))
+    mSt = getValWithKs(x, ["调息", "stepUp"], defaultReturn=None)
+    # TODO: add statement
+    mStmt = None
     match x:
+        case {"balance": bndBalance
+              , "rates": bndRates
+              , "rateTypes": bndInterestInfos
+              , "bondType": bndType
+              , "originBalance": originBalance
+              , "originRate": originRate
+              , "startDate": originDate
+              }:
+            l = len(bndInterestInfos)
+            dueInts = getValWithKs(x, ["应付利息", "dueInt"], defaultReturn=[0]*l)
+            dueIntOverInts = getValWithKs(x, ["拖欠利息", "dueIntOverInt"], defaultReturn=[0]*l)
+            mSts = getValWithKs(x, ["调息", "stepUps"], defaultReturn=None)
+            return {"bndName": vStr(bn), "bndType": mkBondType(bndType)
+                    ,"bndOriginInfo":{"originBalance": vNum(originBalance), "originDate": vDate(originDate), "originRate": vNum(originRate)}
+                    ,"bndInterestInfos":lmap(mkBondRate, bndInterestInfos)
+                    ,"bndStepUps":lmap(mkStepUp, mSts) if mSts else None
+                    ,"bndBalance": vNum(bndBalance)
+                    ,"bndRates":bndRates
+                    ,"bndDuePrin": vNum(duePrin)
+                    ,"bndDueInts": dueInts
+                    ,"bndDueIntOverInts": dueIntOverInts
+                    #,"bndDueIntDates": lastIntPayDate
+                    #,"bndLastPrinPay": 
+                    ,"tag": "MultiIntBond"}
         case {"当前余额": bndBalance, "当前利率": bndRate, "初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
              {"balance": bndBalance, "rate": bndRate, "originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
-            return {"bndName": vStr(bn), "bndBalance": bndBalance, "bndRate": bndRate
-                    , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
+            y = {"bndName": vStr(bn), "bndBalance": vNum(bndBalance), "bndRate": vNum(bndRate)
+                    , "bndOriginInfo": {"originBalance": vNum(originBalance), "originDate": vDate(originDate), "originRate": vNum(originRate)} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
-                    , "bndDuePrin": duePrin, "bndDueInt": dueInt, "bndDueIntOverInt":dueIntOverInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
-                    , "bndLastIntPayDate": lastIntPayDate}
+                    , "bndDuePrin": vNum(duePrin), "bndDueInt": vNum(dueInt), "bndDueIntOverInt":vNum(dueIntOverInt), "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
+                    , "bndLastIntPayDate": lastIntPayDate
+                    , "tag": "Bond"}
+            return y
         case {"初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
              {"originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
-            return {"bndName": vStr(bn), "bndBalance": originBalance, "bndRate": originRate
-                    , "bndOriginInfo": {"originBalance": originBalance, "originDate": originDate, "originRate": originRate} | {"maturityDate": md}
+            return {"bndName": vStr(bn), "bndBalance": vNum(originBalance), "bndRate": vNum(originRate)
+                    , "bndOriginInfo": {"originBalance": vNum(originBalance), "originDate": vNum(originDate), "originRate": vNum(originRate)} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
-                    , "bndDuePrin": duePrin, "bndDueInt": dueInt, "bndDueIntOverInt":dueIntOverInt, "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
-                    , "bndLastIntPayDate": lastIntPayDate}
+                    , "bndDuePrin": vNum(duePrin), "bndDueInt": vNum(dueInt), "bndDueIntOverInt": vNum(dueIntOverInt), "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
+                    , "bndLastIntPayDate": lastIntPayDate
+                    , "tag": "Bond"}
         case _:
+            print(" got here",x)
             raise RuntimeError(f"Failed to match bond:{bn},{x}:mkBnd")
 
 
@@ -753,17 +804,22 @@ def mkRsBase(x):
 
 def mkRateSwap(x):
     match x:
-        case {"settleDates": stl_dates, "pair": pair, "base": base
+        case {"updateDates": updateDates, "pair": pair, "base": base
               ,"start": sd, "balance": bal, **p}:
+            stl_dates = p.get("settleDates", None)
+            extSettleDate = lambda y: (mkDatePattern(y[0]), vStr(y[1]))
+            dc = p.get("dayCount", DC.DC_ACT_365F.value)
             return {"rsType": mkRateSwapType(*pair),
-                    "rsSettleDates": mkDatePattern(stl_dates),
+                    "rsDayCount": dc,
+                    "rsSettleDates": earlyReturnNone(extSettleDate, stl_dates),
+                    "rsUpdateDates": mkDatePattern(updateDates),
                     "rsNotional": mkRsBase(base),
                     "rsStartDate": vDate(sd),
-                    "rsPayingRate": p.get("payRate", 0),
-                    "rsReceivingRate": p.get("receiveRate", 0),
+                    "rsPayingRate": vNum(p.get("payRate", 0)),
+                    "rsReceivingRate": vNum(p.get("receiveRate", 0)),
                     "rsRefBalance": vNum(bal),
                     "rsLastStlDate": p.get("lastSettleDate", None),
-                    "rsNetCash": p.get("netcash", 0),
+                    "rsNetCash": vNum(p.get("netcash", 0)),
                     "rsStmt": p.get("stmt", None)
                     }
         case _:
@@ -791,6 +847,9 @@ def mkRateCap(x):
 
 def mkRateType(x):
     match x :
+        case {"fix":r, "dayCount":dc} | {"固定":r, "日历":dc} |\
+              ["fix", r, dc] | ["固定", r, dc] | ("fix", r, dc) | ("固定", r, dc):
+            return mkTag(("Fix", [dc, vNum(r)]))
         case {"fix":r} | {"固定":r} | ["fix", r] | ["固定", r] | ("fix", r) | ("固定", r):
             return mkTag(("Fix", [DC.DC_ACT_365F.value, vNum(r)]))
         case {"floater":(idx, spd), "rate":r, "reset":dp, **p} | \
@@ -818,9 +877,11 @@ def mkBookType(x: list):
     """Make bookType """
     match x:
         case ["PDL", dr, defaults, ledgers] | ["pdl", dr, defaults, ledgers]:
-            return mkTag(("PDL", [dr, mkDs(defaults), [[ln, mkDs(ds)] for ln, ds in ledgers]]))
+            return mkTag(("PDL", [bookDirection[dr], mkDs(defaults), [[ln, mkDs(ds)] for ln, ds in ledgers]]))
         case ["ds", ledger, dr, ds] | ["ByFormula", ledger, dr, ds] | ['formula', ledger, dr, ds]:
-            return mkTag(("ByDS", [vStr(ledger), dr, mkDs(ds)]))
+            return mkTag(("ByDS", [vStr(ledger), bookDirection[dr], mkDs(ds)]))
+        case ["till", ledger, dr, ds] : 
+            return mkTag(("Till", [vStr(ledger), bookDirection[dr], mkDs(ds)]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkBookType")
 
@@ -841,6 +902,7 @@ def mkSupport(x:list):
             return None
         case _:
             raise RuntimeError(f"Failed to match :{x}:SupportType")
+
 
 def mkOrder(x):
     match x:
@@ -866,7 +928,7 @@ def mkAction(x:list):
     match x:
         case ["账户转移", source, target, m,"簿记",dr, ln] | ["transfer", source, target, m, "book", dr, ln]:
             return mkTag(("TransferAndBook", [ mkLimit(m), vStr(source), vStr(target)
-                                              ,[dr, ln]
+                                              ,[bookDirection[dr], ln]
                                               , None]))
         case ["账户转移", source, target, m] | ["transfer", source, target, m]:
             match m:
@@ -925,6 +987,9 @@ def mkAction(x:list):
         case ["支付利息", source, target, m] | ["payInt", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("PayInt", [l, vStr(source), vList(target, str), s]))
+        case ["payIntAndBook", source, target, m, "book",dr, ln] | ["支付利息", source, target, m,"簿记", dr, ln]:
+            (l, s) = mkMod(m)
+            return mkTag(("PayIntAndBook", [l, vStr(source), vList(target, str), s, [dr, vStr(ln)]]))
         case ["顺序支付利息", source, target, m] | ["payIntBySeq", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("PayIntBySeq", [l, vStr(source), vList(target, str), s]))
@@ -938,6 +1003,16 @@ def mkAction(x:list):
             return mkTag(("PayInt", [None, vStr(source), vList(target, str), None]))
         case ["顺序支付利息", source, target] | ["payIntBySeq", source, target]:
             return mkTag(("PayIntBySeq", [None, vStr(source), vList(target, str), None]))
+        case ["payIntByIndex", source, target, index, m] :
+            (l, s) = mkMod(m)
+            return mkTag(("PayIntByRateIndex", [l, vStr(source), vList(target, str), vNum(index),m]))
+        case ["payIntByIndex", source, target, index] :
+            return mkTag(("PayIntByRateIndex", [None, vStr(source), vList(target, str), vNum(index),None]))
+        case ["payIntByIndexBySeq", source, target, index, m] :
+            (l, s) = mkMod(m)
+            return mkTag(("PayIntByRateIndexBySeq", [l, vStr(source), vList(target, str), vNum(index),m]))
+        case ["payIntByIndexBySeq", source, target, index] :
+            return mkTag(("PayIntByRateIndexBySeq", [None, vStr(source), vList(target, str), vNum(index),None]))
         case ["顺序支付本金", source, target, m] | ["payPrinBySeq", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("PayPrinBySeq", [l, vStr(source), vList(target, str), s]))
@@ -984,7 +1059,7 @@ def mkAction(x:list):
             return mkTag(("WriteOff", [limit, vStr(target)]))
         case ["减记本金", targets, l, "簿记", dr, ln] | ["writeOff", targets, l, "book", dr, ln] if isinstance(targets, list):
             limit = mkLimit(l) if l else None
-            return mkTag(("WriteOffBySeqAndBook", [limit, vList(targets,str),(dr, ln)]))
+            return mkTag(("WriteOffBySeqAndBook", [limit, vList(targets,str),(dr, vStr(ln))]))
         case ["减记本金", targets, l] | ["writeOff", targets, l] if isinstance(targets, list):
             limit = mkLimit(l) if l else None
             return mkTag(("WriteOffBySeq", [limit, vList(targets,str)]))
@@ -1019,8 +1094,14 @@ def mkAction(x:list):
         case ["流动性支持计提", *target] | ["liqAccrue", *target]:
             return mkTag(("LiqAccrue", vList(target,str)))
         ## Rate Swap
+        
         case ["结算", acc, swapName] | ["settleSwap", acc, swapName]:
             return mkTag(("SwapSettle", [vStr(acc), vStr(swapName)]))
+        case ["paySwap", acc, swapName] :
+            return mkTag(("SwapPay", [vStr(acc), vStr(swapName)]))
+        case ["receiveSwap", acc, swapName] :
+            return mkTag(("SwapReceive", [vStr(acc), vStr(swapName)]))
+        
         ## Rate Cap
         case ["利率结算", acc, capName] | ["settleCap", acc, capName]:
             return mkTag(("CollectRateCap", [vStr(acc), vStr(capName)]))
@@ -1051,7 +1132,7 @@ def mkAction(x:list):
             return mkTag(("ChangeStatus",[mkPre(p), mkStatus(st)]))
         case ["更改状态", st] | ["changeStatus", st]:
             return mkTag(("ChangeStatus",[None, mkStatus(st)]))
-        case []:
+        case None:
             return mkTag(("Placeholder",[]))
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkAction")
@@ -1059,7 +1140,7 @@ def mkAction(x:list):
 
 def mkStatus(x: tuple|str):
     match x:
-        case "摊销" | "Amortizing" | "摊还":
+        case "摊销" | "Amortizing" | "摊还" | "amortizing":
             return mkTag(("Amortizing"))
         case "Warehousing" | "储备":
             return mkTag(("Warehousing", None))
@@ -1196,6 +1277,10 @@ def mkWaterfall(r, x):
     
     r[_w_tag] = lmap(mkAction, _v)
     return mkWaterfall(r, x)
+
+def mkWaterfall2(x:dict):
+
+    return {}
 
 
 def mkRoundingType(x):
@@ -2137,7 +2222,8 @@ def readRunSummary(x, locale) -> dict:
         x.columns = pd.MultiIndex.from_tuples([tuple(col.split("&")) for col in x.columns])
         x.set_index("date",inplace=True)
         return x[["Asset", "Liability", "Net Asset"]]
- 
+
+
     def buildCashReport(cashData, begDate, endDate, missingFields):
         comp = ["inflow","outflow","net"]
         x = reduce(lambda d1, d2: d1 | d2, [ cashData[_] & lens.modify(buildTree) for _ in comp ])
@@ -2149,6 +2235,7 @@ def readRunSummary(x, locale) -> dict:
         x.set_index([pd.Index([begDate],name="startDate")
                      ,pd.Index([endDate],name="endDate")], inplace=True)
         return x[["Inflow", "Outflow", "Net Cash"]]
+
 
     def patchMissingField(_rpts):
         comp = ["inflow","outflow","net"]
@@ -2164,8 +2251,8 @@ def readRunSummary(x, locale) -> dict:
     
     if rpts:
         r['report'] = {}
-        bsReportList = [(buildBalanceSheet(rpt[balanceSheetIdx],rpt[endDateIdx]))
-                                                 for rpt in rpts]
+        bsReportList = [(buildBalanceSheet(rpt[balanceSheetIdx],rpt[endDateIdx])) 
+                        for rpt in rpts]
         bsReport = pd.concat(bsReportList)
         bsReport.index = [ _[0] for _ in bsReport.index ] 
         r['report']['balanceSheet'] = bsReport
@@ -2173,7 +2260,7 @@ def readRunSummary(x, locale) -> dict:
         cashReportRaw = [ rpt[cashReportIdx] for rpt in rpts ]
         cfAllFieldsMap = tz.dissoc(patchMissingField(cashReportRaw), "Net Cash")
         cfRpts = [buildCashReport(rpt[cashReportIdx],rpt[beginDateIdx],rpt[endDateIdx],cfAllFieldsMap)
-                  for rpt in rpts]
+                    for rpt in rpts]
         r['report']['cash'] = pd.concat(cfRpts)
 
     return r

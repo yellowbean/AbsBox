@@ -87,6 +87,7 @@ To model them via sequential parameter ( *Not Recommend* ):
         ,<Collection Rule>
         ,<Liquidation facilities>
         ,<Interest Rate Swap>
+        ,None # reserve for currency swap
         ,<Triggers>
         ,<Deal Status>
         ,<Custom data> # optional
@@ -330,7 +331,7 @@ Ratio Type
 Bool Type
 ^^^^^^^^^^
     * ``("trigger", loc ,<trigger name>)`` -> status of trigger with name ``<trigger name>`` at :ref:`Trigger Locations`
-    * ``("isMostSenior","A",["B","C"])`` -> True if the bond "A" is oustanding and "B" and "C" are not outstanding
+    * ``("isMostSenior","A",("B","C"))`` -> True if the bond "A" is oustanding and "B" and "C" are not outstanding
     * ``("status", <deal status>)`` -> True if current deal status is :ref:`Deal Status`
     * ``("rateTest", <formula>, <cmp>, rate)`` -> True if :ref:`Formula` compare with a rate value
     * ``("allTest", True|False, <boolean type ds>....)`` -> True if all boolean type ds are True/False
@@ -1877,6 +1878,11 @@ syntax
                                            ,{"fixReserve":100}]}
                                     ,{"fixReserve":150}]})
 
+      ("reserveAcc",{"type":("when",[("isPaidOff","A","B","C","D"),True]
+                        ,("fix",0)
+                        ,("target",("*",("poolBalance",),0.0035)))
+                ,"balance":begReserveBal}),
+
 Reinvestment Setup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1914,6 +1920,8 @@ Fields:
                                  ,"reset":"QuarterEnd"
                                  ,"rate": 0.03
                                  ,"lastSettleDate":"2022-11-02"}})
+
+  
 
 
 
@@ -1971,6 +1979,17 @@ syntax
 
     :code:`"rateType":{"fix":0.0569,"dayCount":"DC_ACT_365"}`
 
+    :code:`"rateType":["fix":0.0569]`
+
+    :code:`"rateType":("fix":0.0569)`
+
+.. versionadded:: 0.40.10
+
+syntax
+    :code:`"rateType":("fix", 0.0569, "DC_ACT_365")`
+
+    :code:`"rateType":["fix", 0.0569, "DC_ACT_365"]`
+
 Float Rate 
 """"""""""""""""
 
@@ -1983,6 +2002,13 @@ syntax
     
     :code:`"rateType":{"floater":[0.05, "SOFR1Y",-0.0169,"MonthEnd"], "dayCount":"DC_ACT_365"}`
     
+    :code:`"rateType":("floor", 0.01, <floater rate>)`
+    
+    :code:`"rateType":("floor", 0.01, {"floater":[0.05, "SOFR1Y",-0.0169,"MonthEnd"]})`
+
+    :code:`"rateType":("cap", 0.10, <floater rate>)`
+   
+    :code:`"rateType":("cap", 0.10, {"floater":[0.05, "SOFR1Y",-0.0169,"MonthEnd"]})`
 
 Step-Up Rate
 """"""""""""""
@@ -2466,6 +2492,20 @@ PayInt
       * ``limit`` -> :ref:`<limit>`
       * ``support`` -> :ref:`<support>`
 
+PayIntAndBook
+  .. versionadded:: 0.40.10
+  pay interest to bond and book the ledger
+
+  syntax
+    ``["payInt", {Account}, [<Bonds>], m, "book", <Direction>, <Ledger>]``
+
+    `m`is just a map same in the `payFee` , which has keys :
+
+      * ``limit`` -> :ref:`<limit>`
+      * ``support`` -> :ref:`<support>`
+
+
+
 PayIntBySeq
   .. versionadded:: 0.23.4
   pay interest to bonds sequentially
@@ -2834,6 +2874,9 @@ Liquidity Repay
     * ``["liqRepay","bal", <Account>, <liqProvider>, <Limit>]``
     * ``["liqRepay","int", <Account>, <liqProvider>, <Limit>]``
     * ``["liqRepay","premium", <Account>, <liqProvider>, <Limit>]``
+    * ``["liqRepay",["int","bal","premium"], <Account>, <liqProvider>, <Limit>]``
+
+      repay interest first then balance, then premium
 
 Compensation 
   Use all cash from the account and pay back to liquidity provider as compensation,no limit amount.
@@ -2847,6 +2890,31 @@ Accrue interest & fee
   syntax:
     ``["liqAccrue", <liqProvider>]``
   
+
+Rate Swap
+^^^^^^^^^^^^
+
+Settle
+  .. versionadded:: 0.40.10
+  syntax
+  ``["settleSwap", <AccountName>, <SwapName>]``
+
+Pay Out
+  .. versionadded:: 0.40.10
+  syntax
+  ``["paySwap", <AccountName>, <SwapName>]``
+
+Collect 
+  .. versionadded:: 0.40.10
+  syntax
+  ``["receiveSwap", <AccountName>, <SwapName>]``
+
+
+
+Rate Hedge
+^^^^^^^^^^^^
+
+
 
 Conditional Action
 ^^^^^^^^^^^^^^^^^^^^
@@ -2940,9 +3008,26 @@ syntax
   * ``["formula",<ledger name>,<Debit|Credit>,<formula>]``
 
     The most generic booking type ,which just book a :ref:`Formula` value to ledger ``<ledger name>`` with either ``Debit`` or ``Credit``.  
-..
-  * ``["AccountDraw",<ledger name>]``
-    It was used in ``Support``,when there is insufficent interest or fee payment from account A and account B cures the shortfall ,that amount draw from account B was call "Account Draw" and booked in the ledger.
+
+  * ``["till",<ledger name>,<Debit|Credit>,<formula>]``
+
+    Book the value of formula to ledger till the value equals to the formula.
+    i.e 
+
+    * ledger => credit ,10, input: formula => 20,credit 
+      
+      * then 10 credit will be booked to ledger
+    * ledger => credit ,10, input: formula => 10,credit 
+      
+      * then nothing will be booked
+    * ledger => credit ,10, input: formula => 20,debit
+  
+      * then 30 debit will be booked to ledger
+    * ledger => credit ,10, input: formula => 0,debit/debit
+
+      * then 10 debit will be booked
+
+
 
 .. seealso:: 
   
@@ -3344,6 +3429,37 @@ Liquidity Provider(Facility) Example
     ,"fee":0.01
     }
   }
+
+Example-1
+""""""""""""""""""""""""""""""""
+
+
+Cash Advance Facility Maximum Amount means, on each date 
+
+  * (a) as long as any of the Class A Notes or Class B Notes are outstanding, an amount equal to 
+    
+    * (i) the greater of 0.50 per cent. of the Principal Amount Outstanding of the Class A Notes and Class B Notes on such date and 
+    * (ii) 0.20 per cent. of the Principal Amount Outstanding of the Class A Notes and Class B Notes as at the Closing Date and 
+  * (b) on the Notes Payment Date on which the Class A Notes and Class B Notes have been or are to be redeemed in full, zero;
+
+.. code-block:: python
+
+  {"warehouse":{
+    "credit" : 2000
+    ,"balance":300
+    ,"type": {"formula":("max", ("factor",("bondBalance","A","B"),0.005)
+                              , ("factor",("originalBondBalance","A","B"),0.002))}
+    ,"creditCalc":"IncludeDueInt"
+    ,"start": "2021-06-15"
+    ,"rateType": ("fix", 0.05)
+    ,"feeType": ("fix", 0.03)
+    ,"rate":0.03
+    ,"fee":0.01
+    }
+  }
+
+
+
 
 Interest Rate Hedge 
 ---------------------

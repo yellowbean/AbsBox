@@ -8,7 +8,19 @@ mypool = {"清单":[["租赁",{"初始租金":100,"初始期限":12,"频率":"�
                 ]
          ,"封包日":"2021-01-04"}
 
-from absbox.local.util import aggCFby
+def aggCFby(_df, interval, cols):
+    df = _df.copy()
+    idx = None
+    dummy_col = '_index'
+    df[dummy_col] = df.index
+    _mapping = {"月份": "M", "Month": "M", "M": "M", "month": "M"}
+    if df.index.name == "日期":
+        idx = "日期"
+    else:
+        idx = "date"
+    df[dummy_col] = pd.to_datetime(df[dummy_col]).dt.to_period(_mapping[interval])
+    return df.groupby([dummy_col])[cols].sum().rename_axis(idx)
+
 p = localAPI.runPool(mypool
                     ,assumptions=[{"租赁截止日":"2023-02-01"}]
                     ,read=True)

@@ -20,6 +20,8 @@ dateStr = Regex(r"^\d{4}-\d{2}-\d{2}$")
 def vList(x, t, msg:str = None) -> list:
     return Schema([t]).validate(x)
 
+def vTuple(x, t, msg:str = None) -> tuple:
+    return Schema((t,)).validate(x)
 
 def vDict(x, msg:str = None) -> dict:
     pass
@@ -31,7 +33,6 @@ def vStr(x, msg:str = None) -> str:
 
 def vNum(x, msg:str = None) -> float:
     return Schema(Or(float, int)).validate(x)
-
 
 def vFloat(x, msg:str = None) -> float:
     return Schema(float).validate(x)

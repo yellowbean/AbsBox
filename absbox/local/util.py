@@ -15,7 +15,7 @@ def mapNone(x, v):
         return x
 
 
-def lmap(f, xs):
+def lmap(f: callable, xs) -> list:
     ''' just make it looks more functional '''
     return list(map(f, xs))
 
@@ -58,17 +58,22 @@ def readTagMap(x:dict) -> str:
         case _ :
             return f"<{x}>"
 
+
 def readTag(x: dict):
     return f"<{x['tag']}:{','.join(x['contents'])}>"
+
 
 def isDate(x):
     return re.match(r"\d{4}\-\d{2}\-\d{2}", x)
 
+
 def allList(xs):
     return all([isinstance(x, list) for x in xs])
 
+
 def mkTs(n, vs):
     return mkTag((n, vs))
+
 
 def mkTbl(n, vs):
     return mkTag((n, vs))
@@ -104,20 +109,6 @@ def unifyTs(xs):
                                                 , on=[_index_name]), xs)
     
     return r.sort_index()
-
-
-def aggCFby(_df, interval, cols):
-    df = _df.copy()
-    idx = None
-    dummy_col = '_index'
-    df[dummy_col] = df.index
-    _mapping = {"月份": "M", "Month": "M", "M": "M", "month": "M"}
-    if df.index.name == "日期":
-        idx = "日期"
-    else:
-        idx = "date"
-    df[dummy_col] = pd.to_datetime(df[dummy_col]).dt.to_period(_mapping[interval])
-    return df.groupby([dummy_col])[cols].sum().rename_axis(idx)
 
 
 def update_deal(d, i, c): #Deprecated ,to be replace with Lens
@@ -218,12 +209,14 @@ def renameKs2(m: dict, kmapping:dict) -> dict:
     assert set(m.keys()).issubset(set(kmapping.keys())), f"{m.keys()} not in {kmapping.keys()}"
     return {kmapping[k]: v for k, v in m.items()}
 
+
 def updateKs(m: dict, kmapping:dict) -> dict:
     ''' Given a map, update ks from a key-mapping '''
     assert isinstance(m, dict), "M is not a map"
     assert isinstance(kmapping, dict), f"Mapping is not a map: {kmapping}"
 
     return {kmapping.get(k,k):v for k,v in m.items()}
+
 
 def ensure100(xs, msg=""):
     assert sum(xs) == 1.0, f"Doesn't not sum up 100%: {msg}"
@@ -456,6 +449,4 @@ def patchDicts(dict1:dict,dict2:dict)-> dict:
     Merge two dictionaries, if a key exists in both dictionaries,use the value from dict2
     if key only exists in either one, use the only one value
     """
-    return tz.merge_with(lambda xs: xs[1] if len(xs)==2 else xs[0]
-                         ,dict1
-                         ,dict2)
+    return tz.merge_with(lambda xs: xs[1] if len(xs)==2 else xs[0] ,dict1 ,dict2)

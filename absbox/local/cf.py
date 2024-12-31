@@ -1,6 +1,7 @@
 import pandas as pd
 import toolz as tz
 from lenses import lens
+import enum
 from absbox.validation import vInt, vDate, vFloat, vBool
 from absbox.validation import vDict, vList, vStr, vNum
 from absbox import unifyTs
@@ -42,6 +43,12 @@ def buildDaySeq2(_df):
 
 def filterCols(xs, columnsToKeep):
     return [_[columnsToKeep] for _ in xs]
+
+
+class BondCfHeader(enum.Enum):
+    SIMPLE = ['rate','cash','intDue','intOverInt','factor','memo']+["利率","本息合计","应付利息","罚息","本金系数","备注"]
+    STANDARD = ['intOverInt','factor','memo']+["罚息","本金系数","备注"]
+    FULL = []
 
 
 def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注","应付利息","罚息","intDue","intOverInt"]) -> pd.DataFrame:
@@ -86,8 +93,7 @@ def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注","应�
                     cfFrame.append(v)
                     
         header = pd.MultiIndex.from_tuples(indexes
-                                          , names=["BondGroup",'Bond',"Field"]
-                                          )       
+                                        , names=["BondGroup",'Bond',"Field"])       
         
         df = pd.concat(cfFrame,axis=1)
     df.columns = header
@@ -164,12 +170,21 @@ def readInspect(r:dict) -> pd.DataFrame:
     else:
         u = pd.DataFrame()
 
-    w = r['waterfallInspect'].to_records() if ('waterfallInspect' in r  and r['waterfallInspect'] and (not r['waterfallInspect'].empty)) else []
+    if not 'waterfallInspect' in r:
+        return pd.concat([u],axis=1).sort_index()
+    
+    if r['waterfallInspect'] is None:
+        return pd.concat([u],axis=1).sort_index()
+    
+    if r['waterfallInspect'].empty:
+        return pd.concat([u],axis=1).sort_index()
+
+    w = r['waterfallInspect'].to_records()
     wdf = tz.pipe(tz.groupby(lambda x:tz.nth(2,x), w)
             ,lambda m: tz.valmap(lambda xs: [ (_[1],_[4]) for _ in xs],m)
             ,lambda m: tz.valmap(lambda xs: pd.DataFrame(xs, columns =['Date', 'val']).set_index('Date'),m)
             ,lambda m: {k:v.rename({"val":k},axis=1) for k,v in m.items() }
-         )
+            )
     return pd.concat([u,*wdf.values()],axis=1).sort_index()
 
 
