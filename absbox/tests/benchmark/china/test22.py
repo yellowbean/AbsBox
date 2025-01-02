@@ -1,5 +1,7 @@
 from absbox import API
 
+import
+
 localAPI = API("https://absbox.org/api/latest",'chinese')
 
 mypool = {"清单":[["租赁",{"初始租金":100,"初始期限":12,"频率":"月末","起始日":"2021-01-31","计提周期":"季度末", "涨幅":0.085}]

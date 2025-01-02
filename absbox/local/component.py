@@ -272,9 +272,9 @@ def mkDs(x):
                 return mkTag(("BondRate", vStr(bn)))
             case ("债券加权利率", *bn) | ("bondWaRate", *bn):
                 return mkTag(("BondWaRate", vList(bn, str)))
-            case ("资产池利率", *pNames) | ("poolWaRate", *pNames):
-                if pNames:
-                    return mkTag(("PoolWaRate", lmap(mkPid, pNames)))
+            case ("资产池利率", pName) | ("poolWaRate", pName):
+                return mkTag(("PoolWaRate", mkPid(pName)))
+            case ("资产池利率",) | ("poolWaRate",):
                 return mkTag(("PoolWaRate", None))
             case ("所有账户余额",) | ("accountBalance"):
                 return mkTag("AllAccBalance")
@@ -776,16 +776,20 @@ def mkLiqRepayType(x):
 
 def mkRateSwapType(pr, rr):
     def isFloater(y):
-        if isinstance(y, tuple):
+        if isinstance(y, tuple) and len(y) == 2 and isinstance(y[1],float):
             return True
         return False
     match (isFloater(pr), isFloater(rr)):
+        case (False, True) if isinstance(pr, float):
+            return mkTag(("FixedToFloating", [pr, rr]))
+        case (False, True):
+            return mkTag(("FormulaToFloating",[mkDs(pr), rr]))
+        case (True, False) if isinstance(rr, float):
+            return mkTag(("FloatingToFixed", [pr, rr]))
+        case (True, False):
+            return mkTag(("FloatingToFormula",[pr, mkDs(rr)]))
         case (True, True):
             return mkTag(("FloatingToFloating", [pr, rr]))
-        case (False, True):
-            return mkTag(("FixedToFloating", [pr, rr]))
-        case (True, False):
-            return mkTag(("FloatingToFixed", [pr, rr]))
         case _:
             raise RuntimeError(f"Failed to match :{rr,pr}:Interest Swap Type")
 
