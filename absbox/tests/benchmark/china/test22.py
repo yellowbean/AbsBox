@@ -1,6 +1,5 @@
 from absbox import API
 
-import
 
 localAPI = API("https://absbox.org/api/latest",'chinese')
 
