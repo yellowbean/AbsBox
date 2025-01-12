@@ -22,6 +22,4 @@ from absbox.report import toHtml,OutputType,toExcel
 
 import absbox.examples as examples
 
-from absbox.tests.releaseChecker import testByEngines
-
 __version__ = version("absbox")
