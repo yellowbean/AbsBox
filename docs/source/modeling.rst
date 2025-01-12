@@ -239,6 +239,10 @@ Bond
     .. versionadded:: 0.40.9
     * ``("totalFunded","A","B")``  -> sum of funded amount for bond A and bond B
     
+    .. versionadded:: 0.41.1
+    * ``("amountForTargetIrr",0.11,"A")``, -> amount needed to make bond A reach targeted IRR rate 11%.(Make sure there is negative cash statment in the bond "A")
+    * ``("totalFunded","A1","E")``  -> sum of funded amount for bond A1 and bond E
+
 Pool 
 """""""
     * ``("poolBalance",)``  -> current pool balance
@@ -317,6 +321,7 @@ Ratio Type
     * ``("cumPoolDefaultedRate",)`` -> cumulative default rate of pool
     * ``("cumPoolDefaultedRateTill",n)`` -> cumulative default rate of pool at `N` period. ( -1 means period before last period)
     * ``("cumPoolNetLossRate",)`` -> cumulative loss rate of pool
+    * ``("poolWaRate",)`` -> weighted average pool coupon 
     * ``("poolWaRate",)`` -> weighted average pool coupon 
     * ``("bondRate","A")`` -> the bond rate of bond "A"
     * ``("bondWaRate",<Bond1>,<Bond2>...)`` -> weighted average bond coupon
@@ -2189,6 +2194,33 @@ Here is couple benefits to use bond group:
 * It offers short cut to paydown by different way: by interst rate, by maturity date, by pro-rata, by bond names.
 * In the future, it may offer a way to issue new bonds.( New bond will be inserted into that group)
 
+Multi Interest Bond
+^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 0.41.1
+
+`Multi Interest Bond` is a bond with multiple interest rates. It is being used to model bond with different priority of interest components for single bond, like "sub ordinated interest/senior interest"
+
+.. code-block:: python 
+
+    ("A1",{"balance":1200
+                 ,"rates":[0.05,0.02]
+                 ,"originBalance":1200
+                 ,"originRate":0.07
+                 ,"startDate":"2020-01-03"
+                 ,"rateTypes":[("fix",0.05),("fix",0.02)]
+                 ,"bondType":{"Sequential":None}}
+           )
+
+    # to accrual interest 
+    ,["calcInt","A1"]
+
+    # to pay out first interest component 
+    ,["payIntByIndex","acc01",["A1"],0]
+    
+    ,["payIntByIndex","acc01",["A1"],1]
+
+
 Waterfall
 -------------
 
@@ -2486,6 +2518,34 @@ PayInt
     ``["payInt", {Account}, [<Bonds>] ]``
 
     ``["payInt", {Account}, [<Bonds>], m ]``
+    
+    `m`is just a map same in the `payFee` , which has keys :
+
+      * ``limit`` -> :ref:`<limit>`
+      * ``support`` -> :ref:`<support>`
+
+PayIntByIndex
+  .. versionadded:: 0.41.1
+  pay specific index component to a multi-interest bond
+
+  syntax 
+    ``["payIntByIndex", {Account},[<Bonds>],<Interest Index>]``
+    ``["payIntByIndex", {Account},[<Bonds>],<Interest Index>, m]``
+    ``["payIntByIndex","acc01",["A1"],1]``
+
+    `m`is just a map same in the `payFee` , which has keys :
+
+      * ``limit`` -> :ref:`<limit>`
+      * ``support`` -> :ref:`<support>`
+
+PayIntByIndexBySeq
+  .. versionadded:: 0.41.1
+
+  pay specific index component to a multi-interest bond sequentially
+
+  syntax 
+    ``["payIntByIndexBySeq", {Account},[<Bonds>],<Interest Index>]``
+    ``["payIntByIndexBySeq", {Account},[<Bonds>],<Interest Index>, m]``
     
     `m`is just a map same in the `payFee` , which has keys :
 

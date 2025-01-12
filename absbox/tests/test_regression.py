@@ -51,7 +51,7 @@ def translate(d, folder, o):
         print(f"Skipping:{benchfile}")
         with open(benchfile, 'w', encoding='utf8') as newbench:
             try:
-                print(f"Writing new bench out case -> size {len(d.json)}")
+                print(f"Writing new bench out case -> ")
             except Exception as e:
                 print(f"Error in build deal json:{e}")
             assert d.json is not None, f"None: Failed to generate Deal JSON file:{d.json}"
@@ -226,5 +226,4 @@ def test_resp():
             ,("test07.json","empty.json","bmwRevolving.json","test07.out.json")
             ]
     run_deal(us_folder, pair)
-
 

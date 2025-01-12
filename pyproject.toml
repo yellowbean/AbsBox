@@ -54,6 +54,11 @@ changelog = "https://github.com/yellowbean/AbsBox/blob/main/CHANGELOG.rst"
 [tool.pytest.ini_options]
 minversion = "7.0"
 addopts = "-ra -q --color=yes  --import-mode=importlib"
+markers = [
+    "pool","account","bond","fee","interest",
+    "TB",
+]
+
 
 testpaths = [
     "absbox/tests",

@@ -1087,6 +1087,7 @@
         "bndDueIntDate": null,
         "bndStepUp": null,
         "bndLastIntPayDate": null,
+        "bndStmt": null,
         "tag": "Bond"
       },
       "Sub": {
@@ -1115,6 +1116,7 @@
         "bndDueIntDate": null,
         "bndStepUp": null,
         "bndLastIntPayDate": null,
+        "bndStmt": null,
         "tag": "Bond"
       }
     },

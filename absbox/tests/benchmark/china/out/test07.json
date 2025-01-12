@@ -662,6 +662,7 @@
         "bndDueIntDate": null,
         "bndStepUp": null,
         "bndLastIntPayDate": null,
+        "bndStmt": null,
         "tag": "Bond"
       },
       "\u6b21\u7ea7": {
@@ -690,6 +691,7 @@
         "bndDueIntDate": null,
         "bndStepUp": null,
         "bndLastIntPayDate": null,
+        "bndStmt": null,
         "tag": "Bond"
       }
     },

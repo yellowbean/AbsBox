@@ -124,6 +124,7 @@
         "bndDueIntDate": null,
         "bndStepUp": null,
         "bndLastIntPayDate": null,
+        "bndStmt": null,
         "tag": "Bond"
       },
       "A2": {
@@ -163,6 +164,7 @@
         "bndDueIntDate": null,
         "bndStepUp": null,
         "bndLastIntPayDate": null,
+        "bndStmt": null,
         "tag": "Bond"
       },
       "A3": {
@@ -202,6 +204,7 @@
         "bndDueIntDate": null,
         "bndStepUp": null,
         "bndLastIntPayDate": null,
+        "bndStmt": null,
         "tag": "Bond"
       },
       "\u6b21\u7ea7": {
@@ -230,6 +233,7 @@
         "bndDueIntDate": null,
         "bndStepUp": null,
         "bndLastIntPayDate": null,
+        "bndStmt": null,
         "tag": "Bond"
       }
     },

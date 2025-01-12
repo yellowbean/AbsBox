@@ -65,11 +65,13 @@ def mkDatePattern(x):
             return mkTag((_x))
         case _x if (_x in datePattern.keys()):
             return mkTag((datePattern[x]))
+        case d if isinstance(d, str):
+            return mkTag(("SingletonDate", d))
         case _:
             raise RuntimeError(f"Failed to match {x}")
 
 
-def getStartDate(x):
+def getStartDate(x:dict) -> tuple:
     match x:
         case {"封包日": a, "起息日": b, "首次兑付日": c, "法定到期日": d, "收款频率": pf, "付款频率": bf} | \
              {"cutoff": a, "closing": b, "firstPay": c, "stated": d, "poolFreq": pf, "payFreq": bf}:
@@ -80,6 +82,8 @@ def getStartDate(x):
         case {"归集日": (lastCollected, nextCollect), "兑付日": (pp, np), "法定到期日": c, "收款频率": pf, "付款频率": bf} | \
              {"collect": (lastCollected, nextCollect), "pay": (pp, np), "stated": c, "poolFreq": pf, "payFreq": bf}:
             return (vDate(lastCollected), vDate(pp))
+        case {"lastCollect":a,"lastPay":b}:
+            return (a, b)
         case _:
             raise RuntimeError(f"Failed to get Start Date from {x}")
 
@@ -87,26 +91,61 @@ def getStartDate(x):
 def mkDate(x):
     ''' make date component for deal '''
     match x:
+        case {"cutoff": a, "closing": b, "firstPay": c,"firstCollect": d, "stated": e, "poolFreq": pf, "payFreq": bf, "cust":cust} if isinstance(cust, dict):
+            custom = {f"CustomExeDates {k}":mkDatePattern(v) for k,v in cust.items()}
+            m = {
+                "CutoffDate":mkDatePattern(vDate(a)),
+                "ClosingDate":mkDatePattern(vDate(b)),
+                "FirstPayDate":mkDatePattern(vDate(c)),
+                "FirstCollectDate":mkDatePattern(vDate(d)),
+                "StatedMaturityDate":mkDatePattern(vDate(e)),
+                "DistributionDates":mkDatePattern(bf),
+                "CollectionDates":mkDatePattern(pf),
+            } | custom
+            return mkTag(("GenericDates",m))
+        case {"lastCollect": a, "lastPay": b, "nextPay": c,"nextCollect": d, "stated": e, "poolFreq": pf, "payFreq": bf, "cust":cust} if isinstance(cust, dict): 
+            custom = {f"CustomExeDates {k}":mkDatePattern(v) for k,v in cust.items()}
+            m = {
+                "LastCollectDate":mkDatePattern(vDate(a)),
+                "LastPayDate":mkDatePattern(vDate(b)),
+                "NextPayDate":mkDatePattern(vDate(c)),
+                "NextCollectDate":mkDatePattern(vDate(d)),
+                "StatedMaturityDate":mkDatePattern(vDate(e)),
+                "DistributionDates":mkDatePattern(bf),
+                "CollectionDates":mkDatePattern(pf),
+            } | custom
+            return mkTag(("GenericDates",m))
+        case {"lastCollect": a, "lastPay": b, "nextPay": c,"nextCollect": d, "stated": e, "poolFreq": pf, "payFreq": bf}: 
+            m = {
+                "LastCollectDate":mkDatePattern(vDate(a)),
+                "LastPayDate":mkDatePattern(vDate(b)),
+                "NextPayDate":mkDatePattern(vDate(c)),
+                "NextCollectDate":mkDatePattern(vDate(d)),
+                "StatedMaturityDate":mkDatePattern(vDate(e)),
+                "DistributionDates":mkDatePattern(bf),
+                "CollectionDates":mkDatePattern(pf),
+            }
+            return mkTag(("GenericDates",m))
         case {"封包日": a, "起息日": b, "首次兑付日": c, "法定到期日": d, "收款频率": pf, "付款频率": bf} | \
              {"cutoff": a, "closing": b, "firstPay": c, "stated": d, "poolFreq": pf, "payFreq": bf}:
             firstCollection = x.get("首次归集日", b)
-            mr = x.get("循环结束日", None)
+            mr = None
             return mkTag(("PreClosingDates"
-                          , [vDate(a), vDate(b), mr, vDate(d), [vDate(firstCollection), mkDatePattern(pf)], [vDate(c), mkDatePattern(bf)]]))
+                        , [vDate(a), vDate(b), mr, vDate(d), [vDate(firstCollection), mkDatePattern(pf)], [vDate(c), mkDatePattern(bf)]]))
         case {"归集日": (lastCollected, nextCollect), "兑付日": (pp, np), "法定到期日": c, "收款频率": pf, "付款频率": bf} | \
              {"collect": (lastCollected, nextCollect), "pay": (pp, np), "stated": c, "poolFreq": pf, "payFreq": bf}:
-            mr = x.get("循环结束日", None)
+            mr = None
             return mkTag(("CurrentDates", [[vDate(lastCollected), vDate(pp)],
-                                           mr,
-                                           vDate(c),
-                                           [vDate(nextCollect), mkDatePattern(pf)],
-                                           [vDate(np), mkDatePattern(bf)]]))
+                                            mr,
+                                            vDate(c),
+                                            [vDate(nextCollect), mkDatePattern(pf)],
+                                            [vDate(np), mkDatePattern(bf)]]))
         case {"回款日": cdays, "分配日": ddays, "封包日": cutoffDate, "起息日": closingDate} | \
                 {"poolCollection": cdays, "distirbution": ddays, "cutoff": cutoffDate, "closing": closingDate}:
             return mkTag(("CustomDates", [cutoffDate
-                                          , [mkTag(("PoolCollection", [cd, ""])) for cd in cdays]
-                                          , closingDate
-                                          , [mkTag(("RunWaterfall", [dd, ""])) for dd in ddays]]))
+                                        , [mkTag(("PoolCollection", [cd, ""])) for cd in cdays]
+                                        , closingDate
+                                        , [mkTag(("RunWaterfall", [dd, ""])) for dd in ddays]]))
         case _:
             raise RuntimeError(f"Failed to match:{x} in Dates")
 
@@ -394,6 +433,8 @@ def mkDs(x):
                 return mkTag(("Avg", [mkDs(_) for _ in ds]))
             case ("avgRatio", *ds) | ("平均比例", *ds):
                 return mkTag(("AvgRatio", [mkDs(_) for _ in ds]))
+            case ("amountForTargetIrr", irr, bn):
+                return mkTag(("AmountRequiredForTargetIRR", [irr, bn]))
             case _:
                 raise RuntimeError(f"Failed to match DS/Formula: {x}")
     except TypeError as e:
@@ -613,7 +654,6 @@ def mkBndComp(bn,bo):
         try:
             mkBnd("whatever",bm)
         except Exception as e:
-            print("mkbnd",e)
             return False
         return True
 
@@ -625,6 +665,26 @@ def mkBndComp(bn,bo):
         case _ :
             raise RuntimeError(f"Failed to match bond component")
 
+def mkTxn(tn:str, xs:list)-> list:
+    """ Make bond statement, accept a list of bond transaction """
+    match tn :
+        case "bond":
+            return [ mkTag(("BondTxn", _)) for _ in xs ]
+        case "account" | "acc":
+            return [ mkTag(("AccTxn", _)) for _ in xs ]
+        case "expense" | "exp":
+            return [ mkTag(("ExpTxn", _)) for _ in xs ]
+        case "support":
+            return [ mkTag(("SupportTxn", _)) for _ in xs ]
+        case "irs" | "rateSwap":
+            return [ mkTag(("IrsTxn", _)) for _ in xs ]
+        case "entry" | "ledger" :
+            return [ mkTag(("EntryTxn", _)) for _ in xs ]
+        case "trg" | "trigger" :
+            return [ mkTag(("TrgTxn", _)) for _ in xs ]
+        case _:
+            raise RuntimeError(f"Failed to match txn: {tn}")
+
 
 def mkBnd(bn, x:dict):
     """ Make a single bond object """
@@ -635,8 +695,9 @@ def mkBnd(bn, x:dict):
     duePrin = getValWithKs(x, ["应付本金", "duePrin"], defaultReturn=0)
     dueIntOverInt = getValWithKs(x, ["拖欠利息", "dueIntOverInt"], defaultReturn=0)
     mSt = getValWithKs(x, ["调息", "stepUp"], defaultReturn=None)
-    # TODO: add statement
-    mStmt = None
+    mTxns = getValWithKs(x, ["stmt", ], defaultReturn=None)
+    # mStmt = mkTag(("Statement", mkTxn("bond", mTxns))) if mTxns else None
+    mStmt = mkTxn("bond", mTxns) if mTxns else None
     match x:
         case {"balance": bndBalance
               , "rates": bndRates
@@ -659,6 +720,7 @@ def mkBnd(bn, x:dict):
                     ,"bndDuePrin": vNum(duePrin)
                     ,"bndDueInts": dueInts
                     ,"bndDueIntOverInts": dueIntOverInts
+                    ,"bndStmt": mStmt
                     #,"bndDueIntDates": lastIntPayDate
                     #,"bndLastPrinPay": 
                     ,"tag": "MultiIntBond"}
@@ -669,6 +731,7 @@ def mkBnd(bn, x:dict):
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
                     , "bndDuePrin": vNum(duePrin), "bndDueInt": vNum(dueInt), "bndDueIntOverInt":vNum(dueIntOverInt), "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
                     , "bndLastIntPayDate": lastIntPayDate
+                    , "bndStmt": mStmt
                     , "tag": "Bond"}
             return y
         case {"初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
@@ -678,6 +741,7 @@ def mkBnd(bn, x:dict):
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
                     , "bndDuePrin": vNum(duePrin), "bndDueInt": vNum(dueInt), "bndDueIntOverInt": vNum(dueIntOverInt), "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
                     , "bndLastIntPayDate": lastIntPayDate
+                    , "bndStmt": mStmt
                     , "tag": "Bond"}
         case _:
             print(" got here",x)
@@ -1276,6 +1340,8 @@ def mkWaterfall(r, x):
             _w_tag = f"DefaultDistribution"
         case "储备" | "Warehousing" | ('Warehousing', None):
             _w_tag = f"Warehousing Nothing"
+        case ("custom",wName): 
+            _w_tag = f"CustomWaterfall {wName}"
         case _:
             raise RuntimeError(f"Failed to match :{x}:mkWaterfall with key {_k}")
     
