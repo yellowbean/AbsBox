@@ -1,5 +1,7 @@
 from absbox import API
 
+import pandas as pd 
+
 
 localAPI = API("https://absbox.org/api/latest",'chinese')
 
