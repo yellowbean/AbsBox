@@ -14,3 +14,4 @@ Model Examples
    sellAssets
    trasnferMultiple
    testCalls
+   EDML_BLUE_2024
