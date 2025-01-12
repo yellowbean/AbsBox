@@ -15,3 +15,4 @@ Model Examples
    trasnferMultiple
    testCalls
    EDML_BLUE_2024
+   MultiIntBond
