@@ -7,3 +7,4 @@ Run Assets in Pool
    pool_sample1
    pool_sample2
    pool_multiScenario
+   PoolAndTag

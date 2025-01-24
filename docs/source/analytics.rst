@@ -641,6 +641,22 @@ By Obligor Fields
 .. versionadded:: 0.29.2
 
 
+Syntax is similar to ``By Obligor``, but the match rule is based on asset fields.
+
+Field Match Rule:
+  * ("not", <Field Match Rule>) : negate the rule
+  * (<fieldName>, "in", <option list>): hit when asset field value in the list
+  * (<fieldName>, "cmp", <cmp>, <value>): only for numeric field value, hit when asset field value compare with value by cmp operator
+  * (<fieldName>, "range", <rangeType>, <lowValue>, <highValue>): only for numeric field value, hit when asset field value in the range
+
+.. code-block:: python
+
+   ("Obligor",("ByTag",<tags>,<match rule>,<assumption>)
+              ,("ById",<ids>,<assumption>)
+              ,("ByField",[<field match rule>],<assumption>)
+              ,("ByDefault",<assumption>))
+
+
 
 
 
@@ -1749,9 +1765,13 @@ Sensitivity Analysis
 There are four types in sensitivity analysis in `absbox`: 
 
 * ``Pool Performance``
+  using multiple pool performance scenarios.
 * ``Deal Structure``
+  using multiple deal structures.
 * ``Deal Run Assumption``
+  using multiple deal assumptions, like call, interest rate curve etc.
 * A combination of above
+  a combination of above three types.
 
 
 .. list-table:: Sensitivity Run Type
