@@ -45,6 +45,7 @@ Content
    support
    reference
    nbsample/index
+   faq
    api
    changelog
 
