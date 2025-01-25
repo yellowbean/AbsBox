@@ -93,6 +93,7 @@ To model them via sequential parameter ( *Not Recommend* ):
         ,<Custom data> # optional
         ,<Ledgers> # optional
         ,<Rate Caps> # optional
+        ,<Deal Stats> # optional
     )
 
 .. _Generic ABS:
@@ -2096,10 +2097,11 @@ syntax
 
 Principal 
 ^^^^^^^^^^^
-there are 4 types of `Principal` for bonds/tranches
+there are 5 types of `Principal` for bonds/tranches
 
   * ``Sequential``： can be paid down as much as its oustanding balance
-  * ``PAC``： Balance of bond can only be paid down by a predefined schedule
+  * ``PAC``： Balance of bond can only be paid down by a predefined balance schedule
+  * ``BalanceByPeriod``: Balance of bond can only be paid down by a predefined balance schedule ,indexed by bond paid period
   * ``Lockout``： Principal won't be paid after lockout date
   * ``Equity``：  No interest and shall serve as junior tranche
 
@@ -2123,7 +2125,7 @@ A bond with target amortize balances, it will stop recieving principal once its 
 
 
 .. code-block:: python
- 
+
   ("A1",{"balance":1000
        ,"rate":0.07
        ,"originBalance":1000
@@ -2136,6 +2138,27 @@ A bond with target amortize balances, it will stop recieving principal once its 
                      ,["2021-09-20",630]
                      ,["2021-10-20",0]
                      ]}})
+
+BalanceByPeriod
+""""""""""""""""""
+
+.. versionadded:: 0.42.0
+
+.. code-block:: python
+
+    ("A1",{"balance":1000
+             ,"rate":0.07
+             ,"originBalance":1000
+             ,"originRate":0.07
+             ,"startDate":"2020-01-03"
+             ,"rateType":{"Fixed":0.08}
+             ,"bondType":{"BalanceByPeriod":
+                   [[0,900]
+                   ,[1,850]
+                   ,[5,800]
+                   ,[6,0] 
+                   ]}
+            })
 
 
 Lockout

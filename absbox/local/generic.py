@@ -48,6 +48,7 @@ class Generic:
     custom: dict = None
     ledgers: dict = None
     rateCap: dict = None
+    stats: dict = None
 
     @property
     def json(self) -> dict:
@@ -74,13 +75,24 @@ class Generic:
             "triggers": renameKs2({k: {_k: mkTrigger(_v) for (_k,_v) in v.items() } for (k, v) in self.trigger.items()},englishDealCycle) if self.trigger else None,
             "liqProvider": {ln: mkLiqProvider(ln, lo | {"start":lastCloseDate} ) 
                             for ln,lo in self.liqFacility.items() } if self.liqFacility else None,
-            "ledgers": {ln: mkLedger(ln, v) for ln,v in self.ledgers.items()} if self.ledgers else None
+            "ledgers": {ln: mkLedger(ln, v) for ln,v in self.ledgers.items()} if self.ledgers else None,
+            "stats": self.buildStats()
         }
 
         _dealType = identify_deal_type(_r)
 
         return mkTag((_dealType, _r))
 
+    def buildStats(self,):
+        if self.stats is None:
+            return [{},{},{},{}]
+        a = {k:v for k,v in self.stats.items() if k in dealStatBalance }
+        b = {k:v for k,v in self.stats.items() if k in dealStatRate }
+        c = {k:v for k,v in self.stats.items() if k in dealStatBool }
+        d = {k:v for k,v in self.stats.items() if k in dealStatInt }
+        
+        # bal, rate, bool, int
+        return [a,b,c,d]
 
     def read_pricing(self, pricing):
         return earlyReturnNone(mkPricingAssump, pricing)

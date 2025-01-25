@@ -584,6 +584,8 @@ def mkBondType(x):
     match x:
         case {"固定摊还": schedule} | {"PAC": schedule}:
             return mkTag(("PAC", mkTag(("BalanceCurve", schedule))))
+        case {"BalanceByPeriod": bals}:
+            return mkTag(("AmtByPeriod", mkTag(("WithTrailVal", bals))))
         case {"过手摊还": None} | {"Sequential": None} | "Sequential" | "过手摊还":
             return mkTag(("Sequential"))
         case {"锁定摊还": _after} | {"Lockout": _after}:
@@ -744,7 +746,6 @@ def mkBnd(bn, x:dict):
                     , "bndStmt": mStmt
                     , "tag": "Bond"}
         case _:
-            print(" got here",x)
             raise RuntimeError(f"Failed to match bond:{bn},{x}:mkBnd")
 
 
