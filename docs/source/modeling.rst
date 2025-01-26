@@ -2144,6 +2144,8 @@ BalanceByPeriod
 
 .. versionadded:: 0.42.0
 
+The repayment schedule balance depends on waterfall distribution periods( defined by `PayFreq` in deal dates )
+
 .. code-block:: python
 
     ("A1",{"balance":1000
@@ -2159,6 +2161,12 @@ BalanceByPeriod
                    ,[6,0] 
                    ]}
             })
+
+
+.. warning::
+    
+    If a deal is already ongoing , make sure need to model `bond paied period` in `deal states`
+
 
 
 Lockout
