@@ -2777,6 +2777,12 @@
         "ledgBalance": 0,
         "ledgStmt": null
       }
-    }
+    },
+    "stats": [
+      {},
+      {},
+      {},
+      {}
+    ]
   }
 }

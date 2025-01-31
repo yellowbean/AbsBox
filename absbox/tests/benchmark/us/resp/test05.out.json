@@ -10337,7 +10337,15 @@
             ]
           }
         ],
-        "call": null,
+        "stats": [
+          {},
+          {},
+          {},
+          {
+            "PoolCollectedPeriod": 104,
+            "BondPaidPeriod": 102
+          }
+        ],
         "liqProvider": {
           "insuranceProvider": {
             "liqName": "insuranceProvider",
@@ -15897,7 +15905,6 @@
         "currencySwap": null,
         "custom": null,
         "triggers": null,
-        "overrides": null,
         "ledgers": null
       }
     },

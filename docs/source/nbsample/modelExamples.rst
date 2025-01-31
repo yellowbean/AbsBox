@@ -16,3 +16,4 @@ Model Examples
    testCalls
    EDML_BLUE_2024
    MultiIntBond
+   BondScheduleByPeriod

@@ -435,6 +435,16 @@ def mkDs(x):
                 return mkTag(("AvgRatio", [mkDs(_) for _ in ds]))
             case ("amountForTargetIrr", irr, bn):
                 return mkTag(("AmountRequiredForTargetIRR", [irr, bn]))
+            case ("dealStat", _t, s):
+                match _t :
+                    case "int":
+                        return mkTag(("DealStatInt", s))
+                    case "float" | "double" | "balance":
+                        return mkTag(("DealStatBalance", s))
+                    case "bool": 
+                        return mkTag(("DealStatBool", s))
+                    case "rate" | "ratio" | "percent":
+                        return mkTag(("DealStatRate", s))
             case _:
                 raise RuntimeError(f"Failed to match DS/Formula: {x}")
     except TypeError as e:
@@ -585,7 +595,7 @@ def mkBondType(x):
         case {"固定摊还": schedule} | {"PAC": schedule}:
             return mkTag(("PAC", mkTag(("BalanceCurve", schedule))))
         case {"BalanceByPeriod": bals}:
-            return mkTag(("AmtByPeriod", mkTag(("WithTrailVal", bals))))
+            return mkTag(("AmtByPeriod", mkTag(("CurrentVal", bals))))
         case {"过手摊还": None} | {"Sequential": None} | "Sequential" | "过手摊还":
             return mkTag(("Sequential"))
         case {"锁定摊还": _after} | {"Lockout": _after}:
@@ -643,9 +653,9 @@ def mkBondRate(x:dict)->dict:
 def mkStepUp(x):
     match x:
         case ("ladder", d, spd, dp):
-            return mkTag(("PassDateLadderSpread", [d, vNum(spd), mkDatePattern(dp)]))
+            return mkTag(("PassDateLadderSpread", [vDate(d), vNum(spd), mkDatePattern(dp)]))
         case ("once", d, spd):
-            return mkTag(("PassDateSpread", [d, vNum(spd)]))
+            return mkTag(("PassDateSpread", [vDate(d), vNum(spd)]))
         case _:
             raise RuntimeError(f"Failed to match bond step up type:{x}")
 
@@ -696,7 +706,7 @@ def mkBnd(bn, x:dict):
     dueInt = getValWithKs(x, ["应付利息", "dueInt"], defaultReturn=0)
     duePrin = getValWithKs(x, ["应付本金", "duePrin"], defaultReturn=0)
     dueIntOverInt = getValWithKs(x, ["拖欠利息", "dueIntOverInt"], defaultReturn=0)
-    mSt = getValWithKs(x, ["调息", "stepUp"], defaultReturn=None)
+    mSt = getValWithKs(x, ["调息", "stepUp"], defaultReturn=None, mapping=mkStepUp)
     mTxns = getValWithKs(x, ["stmt", ], defaultReturn=None)
     # mStmt = mkTag(("Statement", mkTxn("bond", mTxns))) if mTxns else None
     mStmt = mkTxn("bond", mTxns) if mTxns else None

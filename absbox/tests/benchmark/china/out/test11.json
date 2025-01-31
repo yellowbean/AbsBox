@@ -236,13 +236,18 @@
         "accName": "\u8d26\u623702",
         "accType": null,
         "accInterest": {
-          "tag": "BankAccount",
+          "tag": "InvestmentAccount",
           "contents": [
             "LPR5Y",
+            0.01,
             {
               "tag": "MonthEnd"
             },
-            "2021-06-15"
+            {
+              "tag": "MonthEnd"
+            },
+            "2021-06-15",
+            0.03
           ]
         },
         "accStmt": null
@@ -287,6 +292,12 @@
     "custom": null,
     "triggers": null,
     "liqProvider": null,
-    "ledgers": null
+    "ledgers": null,
+    "stats": [
+      {},
+      {},
+      {},
+      {}
+    ]
   }
 }

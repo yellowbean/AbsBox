@@ -7339,14 +7339,21 @@
             ]
           }
         ],
-        "call": null,
+        "stats": [
+          {},
+          {},
+          {},
+          {
+            "PoolCollectedPeriod": 34,
+            "BondPaidPeriod": 33
+          }
+        ],
         "liqProvider": null,
         "rateSwap": null,
         "rateCap": null,
         "currencySwap": null,
         "custom": null,
         "triggers": null,
-        "overrides": null,
         "ledgers": null
       }
     },

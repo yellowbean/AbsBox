@@ -305,6 +305,12 @@
       }
     },
     "liqProvider": null,
-    "ledgers": null
+    "ledgers": null,
+    "stats": [
+      {},
+      {},
+      {},
+      {}
+    ]
   }
 }

@@ -10893,7 +10893,15 @@
             ]
           }
         ],
-        "call": null,
+        "stats": [
+          {},
+          {},
+          {},
+          {
+            "PoolCollectedPeriod": 104,
+            "BondPaidPeriod": 102
+          }
+        ],
         "liqProvider": null,
         "rateSwap": null,
         "rateCap": null,
@@ -11762,7 +11770,6 @@
           "BeginDistributionWF": {},
           "EndDistributionWF": {}
         },
-        "overrides": null,
         "ledgers": null
       }
     },

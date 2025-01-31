@@ -37700,8 +37700,11 @@
               "maturityDate": null
             },
             "bndInterestInfo": {
-              "tag": "InterestByYield",
-              "contents": 0.02
+              "tag": "Fix",
+              "contents": [
+                0.02,
+                "DC_ACT_365F"
+              ]
             },
             "bndStepUp": null,
             "bndBalance": 466057627.45,
@@ -46586,14 +46589,21 @@
             ]
           }
         ],
-        "call": null,
+        "stats": [
+          {},
+          {},
+          {},
+          {
+            "PoolCollectedPeriod": 204,
+            "BondPaidPeriod": 203
+          }
+        ],
         "liqProvider": null,
         "rateSwap": null,
         "rateCap": null,
         "currencySwap": null,
         "custom": null,
         "triggers": null,
-        "overrides": null,
         "ledgers": null
       }
     },

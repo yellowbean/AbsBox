@@ -1,18 +1,4 @@
-{"inspectOn": [
-        [
-            {"tag": "MonthEnd"
-            },
-            {"tag": "CurrentBondBalance", "contents":null
-            }
-        ],
-        [
-            {"tag": "MonthFirst"
-            },
-            {"tag": "CurrentPoolBalance", "contents":null
-            }
-        ]
-    ],
- "interest": [
+{"interest": [
         {"tag": "RateFlat", "contents": ["LPR5Y",
                 0.05
             ]

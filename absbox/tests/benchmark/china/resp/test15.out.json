@@ -105413,7 +105413,15 @@
             ]
           }
         ],
-        "call": null,
+        "stats": [
+          {},
+          {},
+          {},
+          {
+            "PoolCollectedPeriod": 458,
+            "BondPaidPeriod": 457
+          }
+        ],
         "liqProvider": {
           "\u53d1\u8d77\u4eba": {
             "liqName": "\u53d1\u8d77\u4eba",
@@ -116489,7 +116497,6 @@
           }
         },
         "triggers": null,
-        "overrides": null,
         "ledgers": null
       }
     },

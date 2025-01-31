@@ -199,8 +199,11 @@
           "maturityDate": null
         },
         "bndInterestInfo": {
-          "tag": "InterestByYield",
-          "contents": 0.02
+          "tag": "Fix",
+          "contents": [
+            0.02,
+            "DC_ACT_365F"
+          ]
         },
         "bndType": {
           "tag": "Equity"
@@ -462,6 +465,12 @@
     "custom": null,
     "triggers": null,
     "liqProvider": null,
-    "ledgers": null
+    "ledgers": null,
+    "stats": [
+      {},
+      {},
+      {},
+      {}
+    ]
   }
 }

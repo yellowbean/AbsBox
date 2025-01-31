@@ -306,6 +306,12 @@
     "custom": null,
     "triggers": null,
     "liqProvider": null,
-    "ledgers": null
+    "ledgers": null,
+    "stats": [
+      {},
+      {},
+      {},
+      {}
+    ]
   }
 }

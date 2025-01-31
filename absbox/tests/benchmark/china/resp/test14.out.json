@@ -69198,7 +69198,15 @@
             ]
           }
         ],
-        "call": null,
+        "stats": [
+          {},
+          {},
+          {},
+          {
+            "PoolCollectedPeriod": 475,
+            "BondPaidPeriod": 473
+          }
+        ],
         "liqProvider": {
           "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8": {
             "liqName": "\u5927\u539f\u79cd\u4fdd\u9669\u516c\u53f8",
@@ -80584,7 +80592,6 @@
         "currencySwap": null,
         "custom": null,
         "triggers": null,
-        "overrides": null,
         "ledgers": null
       }
     },

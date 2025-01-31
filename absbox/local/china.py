@@ -72,7 +72,8 @@ class SPV:
             "triggers": renameKs2({k: {_k: mkTrigger(_v) for (_k,_v) in v.items()} for (k,v) in self.触发事件.items() },chinaDealCycle) if self.触发事件 else None,
             "liqProvider": {ln: mkLiqProvider(ln, lo | {"起始日":defaultStartDate} ) 
                                 for ln,lo in self.流动性支持.items() } if self.流动性支持 else None,
-            "ledgers": {ln: mkLedger(ln, v) for ln,v in self.科目.items()} if self.科目 else None
+            "ledgers": {ln: mkLedger(ln, v) for ln,v in self.科目.items()} if self.科目 else None,
+            "stats": [{},{},{},{}]
         }
         _dealType = identify_deal_type(_r)
 

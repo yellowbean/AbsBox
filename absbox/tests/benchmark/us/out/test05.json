@@ -340,6 +340,12 @@
         "liqStmt": null
       }
     },
-    "ledgers": null
+    "ledgers": null,
+    "stats": [
+      {},
+      {},
+      {},
+      {}
+    ]
   }
 }

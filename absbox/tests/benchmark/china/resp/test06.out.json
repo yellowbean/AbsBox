@@ -23753,14 +23753,21 @@
             ]
           }
         ],
-        "call": null,
+        "stats": [
+          {},
+          {},
+          {},
+          {
+            "PoolCollectedPeriod": 99,
+            "BondPaidPeriod": 99
+          }
+        ],
         "liqProvider": null,
         "rateSwap": null,
         "rateCap": null,
         "currencySwap": null,
         "custom": null,
         "triggers": null,
-        "overrides": null,
         "ledgers": null
       }
     },

@@ -26660,7 +26660,15 @@
             ]
           }
         ],
-        "call": null,
+        "stats": [
+          {},
+          {},
+          {},
+          {
+            "PoolCollectedPeriod": 476,
+            "BondPaidPeriod": 474
+          }
+        ],
         "liqProvider": null,
         "rateSwap": null,
         "rateCap": null,
@@ -26705,7 +26713,6 @@
             }
           }
         },
-        "overrides": null,
         "ledgers": null
       }
     },

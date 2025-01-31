@@ -2167,7 +2167,9 @@ The repayment schedule balance depends on waterfall distribution periods( define
     
     If a deal is already ongoing , make sure need to model `bond paied period` in `deal states`
 
+.. seealso::
 
+    :ref:`Bond Schedule By Index Example`
 
 Lockout
 """""""""""""
@@ -3685,6 +3687,35 @@ It can be booked in waterfall action :ref:`Booking Ledger` ,and it can be query 
 The ``Ledger`` won't hold any cash,but serve a purpose of record. The `balance` or `transaction amount` of ``Ledger`` was used to calculate amount to pay bonds or transfer amount in accounts.
 
 Enough explain for finance people, from engineering pespective, ``Ledger`` is just a ``stateful variable`` during whole projection period 😎
+
+
+
+Deal Stats
+------------------- 
+
+.. versionadded:: 0.42.0
+
+Facts about the deal, like:
+
+* ``BondPaidPeriod`` -> how many periods bond has been paid
+* ``PoolCollectedPeriod`` -> how many periods pool has been collected
+
+The data is helpful when schedule payment was presented in ``index-based``.
+
+.. code-block:: python
+
+    (
+    ....
+    ,None
+    ,("PreClosing","Amortizing")
+    ,None
+    ,None
+    ,None
+    ,{"BondPaidPeriod": 2,"PoolCollectedPeriod":0}
+    )
+
+
+
 
 
 Examples
