@@ -17,3 +17,4 @@ Model Examples
    EDML_BLUE_2024
    MultiIntBond
    BondScheduleByPeriod
+   FeeFlowByIndex

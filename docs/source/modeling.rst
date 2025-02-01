@@ -947,6 +947,28 @@ syntax
     ,{"type":{"customFee":[["2024-01-01",100]
                           ,["2024-03-15",50]]}})
 
+custom fee flow by index
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 0.42.1 
+
+A custom fee flow with index (Either bond paid or pool collection period)
+The ``Amount`` will be the ``Total`` amount of fee due on that index date.
+
+
+syntax
+  ``{"flowByBondPeriod":[ [<Index>,<Amount>] .... ]}``
+  ``{"flowByPoolPeriod":[ [<Index>,<Amount>] .... ]}``
+
+.. code-block:: python
+
+  # each period new fee due 100
+  {"flowByBondPeriod": [ [1,100],[2,200],[3,300] ]}
+  # each period new fee due 100,50,25
+  {"flowByPoolPeriod": [ [1,100],[2,150],[3,175] ]}
+
+
+
 
 count type fee
 ^^^^^^^^^^^^^^^^^^^

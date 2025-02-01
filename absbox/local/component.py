@@ -178,6 +178,10 @@ def mkFeeType(x):
             return mkTag(("ByCollectPeriod", amt))
         case {"分段费用": [dp, ds, tbl]} | {"byTable": [dp, ds, tbl]}:
             return mkTag(("AmtByTbl", [mkDatePattern(dp), mkDs(ds), tbl]))
+        case {"flowByBondPeriod": curve}:
+            return mkTag(("FeeFlowByBondPeriod", mkTag(("CurrentVal", curve))))
+        case {"flowByPoolPeriod": curve}:
+            return mkTag(("FeeFlowByPoolPeriod", mkTag(("CurrentVal", curve))))
         case _:
             raise RuntimeError(f"Failed to match on fee type:{x}")
 
@@ -367,8 +371,8 @@ def mkDs(x):
                 return mkTag(("IsDealStatus", mkStatus(st)))
             case ("待付费用", *fns) | ("feeDue", *fns):
                 return mkTag(("CurrentDueFee", fns))
-            case ("已付费用", *fns) | ("lastFeePaid", *fns):
-                return mkTag(("LastFeePaid", fns))
+            case ("feePaidAmt", *fns) | ("已付费用", *fns) | ("lastFeePaid", *fns):
+                return mkTag(("FeePaidAmt", fns))
             case ("费用支付总额", cmt, *fns) | ("feeTxnAmount", cmt, *fns) | ("feeTxnAmt", cmt, *fns):
                 return mkTag(("FeeTxnAmt", [fns, cmt]))
             case ("债券支付总额", cmt, *bns) | ("bondTxnAmount", cmt, *bns) | ("bondTxnAmt", cmt, *bns):
@@ -514,11 +518,11 @@ def mkAccInt(x):
         case {"周期": _dp, "重置周期":_dp2, "参考利率": idx, "利差": spd, "最近结息日": lsd,"利率": r} \
                 | {"period": _dp,"reset": _dp2,  "index": idx, "spread": spd, "lastSettleDate": lsd
                    ,"rate": r}:
-            return mkTag(("InvestmentAccount", [idx, spd, mkDatePattern(_dp)
-                                                ,mkDatePattern(_dp2), lsd, r]))
+            return mkTag(("InvestmentAccount", [vStr(idx), vNum(spd), mkDatePattern(_dp)
+                                                ,mkDatePattern(_dp2), vDate(lsd), vNum(r)]))
         case {"周期": _dp, "利率": br, "最近结息日": lsd} \
                 | {"period": _dp, "rate": br, "lastSettleDate": lsd}:
-            return mkTag(("BankAccount", [br, mkDatePattern(_dp), lsd]))
+            return mkTag(("BankAccount", [vNum(br), mkDatePattern(_dp), vDate(lsd)]))
         case None:
             return None
         case _:
