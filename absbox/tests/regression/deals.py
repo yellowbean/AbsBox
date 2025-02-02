@@ -1,4 +1,7 @@
 from absbox import Generic
+import toolz as tz
+from lenses import lens
+
 
 test01 = Generic(
     "TEST01- preclosing"
@@ -96,3 +99,7 @@ test02 = Generic(
     ,None
     ,"Amortizing"
     )
+
+test03 = tz.pipe(test01 & lens.pool
+                
+)

@@ -1776,6 +1776,12 @@ exmaple:
     # 100% of prepayment will be allocated to acc01
     ,["CollectedRecoveries","acc01"]]
 
+  # multiple pools
+  [[["PoolA",],"CollectedInterest","acc01"]
+    ,[["PoolB",],"CollectedInterest","acc03"]
+    ,[["PoolA","PoolB"],"CollectedPrincipal",[0.7,"acc02"],[0.3,"acc03"]]
+    ]
+
 Collect Proceeds from multiple pools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
