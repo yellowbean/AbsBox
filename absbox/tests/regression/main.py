@@ -5,6 +5,7 @@ import pytest
 import re, math
 
 from absbox.tests.regression.deals import *
+from absbox.tests.regression.assets import *
 
 from absbox import API,EnginePath,readInspect,PickApiFrom
 
@@ -16,7 +17,7 @@ def filterTxn(rs, f, rg):
 
 @pytest.fixture
 def setup_api():
-    api = API(EnginePath.DEV,check=False,lang='english')
+    api = API(EnginePath.DEV, check=False,lang='english')
     return api
 
 @pytest.mark.pool
@@ -99,4 +100,38 @@ def test_collect_01(setup_api):
     closeTo((r['pool']['flow']['PoolA'].loc[:'2021-04-15']["Principal"].values.sum() +\
             r['pool']['flow']['PoolB'].loc[:'2021-04-15']["Principal"].values.sum())*0.3
             , filterTxn( r['accounts']['acc03'].loc[:'2021-04-15'].to_dict('records'), 'memo', ".*CollectedPrincipal.*")[0]['change'])
-    
+
+def toCprRates(mflow):
+    return [ round(_, 3) for _ in  (1 - (1 - mflow.Prepayment.shift(-1) / mflow.Balance)**12).to_list() ]
+
+@pytest.mark.asset
+def test_asset_01(setup_api):
+    """ PSA """
+    r = setup_api.runAsset("2020-01-02"
+                    ,[m]
+                    ,poolAssump=("Pool"
+                                    ,("Mortgage", None, {"PSA":1.0}, None, None)
+                                    ,None
+                                    ,None)
+                    ,read=True)
+
+    assert toCprRates(r[0])[:80] == ([ _/1000 for _ in  range(2,62,2)] + [0.06]*50)
+
+    # m with 60 remaining term
+    r = setup_api.runAsset("2020-01-02"
+                     ,[m & lens[2]['remainTerm'].set(60)]
+                     ,poolAssump=("Pool"
+                                    ,("Mortgage", None, {"PSA":1.0}, None, None)
+                                    ,None
+                                    ,None)
+                     ,read=True)
+    assert toCprRates(r[0])[:60] == ([ _/1000 for _ in  range(2,62,2)][20:] + [0.06]*50)
+
+    r = setup_api.runAsset("2020-01-02"
+                     ,[m & lens[2]['remainTerm'].set(10)]
+                     ,poolAssump=("Pool"
+                                    ,("Mortgage", None, {"PSA":1.0}, None, None)
+                                    ,None
+                                    ,None)
+                     ,read=True)
+    assert toCprRates(r[0])[:10] == ([0.06]*10)

@@ -1741,6 +1741,8 @@ def mkAssumpPrepay(x):
             return mkTag(("PrepaymentCPR", vNum(r)))
         case {"StressByCurve": [curve, assump]}:
             return mkTag(("PrepayStressByTs", [ mkRateTs(curve), mkAssumpPrepay(assump)]))
+        case {"PSA": r}:
+            return mkTag(("PrepaymentPSA", vNum(r)))
         case _ :
             raise RuntimeError(f"failed to match {x}")
 

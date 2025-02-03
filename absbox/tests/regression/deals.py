@@ -99,7 +99,3 @@ test02 = Generic(
     ,None
     ,"Amortizing"
     )
-
-test03 = tz.pipe(test01 & lens.pool
-                
-)
