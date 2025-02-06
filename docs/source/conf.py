@@ -6,11 +6,11 @@ import sys
 # -- Project information
 
 project = 'absbox'
-copyright = '2024, Xiaoyu Zhang'
+copyright = '2025, Xiaoyu Zhang'
 author = 'Xiaoyu Zhang'
 
-release = "0.40.5"
-release = "0.40.5"
+release = "0.42.1"
+release = "0.42.1"
 
 # -- General configuration
 
@@ -47,6 +47,10 @@ html_theme_options = {
     'titles_only': False
 }
 
+
+nb_execution_excludepatterns = [
+    'nbsample/firstLoss.ipynb',
+]
 
 ## Autoapi Doc
 #autoapi_dirs = ['../../../PyABS']

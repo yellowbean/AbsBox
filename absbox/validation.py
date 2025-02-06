@@ -20,6 +20,9 @@ dateStr = Regex(r"^\d{4}-\d{2}-\d{2}$")
 def vList(x, t, msg:str = None) -> list:
     return Schema([t]).validate(x)
 
+def vListOfList(x, t, msg:str = None) -> list:
+    return Schema([[t]]).validate(x)
+
 def vTuple(x, t, msg:str = None) -> tuple:
     return Schema((t,)).validate(x)
 

@@ -18,3 +18,15 @@ m = ["Mortgage"
             ,"currentRate": 0.075
             ,"remainTerm": 80
             ,"status": "Current"}]
+
+m1 = ["Mortgage"
+        ,{"originBalance": 12000.0
+            ,"originRate": ["fix",0.045]
+            ,"originTerm": 18
+            ,"freq": "Monthly"
+            ,"type": "Level"
+            ,"originDate": "2021-02-01"}
+        ,{"currentBalance": 10000.0
+            ,"currentRate": 0.075
+            ,"remainTerm": 12
+            ,"status": "Current"}]

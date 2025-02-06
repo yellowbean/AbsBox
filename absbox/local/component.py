@@ -6,7 +6,7 @@ from absbox.local.base import *
 
 import sys
 
-from absbox.validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple
+from absbox.validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple, vListOfList
 from schema import Or
 from enum import Enum
 import itertools
@@ -1726,6 +1726,8 @@ def mkAssumpDefault(x):
             return mkTag(("DefaultAtEndByRate", [vNum(r1), vNum(r2)]))
         case {"StressByCurve": [curve, assump]}:
             return mkTag(("DefaultStressByTs", [ mkRateTs(curve), mkAssumpDefault(assump)]))
+        case {"byTerm": rs}:
+            return mkTag(("DefaultByTerm", vListOfList(rs, numVal)))
         case _ :
             raise RuntimeError(f"failed to match {x}")
 
@@ -1743,6 +1745,8 @@ def mkAssumpPrepay(x):
             return mkTag(("PrepayStressByTs", [ mkRateTs(curve), mkAssumpPrepay(assump)]))
         case {"PSA": r}:
             return mkTag(("PrepaymentPSA", vNum(r)))
+        case {"byTerm": rs}:
+            return mkTag(("PrepaymentByTerm", vListOfList(rs, numVal)))
         case _ :
             raise RuntimeError(f"failed to match {x}")
 

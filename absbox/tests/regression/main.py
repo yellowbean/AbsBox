@@ -17,7 +17,7 @@ def filterTxn(rs, f, rg):
 
 @pytest.fixture
 def setup_api():
-    api = API(EnginePath.DEV, check=False,lang='english')
+    api = API(EnginePath.DEV, check=False, lang='english')
     return api
 
 @pytest.mark.pool
@@ -104,6 +104,13 @@ def test_collect_01(setup_api):
 def toCprRates(mflow):
     return [ round(_, 3) for _ in  (1 - (1 - mflow.Prepayment.shift(-1) / mflow.Balance)**12).to_list() ]
 
+def ppyRate(mflow):
+    return [ round(_, 3) for _ in  (mflow.Prepayment / mflow.Balance.shift(1)).to_list() ]
+
+def defRate(mflow):
+    return [ round(_, 3) for _ in  (mflow.Default / mflow.Balance.shift(1)).to_list() ]
+
+
 @pytest.mark.asset
 def test_asset_01(setup_api):
     """ PSA """
@@ -135,3 +142,53 @@ def test_asset_01(setup_api):
                                     ,None)
                      ,read=True)
     assert toCprRates(r[0])[:10] == ([0.06]*10)
+
+
+@pytest.mark.asset
+def test_asset_02(setup_api):
+    """ Assump byTerm """
+
+    byTermAssump = [ [0.01]*9+[0.02]*9
+                    ,[0.02]*6+[0.03]*6
+                    ,[0.03]*3+[0.04]*3  ]
+
+    r = setup_api.runAsset("2020-01-02"
+                        ,[m1]
+                        ,poolAssump=("Pool"
+                                        ,("Mortgage", {"byTerm":byTermAssump}, None, None, None)
+                                        ,None
+                                        ,None)
+                        ,read=True)
+
+    assert defRate(r[0])[1:] == [0.01, 0.01, 0.01, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02]
+
+    ## pick 12month term 
+    r = setup_api.runAsset("2020-01-02"
+                        ,[m1 & lens[1]['originTerm'].set(12)
+                            & lens[2]['remainTerm'].set(9)]
+                        ,poolAssump=("Pool"
+                                        ,("Mortgage", {"byTerm":byTermAssump}, None, None, None)
+                                        ,None
+                                        ,None)
+                        ,read=True)
+    assert defRate(r[0])[1:] == [0.02, 0.02, 0.02]+[0.03]*6
+    ## using prepay
+    r = setup_api.runAsset("2020-01-02"
+                        ,[m1 & lens[1]['originTerm'].set(12)
+                            & lens[2]['remainTerm'].set(9)]
+                        ,poolAssump=("Pool"
+                                        ,("Mortgage",None, {"byTerm":byTermAssump}, None, None)
+                                        ,None
+                                        ,None)
+                        ,read=True)
+    assert ppyRate(r[0])[1:] == [0.02, 0.02, 0.02]+[0.03]*6
+    
+@pytest.mark.skip(reason="public server doesn't support this test due to performance")
+def test_first_loss(setup_api):
+    r0 = setup_api.runFirstLoss(test01
+                    ,"A1"
+                    ,poolAssump=("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
+                                    ,None
+                                    ,None)
+                    )
+    assert r0['contents'][0] == 31.6013610271222

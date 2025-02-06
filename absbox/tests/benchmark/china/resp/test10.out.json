@@ -85,25 +85,16 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2021-04-02",
-                  0,
-                  0,
-                  "<Pool:CollectedRecoveries>"
+                  1.55,
+                  1.55,
+                  "<Pool:CollectedInterest>"
                 ]
               },
               {
                 "tag": "AccTxn",
                 "contents": [
                   "2021-04-02",
-                  1.98,
-                  1.98,
-                  "<Pool:CollectedPrepayment>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-04-02",
-                  9.15,
+                  8.72,
                   7.17,
                   "<Pool:CollectedPrincipal>"
                 ]
@@ -113,8 +104,17 @@
                 "contents": [
                   "2021-04-02",
                   10.7,
-                  1.55,
-                  "<Pool:CollectedInterest>"
+                  1.98,
+                  "<Pool:CollectedPrepayment>"
+                ]
+              },
+              {
+                "tag": "AccTxn",
+                "contents": [
+                  "2021-04-02",
+                  10.7,
+                  0,
+                  "<Pool:CollectedRecoveries>"
                 ]
               },
               {
@@ -166,25 +166,16 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2021-05-26",
-                  0,
-                  0,
-                  "<Pool:CollectedRecoveries>"
+                  0.73,
+                  0.73,
+                  "<Pool:CollectedInterest>"
                 ]
               },
               {
                 "tag": "AccTxn",
                 "contents": [
                   "2021-05-26",
-                  0.95,
-                  0.95,
-                  "<Pool:CollectedPrepayment>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-05-26",
-                  4.52,
+                  4.3,
                   3.57,
                   "<Pool:CollectedPrincipal>"
                 ]
@@ -194,8 +185,17 @@
                 "contents": [
                   "2021-05-26",
                   5.25,
-                  0.73,
-                  "<Pool:CollectedInterest>"
+                  0.95,
+                  "<Pool:CollectedPrepayment>"
+                ]
+              },
+              {
+                "tag": "AccTxn",
+                "contents": [
+                  "2021-05-26",
+                  5.25,
+                  0,
+                  "<Pool:CollectedRecoveries>"
                 ]
               },
               {
@@ -247,25 +247,16 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2021-06-26",
-                  0,
-                  0,
-                  "<Pool:CollectedRecoveries>"
+                  0.7,
+                  0.7,
+                  "<Pool:CollectedInterest>"
                 ]
               },
               {
                 "tag": "AccTxn",
                 "contents": [
                   "2021-06-26",
-                  0.94,
-                  0.94,
-                  "<Pool:CollectedPrepayment>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-06-26",
-                  4.5,
+                  4.26,
                   3.56,
                   "<Pool:CollectedPrincipal>"
                 ]
@@ -275,8 +266,17 @@
                 "contents": [
                   "2021-06-26",
                   5.2,
-                  0.7,
-                  "<Pool:CollectedInterest>"
+                  0.94,
+                  "<Pool:CollectedPrepayment>"
+                ]
+              },
+              {
+                "tag": "AccTxn",
+                "contents": [
+                  "2021-06-26",
+                  5.2,
+                  0,
+                  "<Pool:CollectedRecoveries>"
                 ]
               },
               {
@@ -328,25 +328,16 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2022-01-26",
-                  0,
-                  0,
-                  "<Pool:CollectedRecoveries>"
+                  4.06,
+                  4.06,
+                  "<Pool:CollectedInterest>"
                 ]
               },
               {
                 "tag": "AccTxn",
                 "contents": [
                   "2022-01-26",
-                  5.38,
-                  5.38,
-                  "<Pool:CollectedPrepayment>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-01-26",
-                  30.02,
+                  28.7,
                   24.64,
                   "<Pool:CollectedPrincipal>"
                 ]
@@ -356,8 +347,17 @@
                 "contents": [
                   "2022-01-26",
                   34.08,
-                  4.06,
-                  "<Pool:CollectedInterest>"
+                  5.38,
+                  "<Pool:CollectedPrepayment>"
+                ]
+              },
+              {
+                "tag": "AccTxn",
+                "contents": [
+                  "2022-01-26",
+                  34.08,
+                  0,
+                  "<Pool:CollectedRecoveries>"
                 ]
               },
               {

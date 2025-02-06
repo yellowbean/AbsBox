@@ -123,7 +123,8 @@ Performing
     * ``{"CDRPadding":[0.01,0.02,0.04]}`` same with above but the CDR 4% will be applied to rest of periods of the asset
     * ``{"ByAmount":(2000,[500,500,1000])}`` apply a custom default amount vector.
     * ``{"DefaultAtEndByRate":(0.05,0.10)}``, will apply 5% as CDR for all periods except last period. The last period will use default CDR 10% (which start from begining day).
-
+    .. versionadded:: 0.42.2
+    * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
 * <Prepayment Assumption>
   
   prepayment assumption for performing asset
@@ -131,6 +132,10 @@ Performing
     * ``{"CPR":0.01}`` means 1% in annualized of current balance will be prepay at the end of each period
     * ``{"CPR":[0.01,0.02,0.04]}`` means a vector of CPR will be applied since the asset snapshot date (determined by ``remain terms``)
     * ``{"CPRPadding":[0.01,0.02,0.04]}`` same with above but the CPR 4% will be applied to rest of periods of the asset
+    .. versionadded:: 0.42.2
+    * ``{"PSA": 1.0}`` 100% of PSA Speed. 
+    * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
+
 
 * <Recovery Assumption>
 
@@ -189,9 +194,11 @@ Summary
         "Default Assumption" -> "{'CDRPadding':[x...]}"
         "Default Assumption" -> "{'ByAmount':(<total>, [x...])}"
         "Default Assumption" -> "{'DefaultAtEndByRate':(x,y)}"
+        "Default Assumption" -> "{'byTerm':....}"
         "Prepayment Assumption" -> "{'CPR':x}"
         "Prepayment Assumption" -> "{'CPR':[x...]}"
         "Prepayment Assumption" -> "{'CPRPadding':[x...]}"
+        "Prepayment Assumption" -> "{'byTerm':....}"
         "Recovery Assumption" -> "{'Rate':x,'Lag':y}"
         "Defaulted" -> "Defaulted Assumption"
         "Defaulted Assumption" -> "{'Defaulted':[x,y,[z...]]}"
@@ -210,11 +217,18 @@ Loan
                   ,runAssump = None
                   ,read=True)
 
-* <default assump> : ``{"CDR":<%>}``, can be a vector or constant value
-* <default assump> : ``{"CDRPadding":<%>}``, can be a vector or constant value, with last element till end of the asset
-* <prepayment assump> : ``{"CPR":<%>}``, can be a vector or constant value
-* <prepayment assump> : ``{"CPRPadding":<%>}``, can be a vector or constant value , with last element till end of the asset
+* Default
 
+  * <default assump> : ``{"CDR":<%>}``, can be a vector or constant value
+  * <default assump> : ``{"CDRPadding":<%>}``, can be a vector or constant value, with last element till end of the asset
+  .. versionadded:: 0.42.2
+  * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
+* Prepayment
+
+  * <prepayment assump> : ``{"CPR":<%>}``, can be a vector or constant value
+  * <prepayment assump> : ``{"CPRPadding":<%>}``, can be a vector or constant value , with last element till end of the asset
+  .. versionadded:: 0.42.2
+  * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
 
 Summary
 """"""""""""""""
@@ -236,10 +250,12 @@ Summary
         "Prepayment Assumption" -> "{'CPR':x}"
         "Prepayment Assumption" -> "{'CPR':[x...]}"
         "Prepayment Assumption" -> "{'CPRPadding':[x...]}"
+        "Prepayment Assumption" -> "{'byTerm':....}"
         "Default Assumption" -> "{'CDR':x}"
         "Default Assumption" -> "{'CDR':[x...]}"
         "Default Assumption" -> "{'CDRPadding':[x...]}"
         "Default Assumption" -> "{'DefaultAtEndByRate':(x,y)}"
+        "Default Assumption" -> "{'byTerm':....}"
         "Recovery Assumption" -> "{'Rate':x,'Lag':y}"
     }
 
@@ -256,9 +272,16 @@ Installment
                   ,runAssump = None
                   ,read=True)
 
-* <default assump> : ``{"CDR":<%>}``
-* <prepayment assump> : ``{"CPR":<%>}``
+* Default
 
+  * <default assump> : ``{"CDR":<%>}``
+  .. versionadded:: 0.42.2
+  * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
+* Prepayment
+
+  * <prepayment assump> : ``{"CPR":<%>}``
+  .. versionadded:: 0.42.2
+  * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
 
 Summary
 """"""""""""""""
@@ -278,8 +301,10 @@ Summary
         Performing -> "Prepayment Assumption"
         Performing -> "Recovery Assumption"
         "Prepayment Assumption" -> "{'CPR':x}"
+        "Prepayment Assumption" -> "{'byTerm':....}"
         "Default Assumption" -> "{'CDR':x}"
         "Default Assumption" -> "{'DefaultAtEndByRate':(x,y)}"
+        "Default Assumption" -> "{'byTerm':....}"
         "Recovery Assumption" -> "{'Rate':x,'Lag':y}"
     }
 
@@ -1296,6 +1321,40 @@ Pass a map to ``poolAssump`` to run multiple scenarios.
 
 .. seealso:: 
    For details on sensitivity run pls refer to :ref:`Sensitivity Analysis`
+
+First Loss Run
+""""""""""""""""""""
+
+.. versionadded:: 0.42.2
+
+User can input with an assumption with one more field ("Bond Name") compare to single run: 
+
+* deal object
+* pool performance assumption
+* deal run assumption 
+* bond name 
+
+The engine will stress on the default assumption till the bond incur a 0.01 loss.
+Then engine return a tuple with the factor it used and the stressed assumption.
+
+.. code-block:: python
+
+  r0 = localAPI.runFirstLoss(examples.test01
+                            ,"A1"
+                            ,poolAssump=("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
+                                            ,None
+                                            ,None)
+                            ,read=True
+                            ,debug=False)
+
+  # stress factor 
+  r0[0]
+  # stressed scenario
+  r0[1]
+
+.. seealso:: 
+   For details on first loss run pls refer to :ref:`First Loss Example`
+
 
 Running a pool of assets 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
