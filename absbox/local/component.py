@@ -65,7 +65,7 @@ def mkDatePattern(x):
             return mkTag((_x))
         case _x if (_x in datePattern.keys()):
             return mkTag((datePattern[x]))
-        case d if isinstance(d, str):
+        case d if isinstance(d, str) and vDate(x):
             return mkTag(("SingletonDate", d))
         case _:
             raise RuntimeError(f"Failed to match {x}")
@@ -127,13 +127,13 @@ def mkDate(x):
             }
             return mkTag(("GenericDates",m))
         case {"封包日": a, "起息日": b, "首次兑付日": c, "法定到期日": d, "收款频率": pf, "付款频率": bf} | \
-             {"cutoff": a, "closing": b, "firstPay": c, "stated": d, "poolFreq": pf, "payFreq": bf}:
+             {"cutoff": a, "closing": b, "firstPay": c, "stated": d, "poolFreq": pf, "payFreq": bf} if (not "cust" in x):
             firstCollection = x.get("首次归集日", b)
             mr = None
             return mkTag(("PreClosingDates"
                         , [vDate(a), vDate(b), mr, vDate(d), [vDate(firstCollection), mkDatePattern(pf)], [vDate(c), mkDatePattern(bf)]]))
         case {"归集日": (lastCollected, nextCollect), "兑付日": (pp, np), "法定到期日": c, "收款频率": pf, "付款频率": bf} | \
-             {"collect": (lastCollected, nextCollect), "pay": (pp, np), "stated": c, "poolFreq": pf, "payFreq": bf}:
+             {"collect": (lastCollected, nextCollect), "pay": (pp, np), "stated": c, "poolFreq": pf, "payFreq": bf} if (not "cust" in x):
             mr = None
             return mkTag(("CurrentDates", [[vDate(lastCollected), vDate(pp)],
                                             mr,
@@ -147,7 +147,7 @@ def mkDate(x):
                                         , closingDate
                                         , [mkTag(("RunWaterfall", [dd, ""])) for dd in ddays]]))
         case _:
-            raise RuntimeError(f"Failed to match:{x} in Dates")
+            raise RuntimeError(f"Failed to match:{x} in Dates but got: {x.keys()}")
 
 
 def mkDsRate(x):
@@ -972,7 +972,7 @@ def mkBookType(x: list):
 def mkSupport(x:list):
     match x:
         case ["account", accName, (direction,ledgerName)] | ["suppportAccount", accName, (direction,ledgerName)] | ["支持账户", accName, (direction,ledgerName)] if direction in bookDirection.keys():
-            return mkTag(("SupportAccount", [vStr(accName), [vStr(bookDirection["direction"]),vStr(ledgerName)]]))
+            return mkTag(("SupportAccount", [vStr(accName), [vStr(bookDirection[direction]),vStr(ledgerName)]]))
         case ["account", accName] | ["suppportAccount", accName] | ["支持账户", accName]:
             return mkTag(("SupportAccount", [vStr(accName), None]))
         case ["facility", liqName] | ["suppportFacility", liqName] | ["支持机构", liqName]:
