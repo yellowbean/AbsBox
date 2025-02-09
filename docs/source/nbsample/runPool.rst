@@ -8,3 +8,4 @@ Run Assets in Pool
    pool_sample2
    pool_multiScenario
    PoolAndTag
+   WhyByTerm
