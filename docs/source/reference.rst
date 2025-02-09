@@ -34,6 +34,8 @@ Videos
      - https://youtu.be/TOe2vQRs-oc
    * - 201 - Pool Performance Assumption
      - https://youtu.be/HwcsA_zIKr0
+   * - 202 - Term based Assumption
+     - https://youtu.be/YHOpgo_gw-8 
    * - 301 - Sensitivity Analysis
      - TBD
    * - 302 - Structuring
