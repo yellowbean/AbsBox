@@ -9,8 +9,8 @@ project = 'absbox'
 copyright = '2025, Xiaoyu Zhang'
 author = 'Xiaoyu Zhang'
 
-release = "0.42.1"
-release = "0.42.1"
+release = "0.42.2"
+release = "0.42.2"
 
 # -- General configuration
 
@@ -49,7 +49,6 @@ html_theme_options = {
 
 
 nb_execution_excludepatterns = [
-    'nbsample/firstLoss.ipynb',
 ]
 
 ## Autoapi Doc
