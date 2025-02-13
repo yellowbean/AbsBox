@@ -493,6 +493,18 @@ def mkPre(p):
             case ["period", op, v]:
                 return mkTag(("IfInt", [op_map[op], mkDs(("periodNum",)), vNum(v)]))
 
+            case ["periodCurve", dsVal, op, dsSelect, periodCurve]:
+                val = mkDs(dsVal)
+                select = mkDs(dsSelect)
+                curve = mkTag(("CurrentVal", periodCurve))
+                return mkTag(("IfByPeriodCurve", [op_map[op], val, select, curve]))
+
+            case ["periodRateCurve", dsVal, op, dsSelect, periodCurve]:
+                val = mkDs(dsVal)
+                select = mkDs(dsSelect)
+                curve = mkTag(("CurrentVal", periodCurve))
+                return mkTag(("IfRateByPeriodCurve", [op_map[op], val, select, curve]))
+            
             case [ds, "=", 0]:
                 return mkTag(("IfZero", mkDs(ds)))
             case [ds, b] if isinstance(b, bool):

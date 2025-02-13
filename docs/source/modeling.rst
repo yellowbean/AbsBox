@@ -313,6 +313,9 @@ Integer Type
     .. versionadded:: 0.23.5
     * ``("periodNum",)``  -> number of pool collection periods collected during *PROJECTION*
 
+    .. versionadded:: 0.42.2
+    * ``("dealStat","int","BondPaidPeriod")`` -> number of bond payment periods.
+    * ``("dealStat","int","PoolCollectedPeriod")`` -> number of pool colllection periods.
 
 Ratio Type
 ^^^^^^^^^^^^
@@ -421,14 +424,22 @@ Compare with a bool
 * ``[<formula>,True]`` -> true when <formula> is equal to `True`
 * ``[<formula>,False]`` -> true when <formula> is equal to `False`
 
-Compare with a curve
-^^^^^^^^^^^^^^^^^^^^^^^^
+Compare with a date-based curve
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * ``[<formula>,">",curve]`` -> true when <formula> greater than a curve
 * ``[<formula>,"<",curve]`` -> true when <formula> less than a curve
 * ``[<formula>,">=",curve]`` -> true when <formula> greater or equals to a curve
 * ``[<formula>,"<=",curve]`` -> true when <formula> less or equals than a curve
 * ``[<formula>,"=",curve]`` -> true when <formula> equals to a curve
+
+Compare with a index-based curve
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* ["periodRateCurve", <formula>, ">", <Selector Formula>, <curve>] -> true when <formula> greater than a value query from a curve by <selector> formula
+
+.. seealso:: 
+
+    :ref:`Trigger by a period-based rate curve`
 
 Date Based Condition
 ^^^^^^^^^^^^^^^^^^^^

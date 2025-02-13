@@ -7,5 +7,6 @@ Trigger Examples
    triggers
    triggerRolling
    TriggerWithWaterfallActions
+   TriggerByPeriod
 
    
