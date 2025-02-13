@@ -183,7 +183,7 @@ def test_asset_02(setup_api):
                         ,read=True)
     assert ppyRate(r[0])[1:] == [0.02, 0.02, 0.02]+[0.03]*6
     
-@pytest.mark.skip(reason="public server doesn't support this test due to performance")
+@pytest.mark.analytics
 def test_first_loss(setup_api):
     r0 = setup_api.runFirstLoss(test01
                     ,"A1"
@@ -191,4 +191,4 @@ def test_first_loss(setup_api):
                                     ,None
                                     ,None)
                     )
-    assert r0['contents'][0] == 31.6013610271222
+    closeTo(r0['contents'][0], 31.60100353659348, r=6)

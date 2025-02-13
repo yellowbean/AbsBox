@@ -1335,7 +1335,13 @@ User can input with an assumption with one more field ("Bond Name") compare to s
 * bond name 
 
 The engine will stress on the default assumption till the bond incur a 0.01 loss.
-Then engine return a tuple with the factor it used and the stressed assumption.
+Then engine return a tuple 
+
+* The factor it used and the stressed assumption.
+* The assumption was applied to make the bond  incur first 0.01 loss.
+
+.. warning::
+  The iteration begins with stress 500x on the default assumption. Make sure the default assumption is not zero
 
 .. code-block:: python
 

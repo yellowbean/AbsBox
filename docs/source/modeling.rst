@@ -435,7 +435,9 @@ Compare with a date-based curve
 
 Compare with a index-based curve
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* ["periodRateCurve", <formula>, ">", <Selector Formula>, <curve>] -> true when <formula> greater than a value query from a curve by <selector> formula
+.. versionadded:: 0.42.3
+
+* ``["periodRateCurve", <formula>, ">", <Selector Formula>, <curve>]`` -> true when <formula> greater than a value query from a curve by <selector> formula
 
 .. seealso:: 
 
