@@ -2160,18 +2160,53 @@ def mkFee(x,fsDate=None):
         case _:
             raise RuntimeError(f"Failed to match fee: {x}")
 
+def mkBondPricingMethod(x):
+    match x:
+        case ("byFactor", f):
+            return mkTag(("BondBalanceFactor", f))
+        case ("byRate", r):
+            return mkTag(("PvBondByRate", r))
+        case ("byCurve", ts):
+            return mkTag(("PvBondByCurve", ts))
+        case _:
+            raise RuntimeError(f"Failed to match bondPricingMethod: {x}")
+
+def mkTradeType(x):
+    match x:
+        case ("byCash", cash):
+            return mkTag(("ByCash", vNum(cash)))
+        case ("byBalance", balance):
+            return mkTag(("ByBalance", vNum(cash)))
+        case _:
+            raise RuntimeError(f"Failed to match trade Type: {x}")
+
+def mkIrrType(x):
+    match x:
+        case ("holding", historyCash, holding):
+            return mkTag(("HoldingBond", [historyCash, vNum(holding), None]))
+        case ("holding", historyCash, holding, d, bondPricing):
+            return mkTag(("HoldingBond", [historyCash, vNum(holding), (vDate(d), mkBondPricingMethod(bondPricing))]))
+        case ("buy", d, bondPricing, tradeType):
+            return mkTag(("BuyBond", [vDate(d), mkBondPricingMethod(bondPricing), mkTradeType(tradeType), None]))
+        case _:
+            raise RuntimeError(f"Failed to match irrType: {x}")
+
+
 
 def mkPricingAssump(x):
     match x:
-        case {"贴现日": pricingDay, "贴现曲线": xs} | {"date": pricingDay, "curve": xs}| {"PVDate": pricingDay, "PVCurve": xs}:
+        case ("pv",pricingDay,xs) | {"贴现日": pricingDay, "贴现曲线": xs} | {"date": pricingDay, "curve": xs}| {"PVDate": pricingDay, "PVCurve": xs}:
             return mkTag(("DiscountCurve", [vDate(pricingDay), mkTs("IRateCurve", xs)]))
-        case {"债券": bnd_with_price, "利率曲线": rdps} | {"bonds": bnd_with_price, "curve": rdps}:
+        case ("zspread",bnd_with_price, rdps) | {"债券": bnd_with_price, "利率曲线": rdps} | {"bonds": bnd_with_price, "curve": rdps}:
             return mkTag(("RunZSpread", [mkTs("IRateCurve", rdps), bnd_with_price]))
+        case ("irr", m) | {"IRR": m} | {"Irr": m} if isinstance(m, dict):
+            return mkTag(("IrrInput", mapValsBy(m, mkIrrType)))
         case _:
             raise RuntimeError(f"Failed to match pricing assumption: {x}")
 
 
 def readPricingResult(x, locale) -> dict | None:
+    """ Read pricing result """
     if x is None:
         return None
     h = None
@@ -2182,6 +2217,8 @@ def readPricingResult(x, locale) -> dict | None:
              "en": ["pricing", "face", "WAL", "duration", "convexity", "accure interest"]}
     elif tag == "ZSpread":
         h = {"cn": ["静态利差"], "en": ["Z-spread"]}
+    elif tag == "IrrResult":
+        h = {"cn": ["IRR"], "en": ["IRR"]}
     else:
         raise RuntimeError(f"Failed to read princing result: {x} with tag={tag}")
 
@@ -2193,10 +2230,11 @@ def readPricingResult(x, locale) -> dict | None:
 
     pricingResult = pd.DataFrame.from_dict(tz.valmap(lambda y:y['contents'][:-1],x)
                                   , orient='index', columns=h[locale]).sort_index()
-    #
+    
     return {"summary":pricingResult
-           ,"breakdown":tz.valmap(lambda z: pd.DataFrame( [ _['contents'] for _ in z['contents'][-1]], columns=english_bondflow_fields).set_index("date"), x)
-           }
+            ,"breakdown":tz.valmap(lambda z: pd.DataFrame([ _['contents'] for _ in z['contents'][-1]]
+                                                            , columns=english_bondflow_fields).set_index("date")
+                                    , x)}
 
 
 def readPoolCf(x, lang='english'):
