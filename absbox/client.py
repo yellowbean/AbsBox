@@ -17,7 +17,8 @@ from absbox.validation import isValidUrl, vStr
 from absbox.local.util import mkTag,mapValsBy \
                               , _read_cf, _read_asset_pricing, mergeStrWithDict \
                               , earlyReturnNone, searchByFst, filter_by_tags \
-                              , enumVals, lmap, inferPoolTypeFromAst, getValWithKs, mapNone
+                              , enumVals, lmap, inferPoolTypeFromAst, getValWithKs, mapNone\
+                              , readAeson
 from absbox.local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkLiqMethod \
                                    , mkAssetUnion, mkRateAssumption, mkDatePattern, mkPoolType
 
@@ -718,10 +719,11 @@ class API:
         if result is None or 'error' in result or 'Left' in result:
             leftVal = result.get("Left","")
             raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
-        # rawWarnMsg = map( lambda x:f"{MsgColor.Warning.value}{x['contents']}", filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg)))
-        # if rawWarnMsg and showWarning:
-        #     console.print("Warning Message from server:\n"+"\n".join(list(rawWarnMsg)))
-        return result['Right']
+
+        if read:
+            return readAeson(result['Right'])
+        else:
+            result['Right']
 
     def runAsset(self, date, _assets, poolAssump=None, rateAssump=None
                  , pricing=None, read=True, debug=False) -> tuple:

@@ -450,3 +450,25 @@ def patchDicts(dict1:dict,dict2:dict)-> dict:
     if key only exists in either one, use the only one value
     """
     return tz.merge_with(lambda xs: xs[1] if len(xs)==2 else xs[0] ,dict1 ,dict2)
+
+
+def readAeson(x:dict):
+    match x:
+        case {"tag": tag,"contents": contents} if isinstance(contents,list):
+            return {tag:readAeson(contents)}
+        case {"tag": tag,"contents": contents} if isinstance(contents,dict):
+            return {tag:readAeson(contents)}            
+        case {"tag": tag,"contents": contents} if isinstance(contents,str):
+            return {tag: contents}   
+        case {"tag": tag} if isinstance(tag,str):
+            return tag   
+        case x if isinstance(x,list):
+            return [readAeson(_x) for _x in x]
+        case {'numerator': n,'denominator': de}:
+            return (n/de)
+        case n if isinstance(n,float) or isinstance(n,int):
+            return n
+        case None:
+            return None
+        case _:
+            raise RuntimeError("failed to match",x)
