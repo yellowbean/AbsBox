@@ -2211,6 +2211,8 @@ def readPricingResult(x, locale) -> dict | None:
         return None
     h = None
 
+    if x is None or x == {}:
+        return None
     tag = list(x.values())[0]["tag"]
     if tag == "PriceResult":
         h = {"cn": ["估值", "票面估值", "WAL", "久期", "凸性", "应计利息"],

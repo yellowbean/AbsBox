@@ -190,5 +190,6 @@ def test_first_loss(setup_api):
                     ,poolAssump=("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
                                     ,None
                                     ,None)
+                    ,read=True
                     )
-    closeTo(r0['contents'][0], 31.60100353659348, r=6)
+    closeTo(r0['FirstLossResult'][0], 31.60100353659348, r=6)
