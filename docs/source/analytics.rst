@@ -1023,10 +1023,10 @@ to view results
 
    r['result']['report']['cash']
 
-Pricing
-^^^^^^^^^^^
+Pricing & IRR
+^^^^^^^^^^^^^^^^
 
-* User can provide a pricing curve and a pricing data to argument `pricing`,which all future bond cashflow will be discounted at that date with the curve provided.
+* User can provide a pricing curve and a pricing data to argument `pricing`,which all future bond cashflows will be discounted at that date with the curve provided.
 
 .. code-block:: python
 
@@ -1047,6 +1047,37 @@ bond cashflow equals to ``<price>``
      ,{"bonds":{"A1":("2021-07-26",100)}
       ,"curve":[["2021-01-01",0.025]
                ,["2024-08-01",0.025]]})
+
+* Calculate IRR of bonds
+
+.. versionadded:: 0.42.4
+
+User shall input a dict with solo key ``IRR`` and value is a dict with bond name and ``IRR calculate assumption``
+
+.. code-block:: python
+
+  ("pricing"
+      ,{"IRR":
+          {"B":<IRR calculate assumption>
+        }
+      }
+    )
+
+IRR calculate assumption
+  It has three types 
+
+  * Holding a bond to maturity
+      ``("holding",[<history of cashflow of investment>], <position size>)``
+
+      ``{"B":("holding",[("2021-04-01",-500)],500)``
+  * Holding a bond and sell it at a future date
+      ``("holding",[<history of cashflow of investment>],<position size>,<sell date>,<sell price>)}``
+      
+      ``("holding",[("2021-04-01",-500)],500,"2021-08-19",("byFactor",1.0))}``
+  * Buy a bond at a future date and hold it to maturity
+      ``("buy",<buy date>,<buy price>,<cash to buy>)``
+
+      ``("buy","2021-08-01",("byFactor",0.99),("byCash",200))``
 
 Mannual Fire Trigger 
 ^^^^^^^^^^^^^^^^^^^^^^^^
