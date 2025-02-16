@@ -193,3 +193,39 @@ def test_first_loss(setup_api):
                     ,read=True
                     )
     closeTo(r0['FirstLossResult'][0], 31.60100353659348, r=6)
+
+@pytest.mark.analytics
+def test_irr_01(setup_api):
+    r0 = setup_api.run(Irr01
+                    ,poolAssump=("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
+                                    ,None
+                                    ,None)
+                    ,runAssump = [("pricing",{"IRR":{"B":("holding",[("2021-04-01",-500)],500)}})]
+                    ,read=True
+                    )
+    #print(">>>", r0)
+    closeTo(r0['pricing']['summary'].loc["B"].IRR, 0.264238, r=6)
+
+    r1 = setup_api.run(Irr01
+                ,poolAssump=("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
+                                ,None
+                                ,None)
+                ,runAssump = [("pricing",{"IRR":
+                                          {"A1":("holding",[("2021-04-01",-500)],500,"2021-08-19",("byFactor",1.0))}
+                                         }
+                              )]
+                ,read=True)
+
+    closeTo(r1['pricing']['summary'].loc["A1"].IRR, 0.07196, r=6)
+
+    r3 = setup_api.run(Irr01
+                ,poolAssump=("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
+                                ,None
+                                ,None)
+                ,runAssump = [("pricing",{"IRR":
+                                          {"A1":("buy","2021-08-01",("byFactor",0.99),("byCash",200))}
+                                         }
+                              )]
+                ,read=True)
+    
+    closeTo(r3['pricing']['summary'].loc["A1"].IRR, 0.12248, r=6)
