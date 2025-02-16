@@ -1079,6 +1079,11 @@ IRR calculate assumption
 
       ``("buy","2021-08-01",("byFactor",0.99),("byCash",200))``
 
+.. seealso:: 
+  
+  Example :ref:`IRR Example`
+
+
 Mannual Fire Trigger 
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
