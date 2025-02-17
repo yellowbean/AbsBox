@@ -1136,6 +1136,37 @@ CLO features:
 
 
 
+How to get response ? 
+-------------------------------
+
+Typically, a function call has parameter ``read``
+
+
+read = True 
+^^^^^^^^^^^^^^^
+
+If user supplied with ``True``, absbox will try to convert response with pandas dataframe where possible.
+
+
+read = False
+^^^^^^^^^^^^^^^
+
+Or, use can pass with read with ``False``, which will just return a raw response from servant/aeson.
+
+To make it slightly readable , there is a util function may help.
+
+.. versionadded:: 0.42.6
+
+.. code-block:: python
+
+  from absbox import readAeson
+  
+  r0 = localAPI.run(.....,read=False)
+  
+  readAeson(r0)
+
+
+
 How to use pre-built executable
 ------------------------------------------------
 
