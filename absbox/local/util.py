@@ -472,6 +472,10 @@ def readAeson(x:dict):
             return [readAeson(_x) for _x in x]
         case n if isinstance(n,float) or isinstance(n,int):
             return n
+        case m if isinstance(m, dict):
+            return {k: readAeson(v) for k,v in m.items() }
+        case s if isinstance(s, str):
+            return s
         case None:
             return None
         case {}:
