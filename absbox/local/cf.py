@@ -5,6 +5,7 @@ import enum
 from absbox.validation import vInt, vDate, vFloat, vBool
 from absbox.validation import vDict, vList, vStr, vNum
 from absbox import unifyTs
+from absbox.local.util import getNumCols
 
 
 def readToCf(xs, header=None, idx=None, sort_index=False) -> pd.DataFrame:
@@ -57,12 +58,13 @@ def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注","应�
             return True
         else:
             return False
-
     def hasBondGroup():
         _r = [ isBondGroup(k, v) for k, v in bMap.items()]
         return any(_r)
+
     def filterCols(x:dict, columnsToKeep) -> pd.DataFrame:
         return lens.Recur(pd.DataFrame).modify(lambda z: z[columnsToKeep])(x)
+
     bondNames = list(bMap.keys())
     if not bondNames:
         return pd.DataFrame()
@@ -73,8 +75,7 @@ def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注","应�
     # columns to show for each bond
     columns = list(filter(lambda x: x not in set(popColumns), bondColumns))
     if not hasBondGroup():
-        header = pd.MultiIndex.from_product([bondNames,columns]
-                                            , names=['Bond',"Field"])
+        header = pd.MultiIndex.from_product([bondNames,columns])
         yyz = list(filterCols(bMap, columns).values())
         df = pd.concat(yyz,axis=1)
     else:
@@ -92,8 +93,7 @@ def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注","应�
                     indexes.extend([(k,"-",_) for _ in columns])
                     cfFrame.append(v)
                     
-        header = pd.MultiIndex.from_tuples(indexes
-                                        , names=["BondGroup",'Bond',"Field"])       
+        header = pd.MultiIndex.from_tuples(indexes)       
         
         df = pd.concat(cfFrame,axis=1)
     df.columns = header
@@ -145,7 +145,7 @@ def readPoolsCf(pMap) -> pd.DataFrame:
     pFlows = pMap & lens.Values().collect()
     pColumns = pMap & lens.Values().F(lambda x:x.columns.to_list()).collect()
     headers = tz.concat([  [ (k,c) for c in cs]  for k,cs in zip(pNames,pColumns)])
-    headerIndex = pd.MultiIndex.from_tuples(headers, names=["Pool", "Field"])
+    headerIndex = pd.MultiIndex.from_tuples(headers)
     df = pd.concat(pFlows,axis=1)
     df.columns = headerIndex
     return df

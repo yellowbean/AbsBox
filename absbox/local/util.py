@@ -455,20 +455,32 @@ def patchDicts(dict1:dict,dict2:dict)-> dict:
 def readAeson(x:dict):
     match x:
         case {"tag": tag,"contents": contents} if isinstance(contents,list):
-            return {tag:readAeson(contents)}
+            return {tag: [readAeson(c) for c in contents]}
         case {"tag": tag,"contents": contents} if isinstance(contents,dict):
-            return {tag:readAeson(contents)}            
+            return {tag: {k: readAeson(v) for k,v in contents.items()} }            
         case {"tag": tag,"contents": contents} if isinstance(contents,str):
             return {tag: contents}   
+        case {"tag": tag, **kwargs} if len(kwargs)>1 :
+            return {k: readAeson(v) for k,v in kwargs.items()} | {"tag": tag}
         case {"tag": tag} if isinstance(tag,str):
             return tag   
-        case x if isinstance(x,list):
-            return [readAeson(_x) for _x in x]
         case {'numerator': n,'denominator': de}:
             return (n/de)
+        case x if isinstance(x,dict):
+            return {k:readAeson(_x) for k,_x in x.items()}
+        case x if isinstance(x,list):
+            return [readAeson(_x) for _x in x]
         case n if isinstance(n,float) or isinstance(n,int):
             return n
         case None:
             return None
+        case {}:
+            return {}
+        case s if isinstance(s,str):
+            return s
         case _:
             raise RuntimeError("failed to match",x)
+
+def getNumCols(df:pd.DataFrame)-> list:
+    numeric_columns = [col for col in df.columns if pd.to_numeric(df[col], errors='coerce').notna().all()]
+    return numeric_columns

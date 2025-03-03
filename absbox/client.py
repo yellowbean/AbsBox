@@ -54,8 +54,8 @@ class Endpoints(str, enum.Enum):
     """Run a single deal with multiple deal run scenarios endpoint"""
     RunByCombo = "runByCombo"
     """Run mulitple sensitivities"""
-    RunFirstLoss = "runByFirstLoss"
-    """Run first loss"""
+    RunRootFinder = "runByRootFinder"
+    """Run root finder"""
     RunDate = "runDate"
     """Run Dates from a datepattern """
     Version = "version"
@@ -79,8 +79,8 @@ class RunReqType(str, enum.Enum):
     """ Single Pool With Multiple Assumptions """
     ComboSensitivity = "MultiComboReq"
     """ Multiple sensitivities """
-    FirstLoss = "FirstLossReq"
-    """ First Loss Run """
+    RootFinder = "RootFinderReq"
+    """ Root Finder Run """
 
 
 class RunResp(int, enum.Enum):
@@ -113,7 +113,7 @@ class LibraryEndpoints(str, enum.Enum):
 
 class LibraryPath(str, enum.Enum):
     """ Enum class representing shortcut to deal library and data service """
-    CHINA = "http://absbox.org......."
+    CHINA = "http://absbox.cloud"
 
 
 class EnginePath(str, enum.Enum):
@@ -244,7 +244,7 @@ class API:
         console.print(f"✅{MsgColor.Success.value}Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
         self.session = requests.Session()
 
-    def build_run_deal_req(self, run_type: str, deal, perfAssump=None, nonPerfAssump=[]) -> str:
+    def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=[]) -> str:
         """build run deal requests: (single run, multi-scenario run, multi-struct run) 2
         
         :meta private:
@@ -263,7 +263,7 @@ class API:
         """
         r = None
 
-        match Schema(str).validate(run_type):
+        match run_type:
             case "Single" | "S":
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
@@ -293,11 +293,17 @@ class API:
                 if mRunAssump == {}:
                     mRunAssump = {"Empty":{}}
                 r = mkTag((RunReqType.ComboSensitivity.value, [mDeal, mAssump, mRunAssump]))
-            case "FirstLoss" | "FL":
+            case ("FirstLoss", bn) | ("FL", bn):
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = mkAssumpType(perfAssump)
                 _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
-                r = mkTag((RunReqType.FirstLoss.value, [_deal, _perfAssump, _nonPerfAssump]))
+                r = mkTag(("FirstLossReq", [(_deal, _perfAssump, _nonPerfAssump), bn]))
+            case ("MaxSpreadToFaceReq", (bn,bns)) :
+                _deal = deal.json if hasattr(deal, "json") else deal
+                _perfAssump = mkAssumpType(perfAssump)
+                _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
+                r = mkTag(("MaxSpreadToFaceReq", [(_deal, _perfAssump, _nonPerfAssump)
+                                                    , (bn,bns)]))
             case _:
                 raise RuntimeError(f"Failed to match run type:{run_type}")
         try:
@@ -686,7 +692,7 @@ class API:
         else:
             return result
 
-    def runFirstLoss(self, deal, bName, poolAssump=None, runAssump=[], read=True, showWarning=True, debug=False) -> dict:
+    def runFirstLoss(self, deal, bName, poolAssump=None, runAssump=[], read=True, debug=False) -> dict:
         """run first loss with deal and pool assumptions
 
         :param deal: a deal object
@@ -697,8 +703,6 @@ class API:
         :type runAssump: list, optional
         :param read: flag to convert result to pandas dataframe, defaults to True
         :type read: bool, optional
-        :param showWarning: flag to show warnings, defaults to True
-        :type showWarning: bool, optional
         :param debug: return request text instead of sending out such request, defaults to False
         :type debug: bool, optional
         :return: result of run, a dict of dataframe if `read` is True.
@@ -708,13 +712,14 @@ class API:
         if (poolAssump is None):
             raise AbsboxError(f"❌{MsgColor.Error.value} poolAssump must be set for first loss run")
 
-        url = f"{self.url}/{Endpoints.RunFirstLoss.value}"
+        url = f"{self.url}/{Endpoints.RunRootFinder.value}"
 
-        req = self.build_run_deal_req("FL", deal, poolAssump, runAssump)
+        req = self.build_run_deal_req(("FL", bName), deal, poolAssump, runAssump)
+
         if debug:
             return req
 
-        result = self._send_req(req & lens.Json()['contents'].modify(lambda x:x+[bName]), url)
+        result = self._send_req(req, url)
 
         if result is None or 'error' in result or 'Left' in result:
             leftVal = result.get("Left","")
@@ -724,6 +729,39 @@ class API:
             return readAeson(result['Right'])
         else:
             result['Right']
+
+    def runRootFinder(self, p, read=True, debug=False) -> dict:
+        """run root finder with deal and pool assumptions
+
+        :param read: flag to convert result to pandas dataframe, defaults to True
+        :type read: bool, optional
+        :param debug: return request text instead of sending out such request, defaults to False
+        :type debug: bool, optional
+        :return: result of run, a dict of dataframe if `read` is True.
+        :rtype: dict
+        """
+
+        url = f"{self.url}/{Endpoints.RunRootFinder.value}"
+        req = None
+        match p:
+            case ("maxSpreadToFace",deal,poolAssump,runAssump,(bn,bns),adj):
+                req = self.build_run_deal_req(("MaxSpreadToFaceReq",(bn,bns)), deal, poolAssump, runAssump)
+            case ("firstLoss",deal,poolAssump,runAssump,bn):
+                req = self.build_run_deal_req(("FirstLoss",bn), deal, poolAssump, runAssump)
+        if debug:
+            return req
+
+        result = self._send_req(req, url)
+
+        if result is None or 'error' in result or 'Left' in result:
+            leftVal = result.get("Left","")
+            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+        if read:
+            return readAeson(result['Right'])
+        else:
+            return result['Right']
+
+
 
     def runAsset(self, date, _assets, poolAssump=None, rateAssump=None
                  , pricing=None, read=True, debug=False) -> tuple:

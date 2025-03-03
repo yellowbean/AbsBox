@@ -1370,6 +1370,13 @@ User can input with an assumption with one more field ("Bond Name") compare to s
 * deal run assumption 
 * bond name 
 
+.. versionchanged:: 0.42.6
+Using endpoint of ``runRootFinder()``
+
+syntax
+  ``("firstLoss",<deal>,<poolAssump>,<runAssump>,<bondName>)``
+
+
 The engine will stress on the default assumption till the bond incur a 0.01 loss.
 Then engine return a tuple 
 
@@ -1381,18 +1388,19 @@ Then engine return a tuple
 
 .. code-block:: python
 
-  r0 = localAPI.runFirstLoss(examples.test01
-                            ,"A1"
-                            ,poolAssump=("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
-                                            ,None
-                                            ,None)
-                            ,read=True
-                            ,debug=False)
-
+  r0 = localAPI.runRootFinder(
+                  ("firstLoss", test01
+                      ,("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
+                              ,None
+                              ,None)
+                      ,[]
+                      ,"A1"
+                  )
+        )
   # stress factor 
-  r0[0]
+  r0['FirstLossResult'][0]
   # stressed scenario
-  r0[1]
+  r0['FirstLossResult'][1]
 
 .. seealso:: 
    For details on first loss run pls refer to :ref:`First Loss Example`
