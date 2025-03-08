@@ -2072,7 +2072,7 @@ syntax
     :code:`"rateType":("floor", 0.01, {"floater":[0.05, "SOFR1Y",-0.0169,"MonthEnd"]})`
 
     :code:`"rateType":("cap", 0.10, <floater rate>)`
-   
+
     :code:`"rateType":("cap", 0.10, {"floater":[0.05, "SOFR1Y",-0.0169,"MonthEnd"]})`
 
 Step-Up Rate
@@ -2111,6 +2111,20 @@ syntax
   cap & floor :code:`"rateType":("cap",0.06, ("floor",0.005 ,{"floater":[0.05, "SOFR1Y",-0.0169,"MonthEnd"]}))`
 
 
+By Ref Balance
+"""""""""""""""""""
+
+.. versionadded:: 0.43.0
+
+The bond interest will be calculated by a base from a :ref:`Formula`
+
+It use a composite syntax: ``("byRefBalance",<formula>,<rate object>)``
+
+syntax
+  :code:`"rateType":("byRefBalance",("poolBalance",),("fix",0.0569))`
+
+
+
 Interest Over Interest
 """"""""""""""""""""""""""
 
@@ -2145,6 +2159,7 @@ there are 5 types of `Principal` for bonds/tranches
   * ``BalanceByPeriod``: Balance of bond can only be paid down by a predefined balance schedule ,indexed by bond paid period
   * ``Lockout``： Principal won't be paid after lockout date
   * ``Equity``：  No interest and shall serve as junior tranche
+  * ``IO``：  Interest Only tranche
 
 Sequential 
 """""""""""""
@@ -2158,7 +2173,7 @@ A bond with will receive principal till it's balance reduce to 0.
            ,"originRate":0.03
            ,"startDate":"2020-01-03"
            ,"rateType":{"floater":[0.05,"SOFAR1Y",-0.0169,"MonthEnd"]}
-           ,"bondType":{"Sequential":None} })
+           ,"bondType":"Sequential"})
  
 PAC
 """""""""""""
@@ -2242,8 +2257,24 @@ Equity
            ,"originRate":0.00
            ,"startDate":"2020-01-03"
            ,"rateType":{"fix":0.0}  
-           ,"bondType":{"Equity":None} })
+           ,"bondType":"Equity"})
 
+IO
+"""""""""""""
+
+Tranche with always remains due principal = 0.
+
+.. versionadded:: 0.43.0
+
+.. code-block:: python
+
+     ,("IO",{"balance":0.0
+           ,"rate":0.0
+           ,"originBalance":0.0
+           ,"originRate":0.00
+           ,"startDate":"2020-01-03"
+           ,"rateType":{"fix":0.0}  
+           ,"bondType":"IO"})
 
 Bond Group
 ^^^^^^^^^^^^^^
@@ -2535,10 +2566,6 @@ Bond
      - Yes, accure Interest
      - Won't pay cash
      - Yes
-   * - ``calcIntBy``
-     - Yes, accure Interest
-     - Won't pay cash
-     - No
    * - ``payInt``
      - No
      - Yes, pay till due interest is 0
@@ -2599,27 +2626,6 @@ Calc Bond Int
   syntax
     ``["calcInt", <Bond1> , <Bond2> ... ]``
 
-  .. versionadded:: 0.24.0
-  calculate the due interest of a bond with customized interest rate and balance
-
-  syntax
-    ``["calcIntBy", (<Formula>,<Formula>|float) , <Bond1>]``
-
-  .. code-block:: python
-
-    ["calcIntBy",(None,None),"A1"]
-
-    # accrue bond with fix balance of 2000, and a fix rate of 14%
-    ["calcIntBy",(("const",2000),0.14),"A1"] 
-    
-    # accrue with a formula reference to a balance value
-    ["calcIntBy",(("bondBalance","B"),0.14),"A1"]
-    
-    # accrue with a formula reference to a balance value
-    ["calcIntBy",(("bondBalance","B"),0.14),"A1"]
-    
-    # accure with inflated interest rate up with 50%
-    ["calcIntBy",(None,("*",("bondRate","A1"),1.5)),"A1"]
 
 PayInt 
   pay interset to a bond till due int balance is 0

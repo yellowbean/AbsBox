@@ -1049,7 +1049,7 @@ def mkAction(x:list):
         case ["计提费用", *feeNames] | ["calcFee", *feeNames]:
             return mkTag(("CalcFee", vList(feeNames, str)))
         case ["特殊计提利息", (mbal, mrate), bndName] | ["calcIntBy", (mbal, mrate), bndName]:
-            return mkTag(("CalcBondInt", [[vStr(bndName)]
+            return mkTag(("CalcBondIntBy", [[vStr(bndName)]
                                           , earlyReturnNone(mkDs, mbal)
                                           , earlyReturnNone(mkDsRate, mrate)]))
         case ["计提利息", *bndNames] | ["calcInt", *bndNames]:
@@ -1136,7 +1136,7 @@ def mkAction(x:list):
             return mkTag(("PayPrinGroup", [None, vStr(source), vStr(target), byOrder, None]))
         case ["计提利息","组",targets] | ["calcIntByGroup", targets]:
             return mkTag(("AccrueIntGroup", vList(targets, str)))
-        case ["支付利息","组",source, target, o, m] | ["payIntByGroup", source, target,o, m]:
+        case ["支付利息","组",source, target, o, m] | ["payIntByGroup", source, target, o, m]:
             (l, s) = mkMod(m)
             byOrder = mkOrder(o)
             return mkTag(("PayIntGroup", [l, vStr(source), vStr(target),byOrder,s]))
