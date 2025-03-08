@@ -146,7 +146,7 @@ class Generic:
                 output['pool']['flow'] = readPoolCf(deal_content['pool']['contents']['futureCf']['contents'])
         elif deal_content['pool']['tag']=='MultiPool':
             poolMap = deal_content['pool']['contents']
-            output['pool']['flow'] = tz.valmap(lambda v: readPoolCf(v['futureCf']['contents']), poolMap)
+            output['pool']['flow'] = tz.valmap(lambda v: readPoolCf(v['futureCf']['contents']) if (not v['futureCf'] is None) else pd.DataFrame(), poolMap)
         elif deal_content['pool']['tag']=='ResecDeal':
             poolMap = deal_content['pool']['contents']
             output['pool']['flow'] = {tz.get([1,2,4],k.split(":")): readPoolCf(v['futureCf']['contents']) for (k,v) in poolMap.items() }

@@ -618,6 +618,8 @@ def mkBondType(x):
             return mkTag(("Lockout", vDate(_after)))
         case {"权益": _} | {"Equity": _} | "Equity" | "权益":
             return mkTag(("Equity"))
+        case "IO":
+            return mkTag(("IO"))
         case _:
             raise RuntimeError(f"Failed to match bond type: {x}")
 
@@ -654,6 +656,8 @@ def mkBondRate(x:dict)->dict:
             return mkTag(("Fix", [vNum(_rate), DC.DC_ACT_365F.value]))
         case {"期间收益": _yield} | {"interimYield": _yield}:
             return mkTag(("InterestByYield", vNum(_yield)))
+        case ("refBalance", ds, ii):
+            return mkTag(("RefBal", [mkDs(ds), mkBondRate(ii)]))
         # rate with cap
         case ("上限", cap, br) | ("cap", cap, br):
             return mkTag(("CapRate", [mkBondRate(br), vNum(cap)]))
@@ -1049,7 +1053,7 @@ def mkAction(x:list):
                                           , earlyReturnNone(mkDs, mbal)
                                           , earlyReturnNone(mkDsRate, mrate)]))
         case ["计提利息", *bndNames] | ["calcInt", *bndNames]:
-            return mkTag(("CalcBondInt", [vList(bndNames, str), None, None]))
+            return mkTag(("CalcBondInt", [vList(bndNames, str)]))
         case ["计提支付费用", source, target, m] | ["calcAndPayFee", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("CalcAndPayFee", [l, vStr(source), vList(target, str), s]))
@@ -1529,11 +1533,11 @@ def mkLeaseStepUp(x):
         case ("flatRate", r):
             return mkTag(("FlatRate", vNum(r)))
         case ("byRates", *rs):
-            return mkTag(("ByRateCurve", vList(rs, float)))
+            return mkTag(("ByRateCurve", vList(rs, vNum)))
         case ("flatAmount", bal):
             return mkTag(("ByFlatAmount", vNum(bal)))
         case ("byAmounts", *bs):
-            return mkTag(("ByAmountCurve", vList(bs, float)))
+            return mkTag(("ByAmountCurve", vList(bs, vNum)))
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkLeaseStepUp")
         
@@ -2279,6 +2283,8 @@ def readPricingResult(x, locale) -> dict | None:
 
 def readPoolCf(x, lang='english'):
     r = None
+    if x is None:
+        return []
     cflow = x[1]
     if not cflow:
         return pd.DataFrame()

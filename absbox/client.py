@@ -100,20 +100,19 @@ class MsgColor(str, enum.Enum):
 
 class LibraryEndpoints(str, enum.Enum):
     """Endpoints for deal library"""
+    Ack = "ack"
     Token = "token"
     Query = "query"
-    List = "list"
     Run = "run"
-    Data = "data"
-    DataList = "data/list"
-    DealFetch = "deal/fetch"
-    ReportFetch = "data/report"
-
+    # Data = "data"
+    # DataList = "data/list"
+    # DealFetch = "deal/fetch"
+    # ReportFetch = "data/report"
 
 
 class LibraryPath(str, enum.Enum):
     """ Enum class representing shortcut to deal library and data service """
-    CHINA = "http://absbox.cloud"
+    LDN = "http://ldn.spv.run/"
 
 
 class EnginePath(str, enum.Enum):
@@ -219,7 +218,7 @@ class API:
         if self.url == EnginePath.USE_ENV.value:
             urlInEnv = os.environ.get("ABSBOX_SERVER")
             if urlInEnv is None:
-                raise AbsboxError(f"❌{MsgColor.Error.value}No ABSBOX_SERVER found in environment variable")
+                raise AbsboxError(f"❌No ABSBOX_SERVER found in environment variable")
             else:
                 self.url = isValidUrl(urlInEnv).rstrip("/")
         else:
@@ -228,12 +227,12 @@ class API:
         console.print(f"{MsgColor.Info.value}Connecting engine server -> {self.url}")
         
         if self.lang not in ["chinese", "english"]:
-            raise AbsboxError(f"❌{MsgColor.Error.value}Invalid language:{self.lang}, only support 'chinese' or 'english' ")
+            raise AbsboxError(f"❌Invalid language:{self.lang}, only support 'chinese' or 'english' ")
 
         try:
             _r = requests.get(f"{self.url}/{Endpoints.Version.value}", verify=False, timeout=5, headers = {"Origin":"http://localhost:8001"}).text
         except (ConnectionRefusedError, ConnectionError):
-            raise AbsboxError(f"❌{MsgColor.Error.value}Error: Can't not connect to API server {self.url}")
+            raise AbsboxError(f"❌Error: Can't not connect to API server {self.url}")
         if _r is None:
             raise RuntimeError(f"Failed to get version from url:{self.url}")
         self.server_info = self.server_info | json.loads(_r)
@@ -241,7 +240,7 @@ class API:
         if self.check and (self.version[1] != engine_version[1]):
             console.print("pls upgrade your api package by: pip -U absbox")
             raise VersionMismatch('.'.join(self.version), '.'.join(engine_version))
-        console.print(f"✅{MsgColor.Success.value}Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
+        console.print(f"✅Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
         self.session = requests.Session()
 
     def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=[]) -> str:
@@ -832,183 +831,6 @@ class API:
         result = self._send_req(req, url)
         return result
 
-    def loginLibrary(self, user, pw, **q):
-        """login to deal library with user and password
-
-            update token attribute if login success
-            
-        :param user: username
-        :type user: string
-        :param pw: password
-        :type pw: string
-        :param q: query parameters:
-
-                    - {"deal_library": <deal library url> }, specify the deal library server;
-        :return: None 
-        :rtype: None
-        """
-        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.Token.value}"
-        cred = {"user": vStr(user), "password": pw}
-        r = self._send_req(json.dumps(cred), deal_library_url)
-        if 'token' in r:
-            console.print(f"✅{MsgColor.Success.value} login successfully, {r['msg']}")
-            self.token = r['token']
-        else:
-            if hasattr(self, 'token'):
-                delattr(self, 'token')
-            console.print(f"❌{MsgColor.Error.value} Failed to login,{r['msg']}")
-            return None
-    
-    def safeLogin(self, user, **q):
-        """safe login with user and password in interactive console
-
-        a interactive input is pending after calling this function
-
-        :param user: username
-        :type user: string
-        """
-        try:
-            pw = getpass.getpass()
-            self.loginLibrary(user, pw, **q)
-        except Exception as e:
-            raise AbsboxError(f"❌{MsgColor.Error.value} Failed during library login {e}")
-
-    def queryLibrary(self, ks, **q):
-        """query deal library with bond ids
-
-        :param ks: bond Ids
-        :type ks: list
-        :param q: query parameters:
-
-                    - if {"read":True}, return a dataframe, else return raw result;
-        :return: a list of bonds found in library
-        :rtype: pd.DataFrame or raw result
-        
-        """
-        if not hasattr(self, "token"):
-            raise AbsboxError(f"❌{MsgColor.Error.value} No token found , please call loginLibrary() to login")
-
-        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.Query.value}"
-        d = {"bond_id": [k for k in ks]}
-        q = {"read": True} | q
-        result = self._send_req(json.dumps(d|q), deal_library_url, headers={"Authorization": f"Bearer {self.token}"})
-        console.print(f"✅{MsgColor.Success.value} query success")
-        if q['read']:
-            if 'data' in result:
-                return pd.DataFrame(result['data'], columns=result['header'])
-            elif 'error' in result:
-                return pd.DataFrame([result["error"]], columns=["error"])
-        else:
-            return result
-
-    def listLibrary(self, **q):
-        """list all available bonds in library
-
-        :param q: query parameters:
-
-                    - if {"read":True}, return a dataframe, else return raw result;
-                    - {"deal_library": <deal library url> }, specify the deal library server;
-        :type q: dict
-        :return: a list of available bonds in library
-        :rtype: pd.DataFrame or raw result
-        """
-        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.List.value}"
-        result = self._send_req(json.dumps(q), deal_library_url)
-        console.print(f"✅{MsgColor.Success.value} list success")
-        if ('read' in q) and (q['read'] == True):
-            return pd.DataFrame(result['data'], columns=result['header'])
-        else:
-            return result
-
-    def runLibrary(self, _id, **p):
-        """send deal id with assumptions to remote server and get result back
-
-        :param _id: dealId
-        :type _id: string
-        :param p: run parameters:
-
-                    - {"deal_library": <deal library url> }, specify the deal library server;
-                    - {"read":True}, return a dataframe, else return raw result;
-                    - {"poolAssump":<pool assumptions>}, specify pool assumptions;
-                    - {"runAssump":<deal assumptions>}, specify run assumptions;
-        :type p: dict
-        :raises RuntimeError: _description_
-        :return: raw string or dataframe
-        :rtype: string | pd.DataFrame
-        """
-        deal_library_url = p['deal_library']+f"/{LibraryEndpoints.Run.value}"
-        read = p.get("read", True)
-        dealAssump, poolAssump = tz.get(["runAssump", "poolAssump"], p, None)
-        runType = p.get("runType", "S")
-        prod_flag = {"production": p.get("production", True)}
-
-        runReq = mergeStrWithDict(self.build_run_deal_req(runType, _id, poolAssump, dealAssump), prod_flag)
-        if not hasattr(self, "token"):
-            raise AbsboxError(f"❌{MsgColor.Error.value} No token found, please call loginLibrary() to login")
-        
-        result = self._send_req(runReq, deal_library_url, headers={"Authorization": f"Bearer {self.token}"})
-
-        def lookupReader(x):
-            match x:
-                case "china.SPV":
-                    return SPV
-                case "generic.Generic":
-                    return Generic
-                case _:
-                    raise RuntimeError(f"Failed to match reader:{x}")
-        try:
-            ri = result['run_info']
-            result = result['run_result']
-            console.print(f"✅{MsgColor.Success.value}run success with deal id={ri['deal_id']}/report num={ri['report_num']},doc_id={ri['doc_id']}")
-        except Exception as e:
-            raise AbsboxError(f"❌{MsgColor.Error.value} message from API server:{result},\n,{e}")
-        try:       
-            classReader = lookupReader(p['reader'])
-            if read and isinstance(result, list):
-                return classReader.read(result)
-            elif read and isinstance(result, dict):
-                return tz.valmap(classReader.read, result)  # {k: classReader.read(v) for k, v in result.items()}
-            else:
-                return result
-        except Exception as e:
-            raise AbsboxError(f"❌{MsgColor.Error.value}: Failed to read result with error = {e}")
-
-    def listLibraryData(self, **q):
-        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.DataList.value}"
-        result = self._send_req(json.dumps(q), deal_library_url)
-        console.print(f"✅{MsgColor.Success.value} list success")
-        if ('read' in q) and (q['read'] == True):
-            return pd.DataFrame(result['data'], columns=result['header'])
-        else:
-            return result
-
-
-    def fetchLibraryData(self, **q):
-        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.ReportFetch.value}"
-        hdrs = self.hdrs | {"Authorization": f"Bearer {self.token}"}
-        # fetch type
-        ## by single bond id
-        ## by deal id 
-        ## by series name
-
-        ## filter ,date range
-
-        result = self._send_req(json.dumps(q), deal_library_url, headers=hdrs)
-        console.print(f"✅{MsgColor.Success.value} fetch success")
-        
-        return result
-    
-    def fetchLibraryDeal(self, **q):
-        deal_library_url = q['deal_library']+f"/{LibraryEndpoints.DealFetch.value}"
-        hdrs = self.hdrs | {"Authorization": f"Bearer {self.token}"}
-        r = None
-        if self.session:
-            r = self.session.post(deal_library_url, data=json.dumps(q).encode('utf-8'), headers=hdrs, verify=False, timeout=15)
-            if r.status_code != 200:
-                raise AbsboxError(f"❌{MsgColor.Error.value}Failed to fetch deal from library")
-            return pickle.loads(r.content)
-
-
     def _send_req(self, _req, _url: str, timeout=10, headers={})-> dict | None:
         """generic function send request to server
 
@@ -1031,6 +853,181 @@ class API:
                 r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
             else:
                 raise AbsboxError(f"❌: None type for session")
+        except (ConnectionRefusedError, ConnectionError):
+            raise AbsboxError(f"❌ Failed to talk to server {_url}")
+        except ReadTimeout:
+            raise AbsboxError(f"❌ Failed to get response from server")
+        if r.status_code != 200:
+            raise EngineError(r)
+        try:
+            return json.loads(r.text)
+        except JSONDecodeError as e:
+            raise EngineError(e)
+
+@dataclass
+class LIBRARY:
+    """ Deal Library class for deal library operations 
+    :return: Deal Library instance
+    :rtype: DealLibrary
+    """
+    url: str = ""
+    token: str = None
+    hdrs = {'Content-type': 'application/json', 'Accept': '*/*', 'Accept-Encoding': 'gzip'}
+    debug = False
+    libraryInfo = None
+
+    def __post_init__(self):
+
+        try:
+            _r = requests.get(f"{self.url}/ack", verify=False)
+        except Exception as e:
+            raise AbsboxError(f"❌ Failed to connect to library server:{e}")
+        if _r.status_code == 200:
+            self.session = requests.Session()
+            self.libraryInfo = json.loads(_r.text)
+            console.print(f"✅ Connected to library server")
+            console.print(f"✅ absbox version:{self.libraryInfo['absbox']}, Hastructure:{self.libraryInfo['Hastructure']['url']} / {self.libraryInfo['Hastructure']['version']}")
+
+    def login(self, user, pw, **q):
+        """login to deal library with user and password
+
+            update token attribute if login success
+            
+        :param user: username
+        :type user: string
+        :param pw: password
+        :type pw: string
+        :param q: query parameters:
+                    - {"deal_library": <deal library url> }, specify the deal library server;
+        :return: None 
+        :rtype: None
+        """
+        deal_library_url = self.url+f"/{LibraryEndpoints.Token.value}"
+        cred = {"user": vStr(user), "password": pw}
+        r = self._send_req(json.dumps(cred), deal_library_url)
+        if 'token' in r:
+            console.print(f"✅ login successfully, user-> {r['user']},company-> {r['company']}")
+            self.token = r['token']
+            self._send_req(json.dumps({"token": self.token}), deal_library_url)
+        else:
+            if hasattr(self, 'token'):
+                delattr(self, 'token')
+            console.print(f"❌ Failed to login,{r['msg']}")
+            return None
+    
+    def safeLogin(self, user, **q):
+        """safe login with user and password in interactive console
+
+        a interactive input is pending after calling this function
+
+        :param user: username
+        :type user: string
+        """
+        try:
+            pw = getpass.getpass()
+            self.login(user, pw, **q)
+        except Exception as e:
+            raise AbsboxError(f"❌ Failed during library login {e}")
+
+    def query(self, k = {}, **q):
+        """query deal library with bond ids
+
+        :param ks: bond Ids
+        :type ks: list
+        :param q: query parameters:
+
+                    - if {"read":True}, return a dataframe, else return raw result;
+        :return: a list of bonds found in library
+        :rtype: pd.DataFrame or raw result
+        
+        """
+        if not hasattr(self, "token"):
+            raise AbsboxError(f"❌ No token found , please call loginLibrary() to login")
+
+        deal_library_url = self.url+f"/{LibraryEndpoints.Query.value}"
+        q = {"read": True} | q
+        result = self._send_req(json.dumps(k|q), deal_library_url, headers={"Authorization": f"Bearer {self.token}"})
+        console.print(f"✅ query success")
+        if q['read']:
+            if 'data' in result:
+                return pd.DataFrame(result['data'], columns=result['header'])
+            elif 'error' in result:
+                return pd.DataFrame([result["error"]], columns=["error"])
+        else:
+            return result
+
+
+    def run(self, _id, **p):
+        """send deal id with assumptions to remote server and get result back
+
+        :param _id: how to find a deal in library database
+        :type _id: dict
+        :param p: run parameters:
+                    - {"read":True}, return a dataframe, else return raw result;
+                    - {"poolAssump":<pool assumptions>}, specify pool assumptions;
+                    - {"runAssump":<deal assumptions>}, specify run assumptions;
+        :type p: dict
+        :raises RuntimeError: _description_
+        :return: raw string or dataframe
+        :rtype: string | pd.DataFrame
+        """
+        if not hasattr(self, "token"):
+            raise AbsboxError(f"❌ No token found, please call login() to login")
+
+        deal_library_url = self.url+f"/{LibraryEndpoints.Run.value}"
+        read = p.get("read", True)
+        
+        runAssump, poolAssump = tz.get(["runAssump", "poolAssump"], p, None)
+        runType = p.get("runType", "S")
+
+        runReq = {"q": _id, "runType": runType, 
+                    "runAssump": runAssump, "poolAssump": poolAssump }
+        
+        bRunReq = pickle.dumps(runReq)
+
+        r = self._send_req(bRunReq, deal_library_url
+                            , headers={"Authorization": f"Bearer {self.token}"
+                                        ,"Content-Type":"application/octet-stream"})
+        
+        try:
+            result = r['result']
+            console.print(f"✅ run success with deal")
+        except Exception as e:
+            raise AbsboxError(f"❌ message from API server:{result},\n,{e}")
+        try:       
+            if read and isinstance(result, list):
+                return Generic.read(result)
+            elif read and isinstance(result, dict):
+                return tz.valmap(Generic.read, result)
+            else:
+                return result
+        except Exception as e:
+            raise AbsboxError(f"❌ Failed to read result with error = {e}")
+
+    def _send_req(self, _req, _url: str, timeout=10, headers={})-> dict | None:
+        """generic function send request to server
+
+        :meta private:
+        :param _req: request body
+        :type _req: string
+        :param _url: engine server url
+        :type _url: str
+        :param timeout: timeout in seconds, defaults to 10
+        :type timeout: int, optional
+        :param headers: default request header, defaults to {}
+        :type headers: dict, optional
+        :return: response in dict
+        :rtype: dict | None
+        """
+        try:
+            hdrs = self.hdrs | headers
+            r = None
+            if self.session and not isinstance(_req, bytes):
+                r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
+            elif self.session :
+                r = self.session.post(_url, data=_req, headers=hdrs, verify=False, timeout=timeout)
+            else:
+                raise AbsboxError(f"❌ None type for session")
         except (ConnectionRefusedError, ConnectionError):
             raise AbsboxError(f"❌ Failed to talk to server {_url}")
         except ReadTimeout:
