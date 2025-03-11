@@ -530,7 +530,11 @@ Pool assumption can be applied via multiple ways:
     digraph {
         rankdir = LR
         "Asset Assumption" -> "Whole Pool"
+        "Asset Assumption" -> "By Pool Name"
+        "Asset Assumption" -> "By Deal Name"
         "Whole Pool" -> "('Pool',<assump>)"
+        "By Pool Name" -> "('ByPoolId',<assump>)"
+        "By Deal Name" -> "('ByDealName',<assump>)"
         "Asset Assumption" -> "By Pool Index"
         "By Pool Index" -> "('ByIndex',(index,<assump>)...)"
         "Asset Assumption" -> "By Obligor"
@@ -546,7 +550,7 @@ Pool assumption can be applied via multiple ways:
 
 
 
-Pool Level
+By Pool Level
 """"""""""""""""""""""""
 
 The assump will be applied to *ALL* assets in the pool
@@ -681,7 +685,27 @@ Field Match Rule:
               ,("ByField",[<field match rule>],<assumption>)
               ,("ByDefault",<assumption>))
 
+By Pool Name 
+""""""""""""""""""
 
+This assumption map with key of assumption to the name of pool.
+
+.. code-block:: python
+
+   #syntax 
+   ("ByPoolName",<assumption>)
+
+
+By Deal Name
+""""""""""""""""
+
+This only apply to resercuritization deal, which the key of assumption is the name of underlying deal.
+
+
+.. code-block:: python
+  
+   #syntax 
+   ("ByDealName",<assumption>)
 
 
 

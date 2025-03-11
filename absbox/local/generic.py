@@ -15,7 +15,7 @@ import toolz as tz
 
 def readBondStmt(respBond):
     match respBond:
-        case {'tag':'BondGroup','contents':bndMap }:
+        case {'tag':'BondGroup','contents': [bndMap, pt] }:
             return {k: pd.DataFrame(list(tz.pluck("contents",[] if v['bndStmt'] is None else v['bndStmt'])), columns=english_bondflow_fields).set_index("date") for k,v in bndMap.items() }
         case {'tag':'Bond', **singleBndMap }:
             bStmt = mapNone(singleBndMap.get('bndStmt',[]),[])

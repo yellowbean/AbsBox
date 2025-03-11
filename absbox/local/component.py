@@ -347,6 +347,8 @@ def mkDs(x):
                 return mkTag(("LastBondPrinPaid", vList(bnds, str)))
             case ("债券低于目标余额", bn) | ("behindTargetBalance", bn):
                 return mkTag(("BondBalanceGap", vStr(bn)))
+            case ("债券目标余额",*bnds) | ("bondTargetBalance",*bnds):
+                return mkTag(("BondBalanceTarget", vList(bnds, str)))
             case ("累积募资", *bnds) | ("totalFunded", *bnds):
                 return mkTag(("BondTotalFunding", vList(bnds,str)))
             case ("已提供流动性", *liqName) | ("liqBalance", *liqName):
@@ -608,15 +610,17 @@ def mkAcc(an, x=None):
 
 def mkBondType(x):
     match x:
+        case {"PAC":schedule,"IfOustanding":bns}:
+            return mkTag(("PacAnchor", [mkTag(("BalanceCurve", schedule)), vList(bns, str)]))
         case {"固定摊还": schedule} | {"PAC": schedule}:
             return mkTag(("PAC", mkTag(("BalanceCurve", schedule))))
         case {"BalanceByPeriod": bals}:
             return mkTag(("AmtByPeriod", mkTag(("CurrentVal", bals))))
-        case {"过手摊还": None} | {"Sequential": None} | "Sequential" | "过手摊还":
+        case {"过手摊还": None} | {"Sequential": None} | "Sequential" | "过手摊还" | "Seq":
             return mkTag(("Sequential"))
         case {"锁定摊还": _after} | {"Lockout": _after}:
             return mkTag(("Lockout", vDate(_after)))
-        case {"权益": _} | {"Equity": _} | "Equity" | "权益":
+        case {"权益": _} | {"Equity": _} | "Equity" | "权益" | "Eq":
             return mkTag(("Equity"))
         case "IO":
             return mkTag(("IO"))
@@ -690,6 +694,12 @@ def mkBndComp(bn,bo):
         return True
 
     match (bn,bo):
+        case (bn, ("bond", bnd)):
+            return mkBnd(bn, bnd)
+        case (bn, ("bondGroup", bndMap)):
+            return mkTag(("BondGroup", [{k:mkBnd(k,v) for k,v in bndMap.items()}, None] ))
+        case (bn, ("bondGroup", bndMap, pt)):
+            return mkTag(("BondGroup", [{k:mkBnd(k,v) for k,v in bndMap.items()}, mkBondType(pt)] ))
         case (bn, bnd) if itlookslikeaBond(bnd): # single bond
             return mkBnd(bn, bnd)
         case (bondGroupName, bndMap) : # bond group
@@ -1006,15 +1016,17 @@ def mkSupport(x:list):
 def mkOrder(x):
     match x:
         case "byName":
-            return "ByName"
+            return mkTag("ByName")
         case "byProrata":
-            return "ByProRataCurBal"
+            return mkTag("ByProRataCurBal")
         case "byCurRate":
-            return "ByCurrentRate"
+            return mkTag("ByCurrentRate")
         case "byMaturity":
-            return "ByMaturity"
+            return mkTag("ByMaturity")
         case "byStartDate":
-            return "ByStartDate"
+            return mkTag("ByStartDate")
+        case ("byName", *names):
+            return mkTag(("ByCustomNames", vList(names, str)))
 
 
 def mkAction(x:list):

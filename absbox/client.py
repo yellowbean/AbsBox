@@ -104,6 +104,7 @@ class LibraryEndpoints(str, enum.Enum):
     Token = "token"
     Query = "query"
     Run = "run"
+    DealAdd = "deal/add"
     # Data = "data"
     # DataList = "data/list"
     # DealFetch = "deal/fetch"
@@ -875,18 +876,21 @@ class LIBRARY:
     hdrs = {'Content-type': 'application/json', 'Accept': '*/*', 'Accept-Encoding': 'gzip'}
     debug = False
     libraryInfo = None
+    session = None
 
     def __post_init__(self):
 
         try:
-            _r = requests.get(f"{self.url}/ack", verify=False)
+            _r = requests.post(f"{self.url}/ack", verify=False)
         except Exception as e:
             raise AbsboxError(f"❌ Failed to connect to library server:{e}")
         if _r.status_code == 200:
             self.session = requests.Session()
             self.libraryInfo = json.loads(_r.text)
             console.print(f"✅ Connected to library server")
-            console.print(f"✅ absbox version:{self.libraryInfo['absbox']}, Hastructure:{self.libraryInfo['Hastructure']['url']} / {self.libraryInfo['Hastructure']['version']}")
+            console.print(f"✅ absbox version:{self.libraryInfo['absbox']}, Hastructure:{self.libraryInfo['Hastructure']}")
+        else:
+            console.print(f"❌ Failed to connect to library server")
 
     def login(self, user, pw, **q):
         """login to deal library with user and password
@@ -906,15 +910,24 @@ class LIBRARY:
         cred = {"user": vStr(user), "password": pw}
         r = self._send_req(json.dumps(cred), deal_library_url)
         if 'token' in r:
-            console.print(f"✅ login successfully, user-> {r['user']},company-> {r['company']}")
+            console.print(f"✅ login successfully, user-> {r['user']},company-> {r['group']}")
+            #console.print("✅ token is updated",r['token'])
             self.token = r['token']
-            self._send_req(json.dumps({"token": self.token}), deal_library_url)
+            #self._send_req(json.dumps({"token": self.token}), deal_library_url)
         else:
             if hasattr(self, 'token'):
                 delattr(self, 'token')
             console.print(f"❌ Failed to login,{r['msg']}")
             return None
     
+    def ack(self):
+        """acknowledge library connection
+
+        :return: library information
+        :rtype: dict
+        """
+        return self._send_req("", f"{self.url}/ack")
+
     def safeLogin(self, user, **q):
         """safe login with user and password in interactive console
 
@@ -929,7 +942,7 @@ class LIBRARY:
         except Exception as e:
             raise AbsboxError(f"❌ Failed during library login {e}")
 
-    def query(self, k = {}, **q):
+    def query(self, k = {}, read=True):
         """query deal library with bond ids
 
         :param ks: bond Ids
@@ -945,16 +958,43 @@ class LIBRARY:
             raise AbsboxError(f"❌ No token found , please call loginLibrary() to login")
 
         deal_library_url = self.url+f"/{LibraryEndpoints.Query.value}"
-        q = {"read": True} | q
-        result = self._send_req(json.dumps(k|q), deal_library_url, headers={"Authorization": f"Bearer {self.token}"})
+        result = self._send_req(json.dumps({"q":k}), deal_library_url, headers={"Authorization": f"Bearer {self.token}"})
         console.print(f"✅ query success")
-        if q['read']:
+        if read:
             if 'data' in result:
                 return pd.DataFrame(result['data'], columns=result['header'])
             elif 'error' in result:
                 return pd.DataFrame([result["error"]], columns=["error"])
         else:
             return result
+
+    def dealAdd(self, d, **p):
+        """add deal to library"""
+
+        if not hasattr(self, "token"):
+            raise AbsboxError(f"❌ No token found, please call login() to login")
+        deal_library_url = self.url+f"/{LibraryEndpoints.DealAdd.value}"
+
+        data = {
+            "deal":d
+            ,"name": d.name
+            ,"json": d.json
+            ,"extra": p.get("extra",{})
+            ,"period": p.get("period",0)
+            ,"buildVersion": absbox.__version__
+            ,"stage": p.get("stage","")
+            ,"comment": p.get("comment","")
+            ,"permission": p.get("permission","700")
+            ,"tags": p.get("tags",[])
+        }
+
+        bData = pickle.dumps(data)
+
+        r = self._send_req(bData, deal_library_url
+                            , headers={"Authorization": f"Bearer {self.token}"
+                                        ,"Content-Type":"application/octet-stream"})
+
+        console.print(f"✅ add success")
 
 
     def run(self, _id, **p):
@@ -980,8 +1020,9 @@ class LIBRARY:
         runAssump, poolAssump = tz.get(["runAssump", "poolAssump"], p, None)
         runType = p.get("runType", "S")
 
-        runReq = {"q": _id, "runType": runType, 
-                    "runAssump": runAssump, "poolAssump": poolAssump }
+        runReq = {"q": _id, "runType": runType 
+                    ,"runAssump": runAssump, "poolAssump": poolAssump
+                    ,"engine": p.get("engine",None) }
         
         bRunReq = pickle.dumps(runReq)
 

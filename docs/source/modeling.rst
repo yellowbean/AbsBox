@@ -244,6 +244,9 @@ Bond
     * ``("amountForTargetIrr",0.11,"A")``, -> amount needed to make bond A reach targeted IRR rate 11%.(Make sure there is negative cash statment in the bond "A")
     * ``("totalFunded","A1","E")``  -> sum of funded amount for bond A1 and bond E
 
+    .. versionadded:: 0.43.1
+    * ``("bondTargetBalance","A","B")`` -> sum of target balance of the bonds
+
 Pool 
 """""""
     * ``("poolBalance",)``  -> current pool balance
@@ -2195,6 +2198,30 @@ A bond with target amortize balances, it will stop recieving principal once its 
                      ,["2021-10-20",0]
                      ]}})
 
+PAC with Anchor Bonds 
+""""""""""""""""""""""""
+A bond with target amortize balances if anchor bonds are oustanding. If all anchor bonds are paid off, then the schedule won't be effective.
+
+.. versionadded:: 0.43.1
+
+.. code-block:: python 
+  
+  ("A1",{"balance":1000
+       ,"rate":0.07
+       ,"originBalance":1000
+       ,"originRate":0.07
+       ,"startDate":"2020-01-03"
+       ,"rateType":{"fix":0.08}
+       ,"bondType":{"PAC":
+                     [["2021-07-20",800]
+                     ,["2021-08-20",710]
+                     ,["2021-09-20",630]
+                     ,["2021-10-20",0]
+                     ]
+                   ,"anchorBonds":["A2","A3"]}})
+
+
+
 BalanceByPeriod
 """"""""""""""""""
 
@@ -2287,6 +2314,13 @@ Bond Group
   :alt: bondGroup
 
 
+syntax
+  (bondGrpName, <bondMap>)
+  
+  (bondGrpName, ("bondGroup", <bondMap>))
+
+  (bondGrpName, ("bondGroup", <bondMap>, <PAC or PAC Anchor>))
+
 .. code-block:: python 
 
     ,(("A",{"A-1":
@@ -2308,6 +2342,23 @@ Bond Group
              ,"bondType":{"Sequential":None}
             ,"maturityDate":"2026-01-01"}           
            }))
+
+
+Bond Group with PAC
+""""""""""""""""""""""
+
+.. versionadded:: 0.43.1
+
+`Bond Group` can be used to model with extra fields of `PAC` or `PAC Achor` bonds. The target amortize balances used to control maximum principal paydown.
+
+
+.. code-block:: python 
+
+    ("B", ("bondGroup",{"B1":<Bond> ,"B2":<Bond>}
+                      ,{"PAC":target_balance,"anchorBonds":["BA"]})
+              ,)
+
+
 
 Why Bond Group?
 """"""""""""""""""
@@ -3278,6 +3329,8 @@ examples:
     * ``"byCurRate"`` -> pay bonds by interest rate, the higher rate bond will be paid first
     * ``"byMaturity"`` -> pay bonds by maturity date, the earlier maturity bond will be paid first
     * ``"byStartDate"`` -> pay bonds by start date, the earlier start date bond will be paid first
+    .. versionadded:: 0.43.1
+    * ``("byName", name1, name2...)`` -> pay bonds by order of name1, name2...
 
 
 Trigger
