@@ -2315,11 +2315,11 @@ Bond Group
 
 
 syntax
-  (bondGrpName, <bondMap>)
+  ``(bondGrpName, <bondMap>)``
   
-  (bondGrpName, ("bondGroup", <bondMap>))
+  ``(bondGrpName, ("bondGroup", <bondMap>))``
 
-  (bondGrpName, ("bondGroup", <bondMap>, <PAC or PAC Anchor>))
+  ``(bondGrpName, ("bondGroup", <bondMap>, <PAC or PAC Anchor>))``
 
 .. code-block:: python 
 
