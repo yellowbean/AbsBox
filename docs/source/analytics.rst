@@ -2150,3 +2150,34 @@ Built-in Comparision functions
 .. seealso::
   There are couple built-in functions will help user to get result in easier way :ref:`Read Multiple Result Map`
 
+
+
+Compare two results
+""""""""""""""""""""""""
+
+.. versionadded:: 0.43.1
+
+User can compare two results with a built-in function ``compResult`` , it will return a dict with difference of two results.
+
+User can inspect difference as below:
+
+.. code-block:: python
+
+  from absbox import API,EnginePath,compResult
+
+  r1 = localAPI.run(<Deal1>
+                  ,poolAssump = ("Pool",("Mortgage",{"CDR":0.12},None,None,None)
+                                        ,None
+                                        ,None)
+                  ,read=True)
+
+
+  r2 = localAPI.run(<Deal1>
+                  ,poolAssump = ("Pool",("Mortgage",{"CDR":0.11},None,None,None)
+                                        ,None
+                                        ,None)
+                  ,read=True)
+
+  diff = compResult(r1,r2,names=("highCDR","lowCDR"))
+
+  diff['bond']['senior'][['balance','cash']]

@@ -2124,6 +2124,8 @@ The bond interest will be calculated by a base from a :ref:`Formula`
 It use a composite syntax: ``("byRefBalance",<formula>,<rate object>)``
 
 syntax
+  :code:`"rateType":("refBalance",("*",("bondBalance","A","B"), 0.3) ,{"Fixed":0.06})`
+  
   :code:`"rateType":("byRefBalance",("poolBalance",),("fix",0.0569))`
 
 

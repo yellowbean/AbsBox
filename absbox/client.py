@@ -8,10 +8,10 @@ import requests
 from requests.exceptions import ConnectionError, ReadTimeout
 import pandas as pd
 from rich.console import Console
+from rich import print_json
 from schema import Schema
 import toolz as tz
 from lenses import lens
-
 
 from absbox.validation import isValidUrl, vStr
 from absbox.local.util import mkTag,mapValsBy \
@@ -103,8 +103,9 @@ class LibraryEndpoints(str, enum.Enum):
     Ack = "ack"
     Token = "token"
     Query = "query"
-    Run = "run"
-    DealAdd = "deal/add"
+    Run = "run" # run a deal from the library
+    Add = "add" # add new deal to library
+    Get = "get" # get deal from library
     # Data = "data"
     # DataList = "data/list"
     # DealFetch = "deal/fetch"
@@ -888,7 +889,9 @@ class LIBRARY:
             self.session = requests.Session()
             self.libraryInfo = json.loads(_r.text)
             console.print(f"✅ Connected to library server")
-            console.print(f"✅ absbox version:{self.libraryInfo['absbox']}, Hastructure:{self.libraryInfo['Hastructure']}")
+            #print_json(data=self.libraryInfo['Hastructure'])
+            console.print(f"absbox version:{self.libraryInfo['absbox']}")
+            console.print(f"Hastructure:{self.libraryInfo['Hastructure']}")
         else:
             console.print(f"❌ Failed to connect to library server")
 
@@ -910,10 +913,8 @@ class LIBRARY:
         cred = {"user": vStr(user), "password": pw}
         r = self._send_req(json.dumps(cred), deal_library_url)
         if 'token' in r:
-            console.print(f"✅ login successfully, user-> {r['user']},company-> {r['group']}")
-            #console.print("✅ token is updated",r['token'])
+            console.print(f"✅ login successfully, user -> {r['user']},group -> {r['group']}")
             self.token = r['token']
-            #self._send_req(json.dumps({"token": self.token}), deal_library_url)
         else:
             if hasattr(self, 'token'):
                 delattr(self, 'token')
@@ -968,7 +969,7 @@ class LIBRARY:
         else:
             return result
 
-    def dealAdd(self, d, **p):
+    def add(self, d, **p):
         """add deal to library"""
 
         if not hasattr(self, "token"):
@@ -979,9 +980,8 @@ class LIBRARY:
             "deal":d
             ,"name": d.name
             ,"json": d.json
-            ,"extra": p.get("extra",{})
             ,"period": p.get("period",0)
-            ,"buildVersion": absbox.__version__
+            ,"buildVersion": "0.43.1"
             ,"stage": p.get("stage","")
             ,"comment": p.get("comment","")
             ,"permission": p.get("permission","700")
@@ -993,9 +993,22 @@ class LIBRARY:
         r = self._send_req(bData, deal_library_url
                             , headers={"Authorization": f"Bearer {self.token}"
                                         ,"Content-Type":"application/octet-stream"})
+        
 
-        console.print(f"✅ add success")
 
+        console.print(f"✅ add success with deal id={r['dealId']}, name={r['name']}")
+
+    def dealGet(self, q):
+        if not hasattr(self, "token"):
+            raise AbsboxError(f"❌ No token found, please call login() to login")
+        deal_library_url = self.url+f"/{LibraryEndpoints.DealGet.value}"
+
+        r = self._send_req(pickle.dumps({"q":q}), deal_library_url
+                            , headers={"Authorization": f"Bearer {self.token}"
+                                        ,"Content-Type":"application/octet-stream"})
+        
+        return r
+        console.print(f"✅ get deal success")
 
     def run(self, _id, **p):
         """send deal id with assumptions to remote server and get result back
@@ -1021,8 +1034,8 @@ class LIBRARY:
         runType = p.get("runType", "S")
 
         runReq = {"q": _id, "runType": runType 
-                    ,"runAssump": runAssump, "poolAssump": poolAssump
-                    ,"engine": p.get("engine",None) }
+                ,"runAssump": runAssump, "poolAssump": poolAssump
+                ,"engine": p.get("engine",None) }
         
         bRunReq = pickle.dumps(runReq)
 
@@ -1032,16 +1045,17 @@ class LIBRARY:
         
         try:
             result = r['result']
+            runInfo = tz.dissoc(r, 'result')
             console.print(f"✅ run success with deal")
         except Exception as e:
             raise AbsboxError(f"❌ message from API server:{result},\n,{e}")
         try:       
             if read and isinstance(result, list):
-                return Generic.read(result)
+                return (runInfo, Generic.read(result))
             elif read and isinstance(result, dict):
-                return tz.valmap(Generic.read, result)
+                return (runInfo, tz.valmap(Generic.read, result))
             else:
-                return result
+                return (runInfo, result)
         except Exception as e:
             raise AbsboxError(f"❌ Failed to read result with error = {e}")
 
