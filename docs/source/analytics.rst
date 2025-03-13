@@ -2181,3 +2181,9 @@ User can inspect difference as below:
   diff = compResult(r1,r2,names=("highCDR","lowCDR"))
 
   diff['bond']['senior'][['balance','cash']]
+
+Exmaple output:
+
+.. image:: img/cmpResult.png
+  :width: 600
+  :alt: cmp_result
