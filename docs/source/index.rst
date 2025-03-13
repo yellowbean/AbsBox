@@ -42,6 +42,7 @@ Content
    modeling
    analytics
    howto
+   library
    support
    reference
    nbsample/index

@@ -889,7 +889,6 @@ class LIBRARY:
             self.session = requests.Session()
             self.libraryInfo = json.loads(_r.text)
             console.print(f"✅ Connected to library server")
-            #print_json(data=self.libraryInfo['Hastructure'])
             console.print(f"absbox version:{self.libraryInfo['absbox']}")
             console.print(f"Hastructure:{self.libraryInfo['Hastructure']}")
         else:
@@ -974,14 +973,15 @@ class LIBRARY:
 
         if not hasattr(self, "token"):
             raise AbsboxError(f"❌ No token found, please call login() to login")
-        deal_library_url = self.url+f"/{LibraryEndpoints.DealAdd.value}"
+        deal_library_url = self.url+f"/{LibraryEndpoints.Add.value}"
 
         data = {
             "deal":d
-            ,"name": d.name
             ,"json": d.json
+            ,"buildVersion": VERSION_NUM
+            ,"name": d.name
+            ,"version": p.get("version",0)
             ,"period": p.get("period",0)
-            ,"buildVersion": "0.43.1"
             ,"stage": p.get("stage","")
             ,"comment": p.get("comment","")
             ,"permission": p.get("permission","700")
@@ -998,10 +998,10 @@ class LIBRARY:
 
         console.print(f"✅ add success with deal id={r['dealId']}, name={r['name']}")
 
-    def dealGet(self, q):
+    def get(self, q):
         if not hasattr(self, "token"):
             raise AbsboxError(f"❌ No token found, please call login() to login")
-        deal_library_url = self.url+f"/{LibraryEndpoints.DealGet.value}"
+        deal_library_url = self.url+f"/{LibraryEndpoints.Get.value}"
 
         r = self._send_req(pickle.dumps({"q":q}), deal_library_url
                             , headers={"Authorization": f"Bearer {self.token}"
