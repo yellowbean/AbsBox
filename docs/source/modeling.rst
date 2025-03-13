@@ -2293,6 +2293,8 @@ IO
 
 Tranche with always remains due principal = 0.
 
+Typically, the rate will used ``refBalance`` to define how interest is being calculated.
+
 .. versionadded:: 0.43.0
 
 .. code-block:: python
@@ -2302,7 +2304,7 @@ Tranche with always remains due principal = 0.
            ,"originBalance":0.0
            ,"originRate":0.00
            ,"startDate":"2020-01-03"
-           ,"rateType":{"fix":0.0}  
+           ,"rateType":("refBalance",("*",("bondBalance","A","B"), 0.3) ,{"Fixed":0.06})
            ,"bondType":"IO"})
 
 Bond Group
