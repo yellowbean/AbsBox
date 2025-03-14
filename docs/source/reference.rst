@@ -243,11 +243,33 @@ Run Request
 
 For user who has a strong curiosity in `Hastructure` webservice interface, user can use `build_run_deal_req()` to get a json request in string.
 
+The string includes: 
+
+* deal objects 
+* pool performance assumptions
+* deal run assumptions
+
 This trick is useful to understand how `Hastructure` API work and integration with `Hastructure` directly.
 
 .. code-block:: python 
 
   api.build_run_deal_req(....)
+
+
+Make the JSON more readable
+"""""""""""""""""""""""""""""""
+
+The JSON reprensentation is targeting with `Servant/Aeson` in Haskell.
+It's is well design while if you want to protect your eyeball, you can try with read it in Python, there is a built-in function in `absbox` can help you a little built-in.
+
+.. code-block:: python
+
+  from absbox import readAeson
+
+  json_string = api.build_run_deal_req(...)
+
+  readAeson(json_string)
+
 
 
 How to evaluate the model built with `Absbox`?
