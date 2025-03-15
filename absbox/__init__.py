@@ -6,7 +6,7 @@ if (sys.version_info.major >= 3 and sys.version_info.minor < 10):
 from absbox.client import API, Endpoints, EnginePath, PickApiFrom,LIBRARY
 from absbox.local.util import guess_pool_flow_header, unifyTs, mkTbl, readAeson
 from absbox.local.base import *
-from absbox.local.cmp import comp_engines
+from absbox.local.cmp import compResult
 from absbox.local.china import 信贷ABS, SPV
 from absbox.local.generic import Generic
 from absbox.deal import mkDeal, mkDealsBy, setDealsBy, prodDealsBy, setAssumpsBy, prodAssumpsBy

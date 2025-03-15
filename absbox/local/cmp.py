@@ -22,7 +22,7 @@ def compResult(r1:dict, r2:dict, names=("Left", "Right")):
             if pd.api.types.is_numeric_dtype(cmp[column][nameA]) and pd.api.types.is_numeric_dtype(cmp[column][nameB]):
                 result[column, 'diff'] = cmp[column][nameA].fillna(0) - cmp[column][nameB].fillna(0)
         #return result.sort_index(axis=1,level=1)
-        return result.reindex(axis=1, level=1, labels=[nameA, nameB, 'diff'])
+        return result.reindex(axis=1, level=1, labels=[nameA, nameB, 'diff']).sort_index(axis=1,level=0)
 
     # r1 -> Left
     # r2 -> Right

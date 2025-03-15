@@ -105,11 +105,8 @@ class LibraryEndpoints(str, enum.Enum):
     Query = "query"
     Run = "run" # run a deal from the library
     Add = "add" # add new deal to library
+    Cmd = "cmd" # add new deal to library
     Get = "get" # get deal from library
-    # Data = "data"
-    # DataList = "data/list"
-    # DealFetch = "deal/fetch"
-    # ReportFetch = "data/report"
 
 
 class LibraryPath(str, enum.Enum):
@@ -181,7 +178,7 @@ def PickApiFrom(Apilist:list,**kwargs):
     if len(r)>0: 
         return API(r[0],**kwargs)
     else:
-        raise AbsboxError(f"❌{MsgColor.Error.value}No valid API found in list match current lib version {libVersion}, from list:{apiResps}")
+        raise AbsboxError(f"❌ No valid API found in list match current lib version {libVersion}, from list:{apiResps}")
 
 
 @dataclass
@@ -226,7 +223,7 @@ class API:
         else:
             self.url = isValidUrl(self.url).rstrip("/")
             
-        console.print(f"{MsgColor.Info.value}Connecting engine server -> {self.url}")
+        console.print(f" Connecting engine server -> {self.url}")
         
         if self.lang not in ["chinese", "english"]:
             raise AbsboxError(f"❌Invalid language:{self.lang}, only support 'chinese' or 'english' ")
@@ -373,7 +370,7 @@ class API:
         """        
 
         if (not isinstance(poolAssump, tuple)) and (poolAssump is not None):
-            raise AbsboxError(f"❌{MsgColor.Error.value} poolAssump should be a tuple but got {type(poolAssump)}")
+            raise AbsboxError(f"❌ poolAssump should be a tuple but got {type(poolAssump)}")
 
 
         # if run req is a multi-scenario run
@@ -391,9 +388,9 @@ class API:
 
         if result is None or 'error' in result or 'Left' in result:
             leftVal = result.get("Left","")
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
         result = result['Right']
-        rawWarnMsg = map( lambda x:f"{MsgColor.Warning.value}{x['contents']}", filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg)))
+        rawWarnMsg = map( lambda x:f" {x['contents']}", filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg)))
         if rawWarnMsg and showWarning:
             console.print("Warning Message from server:\n"+"\n".join(list(rawWarnMsg)))
 
@@ -439,11 +436,11 @@ class API:
 
         if result is None or 'error' in result or "Left" in set(tz.concat([ _.keys() for _ in result.values()])):
             leftVal = { k:v['Left'] for k,v in result.items() if "Left" in v }
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
         
         result = tz.valmap(lambda x:x['Right'] ,result)
 
-        rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
+        rawWarnMsgByScen = {k: [f" {_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
         rawWarnMsg = list(tz.concat(rawWarnMsgByScen.values()))
         
         if showWarning and len(rawWarnMsg)>0:
@@ -982,7 +979,7 @@ class LIBRARY:
             ,"name": d.name
             ,"version": p.get("version",0)
             ,"period": p.get("period",0)
-            ,"stage": p.get("stage","")
+            ,"stage": p.get("stage","draft")
             ,"comment": p.get("comment","")
             ,"permission": p.get("permission","700")
             ,"tags": p.get("tags",[])
@@ -997,6 +994,16 @@ class LIBRARY:
 
 
         console.print(f"✅ add success with deal id={r['dealId']}, name={r['name']}")
+
+    def cmd(self, p):
+        if not hasattr(self, "token"):
+            raise AbsboxError(f"❌ No token found, please call login() to login")
+
+        deal_library_url = self.url+f"/{LibraryEndpoints.Cmd.value}"
+
+        r = self._send_req(pickle.dumps(p), deal_library_url,headers={"Authorization": f"Bearer {self.token}"} )
+
+        return r
 
     def get(self, q):
         if not hasattr(self, "token"):
@@ -1042,13 +1049,14 @@ class LIBRARY:
         r = self._send_req(bRunReq, deal_library_url
                             , headers={"Authorization": f"Bearer {self.token}"
                                         ,"Content-Type":"application/octet-stream"})
-        
+        if 'error' in r:
+            raise AbsboxError(f"❌ error from server:{r['error']}")
         try:
             result = r['result']
             runInfo = tz.dissoc(r, 'result')
-            console.print(f"✅ run success with deal")
+            console.print(f"✅ run success with deal: {runInfo['deal']['name']}|{runInfo['deal']['id']}")
         except Exception as e:
-            raise AbsboxError(f"❌ message from API server:{result},\n,{e}")
+            raise AbsboxError(f"❌ message from API server:\n,{e}")
         try:       
             if read and isinstance(result, list):
                 return (runInfo, Generic.read(result))
@@ -1058,6 +1066,38 @@ class LIBRARY:
                 return (runInfo, result)
         except Exception as e:
             raise AbsboxError(f"❌ Failed to read result with error = {e}")
+
+#    def batch(self, runInputs, **p):
+#        """ run multiple deals with assumptions, return a map with deal name with id """
+#        
+#        if not hasattr(self, "token"):
+#            raise AbsboxError(f"❌ No token found, please call login() to login")
+#        
+#        deal_library_url = self.url+f"/{LibraryEndpoints.BatchRun.value}"
+#        read = p.get("read", True)
+#
+#        r = self._send_req(bRunReq, deal_library_url
+#                            , headers={"Authorization": f"Bearer {self.token}"
+#                                        ,"Content-Type":"application/octet-stream"})
+#        
+#        try:
+#            result = r['result']
+#            runInfo = tz.dissoc(r, 'result')
+#            console.print(f"✅ run success with deal")
+#        except Exception as e:
+#            raise AbsboxError(f"❌ message from API server:{result},\n,{e}")
+#        try:       
+#            if read and isinstance(result, list):
+#                return (runInfo, Generic.read(result))
+#            elif read and isinstance(result, dict):
+#                return (runInfo, tz.valmap(Generic.read, result))
+#            else:
+#                return (runInfo, result)
+#        except Exception as e:
+#            raise AbsboxError(f"❌ Failed to read result with error = {e}")
+
+
+
 
     def _send_req(self, _req, _url: str, timeout=10, headers={})-> dict | None:
         """generic function send request to server

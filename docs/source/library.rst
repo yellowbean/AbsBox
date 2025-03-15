@@ -17,7 +17,7 @@ User can access the ``Deal Library`` through the component from ``absbox``.
 Self host & Cloud host
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 There is a public ``Deal Library`` instance hosted on the cloud. 
-User can also host his/her own instance of the ``Deal Library`` on own server with commerial terms.
+User can also host his/her own instance of the ``Deal Library`` on own server with commerial terms ( check with :ref:`Email & Slack`).
 
 
 Tutorial

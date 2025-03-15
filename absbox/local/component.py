@@ -1065,7 +1065,7 @@ def mkAction(x:list):
                                           , earlyReturnNone(mkDs, mbal)
                                           , earlyReturnNone(mkDsRate, mrate)]))
         case ["计提利息", *bndNames] | ["calcInt", *bndNames]:
-            return mkTag(("CalcBondInt", [vList(bndNames, str)]))
+            return mkTag(("CalcBondInt", vList(bndNames, str)))
         case ["计提支付费用", source, target, m] | ["calcAndPayFee", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("CalcAndPayFee", [l, vStr(source), vList(target, str), s]))
