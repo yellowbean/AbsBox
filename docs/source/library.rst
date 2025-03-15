@@ -107,3 +107,10 @@ The ``run()`` will return a tuple of two elements:
 
 * Left value -> the run information (engine used, deal used)
 * Right value -> exact the same output as the one in ``absbox`` API instance.
+
+Notebook
+""""""""""""
+
+.. seealso::
+
+    :ref:`Library Example`

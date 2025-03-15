@@ -983,6 +983,7 @@ class LIBRARY:
             ,"comment": p.get("comment","")
             ,"permission": p.get("permission","700")
             ,"tags": p.get("tags",[])
+            ,"group": p.get("group","")
         }
 
         bData = pickle.dumps(data)
@@ -1066,36 +1067,6 @@ class LIBRARY:
                 return (runInfo, result)
         except Exception as e:
             raise AbsboxError(f"❌ Failed to read result with error = {e}")
-
-#    def batch(self, runInputs, **p):
-#        """ run multiple deals with assumptions, return a map with deal name with id """
-#        
-#        if not hasattr(self, "token"):
-#            raise AbsboxError(f"❌ No token found, please call login() to login")
-#        
-#        deal_library_url = self.url+f"/{LibraryEndpoints.BatchRun.value}"
-#        read = p.get("read", True)
-#
-#        r = self._send_req(bRunReq, deal_library_url
-#                            , headers={"Authorization": f"Bearer {self.token}"
-#                                        ,"Content-Type":"application/octet-stream"})
-#        
-#        try:
-#            result = r['result']
-#            runInfo = tz.dissoc(r, 'result')
-#            console.print(f"✅ run success with deal")
-#        except Exception as e:
-#            raise AbsboxError(f"❌ message from API server:{result},\n,{e}")
-#        try:       
-#            if read and isinstance(result, list):
-#                return (runInfo, Generic.read(result))
-#            elif read and isinstance(result, dict):
-#                return (runInfo, tz.valmap(Generic.read, result))
-#            else:
-#                return (runInfo, result)
-#        except Exception as e:
-#            raise AbsboxError(f"❌ Failed to read result with error = {e}")
-
 
 
 
