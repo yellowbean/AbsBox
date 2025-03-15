@@ -164,9 +164,7 @@
         {
           "tag": "CalcBondInt",
           "contents": [
-            [
-              "A1"
-            ]
+            "A1"
           ]
         },
         {
