@@ -31,7 +31,7 @@ VERSION_NUM = version("absbox")
 urllib3.disable_warnings()
 console = Console()
 
-__all__ = ["API", "Endpoints", "RunReqType", "RunResp", "MsgColor", "LibraryEndpoints","EnginePath"]
+__all__ = ["API", "Endpoints", "RunReqType", "RunResp","LibraryEndpoints","EnginePath"]
 
 
 class Endpoints(str, enum.Enum):
@@ -89,13 +89,6 @@ class RunResp(int, enum.Enum):
     DealResp = 0
     PoolResp = 1
     LogResp = 2
-
-
-class MsgColor(str, enum.Enum):
-    Warning = "[bold yellow]"
-    Error = "[bold red]"
-    Success = "[bold green]"
-    Info = "[bold magenta]"
 
 
 class LibraryEndpoints(str, enum.Enum):
@@ -490,7 +483,7 @@ class API:
         
         if result is None or 'error' in result or "Left" in set(tz.concat([ _.keys() for _ in result.values()])):
             leftVal = { k:v['Left'] for k,v in result.items() if "Left" in v }
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
         
         result = tz.valmap(lambda x:x['Right'] ,result)
 
@@ -516,7 +509,7 @@ class API:
         """
 
         if (not isinstance(poolAssump, tuple)) and (poolAssump is not None):
-            raise AbsboxError(f"❌{MsgColor.Error.value} poolAssump should be a tuple but got {type(poolAssump)}")
+            raise AbsboxError(f"❌ poolAssump should be a tuple but got {type(poolAssump)}")
 
         url = f"{self.url}/{Endpoints.RunPool.value}"
 
@@ -529,7 +522,7 @@ class API:
 
         if result is None or 'error' in result or 'Left' in result:
             leftVal = result.get("Left","")
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
         result = result['Right']
         
         if read:
@@ -572,7 +565,7 @@ class API:
 
         if result is None or 'error' in result or "Left" in set(tz.concat([ _.keys() for _ in result.values()])):
             leftVal = { k:v['Left'] for k,v in result.items() if "Left" in v }
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
 
         result = tz.valmap(lambda x:x['Right'] ,result)
         
@@ -615,11 +608,11 @@ class API:
 
         if result is None or 'error' in result or "Left" in set(tz.concat([ _.keys() for _ in result.values()])):
             leftVal = { k:v['Left'] for k,v in result.items() if "Left" in v }
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
 
         result = tz.valmap(lambda x:x['Right'] ,result)
 
-        rawWarnMsgByScen = {k: [f"{MsgColor.Warning.value}{_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
+        rawWarnMsgByScen = {k: [f" {_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
         rawWarnMsg = list(tz.concat(rawWarnMsgByScen.values()))
         
         if showWarning and len(rawWarnMsg)>0:
@@ -654,10 +647,10 @@ class API:
         url = f"{self.url}/{Endpoints.RunByCombo.value}"
 
         if len(dealMap) == 0:
-            raise AbsboxError(f"❌{MsgColor.Error.value}No deals found in dealMap,at least one deal is required")
+            raise AbsboxError(f"❌ No deals found in dealMap,at least one deal is required")
 
         if "^" in " ".join(tz.concatv(dealMap.keys(),poolAssump.keys(),runAssump.keys())):
-            raise AbsboxError(f"❌{MsgColor.Error.value}Deal name should not contain '^' ")
+            raise AbsboxError(f"❌ Deal name should not contain '^' ")
 
         req = self.build_run_deal_req("CS", dealMap, poolAssump, runAssump)
 
@@ -668,13 +661,13 @@ class API:
 
         if result is None or 'error' in result or "Left" in set(tz.concat([ _.keys() for _ in result.values()])):
             leftVal = { k:v['Left'] for k,v in result.items() if "Left" in v }
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
 
         result = tz.valmap(lambda x:x['Right'] ,result)
 
         assert isinstance(result, dict), f"Result should be a dict but got {type(result)}, {result}"
 
-        rawWarnMsgByScen = {"^".join(k): [f"{MsgColor.Warning.value}{_['contents']}" 
+        rawWarnMsgByScen = {"^".join(k): [f" {_['contents']}" 
                                 for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] 
                                     for k, v in result.items()}
 
@@ -708,7 +701,7 @@ class API:
         """
 
         if (poolAssump is None):
-            raise AbsboxError(f"❌{MsgColor.Error.value} poolAssump must be set for first loss run")
+            raise AbsboxError(f"❌ poolAssump must be set for first loss run")
 
         url = f"{self.url}/{Endpoints.RunRootFinder.value}"
 
@@ -721,7 +714,7 @@ class API:
 
         if result is None or 'error' in result or 'Left' in result:
             leftVal = result.get("Left","")
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
 
         if read:
             return readAeson(result['Right'])
@@ -753,7 +746,7 @@ class API:
 
         if result is None or 'error' in result or 'Left' in result:
             leftVal = result.get("Left","")
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
         if read:
             return readAeson(result['Right'])
         else:
@@ -807,7 +800,7 @@ class API:
 
         if result is None or 'error' in result or 'Left' in result:
             leftVal = result.get("Left","")
-            raise AbsboxError(f"❌{MsgColor.Error.value}Failed to get response from run: {leftVal}")
+            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
         
         result = result['Right']
         if read:
