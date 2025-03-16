@@ -1,1 +1,0 @@
-remove plot_by_scenario()/pyspecter
