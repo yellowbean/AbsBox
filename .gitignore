@@ -128,7 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-*.ipynb
 pyabs/*.ipynb
 .idea/aws.xml
 .idea/git_toolbox_prj.xml
@@ -145,3 +144,4 @@ bin/
 etc/jupyter/
 pyvenv.cfg
 share/
+publish.sh

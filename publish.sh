@@ -27,13 +27,21 @@ then
   echo "<PUBLISH> Failing on UT:Running"
   exit 3
 fi
+
+pytest absbox/tests/regression/main.py
+if [ $? -ne 0 ]
+then
+  echo "<PUBLISH> Failing on UT:Regression"
+  exit 3
+fi
+
 echo "Done with Running"
 
 
 # updating version on api version at Python packages
 echo "<PUBLISH> Update Version"
-# version = '0.6.1',
-# sed -i "s/version = .*/version = \'$2\',/g"  pyproject.toml
+
+
 sed -i "" -e "s/^version = .*/version = \"$2\"/g"  pyproject.toml
 sed -i "" -e "s/^version = .*/version = $2/g"  setup.cfg
 
@@ -50,16 +58,16 @@ then
   exit 4
 fi
 
-towncrier build --keep --yes --version $2
-
-if [ $? -ne 0 ]
-then
-  echo "<PUBLISH> Failed to consolidate change log"
-  exit 5
-else 
-  echo "<PUBLISH> Consolidated change log"
-  mv changes/*.rst _history_changes/
-fi
+# towncrier build --keep --yes --version $2
+# 
+# if [ $? -ne 0 ]
+# then
+#   echo "<PUBLISH> Failed to consolidate change log"
+#   exit 5
+# else 
+#   echo "<PUBLISH> Consolidated change log"
+#   mv changes/*.rst _history_changes/
+# fi
 
 
 
