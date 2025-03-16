@@ -100,7 +100,7 @@ def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注","应�
     return df.sort_index()
 
 
-def patchMissingIndex(df,idx:set):
+def patchMissingIndex(df,idx:set)-> pd.DataFrame:
     curIdx = set(df.index.values.tolist())
     missingIdx = idx - curIdx
     return df.reindex(df.index.values.tolist()+list(missingIdx)).sort_index()

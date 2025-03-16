@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import functools
 
-from absbox.local.util import mkTag,mapListValBy,mapValsBy,renameKs2\
+from absbox.local.util import mapListValBy,mapValsBy,renameKs2\
                               ,guess_pool_flow_header,positionFlow,mapNone\
                               ,isMixedDeal
 from absbox.local.util import earlyReturnNone,lmap                              
@@ -12,6 +12,7 @@ import numpy as np
 import collections
 from absbox.validation import vStr,vDate,vNum,vList,vBool,vFloat,vInt
 import toolz as tz
+from .interface import mkTag,readAeson
 
 def readBondStmt(respBond):
     match respBond:
@@ -108,8 +109,8 @@ class Generic:
                      , 'ledgers': ('ledgStmt', english_ledger_flow_fields_d, "")
                      }
         output = {}
-        output['_deal'] = resp[0]
-        deal_content = output['_deal']['contents']
+        output['_deal'] = readAeson(resp[0])
+        deal_content = resp[0]['contents']
 
         for comp_name, comp_v in read_paths.items():
             if deal_content[comp_name] is None:

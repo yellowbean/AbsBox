@@ -1,8 +1,11 @@
-from absbox.local.util import mkTag, mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
+from absbox.local.util import mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
 from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
 from absbox.local.util import filter_by_tags, enumVals, lmap, readTagMap, patchDicts,updateKs
 from absbox.local.base import *
+
+
+from .interface import mkTag
 
 import sys
 

@@ -36,14 +36,6 @@ def runYieldTable(api, d, bondName:str, p_assumps: dict, b_assumps: dict):
 run_yield_table = runYieldTable
 
 
-def sum_fields_to_field(df: pd.DataFrame, cols: list, col: str):
-    """Sum up a list of columns and attach to dataframe, reutrn with a copy
-    """
-    assert isinstance(cols, list), "columns to be sum up must be a list"
-    assert isinstance(col, str), "result column must be a string"
-    return df.assign(col=df[cols].sum(axis=1))
-
-
 def flow_by_scenario(rs, flowpath, node="col", rtn_df=True, ax=1, rnd=2):
     "pull flows from multiple scenario"
     r = None

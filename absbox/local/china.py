@@ -13,6 +13,7 @@ from absbox.local.base import *
 from absbox.local.util import *
 from absbox.local.component import *
 from absbox.deal import isMixedDeal
+from .interface import mkTag
 
 def readBondStmt(respBond):
     match respBond:

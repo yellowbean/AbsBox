@@ -24,12 +24,6 @@ def flat(xss) -> list:
     return reduce(lambda xs, ys: xs + ys, xss)
 
 
-def mkTag(x: tuple | str) -> dict:
-    match x:
-        case (tagName, tagValue):
-            return {"tag": tagName, "contents": tagValue}
-        case (tagName):
-            return {"tag": tagName}
 
 
 def filter_by_tags(xs: list, tags: list) -> list:
@@ -452,38 +446,6 @@ def patchDicts(dict1:dict,dict2:dict)-> dict:
     return tz.merge_with(lambda xs: xs[1] if len(xs)==2 else xs[0] ,dict1 ,dict2)
 
 
-def readAeson(x:dict):
-    match x:
-        case {"tag": tag,"contents": contents} if isinstance(contents,list):
-            return {tag: [readAeson(c) for c in contents]}
-        case {"tag": tag,"contents": contents} if isinstance(contents,dict):
-            return {tag: {k: readAeson(v) for k,v in contents.items()} }            
-        case {"tag": tag,"contents": contents} if isinstance(contents,str):
-            return {tag: contents}   
-        case {"tag": tag, **kwargs} if len(kwargs)>1 :
-            return {k: readAeson(v) for k,v in kwargs.items()} | {"tag": tag}
-        case {"tag": tag} if isinstance(tag,str):
-            return tag   
-        case {'numerator': n,'denominator': de}:
-            return (n/de)
-        case x if isinstance(x,dict):
-            return {k:readAeson(_x) for k,_x in x.items()}
-        case x if isinstance(x,list):
-            return [readAeson(_x) for _x in x]
-        case n if isinstance(n,float) or isinstance(n,int):
-            return n
-        case m if isinstance(m, dict):
-            return {k: readAeson(v) for k,v in m.items() }
-        case s if isinstance(s, str):
-            return s
-        case None:
-            return None
-        case {}:
-            return {}
-        case s if isinstance(s,str):
-            return s
-        case _:
-            raise RuntimeError("failed to match",x)
 
 def getNumCols(df:pd.DataFrame)-> list:
     numeric_columns = [col for col in df.columns if pd.to_numeric(df[col], errors='coerce').notna().all()]
