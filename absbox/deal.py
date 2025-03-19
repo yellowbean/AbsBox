@@ -1,11 +1,13 @@
-from absbox.local.generic import * 
-from absbox.local.component import * 
-from absbox.local.util import * 
 from rich.console import Console
 from lenses import lens
 import toolz as tz
 from itertools import product
 import dataclasses
+
+#from .local.generic import Generic
+from .local.component import * 
+from .local.util import * 
+from .local.generic import Generic
 
 console = Console()
 

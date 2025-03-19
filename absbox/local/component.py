@@ -128,7 +128,8 @@ def mkDate(x):
                 "DistributionDates":mkDatePattern(bf),
                 "CollectionDates":mkDatePattern(pf),
             }
-            return mkTag(("GenericDates",m))
+            y = mkTag(("GenericDates",m))
+            return y
         case {"封包日": a, "起息日": b, "首次兑付日": c, "法定到期日": d, "收款频率": pf, "付款频率": bf} | \
                 {"cutoff": a, "closing": b, "firstPay": c, "stated": d, "poolFreq": pf, "payFreq": bf} if (not "cust" in x):
             firstCollection = x.get("首次归集日", b)
@@ -613,7 +614,7 @@ def mkAcc(an, x=None):
 
 def mkBondType(x):
     match x:
-        case {"PAC":schedule,"IfOustanding":bns}:
+        case {"PAC":schedule,"anchorBonds":bns}:
             return mkTag(("PacAnchor", [mkTag(("BalanceCurve", schedule)), vList(bns, str)]))
         case {"固定摊还": schedule} | {"PAC": schedule}:
             return mkTag(("PAC", mkTag(("BalanceCurve", schedule))))

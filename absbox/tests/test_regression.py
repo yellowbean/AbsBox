@@ -5,10 +5,8 @@ import pprint as pp
 
 from absbox import API
 from absbox.local.china import 信贷ABS
-from absbox.local.util import mkTag
+from absbox.local.interface import mkTag
 import requests
-import pandas as pd
-import rich
 
 from jsondiff import diff
 from deepdiff import DeepDiff

@@ -2,40 +2,32 @@ import json, urllib3, getpass, enum, os, pickle
 from importlib.metadata import version
 from json.decoder import JSONDecodeError
 from dataclasses import dataclass
-from datetime import datetime
-
 import requests
-import pandas as pd
 from rich.console import Console
-from rich import print_json
-from schema import Schema
 import toolz as tz
 from lenses import lens
 
-from absbox.validation import isValidUrl, vStr
-from absbox.local.util import mapValsBy \
+from requests.exceptions import ConnectionError, ReadTimeout
+
+from .validation import isValidUrl
+from .local.util import mapValsBy \
                               , _read_cf, _read_asset_pricing, mergeStrWithDict \
                               , earlyReturnNone, searchByFst, filter_by_tags \
                               , enumVals, lmap, inferPoolTypeFromAst, getValWithKs, mapNone\
                               
-from absbox.local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkLiqMethod \
+from .local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkLiqMethod \
                                    , mkAssetUnion, mkRateAssumption, mkDatePattern, mkPoolType
 
-from absbox.local.base import ValidationMsg
-from absbox.local.china import SPV
-from absbox.local.generic import Generic
-
-
-
-from requests.exceptions import ConnectionError, ReadTimeout
+from .local.base import ValidationMsg
 from .exception import AbsboxError, VersionMismatch, EngineError
-from .local.interface import mkTag,readAeson
+from .local.interface import mkTag, readAeson
 
 VERSION_NUM = version("absbox")
 urllib3.disable_warnings()
 console = Console()
 
-__all__ = ["API", "Endpoints", "RunReqType", "RunResp","LibraryEndpoints","EnginePath"]
+__all__ = ["API", "Endpoints", "RunReqType", "RunResp"
+           , "LibraryEndpoints", "EnginePath"]
 
 
 class Endpoints(str, enum.Enum):
@@ -110,9 +102,7 @@ class EnginePath(str, enum.Enum):
     """ USE_ENV (str): Use environment variable (`ABSBOX_SERVER`) for engine path """
 
 
-
-
-def PickApiFrom(Apilist:list,**kwargs):
+def PickApiFrom(Apilist:list, **kwargs):
     """ Auto init API instance from a list of API urls with version check
 
     :param Apilist: list of API urls
@@ -125,8 +115,8 @@ def PickApiFrom(Apilist:list,**kwargs):
         except Exception as e:
             return ("Error",e)
 
-    _,libVersion,_ = VERSION_NUM.split(".")
-    
+    _, libVersion, _ = VERSION_NUM.split(".")
+
     apiResps = [{"url":api,"resp":pingApi(api)} for api in Apilist ]
     validApis = tz.pipe(apiResps
                     ,lambda apis: list(filter(lambda x:"Error" not in x['resp'],apis))
@@ -150,7 +140,7 @@ class API:
     :return: API instance
     :rtype: API
     """
-    
+
     url: str
     """url of engine server"""
     lang: str = "english"
@@ -184,9 +174,9 @@ class API:
                 self.url = isValidUrl(urlInEnv).rstrip("/")
         else:
             self.url = isValidUrl(self.url).rstrip("/")
-            
+
         console.print(f" Connecting engine server -> {self.url}")
-        
+
         if self.lang not in ["chinese", "english"]:
             raise AbsboxError(f"❌Invalid language:{self.lang}, only support 'chinese' or 'english' ")
 
@@ -206,7 +196,7 @@ class API:
 
     def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=[]) -> str:
         """build run deal requests: (single run, multi-scenario run, multi-struct run) 2
-        
+
         :meta private:
         :param run_type: type of run request, RunReqType.Single.value, RunReqType.MultiScenarios.value, RunReqType.MultiStructs.value
         :type run_type: str
@@ -311,7 +301,7 @@ class API:
             runAssump=[],
             read=True,
             showWarning=True,
-            debug=False) -> dict :
+            debug=False) -> dict:
         """ run deal with pool and deal run assumptions
 
         :param deal: a deal object
@@ -329,7 +319,7 @@ class API:
         :return: result of run, a dict of dataframe if `read` is True.
         :rtype: dict
 
-        """        
+        """
 
         if (not isinstance(poolAssump, tuple)) and (poolAssump is not None):
             raise AbsboxError(f"❌ poolAssump should be a tuple but got {type(poolAssump)}")
@@ -342,17 +332,14 @@ class API:
         req = self.build_run_deal_req("Single", deal, poolAssump, runAssump)
         if debug:
             return req
-        # branching with pricing
-        if runAssump is None or searchByFst(runAssump, "pricing") is None:
-            result = self._send_req(req, url)
-        else:
-            result = self._send_req(req, url, timeout=30)
+
+        result = self._send_req(req, url)
 
         if result is None or 'error' in result or 'Left' in result:
             leftVal = result.get("Left","")
             raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
         result = result['Right']
-        rawWarnMsg = map( lambda x:f" {x['contents']}", filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg)))
+        rawWarnMsg = map(lambda x:f" {x['contents']}", filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg)))
         if rawWarnMsg and showWarning:
             console.print("Warning Message from server:\n"+"\n".join(list(rawWarnMsg)))
 
@@ -813,11 +800,11 @@ class API:
             if self.session:
                 r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
             else:
-                raise AbsboxError(f"❌: None type for session")
+                raise AbsboxError("❌: None type for session")
         except (ConnectionRefusedError, ConnectionError):
             raise AbsboxError(f"❌ Failed to talk to server {_url}")
         except ReadTimeout:
-            raise AbsboxError(f"❌ Failed to get response from server")
+            raise AbsboxError("❌ Failed to get response from server")
         if r.status_code != 200:
             raise EngineError(r)
         try:

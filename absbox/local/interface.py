@@ -3,7 +3,6 @@ from typing import List, Tuple
 from functools import lru_cache
 
 
-@lru_cache(maxsize=256)
 def mkTag(x: tuple | str) -> dict:
     match x:
         case (tagName, tagValue):
@@ -11,7 +10,6 @@ def mkTag(x: tuple | str) -> dict:
         case (tagName):
             return {"tag": tagName}
 
-@lru_cache(maxsize=256)
 def readAeson(x:dict):
     match x:
         case {"tag": tag,"contents": contents} if isinstance(contents,list):
@@ -45,11 +43,9 @@ def readAeson(x:dict):
         case _:
             raise RuntimeError("failed to match",x)
 
-@lru_cache(maxsize=256)
 def toAeson(x:dict | tuple):
     pass
 
 
-@lru_cache(maxsize=256)
 def fromAeson(x:dict):
     pass

@@ -4,10 +4,10 @@ import toolz as tz
 import pytest
 import re, math
 
-from absbox.tests.regression.deals import *
-from absbox.tests.regression.assets import *
+from .deals import *
+from .assets import *
 
-from absbox import API,EnginePath,readInspect,PickApiFrom
+from absbox import API,EnginePath,readInspect,PickApiFrom,readBondsCf
 
 def closeTo(a,b,r=2):
     assert math.floor(a * 10**r)/10**r == math.floor(b * 10**r)/10**r
@@ -15,16 +15,19 @@ def closeTo(a,b,r=2):
 def filterTxn(rs, f, rg):
     return [ r for r in rs if re.match(rg, r[f])] 
 
+
 @pytest.fixture
 def setup_api():
-    api = API(EnginePath.DEV, check=False, lang='english')
+    api = API(EnginePath.LOCAL, check=False, lang='english')
     return api
+
 
 @pytest.mark.pool
 def test_01(setup_api):
     r = setup_api.run(test01 , read=True , runAssump = [])
     assert r['pool']['flow'].keys() == {"PoolConsol"}
     assert r['pool']['flow']['PoolConsol'].to_records()[0][0]== '2021-04-15'
+
 
 @pytest.mark.collect
 def test_collect_01(setup_api):
@@ -229,3 +232,28 @@ def test_irr_01(setup_api):
                 ,read=True)
     
     closeTo(r3['pricing']['summary'].loc["A1"].IRR, 0.12248, r=6)
+
+
+@pytest.mark.bond
+def test_pac_01(setup_api):
+    r = setup_api.run(pac01 , read=True , runAssump = [])
+    assert r['bonds']["A1"].loc["2021-07-26":"2021-11-20"].balance.to_list() == [800.0, 750.0, 700.0, 650.0, 572.71]
+
+
+@pytest.mark.bond
+def test_pac_02(setup_api):
+    r = setup_api.run(pac02 , read=True , runAssump = [])
+    assert r['bonds']["A1"].loc["2021-07-26":"2021-11-20"].balance.to_list() == [800.0, 750.0, 694.21, 617.05, 539.56] 
+
+
+@pytest.mark.bond
+def test_pac_03(setup_api):
+    r = setup_api.run(pac03 , read=True , runAssump = [])
+    groupBals = readBondsCf(r['bonds']).xs('balance',axis=1,level=2)[[("A","A1"),("A","A2")]].sum(axis=1).loc["2021-07-26":"2021-10-20"].to_list()
+    assert groupBals == [1050.0, 980.0, 915.0, 880.0]
+
+@pytest.mark.bond
+def test_pac_04(setup_api):
+    r = setup_api.run(pac04 , read=True , runAssump = [])
+    groupBals = readBondsCf(r['bonds']).xs('balance',axis=1,level=2)[[("A","A1"),("A","A2")]].sum(axis=1).loc["2021-07-26":"2021-12-20"].to_list() 
+    assert groupBals == [1050.0, 980.0, 915.0, 880.0, 850.0, 773.73]

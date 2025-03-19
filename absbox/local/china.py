@@ -7,12 +7,9 @@ import numpy as np
 from urllib.request import unquote
 from functools import reduce 
 import toolz as tz
-from absbox.local.base import *
-
-
-from absbox.local.util import *
-from absbox.local.component import *
-from absbox.deal import isMixedDeal
+from .base import *
+from .util import *
+from .component import *
 from .interface import mkTag
 
 def readBondStmt(respBond):
