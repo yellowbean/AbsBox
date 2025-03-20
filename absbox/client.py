@@ -22,6 +22,8 @@ from .local.base import ValidationMsg
 from .exception import AbsboxError, VersionMismatch, EngineError
 from .local.interface import mkTag, readAeson
 
+from library import LibraryPath
+
 VERSION_NUM = version("absbox")
 urllib3.disable_warnings()
 console = Console()
