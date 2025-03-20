@@ -2,67 +2,31 @@
   "tag": "MDeal",
   "contents": {
     "dates": {
-      "tag": "CustomDates",
+      "tag": "PreClosingDates",
       "contents": [
         "2021-02-28",
+        "2021-03-15",
+        null,
+        "2030-01-01",
         [
+          "2021-03-15",
           {
-            "tag": "PoolCollection",
-            "contents": [
-              "2021-04-02",
-              ""
-            ]
-          },
-          {
-            "tag": "PoolCollection",
+            "tag": "CustomDate",
             "contents": [
               "2021-05-26",
-              ""
-            ]
-          },
-          {
-            "tag": "PoolCollection",
-            "contents": [
               "2021-06-26",
-              ""
-            ]
-          },
-          {
-            "tag": "PoolCollection",
-            "contents": [
-              "2022-01-26",
-              ""
+              "2022-01-26"
             ]
           }
         ],
-        "2021-03-15",
         [
+          "2021-04-15",
           {
-            "tag": "RunWaterfall",
-            "contents": [
-              "2021-04-15",
-              ""
-            ]
-          },
-          {
-            "tag": "RunWaterfall",
+            "tag": "CustomDate",
             "contents": [
               "2021-05-26",
-              ""
-            ]
-          },
-          {
-            "tag": "RunWaterfall",
-            "contents": [
               "2021-07-26",
-              ""
-            ]
-          },
-          {
-            "tag": "RunWaterfall",
-            "contents": [
-              "2022-03-26",
-              ""
+              "2022-03-26"
             ]
           }
         ]
@@ -255,7 +219,7 @@
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDate": null
       }
     },
     "accounts": {
@@ -302,6 +266,7 @@
       }
     ],
     "rateSwap": null,
+    "rateCap": null,
     "currencySwap": null,
     "custom": null,
     "triggers": null,

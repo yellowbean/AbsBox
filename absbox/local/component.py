@@ -1,23 +1,21 @@
-from absbox.local.util import mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
-from absbox.local.util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
-from absbox.local.util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
-from absbox.local.util import filter_by_tags, enumVals, lmap, readTagMap, patchDicts,updateKs
-from absbox.local.base import *
-
-
-from .interface import mkTag
-
-import sys
-
-from absbox.validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple, vListOfList
-from schema import Or
 from enum import Enum
 import itertools
+import sys
 import functools
 import logging
 import toolz as tz
 from lenses import lens
 import pandas as pd
+from schema import Or
+
+from .interface import mkTag
+from .util import mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
+from .util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
+from .util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
+from .util import filter_by_tags, enumVals, lmap, readTagMap, patchDicts,updateKs
+from .base import *
+
+from ..validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple, vListOfList
 
 numVal = Or(float,int)
 
@@ -44,7 +42,7 @@ def mkDatePattern(x):
             return mkTag(("DayOfMonth", vInt(_d)))
         case ["MonthDayOfYear", _m, _d] | ["每年", _m, _d] | ("每年", _m, _d):
             return mkTag(("MonthDayOfYear",[vInt(_m), vInt(_d)]))
-        case ["CustomDate", *_ds]:
+        case ["CustomDate", *_ds] | ["Custom", *_ds] :
             return mkTag(("CustomDate", _ds))
         case ["EveryNMonth", d, n]:
             return mkTag(("EveryNMonth", [vDate(d), vInt(n)]))
@@ -92,7 +90,7 @@ def getStartDate(x:dict) -> tuple:
 
 
 def mkDate(x):
-    ''' make date component for deal '''
+    ''' make dates component for deal '''
     match x:
         case {"cutoff": a, "closing": b, "firstPay": c,"firstCollect": d, "stated": e, "poolFreq": pf, "payFreq": bf, "cust":cust} if isinstance(cust, dict):
             custom = {f"CustomExeDates {k}":mkDatePattern(v) for k,v in cust.items()}
@@ -146,10 +144,7 @@ def mkDate(x):
                                             [vDate(np), mkDatePattern(bf)]]))
         case {"回款日": cdays, "分配日": ddays, "封包日": cutoffDate, "起息日": closingDate} | \
                 {"poolCollection": cdays, "distirbution": ddays, "cutoff": cutoffDate, "closing": closingDate}:
-            return mkTag(("CustomDates", [cutoffDate
-                                        , [mkTag(("PoolCollection", [cd, ""])) for cd in cdays]
-                                        , closingDate
-                                        , [mkTag(("RunWaterfall", [dd, ""])) for dd in ddays]]))
+            raise RuntimeError("Deprecated")
         case _:
             raise RuntimeError(f"Failed to match:{x} in Dates but got: {x.keys()}")
 

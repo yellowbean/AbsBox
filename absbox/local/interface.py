@@ -1,6 +1,5 @@
 from collections import namedtuple
 from typing import List, Tuple
-from functools import lru_cache
 
 
 def mkTag(x: tuple | str) -> dict:

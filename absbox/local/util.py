@@ -1,11 +1,12 @@
 import pandas as pd
 import functools,json,copy,logging,re,itertools
 from functools import reduce
-from absbox.local.base import *
 from datetime import datetime
 from lenses import lens,ui, optics
 import toolz as tz
 
+from .base import *
+from .interface import mkTag
 
 def mapNone(x, v):
     ''' return a default value if x is None, other wise, return x '''

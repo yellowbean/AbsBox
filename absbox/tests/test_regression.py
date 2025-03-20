@@ -1,18 +1,11 @@
-import os,pickle,sys,json,csv,logging
+import os,json,logging
 from json.decoder import JSONDecodeError
 import importlib
-import pprint as pp
-
-from absbox import API
-from absbox.local.china import 信贷ABS
-from absbox.local.interface import mkTag
 import requests
-
-from jsondiff import diff
+import pprint as pp
 from deepdiff import DeepDiff
 
-import absbox.tests.benchmark.us as us
-import absbox.tests.benchmark.china as cn
+from absbox.local.interface import mkTag
 
 
 this_file = os.path.dirname(__file__)
@@ -32,7 +25,6 @@ def read_test_cases():
         file_paths = [r.rstrip() for r in rs if not r.startswith("#") ]
         for file_path in file_paths:
             country,test_num,deal_var_name = file_path.split(",")
-
             deal_path = os.path.join(test_folder,"benchmark",country,test_num)
             spec = importlib.util.spec_from_file_location("runner", deal_path)
             module = importlib.util.module_from_spec(spec)
@@ -107,9 +99,7 @@ def run_deal(input_folder, pair):
                     print(nonPerfInput)
                 else:
                     nonPerfInput = {}
-                req = mkTag(("SingleRunReq", [json.load(dq) 
-                                              , json.load(sq)
-                                              , nonPerfInput])) 
+                req = mkTag(("SingleRunReq", [json.load(dq), json.load(sq), nonPerfInput])) 
                 print("build req done")
                 hdrs = {'Content-type': 'application/json', 'Accept': '*/*'}
                 tresp = None
