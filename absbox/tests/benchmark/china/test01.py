@@ -1,4 +1,4 @@
-from .. import SPV
+from absbox import SPV
 
 test01 = SPV(
     "Senior/Junior"
