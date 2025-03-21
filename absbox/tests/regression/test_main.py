@@ -2,12 +2,15 @@ import pandas as pd
 from lenses import lens
 import toolz as tz
 import pytest
-import re, math
+import re, math, json
+from pathlib import Path
 
 from .deals import *
 from .assets import *
 
 from absbox import API,EnginePath,readInspect,PickApiFrom,readBondsCf
+
+config_file_path = Path(__file__).resolve().parent.parent / 'config.json'
 
 def closeTo(a,b,r=2):
     assert math.floor(a * 10**r)/10**r == math.floor(b * 10**r)/10**r
@@ -18,7 +21,9 @@ def filterTxn(rs, f, rg):
 
 @pytest.fixture
 def setup_api():
-    api = API(EnginePath.LOCAL, check=False, lang='english')
+    with config_file_path.open('r') as config_file:
+        config = json.load(config_file)
+    api = API(config['test_server'], check=False, lang='english')
     return api
 
 

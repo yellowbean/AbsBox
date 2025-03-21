@@ -35,7 +35,6 @@ dependencies = [
     "schema",
     "htpy",
     "dateparser",
-    "pyxirr",
     "more-itertools",
     "xlsxwriter"
 ]
@@ -65,7 +64,6 @@ testpaths = [
     "docs/source/nbsample"
 ]
 
-pythonpath = "/Users/xiaoyu/Projects/PyABS"
 
 [project.optional-dependencies]
 test = [
