@@ -1,4 +1,4 @@
-from absbox import SPV
+from absbox.local.china import SPV
 
 gy = SPV(
     "工元乐居2021年第七期"

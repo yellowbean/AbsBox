@@ -1,4 +1,4 @@
-from absbox import SPV
+from absbox.local.china import SPV
 
 JY_RMBS_01 = SPV(
     "建元"

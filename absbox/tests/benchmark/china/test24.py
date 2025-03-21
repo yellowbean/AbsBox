@@ -1,4 +1,4 @@
-from absbox import SPV
+from absbox.local.china import SPV
 
 德宝天元202301 = SPV(
     "德宝天元之信2023年第一期个人汽车抵押贷款资产支持证券"

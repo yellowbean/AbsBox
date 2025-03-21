@@ -1,4 +1,4 @@
-from absbox import SPV
+from absbox.local.china import SPV
 
 test01 = SPV(
     "自定义费用"

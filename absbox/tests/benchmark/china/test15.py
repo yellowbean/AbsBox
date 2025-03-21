@@ -1,4 +1,4 @@
-from absbox import SPV
+from absbox.local.china import SPV
 # 合格投资 暂时不参与分配 
 test01 = SPV(
     "速利银丰中国 2021 年第一期个人汽车抵押贷款支持证券信托"

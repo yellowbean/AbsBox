@@ -1,4 +1,4 @@
-from absbox import SPV
+from absbox.local.china import SPV
 
 JSD_AUTO_2022_3 = SPV(
     "吉时代2022年第三期个人汽车抵押贷款资产支持证券"

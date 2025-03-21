@@ -1,4 +1,4 @@
-from absbox import SPV
+from absbox.local.china import SPV
 
 BYD_AUTO_2021_2 = SPV(
     "盛世融迪2021年第二期个人汽车抵押贷款"

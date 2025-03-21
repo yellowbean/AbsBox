@@ -1,4 +1,4 @@
-from absbox import SPV
+from absbox.local.china import SPV
 
 YYJH01 = SPV(
     "邮元家和2022年第一期个人住房抵押贷款"

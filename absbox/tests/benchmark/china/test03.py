@@ -1,5 +1,5 @@
 # 分润模式
-from absbox import SPV
+from absbox.local.china import SPV
 
 test01 = SPV(
     "Split the residual"

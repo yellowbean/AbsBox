@@ -1,4 +1,4 @@
-from absbox import SPV
+from absbox.local.china import SPV
 
 test01 = SPV(
      "基于分段违约率的信用事件"

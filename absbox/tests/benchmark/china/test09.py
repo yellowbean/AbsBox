@@ -1,4 +1,4 @@
-from absbox import SPV
+from absbox.local.china import SPV
 
 test09 = SPV(
     "TEST09" 
