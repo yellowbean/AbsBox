@@ -2,10 +2,9 @@ import pandas as pd
 import toolz as tz
 from lenses import lens
 import enum
-from absbox.validation import vInt, vDate, vFloat, vBool
-from absbox.validation import vDict, vList, vStr, vNum
-from absbox import unifyTs
-from absbox.local.util import getNumCols
+from ..validation import vInt, vDate, vFloat, vBool
+from ..validation import vDict, vList, vStr, vNum
+from .util import unifyTs,getNumCols
 
 
 def readToCf(xs, header=None, idx=None, sort_index=False) -> pd.DataFrame:

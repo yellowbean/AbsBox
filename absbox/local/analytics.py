@@ -1,8 +1,6 @@
 import pandas as pd 
-from pyxirr import xirr
-from absbox.local.base import china_bondflow_fields_s, english_bondflow_fields_s,english_bondflow_cash,china_bondflow_cash
-from absbox.validation import vStr
-import numpy as np
+from .base import china_bondflow_fields_s, english_bondflow_fields_s,english_bondflow_cash,china_bondflow_cash
+from ..validation import vStr
 from toolz import get_in
 
 def runYieldTable(api, d, bondName:str, p_assumps: dict, b_assumps: dict):

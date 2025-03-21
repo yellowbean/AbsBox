@@ -1,5 +1,5 @@
 import enum 
-from absbox.local.util import *
+from .util import *
 
 china_date = "日期"
 english_date = "Date"

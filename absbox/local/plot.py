@@ -1,14 +1,13 @@
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
-from absbox.local.util import guess_locale
-#from itertools import reduce
 from functools import reduce
 import numpy as np
 import pandas as pd
 import toolz as tz
 import logging
-from absbox.local.base import china_cumStats, english_cumStats,english_non_balance_flow,china_non_balance_flow
-from absbox import readFlowsByScenarios
+from .base import china_cumStats, english_cumStats,english_non_balance_flow,china_non_balance_flow
+from .util import guess_locale
+from .cf import readFlowsByScenarios
 
 """
  chinese character issue.

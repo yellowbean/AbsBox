@@ -2,7 +2,7 @@ import pandas as pd
 import functools,json,copy,logging,re,itertools
 from functools import reduce
 from datetime import datetime
-from lenses import lens,ui, optics
+from lenses import lens, ui, optics
 import toolz as tz
 
 from .base import *

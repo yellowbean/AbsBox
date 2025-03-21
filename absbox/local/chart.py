@@ -1,4 +1,4 @@
-from absbox.local.util import getValWithKs
+from .util import getValWithKs
 
 def viz(x):
     """ visualized the waterfall (experiment) """

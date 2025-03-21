@@ -4,9 +4,8 @@ import pandas as pd
 import json, enum, os, pathlib, re
 from htpy import body, h1, head, html, li, title, ul, div, span, h3, h2, a, h4,h5, h6
 from markupsafe import Markup
-from absbox import readInspect
-from absbox import readBondsCf,readFeesCf,readAccsCf,readPoolsCf,readLedgers,readTriggers
-import xlsxwriter
+from .local.cf import readInspect
+from .local.cf import readBondsCf,readFeesCf,readAccsCf,readPoolsCf,readLedgers,readTriggers
 
 class OutputType(int, enum.Enum):
     """Internal
