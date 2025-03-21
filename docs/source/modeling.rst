@@ -189,7 +189,7 @@ DatePattern
 * ``["Weekday",0]`` -> Every Sunday
 * ``["MonthDayOfYear",M,D]`` -> Every a day of the year , like Feb 14 on every year during the projection
 * ``["DayOfMonth",M]`` -> A day of the month , like 15 on each month during the projectionh
-* ``["CustomDate","YYYY-MM-DD1","YYYY-MM-DD2"]`` -> a series of user defined dates
+* ``["CustomDate","YYYY-MM-DD1","YYYY-MM-DD2"]`` | ``["Custom","YYYY-MM-DD1","YYYY-MM-DD2"]`` -> a series of user defined dates
 * ``["EveryNMonth","YYYY-MM-DD",N]`` -> a seriers day starts with "YYYY-MM-DD", then every other N months afterwards
 
 Composite ``<DatePattern>``
@@ -753,7 +753,7 @@ Examples:
 
 Custom Defined Dates(for payment holiday)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-User are free to feed in a series of custom defined pool collection date / bond payment dates to accomodate holidays etc.
+User are free to feed in a series of custom defined pool collection date / bond payment dates to accommodate holidays etc.
 
 .. code-block:: python
 
