@@ -1,4 +1,4 @@
-from absbox.local.china import Generic
+from absbox.local.generic import Generic
 
 test01 = Generic(
     "Custom Pay Dates"
