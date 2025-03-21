@@ -28,10 +28,9 @@ def mkDeal(x:dict, preCheck=True):
     pool = getValWithKs(x, ['pool', "collateral", "资产池"])
 
     bonds = list((bn,bo)
-                for bn,bo in getValWithKs(x
-                                         , ['bond', "bonds", "notes", "债券", "支持证券"]).items())
+                for bn,bo in getValWithKs(x, ['bond', "bonds", "notes", "债券", "支持证券"]).items())
     assert bonds is not None, f"bonds shouldn't be None"
-                      
+
     waterfall = getValWithKs(x, ['waterfall', "现金流分配", "分配规则"])
     assert waterfall is not None, f"waterfall shouldn't be None"
     
@@ -39,8 +38,8 @@ def mkDeal(x:dict, preCheck=True):
     assert collection is not None , f"collection shouldn't be None"
 
     liqFacility = getValWithKs(x, ['liqFacility', 'liqProvider', "insurance"
-                                  ,"cashAdvance", "liquidity", "流动性支持"
-                                  , "流动性提供方", "增信方", "担保"], defaultReturn=None)
+                                    ,"cashAdvance", "liquidity", "流动性支持"
+                                    , "流动性提供方", "增信方", "担保"], defaultReturn=None)
     
     rateSwap = getValWithKs(x, ['rateSwap','rateSwaps', "IRSwap", "利率互换"])
     
@@ -112,3 +111,6 @@ def prodAssumpsBy(a, *receipes, **kwargs):
     inflated = [[(p, _) for _ in vs] for (p, vs) in receipes]
     permus = product(*inflated)
     return {str(v): setAssumpsBy(a, *v, **kwargs) for v in permus}
+
+
+
