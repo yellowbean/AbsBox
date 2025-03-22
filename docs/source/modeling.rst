@@ -847,9 +847,14 @@ Fee/Expenses
 syntax
   ``({fee name} , {fee description} )``, fees fall into types below :
 
+  Required fields in ``{fee description}``:
+  
+  * ``"type"`` -> fee type, see :ref:`Fee Type`
+  * ``"feeStart"`` ->  the date fee start to become effective
+
+
   Optional fields in ``{fee description}``:
 
-  * ``"feeStart"`` ->  the date fee start to become effective
   * ``"feeDueDate"`` -> the date when due amount was calculated 
   * ``"feeDue"`` ->    total oustanding due amount 
   * ``"feeLastPaidDate"`` -> the date when last paid
