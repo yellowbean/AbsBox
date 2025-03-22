@@ -19,6 +19,8 @@ console = Console()
 
 from .validation import vStr
 
+__all__ = ["LibraryEndpoints",]
+
 class LibraryEndpoints(str, enum.Enum):
     """Endpoints for deal library"""
     Ack = "ack"
