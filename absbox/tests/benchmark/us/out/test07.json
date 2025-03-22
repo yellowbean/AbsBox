@@ -1416,11 +1416,11 @@
             }
           ]
         },
-        "feeStart": "2023-04-07",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDate": null
+        "feeLastPaidDate": null,
+        "feeStart": "2023-04-07"
       },
       "bmwFee": {
         "feeName": "bmwFee",
@@ -1428,11 +1428,11 @@
           "tag": "FixFee",
           "contents": 0
         },
-        "feeStart": "2023-04-07",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDate": null
+        "feeLastPaidDate": null,
+        "feeStart": "2021-04-07"
       },
       "admFee": {
         "feeName": "admFee",
@@ -1445,11 +1445,11 @@
             15000
           ]
         },
-        "feeStart": "2023-04-07",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDate": null
+        "feeLastPaidDate": null,
+        "feeStart": "2021-04-07"
       }
     },
     "accounts": {

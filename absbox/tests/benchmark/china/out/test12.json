@@ -6321,11 +6321,11 @@
             }
           ]
         },
-        "feeStart": "2022-09-26",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2022-09-26"
       },
       "\u670d\u52a1\u5546\u8d39\u7528": {
         "feeName": "\u670d\u52a1\u5546\u8d39\u7528",
@@ -6342,11 +6342,11 @@
             }
           ]
         },
-        "feeStart": "2022-09-26",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2022-09-26"
       },
       "\u62a5\u9500": {
         "feeName": "\u62a5\u9500",
@@ -6359,11 +6359,11 @@
             600
           ]
         },
-        "feeStart": "2022-09-26",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2022-09-26"
       }
     },
     "accounts": {

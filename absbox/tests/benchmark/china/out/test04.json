@@ -367,11 +367,11 @@
             }
           ]
         },
-        "feeStart": "2022-10-02",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2022-10-02"
       },
       "\u670d\u52a1\u5546\u8d39\u7528": {
         "feeName": "\u670d\u52a1\u5546\u8d39\u7528",
@@ -388,11 +388,11 @@
             }
           ]
         },
-        "feeStart": "2022-10-02",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2022-10-02"
       }
     },
     "accounts": {

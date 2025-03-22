@@ -365,11 +365,11 @@
             }
           ]
         },
-        "feeStart": "2021-10-15",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2021-10-15"
       },
       "\u670d\u52a1\u5546\u8d39\u7528": {
         "feeName": "\u670d\u52a1\u5546\u8d39\u7528",
@@ -386,11 +386,11 @@
             }
           ]
         },
-        "feeStart": "2021-10-15",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2021-10-15"
       },
       "\u6267\u884c\u8d39\u7528": {
         "feeName": "\u6267\u884c\u8d39\u7528",
@@ -403,11 +403,11 @@
             599
           ]
         },
-        "feeStart": "2021-10-15",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2021-10-15"
       }
     },
     "accounts": {

@@ -1445,11 +1445,11 @@
             }
           ]
         },
-        "feeStart": "2023-04-07",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2023-04-07"
       },
       "\u5b9d\u9a6c\u91d1\u878d": {
         "feeName": "\u5b9d\u9a6c\u91d1\u878d",
@@ -1457,11 +1457,11 @@
           "tag": "FixFee",
           "contents": 0
         },
-        "feeStart": "2023-04-07",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2023-04-07"
       },
       "\u6267\u884c\u8d39\u7528": {
         "feeName": "\u6267\u884c\u8d39\u7528",
@@ -1474,11 +1474,11 @@
             15000
           ]
         },
-        "feeStart": "2023-04-07",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2023-04-07"
       }
     },
     "accounts": {

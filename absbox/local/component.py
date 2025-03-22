@@ -7,18 +7,20 @@ import toolz as tz
 from lenses import lens
 import pandas as pd
 from schema import Or
+from rich.console import Console
+
 
 from .interface import mkTag
 from .util import mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
 from .util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from .util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
-from .util import filter_by_tags, enumVals, lmap, readTagMap, patchDicts,updateKs
+from .util import filter_by_tags, enumVals, lmap, readTagMap, patchDicts,updateKs, ensureKeysInMap
 from .base import *
 
 from ..validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple, vListOfList
 
 numVal = Or(float,int)
-
+console = Console()
 
 def mkLiq(x):
     ''' make pricing method '''
@@ -2101,10 +2103,11 @@ def mkLiqProviderType(x):
         case {}:
             return mkTag(("UnLimit"))
         case _:
-            raise RuntimeError(f"Failed to match LiqProvider Type：{x}")
+            raise RuntimeError(f"Failed to match LiqProvider Type:{x}")
         
 
 def mkLiqProvider(n: str, x: dict):
+    ensureKeysInMap(x,["start",],msg="Init liquidity provider")
     x_transformed = renameKs(x,[("已提供","liqBalance"),("应付利息","liqDueInt"),("应付费用","liqDuePremium")
                                 ,("利率","liqRate"),("费率","liqPremiumRate"),("记录","liqStmt")
                                 ,("name","liqName"),("type","liqType")
@@ -2114,7 +2117,8 @@ def mkLiqProvider(n: str, x: dict):
                                 ,("rateType","liqRateType"),("feeType","liqPremiumRateType")
                                 ,("dueIntDate","liqDueIntDate")
                                 ,("balance","liqBalance")
-                                ,("end","liqEnds"),("start","liqStart")
+                                ,("end","liqEnds")
+                                ,("start","liqStart")
                                 ,("stmt","liqStmt")
                                 ,("creditCalc","liqCreditCalc")
                                 ]
@@ -2200,15 +2204,20 @@ def mkCollection(x):
             raise RuntimeError(f"Failed to match collection rule {x}")
 
 
-def mkFee(x,fsDate=None):
+def mkFee(x):
     match x :
         case {"name":fn, "type": feeType, **fi}:
-            opt_fields = subMap(fi, [("feeStart",fsDate),("feeDueDate",None),("feeDue",0),
-                                    ("feeArrears",0),("feeLastPaidDate",None)])
+            if "feeStart" not in fi:
+                raise RuntimeError("feeStart not found in fee:after version 0.45.x fee must to include field feeStart")
+            opt_fields = subMap(fi, [("feeDueDate",None),("feeDue",0),
+                                    ("feeArrears",0),("feeLastPaidDate",None),
+                                    ("feeStart",None)])
             return  {"feeName": vStr(fn), "feeType": mkFeeType(feeType)} | opt_fields
         case {"名称":fn , "类型": feeType, **fi}:
-            opt_fields = subMap2(fi, [("起算日","feeStart",fsDate),("计算日","feeDueDate",None),("应计费用","feeDue",0),
-                                      ("拖欠","feeArrears",0),("上次缴付日期","feeLastPaidDay",None)])
+            print("fee info", fi)
+            opt_fields = subMap2(fi, [("计算日","feeDueDate",None),("应计费用","feeDue",0),
+                                      ("拖欠","feeArrears",0),("上次缴付日期","feeLastPaidDay",None),
+                                      ("起始日","feeStart",None)])
             return  {"feeName": vStr(fn), "feeType": mkFeeType(feeType)} | opt_fields
         case _:
             raise RuntimeError(f"Failed to match fee: {x}")
@@ -2243,7 +2252,6 @@ def mkIrrType(x):
             return mkTag(("BuyBond", [vDate(d), mkBondPricingMethod(bondPricing), mkTradeType(tradeType), None]))
         case _:
             raise RuntimeError(f"Failed to match irrType: {x}")
-
 
 
 def mkPricingAssump(x):

@@ -64,7 +64,7 @@ class Generic:
             "pool":mkPoolType(lastAssetDate, self.pool, mixedAssetFlag),
             "bonds": {bn: mkBndComp(bn, bo) for (bn, bo) in self.bonds},
             "waterfall": mkWaterfall({},self.waterfall.copy()),  
-            "fees": {fn: mkFee(fo|{"name": fn}, fsDate = lastCloseDate) for (fn, fo) in self.fees},
+            "fees": {fn: mkFee(fo|{"name": fn}) for (fn, fo) in self.fees},
             "accounts": {an:mkAcc(an, ao) for (an, ao) in self.accounts},
             "collects": lmap(mkCollection, self.collection),
             "rateSwap": tz.valmap(mkRateSwap, self.rateSwap) if self.rateSwap else None,
@@ -72,7 +72,7 @@ class Generic:
             "currencySwap":None ,
             "custom": tz.valmap(mkCustom, self.custom) if self.custom else None,
             "triggers": renameKs2({k: {_k: mkTrigger(_v) for (_k,_v) in v.items() } for (k, v) in self.trigger.items()},englishDealCycle) if self.trigger else None,
-            "liqProvider": {ln: mkLiqProvider(ln, lo | {"start":lastCloseDate} ) 
+            "liqProvider": {ln: mkLiqProvider(ln, lo) 
                             for ln,lo in self.liqFacility.items() } if self.liqFacility else None,
             "ledgers": {ln: mkLedger(ln, v) for ln,v in self.ledgers.items()} if self.ledgers else None,
             "stats": self.buildStats()

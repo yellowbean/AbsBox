@@ -908,11 +908,11 @@
             }
           ]
         },
-        "feeStart": "2022-09-30",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2022-09-30"
       },
       "\u4ee3\u7406\u652f\u4ed8\u8d39\u7528\u5229\u606f": {
         "feeName": "\u4ee3\u7406\u652f\u4ed8\u8d39\u7528\u5229\u606f",
@@ -931,11 +931,11 @@
             }
           ]
         },
-        "feeStart": "2022-09-30",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2022-09-30"
       },
       "\u4ee3\u7406\u652f\u4ed8\u8d39\u7528\u672c\u91d1": {
         "feeName": "\u4ee3\u7406\u652f\u4ed8\u8d39\u7528\u672c\u91d1",
@@ -954,11 +954,11 @@
             }
           ]
         },
-        "feeStart": "2022-09-30",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2022-09-30"
       },
       "\u8d37\u6b3e\u670d\u52a1\u8d39\u7528": {
         "feeName": "\u8d37\u6b3e\u670d\u52a1\u8d39\u7528",
@@ -975,11 +975,11 @@
             }
           ]
         },
-        "feeStart": "2022-09-30",
         "feeDueDate": "2022-09-29",
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2022-09-30"
       }
     },
     "accounts": {

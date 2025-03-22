@@ -232,11 +232,11 @@
           "tag": "FixFee",
           "contents": 25
         },
-        "feeStart": "2021-10-15",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2021-10-15"
       }
     },
     "accounts": {

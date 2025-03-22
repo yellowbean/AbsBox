@@ -215,11 +215,11 @@
             }
           ]
         },
-        "feeStart": "2021-03-15",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDate": null
+        "feeLastPaidDate": null,
+        "feeStart": "2021-03-15"
       }
     },
     "accounts": {

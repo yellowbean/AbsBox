@@ -36,13 +36,13 @@ GNMA_36208ALG4 = Generic(
       ,)
     ,(("Ginnie_Mae_guaranty",
        {"type":{"annualPctFee":[("poolBalance",),0.0006]}
-       ,"feeDueDate":"2023-04-26"}),
+       ,"feeDueDate":"2023-04-26","feeStart":"2023-05-26"}),
       ("service_fee",
        {"type":{"annualPctFee":[("poolBalance",)
                                 ,("Max"
                                   ,("substract",("poolWaRate",),("bondRate","A1"))
                                   ,("constant",0))]}
-       ,"feeDueDate":"2023-04-26"}))
+       ,"feeDueDate":"2023-04-26","feeStart":"2023-05-26"}))
     ,{"amortizing":[
          ["calcFee","Ginnie_Mae_guaranty","service_fee"]
          ,["payFee","acc01",['Ginnie_Mae_guaranty',"service_fee"]]

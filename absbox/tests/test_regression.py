@@ -4,7 +4,7 @@ import importlib
 import requests
 import pprint as pp
 from deepdiff import DeepDiff
-
+import pytest
 from absbox.local.interface import mkTag
 
 
@@ -38,7 +38,7 @@ def translate(d, folder, o):
     print(f"Translating>> {d} >> {o} ")
     benchfile = os.path.join(this_file, "benchmark", folder, "out", o)
     if not os.path.exists(benchfile) or os.stat(benchfile).st_size < 10 :
-        print(f"Skipping:{benchfile}")
+        print(">>>>> creating/rebuild <<<<<<")
         with open(benchfile, 'w', encoding='utf8') as newbench:
             try:
                 print(f"Writing new bench out case -> ")
@@ -49,6 +49,7 @@ def translate(d, folder, o):
             json.dump(d.json, newbench, indent=2)
         logging.info(f"Create new case for {o}")
     else:
+        print(">>>>> comparing <<<<<<")
         print(f"Comparing with benchmark file:{benchfile}")
         with open(benchfile, 'r') as ofile:
             try:
@@ -64,6 +65,7 @@ def translate(d, folder, o):
                 print(f"Error parsing json format:{benchfile}")
 
 
+@pytest.mark.dependency(name="test_translate")
 def test_translate():
     cases = read_test_cases()
 
@@ -127,7 +129,7 @@ def run_deal(input_folder, pair):
                         json.dump(s_result,wof,indent=2)
                     continue
                 with open(local_bench_file,'r') as eout: # expected output 
-                    print(f"reading resp for {local_bench_file}")
+                    print(f"reading benchmark resp for {local_bench_file}")
                     local_result = json.load(eout)
                     assert "Right" in local_result, f"{dinput}:Left error : {local_result['Left']}"
 
@@ -175,6 +177,7 @@ def run_deal(input_folder, pair):
                     print("Compare Done")
 
 
+@pytest.mark.dependency(depends=["test_translate"])
 def test_resp():
     pair = [("test01.json","mortgage_empty.json",None,"test01.out.json")
             ,("test02.json","mortgage_empty.json",None,"test02.out.json")

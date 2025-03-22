@@ -25,8 +25,6 @@ def flat(xss) -> list:
     return reduce(lambda xs, ys: xs + ys, xss)
 
 
-
-
 def filter_by_tags(xs: list, tags: list) -> list:
     ''' fiter a list of maps by tags'''
     tags_set = set(tags)
@@ -147,17 +145,30 @@ def guess_pool_locale(x):
         raise RuntimeError("Failed to match {x} in guess pool locale")
 
 
-def renameKs(m: dict, mapping, opt_key=False):
+def renameKs(_m: dict, mapping, opt_key=False):
     '''
     rename keys in a map with from a mapping tuple passed in 
     `opt_key` = True, allow skipping mapping tuple not exist in the map
     '''
+    m = _m.copy()
     for (o, n) in mapping:
         if opt_key and o not in m:
             continue
         m[n] = m[o]
         del m[o]
     return m
+
+
+def ensureKeysInMap(m: dict, ks: list, msg=""):
+    ''' Ensure keys in a map, if not found, add with None'''
+    missing = []
+    for k in ks:
+        if k not in m:
+            missing.append(k)
+    if missing:
+        raise RuntimeError(f"Missing keys in map:{missing}, not found in {m.keys()}, location:{msg}")
+    return m
+
 
 
 def subMap(m: dict, ks: list):
@@ -445,7 +456,6 @@ def patchDicts(dict1:dict,dict2:dict)-> dict:
     if key only exists in either one, use the only one value
     """
     return tz.merge_with(lambda xs: xs[1] if len(xs)==2 else xs[0] ,dict1 ,dict2)
-
 
 
 def getNumCols(df:pd.DataFrame)-> list:

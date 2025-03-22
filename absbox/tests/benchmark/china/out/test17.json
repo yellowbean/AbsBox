@@ -211,11 +211,11 @@
             ]
           }
         },
-        "feeStart": "2021-06-15",
         "feeDueDate": null,
         "feeDue": 0,
         "feeArrears": 0,
-        "feeLastPaidDay": null
+        "feeLastPaidDay": null,
+        "feeStart": "2021-06-15"
       }
     },
     "accounts": {
