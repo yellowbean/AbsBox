@@ -12,7 +12,6 @@ class EngineError(Exception):
         errorMsg = engineResp.text
         super().__init__(errorMsg)
 
-
 class AbsboxError(Exception):
     """Exception for error from absbox"""
     def __init__(self, errorMsg) -> None:

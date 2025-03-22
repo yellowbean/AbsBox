@@ -5,9 +5,19 @@ import pickle
 from rich.console import Console
 from rich import print_json
 import enum
-
+import getpass ,json
 import pandas as pd
 from .exception import *
+import requests
+
+from requests.exceptions import ReadTimeout
+from json import JSONDecodeError
+
+from .client import VERSION_NUM
+
+console = Console()
+
+from .validation import vStr
 
 class LibraryEndpoints(str, enum.Enum):
     """Endpoints for deal library"""
@@ -96,7 +106,7 @@ class LIBRARY:
         :type user: string
         """
         try:
-            pw = getpass.getpass()
+            pw = getpass.getpass(prompt=f"Enter your deal library password for {user}:")
             self.login(user, pw, **q)
         except Exception as e:
             raise AbsboxError(f"❌ Failed during library login {e}")

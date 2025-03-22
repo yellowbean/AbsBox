@@ -1,5 +1,4 @@
 from schema import Schema,Regex,Or
-import re
 
 from urllib.parse import urlparse
 

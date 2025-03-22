@@ -79,7 +79,6 @@ def readBondsCf(bMap, popColumns=["factor","memo","本金系数","备注","应�
         df = pd.concat(yyz,axis=1)
     else:
         bMap = filterCols(bMap, columns)
-        bondDf = bMap & lens.Recur(pd.DataFrame).collect()
         indexes = []
         cfFrame = []
         for k,v in bMap.items():
