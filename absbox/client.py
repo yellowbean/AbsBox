@@ -26,7 +26,7 @@ VERSION_NUM = version("absbox")
 urllib3.disable_warnings()
 console = Console()
 
-__all__ = ["API", "Endpoints", "RunReqType", "RunResp" , "LibraryEndpoints", "EnginePath"]
+__all__ = ["API", "Endpoints", "RunReqType", "RunResp" , "EnginePath"]
 
 
 class Endpoints(str, enum.Enum):
