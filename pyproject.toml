@@ -39,6 +39,9 @@ dependencies = [
     "xlsxwriter"
 ]
 
+[tool.setuptools.dynamic]
+version = {attr = "absbox.__version__"}
+
 keywords = ["cashflow", "abs", "mbs", "cashflow model", "rmbs" ,"clo", "cashflow engine","structuring", "srt"]
 
 [tool.setuptools.dynamic]

@@ -18,6 +18,9 @@ def closeTo(a,b,r=2):
 def filterTxn(rs, f, rg):
     return [ r for r in rs if re.match(rg, r[f])] 
 
+def listCloseTo(a,b,r=2):
+    assert len(a) == len(b), f"Length not match {len(a)} {len(b)}"
+    assert all([ closeTo(x,y,r)  for x,y in zip(a,b)]), f"List not match {a},{b}"
 
 @pytest.fixture
 def setup_api():
@@ -261,4 +264,4 @@ def test_pac_03(setup_api):
 def test_pac_04(setup_api):
     r = setup_api.run(pac04 , read=True , runAssump = [])
     groupBals = readBondsCf(r['bonds']).xs('balance',axis=1,level=2)[[("A","A1"),("A","A2")]].sum(axis=1).loc["2021-07-26":"2021-12-20"].to_list() 
-    assert groupBals == [1050.0, 980.0, 915.0, 880.0, 850.0, 773.73]
+    assert groupBals == [1050.0, 980.0, 915.0, 880.0, 850.0, 773.73], "Got"+str(groupBals)

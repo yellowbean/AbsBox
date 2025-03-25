@@ -1,4 +1,4 @@
-import json, urllib3, getpass, enum, os, pickle
+import json, getpass, enum, os, pickle
 from importlib.metadata import version
 from json.decoder import JSONDecodeError
 from dataclasses import dataclass
@@ -23,7 +23,6 @@ from .exception import AbsboxError, VersionMismatch, EngineError
 from .local.interface import mkTag, readAeson
 
 VERSION_NUM = version("absbox")
-urllib3.disable_warnings()
 console = Console()
 
 __all__ = ["API", "Endpoints", "RunReqType", "RunResp" , "EnginePath"]
