@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass
 from datetime import datetime
 import pickle
@@ -9,11 +8,13 @@ import getpass ,json
 import pandas as pd
 from .exception import *
 import requests
+import toolz as tz
 
 from requests.exceptions import ReadTimeout
 from json import JSONDecodeError
 
 from .client import VERSION_NUM
+from .local.generic import Generic
 
 console = Console()
 

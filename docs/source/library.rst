@@ -35,6 +35,16 @@ Connect to the ``Deal Library``
     library = LIBRARY("http://localhost:8082/api")
 
 
+.. note::
+
+    User can setup his/her own library in-house or use the public one hosted on the cloud.
+    The public one is available at ``LibraryPath``
+    
+    .. code-block:: python
+
+        from absbox import LibraryPath
+
+
 Confirm the connection
 """"""""""""""""""""""""
 

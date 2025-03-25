@@ -671,6 +671,8 @@ def mkBondRate(x:dict)->dict:
             return mkTag(("FloorRate", [mkBondRate(br), vNum(floor)]))
         case ("罚息", pRateInfo,bRateInfo) | ("withIntOverInt", pRateInfo, bRateInfo):
             return mkTag(("WithIoI", [mkBondRate(bRateInfo), mkBondIoItype(pRateInfo)]))
+        case None :
+            return mkTag(("Fix",[0, DC.DC_ACT_365F])) 
         case _:
             raise RuntimeError(f"Failed to match bond rate type:{x}")
 
