@@ -39,8 +39,6 @@ dependencies = [
     "xlsxwriter"
 ]
 
-[tool.setuptools.dynamic]
-version = "0.44.2"
 
 keywords = ["cashflow", "abs", "mbs", "cashflow model", "rmbs" ,"clo", "cashflow engine","structuring", "srt"]
 
