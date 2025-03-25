@@ -105,7 +105,7 @@ User can initiate a run request sending to server. The server will find ``Hastru
 
 <Run Type>
     Can be either :
-        * "S" -> Default,single run
+        * "S" -> Default,single run (Default)
         * "MC" -> Multiple pool assumption
         * "MRS" -> Multiple run assumption
         * "CS" -> Combo (multiple pool and run assumption)

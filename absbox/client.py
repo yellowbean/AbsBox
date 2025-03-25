@@ -294,6 +294,17 @@ class API:
 
         return json.dumps(r, ensure_ascii=False)
 
+    @staticmethod    
+    def _getWarningMsg(msgs, flag:bool) -> []:
+        """get warning message from server response
+        :return: list of warning messages
+        :rtype: list
+        """
+        if flag:
+            return [f"{x['contents']}" for x in filter_by_tags(msgs, enumVals(ValidationMsg))]
+        else:
+            return []
+
     def run(self, deal,
             poolAssump=None,
             runAssump=[],
@@ -337,9 +348,9 @@ class API:
             leftVal = result.get("Left","")
             raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
         result = result['Right']
-        rawWarnMsg = map(lambda x:f" {x['contents']}", filter_by_tags(result[RunResp.LogResp.value], enumVals(ValidationMsg)))
-        if rawWarnMsg and showWarning:
-            console.print("Warning Message from server:\n"+"\n".join(list(rawWarnMsg)))
+
+        if (wMsgs:=self._getWarningMsg(result[RunResp.LogResp.value], showWarning)):
+            console.print("Warning Message from server:"+"\n".join(wMsgs))
 
         if read:
             return deal.read(result)
@@ -387,11 +398,10 @@ class API:
         
         result = tz.valmap(lambda x:x['Right'] ,result)
 
-        rawWarnMsgByScen = {k: [f" {_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
-        rawWarnMsg = list(tz.concat(rawWarnMsgByScen.values()))
-        
-        if showWarning and len(rawWarnMsg)>0:
-            console.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
+        rawWarnMsgByScen = {k: _getWarningMsg(v[RunResp.LogResp.value],showWarning) for k, v in result.items()}
+        for scen, msgs in rawWarnMsgByScen.items():
+            if len(msgs)>0:
+                console.print(f"Warning Message from server for {scen}:"+"\n".join(msgs))
 
         if read:
             return tz.valmap(deal.read, result)
@@ -566,11 +576,10 @@ class API:
 
         result = tz.valmap(lambda x:x['Right'] ,result)
 
-        rawWarnMsgByScen = {k: [f" {_['contents']}" for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] for k, v in result.items()}
-        rawWarnMsg = list(tz.concat(rawWarnMsgByScen.values()))
-        
-        if showWarning and len(rawWarnMsg)>0:
-            console.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
+        rawWarnMsgByScen = {k: _getWarningMsg(v[RunResp.LogResp.value],showWarning) for k, v in result.items()}
+        for scen, msgs in rawWarnMsgByScen.items():
+            if len(msgs)>0:
+                console.print(f"Warning Message from server for {scen}:"+"\n".join(msgs))
 
         if read:
             return tz.valmap(deal.read, result)
@@ -621,14 +630,10 @@ class API:
 
         assert isinstance(result, dict), f"Result should be a dict but got {type(result)}, {result}"
 
-        rawWarnMsgByScen = {"^".join(k): [f" {_['contents']}" 
-                                for _ in filter_by_tags(v[RunResp.LogResp.value], enumVals(ValidationMsg))] 
-                                    for k, v in result.items()}
-
-        rawWarnMsg = list(tz.concat(rawWarnMsgByScen.values()))
-        
-        if showWarning and len(rawWarnMsg)>0:
-            console.print("Warning Message from server:\n"+"\n".join(rawWarnMsg))
+        rawWarnMsgByScen = {"^".join(k): _getWarningMsg(v[RunResp.LogResp.value],showWarning) for k, v in result.items()}
+        for scen, msgs in rawWarnMsgByScen.items():
+            if len(msgs)>0:
+                console.print(f"Warning Message from server for {scen}:"+"\n".join(msgs))
 
         if read:
             return {
