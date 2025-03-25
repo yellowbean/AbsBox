@@ -41,6 +41,10 @@ dependencies = [
 
 keywords = ["cashflow", "abs", "mbs", "cashflow model", "rmbs" ,"clo", "cashflow engine","structuring", "srt"]
 
+[tool.setuptools.dynamic]
+version = {attr = "absbox.__version__"}
+
+
 [project.urls]
 homepage = "https://absbox.org"
 documentation = "https://absbox-doc.readthedocs.io/en/latest/"

@@ -197,10 +197,3 @@ def plot_bs(x, excludeItems=["FeeDue","IntAccrue","Account"]):
     ax.legend(loc='upper right')
     ax.set_ylim(0, max([highest_y1, highest_y2])*1.2)
     plt.show()
-
-
-def plot_oc(bsReport: pd.DataFrame, bnds: list):
-    assert isinstance(bsReport, pd.DataFrame), "input report is not a dataframe"
-    assert isinstance(bnds, list), "input bond name is not a list"
-    
-    return None
