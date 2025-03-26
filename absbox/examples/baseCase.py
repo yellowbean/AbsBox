@@ -118,8 +118,8 @@ test03 =  Generic(
              ,"rateType":{"Fixed":0.00}
              ,"bondType":{"Equity":None}
              }))
-    ,(("bondAdmFee",{"type":{"pctFee":[("bondBalance",),0.02]}})
-      ,("poolServFee",{"type":{"annualPctFee":[("poolBalance",),0.02]}}))
+    ,(("bondAdmFee",{"type":{"pctFee":[("bondBalance",),0.02]},"feeStart":"2021-04-01"})
+      ,("poolServFee",{"type":{"annualPctFee":[("poolBalance",),0.02]},"feeStart":"2021-04-01"}))
     ,{"amortizing":[
          ["calcAndPayFee","acc01",["bondAdmFee","poolServFee"]]
          ,["accrueAndPayInt","acc01",["A1"]]
@@ -168,8 +168,8 @@ test04 =  Generic(
              ,"rateType":{"Fixed":0.00}
              ,"bondType":{"Equity":None}
              }))
-    ,(("bondAdmFee",{"type":{"pctFee":[("bondBalance",),0.02]}})
-      ,("poolServFee",{"type":{"annualPctFee":[("poolBalance",),0.02]}}))
+    ,(("bondAdmFee",{"type":{"pctFee":[("bondBalance",),0.02]},"feeStart":"2021-09-20"})
+      ,("poolServFee",{"type":{"annualPctFee":[("poolBalance",),0.02]},"feeStart":"2021-09-20"}))
     ,{"amortizing":[
          ["calcAndPayFee","acc01",["bondAdmFee","poolServFee"]]
          ,["accrueAndPayInt","acc01",["A1"]]
