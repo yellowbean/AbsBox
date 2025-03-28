@@ -1394,10 +1394,6 @@ def mkWaterfall(r, x):
     r[_w_tag] = lmap(mkAction, _v)
     return mkWaterfall(r, x)
 
-def mkWaterfall2(x:dict):
-
-    return {}
-
 
 def mkRoundingType(x):
     match x:
@@ -1407,22 +1403,6 @@ def mkRoundingType(x):
             return mkTag(("RoundCeil", r))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkRoundingType")
-
-
-def mkAssetRate(x):
-    match x:
-        case ["固定", r] | ["fix", r]:
-            return mkTag(("Fix", r))
-        case ["浮动", r, {"基准": idx, "利差": spd, "重置频率": p} as m]:
-            _m = subMap(m, [("cap", None), ("floor", None), ("rounding", None)])
-            _m = applyFnToKey(_m, mkRoundingType, 'rounding')
-            return mkTag(("Floater", [idx, vNum(spd), vNum(r), mkDatePattern(p), _m['floor'], _m['cap'], _m['rounding']]))
-        case ["floater", r, {"index": idx, "spread": spd, "reset": p} as m]:
-            _m = subMap(m, [("cap", None), ("floor", None), ("rounding", None)])
-            _m = applyFnToKey(_m, mkRoundingType, 'rounding')
-            return mkTag(("Floater", [idx, vNum(spd), vNum(r), mkDatePattern(p), _m['floor'], _m['cap'], _m['rounding']]))
-        case _:
-            raise RuntimeError(f"Failed to match {x}:mkAssetRate")
 
 
 def mkAmortPlan(x) -> dict:
@@ -1467,7 +1447,7 @@ def mkAssetStatus(x):
         case "违约" | "Defaulted" | "defaulted":
             return mkTag(("Defaulted",None))
         case ("违约", d) | ("Defaulted", d) | ("defaulted", d):
-            return mkTag(("Defaulted", d))
+            return mkTag(("Defaulted", vDate(d)))
         case _:
             raise RuntimeError(f"Failed to match asset statuts {x}:mkAssetStatus")
 

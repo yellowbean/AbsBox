@@ -11,7 +11,9 @@ def compResult(r1:dict, r2:dict, names=("Left", "Right")):
     :type names: tuple, optional
     """
 
-    def compDf(x, y):
+    def compDf(x:pd.DataFrame, y:pd.DataFrame) -> pd.DataFrame:
+        """ Compare two dataframe ,return the dataframe with difference """ 
+
         (nameA,nameB) = names
         x, y = x.align(y, fill_value=pd.NA)
         cmp = x.compare(y, result_names=(nameA,nameB))
@@ -21,60 +23,51 @@ def compResult(r1:dict, r2:dict, names=("Left", "Right")):
                 result[column, 'diff'] = cmp[column][nameA].fillna(0) - cmp[column][nameB].fillna(0)
         return result.reindex(axis=1, level=1, labels=[nameA, nameB, 'diff']).sort_index(axis=1,level=0)
 
+    def cmpMap(x:dict, y:dict) -> dict:
+        """ compare two map with the same keys """
+        assert set(x.keys())==set(y.keys()), f"keys not match {x.keys()} vs {y.keys()}"
+        cmp = {}
+        for k,v in x.items():
+            assert isinstance(v, pd.DataFrame), f"expecting DataFrame, got {type(v)}"
+            assert isinstance(y[k], pd.DataFrame), f"expecting DataFrame, got {type(y[k])}"
+            if not v.equals(y[k]):
+                cmp[k] = compDf(v, y[k])
+            else:
+                cmp[k] = pd.DataFrame()
+        return cmp
+
     # r1 -> Left
     # r2 -> Right
     comp_result = {}
     # pool check
-    comp_result['pool'] = {}
-    for k,v in r1['pool']['flow'].items():
-        if not v.equals(r2['pool']['flow'][k]):
-            comp_result['pool'][k] = compDf(v, r2['pool']['flow'][k])
-        else:
-            comp_result['pool'] = True
+    comp_result['pools'] = cmpMap(r1['pool']['flow'], r2['pool']['flow'])
 
     # expense check  
-    comp_result['fees'] = {}
-    for fn, f in r1['fees'].items():
-        if not f.equals(r2['fees'][fn]):
-            comp_result['fees'][fn] = compDf(f, r2['fees'][fn])
-        else:
-            comp_result['fees'][fn] = True
+    comp_result['fees'] = cmpMap(r1['fees'], r2['fees'])
 
     # bond check
-    comp_result['bonds'] = {}
-    for fn, f in r1['bonds'].items():
-        if not f.equals(r2['bonds'][fn]):
-            comp_result['bonds'][fn] = compDf(f, r2['bonds'][fn])
-        else:
-            comp_result['bonds'][fn] = True
+    if all([ isinstance(_, pd.DataFrame) for _ in r1['bonds'].values()]) and all([ isinstance(_, pd.DataFrame) for _ in r2['bonds'].values()]):
+        comp_result['bonds'] = cmpMap(r1['bonds'], r2['bonds'])
+    else:
+        comp_result['bonds'] = {}
+        for k,v in r1['bonds'].items():
+            if isinstance(v, pd.DataFrame):
+                comp_result['bonds'][k] = compDf(v, r2['bonds'][k])
+            elif isinstance(v, dict):
+                assert isinstance(r2['bonds'][k], dict), f"expecting dict, got {type(r2['bonds'][k])}"
+                comp_result['bonds'][k] = cmpMap(v, r2['bonds'][k])
 
     # account check
-    comp_result['accounts'] = {}
-    for fn, f in r1['accounts'].items():
-        if not f.equals(r2['accounts'][fn]):
-            comp_result['accounts'][fn] = compDf(f, r2['accounts'][fn])
-        else:
-            comp_result['accounts'][fn] = True
+    comp_result['accounts'] = cmpMap(r1['accounts'], r2['accounts'])
 
     # ledger check 
-    comp_result['ledgers'] = {}
-    if 'ledgers' in r1:
-        for fn, f in r1['ledgers'].items():
-            if not f.equals(r2['ledgers'][fn]):
-                comp_result['ledgers'][fn] = compDf(f, r2['ledgers'][fn])
-            else:
-                comp_result['ledgers'][fn] = True
+    comp_result['ledgers'] = cmpMap(r1['ledgers'], r2['ledgers']) if 'ledgers' in r1 else {}
     
-    comp_result['triggers'] = {}
-    if 'triggers' in r1:
+    if 'triggers' in r1 and r1['triggers'] is not None:
+        comp_result['triggers'] = {}
         for locName, tMap in r1['triggers'].items() :
             if len(tMap) == 0:
                 continue
-            comp_result['triggers'][locName] = {}
-            for tn, t in tMap.items():
-                if not t.equals(r2['triggers'][locName][tn]):
-                    comp_result['trigger'][locName][tn] = compDf(t, r2['triggers'][locName][tn])
-                else:
-                    comp_result['trigger'][locName][tn] = True
-    
+            comp_result['triggers'][locName] = cmpMap(r1['triggers'][locName], r2['triggers'][locName])
+
     return comp_result
