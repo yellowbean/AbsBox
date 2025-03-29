@@ -409,7 +409,6 @@ pac01 = Generic(
     "Amortizing",
 )
 
-from absbox import Generic
 
 pac02 = Generic(
     "PAC 02",
@@ -681,6 +680,101 @@ pac04 = Generic(
             
             # ,["payPrin","acc01",["A1"]]
             ,
+            ["payIntResidual", "acc01", "B"],
+        ],
+    },
+    [["CollectedCash", "acc01"]],
+    None,
+    None,
+    None,
+    None,
+    "Amortizing",
+)
+
+
+bondGrp = Generic(
+    "Bond Group",
+    {
+        "lastCollect": "2021-03-01",
+        "lastPay": "2021-04-15",
+        "nextPay": "2021-07-26",
+        "nextCollect": "2021-04-28",
+        "payFreq": ["DayOfMonth", 20],
+        "poolFreq": "MonthEnd",
+        "stated": "2030-01-01",
+    },
+    {
+        "assets": [
+            [
+                "Mortgage",
+                {
+                    "originBalance": 2200,
+                    "originRate": ["fix", 0.045],
+                    "originTerm": 30,
+                    "freq": "Monthly",
+                    "type": "Level",
+                    "originDate": "2021-02-01",
+                },
+                {
+                    "currentBalance": 2200,
+                    "currentRate": 0.08,
+                    "remainTerm": 30,
+                    "status": "current",
+                },
+            ]
+        ]
+    },
+    (("acc01", {"balance": 0}),),
+    (
+        (
+            "A",
+            (
+                "bondGroup",
+                {
+                    "A1": {
+                        "balance": 1000,
+                        "rate": 0.07,
+                        "originBalance": 1000,
+                        "originRate": 0.07,
+                        "startDate": "2020-01-03",
+                        "rateType": ("fix", 0.08),
+                        "bondType": "Seq",
+                        "lastAccrueDate": "2021-04-15",
+                    },
+                    "A2": {
+                        "balance": 800,
+                        "rate": 0.07,
+                        "originBalance": 800,
+                        "originRate": 0.07,
+                        "startDate": "2020-01-03",
+                        "rateType": ("fix", 0.08),
+                        "bondType": "Seq",
+                        "lastAccrueDate": "2021-04-15",
+                    },
+                },
+            ),
+        ),
+        (
+            "B",
+            {
+                "balance": 1000,
+                "rate": 0.0,
+                "originBalance": 1000,
+                "originRate": 0.07,
+                "startDate": "2020-01-03",
+                "rateType": ("fix", 0.08),
+                "lastAccrueDate": "2021-04-15",
+                "bondType": "Equity",
+            },
+        ),
+    ),
+    tuple(),
+    {
+        "default": [
+            ["accrueAndPayIntByGroup", "acc01", "A", ("byName", "A2","A1")],
+            ["payPrinByGroup", "acc01", "A", ("byName", "A2","A1")],
+            ["accrueAndPayInt","acc01",["B"]],
+            ["payPrin","acc01",["B"]],
             ["payIntResidual", "acc01", "B"],
         ],
     },

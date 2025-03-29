@@ -265,3 +265,10 @@ def test_pac_04(setup_api):
     r = setup_api.run(pac04 , read=True , runAssump = [])
     groupBals = readBondsCf(r['bonds']).xs('balance',axis=1,level=2)[[("A","A1"),("A","A2")]].sum(axis=1).loc["2021-07-26":"2021-12-20"].to_list() 
     assert groupBals == [1050.0, 980.0, 915.0, 880.0, 850.0, 773.73], "Got"+str(groupBals)
+
+@pytest.mark.bond
+def test_bondGrp(setup_api):
+    r = setup_api.run(bondGrp , read=True , runAssump = [])
+    grpFlow = readBondsCf(r['bonds'])['A'].xs('balance',axis=1,level=1)
+    assert grpFlow.A1.to_list()[:8] == [100.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 993.93]
+    assert grpFlow.A2.to_list()[:8] == [510.6, 436.68, 364.06, 290.75, 217.26, 143.1, 68.74, 0.0,]
