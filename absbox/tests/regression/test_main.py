@@ -270,5 +270,5 @@ def test_pac_04(setup_api):
 def test_bondGrp(setup_api):
     r = setup_api.run(bondGrp , read=True , runAssump = [])
     grpFlow = readBondsCf(r['bonds'])['A'].xs('balance',axis=1,level=1)
-    assert grpFlow.A1.to_list()[:8] == [100.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 993.93]
+    assert grpFlow.A1.to_list()[:8] == [1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 993.93]
     assert grpFlow.A2.to_list()[:8] == [510.6, 436.68, 364.06, 290.75, 217.26, 143.1, 68.74, 0.0,]
