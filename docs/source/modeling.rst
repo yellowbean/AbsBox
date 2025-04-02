@@ -2164,12 +2164,13 @@ Principal
 ^^^^^^^^^^^
 there are 5 types of `Principal` for bonds/tranches
 
-  * ``Sequential``： can be paid down as much as its oustanding balance
-  * ``PAC``： Balance of bond can only be paid down by a predefined balance schedule
+  * ``Sequential``: can be paid down as much as its oustanding balance
+  * ``PAC``: Balance of bond can only be paid down by a predefined balance schedule
   * ``BalanceByPeriod``: Balance of bond can only be paid down by a predefined balance schedule ,indexed by bond paid period
-  * ``Lockout``： Principal won't be paid after lockout date
-  * ``Equity``：  No interest and shall serve as junior tranche
-  * ``IO``：  Interest Only tranche
+  * ``Lockout``: Principal won't be paid after lockout date
+  * ``Equity``:  No interest and shall serve as junior tranche
+  * ``IO``:  Interest Only tranche
+  * ``Z``:  only payable if other bonds are paid off
 
 Sequential 
 """""""""""""
