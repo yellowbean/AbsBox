@@ -138,6 +138,7 @@ def run_deal(input_folder, pair):
 
                     if local_result['Right'][1] != s_result['Right'][1]:
                         print(f"Pool Flow Is Not matching => {dinput}")
+                        print(f"Poo diff",DeepDiff(local_result['Right'][1], s_result['Right'][1]))
                         min_length = min([len(local_result['Right'][1]), len(s_result['Right'][1])])
                         for i in range(min_length):
                             if local_result['Right'][1][i] != s_result['Right'][1][i]:

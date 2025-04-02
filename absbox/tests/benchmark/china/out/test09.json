@@ -236,7 +236,7 @@
         "feeDue": 0,
         "feeArrears": 0,
         "feeLastPaidDay": null,
-        "feeStart": null
+        "feeStart": "2021-06-15"
       }
     },
     "accounts": {
