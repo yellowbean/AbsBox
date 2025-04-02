@@ -2185,10 +2185,11 @@ def mkFee(x):
                                     ("feeStart",None)])
             return  {"feeName": vStr(fn), "feeType": mkFeeType(feeType)} | opt_fields
         case {"名称":fn , "类型": feeType, **fi}:
-            print("fee info", fi)
             opt_fields = subMap2(fi, [("计算日","feeDueDate",None),("应计费用","feeDue",0),
                                       ("拖欠","feeArrears",0),("上次缴付日期","feeLastPaidDay",None),
                                       ("起始日","feeStart",None)])
+            if opt_fields["feeStart"] is None :
+                raise RuntimeError("feeStart not found in fee:after version 0.45.x fee must to include field feeStart")
             return  {"feeName": vStr(fn), "feeType": mkFeeType(feeType)} | opt_fields
         case _:
             raise RuntimeError(f"Failed to match fee: {x}")
