@@ -705,8 +705,8 @@ def mkBndComp(bn,bo):
             return mkTag(("BondGroup", [{k:mkBnd(k,v) for k,v in bndMap.items()}, mkBondType(pt)] ))
         case (bn, bnd) if itlookslikeaBond(bnd): # single bond
             return mkBnd(bn, bnd)
-        case (bondGroupName, bndMap) : # bond group
-            return mkTag(("BondGroup", {k:mkBnd(k,v) for k,v in bndMap.items() }))
+        case (bondGroupName, bndMap) if isinstance(bndMap ,dict) : # bond group
+            return mkTag(("BondGroup", [{k:mkBnd(k,v) for k,v in bndMap.items() }, None]))
         case _ :
             raise RuntimeError(f"Failed to match bond component")
 
@@ -741,7 +741,6 @@ def mkBnd(bn, x:dict):
     dueIntOverInt = getValWithKs(x, ["拖欠利息", "dueIntOverInt"], defaultReturn=0)
     mSt = getValWithKs(x, ["调息", "stepUp"], defaultReturn=None, mapping=mkStepUp)
     mTxns = getValWithKs(x, ["stmt", ], defaultReturn=None)
-    # mStmt = mkTag(("Statement", mkTxn("bond", mTxns))) if mTxns else None
     mStmt = mkTxn("bond", mTxns) if mTxns else None
     match x:
         case {"balance": bndBalance
@@ -766,8 +765,6 @@ def mkBnd(bn, x:dict):
                     ,"bndDueInts": dueInts
                     ,"bndDueIntOverInts": dueIntOverInts
                     ,"bndStmt": mStmt
-                    #,"bndDueIntDates": lastIntPayDate
-                    #,"bndLastPrinPay": 
                     ,"tag": "MultiIntBond"}
         case {"当前余额": bndBalance, "当前利率": bndRate, "初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
              {"balance": bndBalance, "rate": bndRate, "originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
@@ -810,23 +807,13 @@ def mkLiqMethod(x):
             raise RuntimeError(f"Failed to match {x}:mkLiqMethod")
 
 
-def mkAccountCapType(x):
-    match x:
-        case {"余额百分比": pct} | {"balPct": pct}:
-            return mkTag(("DuePct", vNum(pct)))
-        case {"金额上限": amt} | {"balCapAmt": amt}:
-            return mkTag(("DueCapAmt", vNum(amt)))
-        case _:
-            raise RuntimeError(f"Failed to match {x}:mkAccountCapType")
-
-
 def mkLimit(x:dict):
     match x:
-        case {"余额百分比": pct} | {"balPct": pct}:
+        case {"余额百分比": pct} | {"balPct": pct} | ("balPct", pct):
             return mkTag(("DuePct", vFloat(pct)))
-        case {"金额上限": amt} | {"balCapAmt": amt}:
+        case {"金额上限": amt} | {"balCapAmt": amt} | ("balCapAmt", amt):
             return mkTag(("DueCapAmt", vNum(amt)))
-        case {"公式": formula} | {"formula": formula} | {"DS": formula} | {"ds": formula}:
+        case {"公式": formula} | {"formula": formula} | {"DS": formula} | {"ds": formula} | ("ds", formula) | ("formula", formula):
             return mkTag(("DS", mkDs(formula)))
         case None:
             return None
@@ -836,22 +823,24 @@ def mkLimit(x:dict):
 
 def mkComment(x):
     match x:
-        case {"payInt": bns}:
+        case {"payInt": bns} | ("payInt", bns):
             return mkTag(("PayInt", bns))
-        case {"payYield": bn}:
+        case {"payYield": bn} | ("payYield", bn):
             return mkTag(("PayYield", bn))
-        case {"payPrin": bns}:
+        case {"payPrin": bns} | ("payPrin", bns):
             return mkTag(("PayPrin", bns))
-        case {"payGroupPrin": bns}:
+        case {"payGroupPrin": bns} | ("payGroupPrin", bns):
             return mkTag(("PayGroupPrin", bns))
-        case {"payGroupInt": bns}:
+        case {"payGroupInt": bns} | ("payGroupInt", bns):
             return mkTag(("PayGroupInt", bns))
-        case {"transfer": [a1, a2]}:
+        case {"transfer": [a1, a2]} | ("transfer", a1, a2):
             return mkTag(("Transfer", [a1, a2]))
-        case {"transfer": [a1, a2, limit]}:
+        case {"transfer": [a1, a2, limit]} | ("transfer", a1, a2, limit):
             return mkTag(("TransferBy", [a1, a2, limit]))
-        case {"direction": d}:
+        case {"direction": d} | ("txnDirection", d):
             return mkTag(("TxnDirection", d))
+        case _:
+            raise RuntimeError(f"Failed to match :{x}:mkComment")
 
 
 def mkLiqDrawType(x):
