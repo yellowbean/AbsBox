@@ -2121,6 +2121,18 @@ Combo Sensitivity Run
 
 In combination of above three.
 
+.. code-block:: python
+
+  r = localAPI.runByCombo({"A":test01,"B":test02}
+                          ,poolAssump={"ScenarioA":("Pool",("Mortgage",{"CDR":0.01},None,None,None)
+                                                                      ,None
+                                                                      ,None)
+                                      ,"ScenarioB":("Pool",("Mortgage",{"CDR":0.02},None,None,None)
+                                                                    ,None
+                                                                    ,None)}
+                          ,runAssump={"A":[("call",("poolBalance",200))]
+                                      ,"B":[("call",("poolBalance",500))]}
+                          ,read=True)
 
 
 Retriving Results
