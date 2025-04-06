@@ -246,18 +246,21 @@ class API:
                 _perfAssump = mkAssumpType(perfAssump)
                 _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
                 r = mkTag(("FirstLossReq", [(_deal, _perfAssump, _nonPerfAssump), bn]))
-            case ("MaxSpreadToFaceReq", (bn,bns)) :
+            case ("MaxSpreadToFaceReq", bn):
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = mkAssumpType(perfAssump)
                 _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
-                r = mkTag(("MaxSpreadToFaceReq", [(_deal, _perfAssump, _nonPerfAssump)
-                                                    , (bn,bns)]))
+                r = mkTag(("MaxSpreadToFaceReq", [(_deal, _perfAssump, _nonPerfAssump), bn]))
             case _:
                 raise RuntimeError(f"Failed to match run type:{run_type}")
+        
+        assert r is not None, f"Failed to build request for run type:{run_type}"
         try:
             return json.dumps(r, ensure_ascii=False)
         except TypeError as e:
             raise AbsboxError(f"❌Failed to convert request to json:{e}")
+
+        
 
     def build_pool_req(self, pool, poolAssump, rateAssumps, isMultiScenario=False) -> str:
         """build pool run request: (single run, multi-scenario run)
@@ -612,7 +615,7 @@ class API:
         if len(dealMap) == 0:
             raise AbsboxError(f"❌ No deals found in dealMap,at least one deal is required")
 
-        if "^" in " ".join(tz.concatv(dealMap.keys(),poolAssump.keys(),runAssump.keys())):
+        if "^" in " ".join(tz.concatv([str(_) for _ in dealMap.keys()],[str(_) for _ in poolAssump.keys()],[str(_) for _ in runAssump.keys()])):
             raise AbsboxError(f"❌ Deal name should not contain '^' ")
 
         req = self.build_run_deal_req("CS", dealMap, poolAssump, runAssump)
@@ -694,8 +697,8 @@ class API:
         url = f"{self.url}/{Endpoints.RunRootFinder.value}"
         req = None
         match p:
-            case ("maxSpreadToFace",deal,poolAssump,runAssump,(bn,bns),adj):
-                req = self.build_run_deal_req(("MaxSpreadToFaceReq",(bn,bns)), deal, poolAssump, runAssump)
+            case ("maxSpreadToFace",deal,poolAssump,runAssump,bn):
+                req = self.build_run_deal_req(("MaxSpreadToFaceReq",bn), deal, poolAssump, runAssump)
             case ("firstLoss",deal,poolAssump,runAssump,bn):
                 req = self.build_run_deal_req(("FirstLoss",bn), deal, poolAssump, runAssump)
         if debug:
@@ -797,6 +800,7 @@ class API:
         :return: response in dict
         :rtype: dict | None
         """
+        assert _req is not None, f"❌request body is None, please check your request"
         try:
             hdrs = self.hdrs | headers
             r = None

@@ -124,6 +124,7 @@ Performing
     * ``{"ByAmount":(2000,[500,500,1000])}`` apply a custom default amount vector.
     * ``{"DefaultAtEndByRate":(0.05,0.10)}``, will apply 5% as CDR for all periods except last period. The last period will use default CDR 10% (which start from begining day).
     .. versionadded:: 0.42.2
+
     * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
 * <Prepayment Assumption>
   
@@ -1382,52 +1383,6 @@ Pass a map to ``poolAssump`` to run multiple scenarios.
 .. seealso:: 
    For details on sensitivity run pls refer to :ref:`Sensitivity Analysis`
 
-First Loss Run
-""""""""""""""""""""
-
-.. versionadded:: 0.42.2
-
-User can input with an assumption with one more field ("Bond Name") compare to single run: 
-
-* deal object
-* pool performance assumption
-* deal run assumption 
-* bond name 
-
-.. versionchanged:: 0.42.6
-Using endpoint of ``runRootFinder()``
-
-syntax
-  ``("firstLoss",<deal>,<poolAssump>,<runAssump>,<bondName>)``
-
-
-The engine will stress on the default assumption till the bond incur a 0.01 loss.
-Then engine return a tuple 
-
-* The factor it used and the stressed assumption.
-* The assumption was applied to make the bond  incur first 0.01 loss.
-
-.. warning::
-  The iteration begins with stress 500x on the default assumption. Make sure the default assumption is not zero
-
-.. code-block:: python
-
-  r0 = localAPI.runRootFinder(
-                  ("firstLoss", test01
-                      ,("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
-                              ,None
-                              ,None)
-                      ,[]
-                      ,"A1"
-                  )
-        )
-  # stress factor 
-  r0['FirstLossResult'][0]
-  # stressed scenario
-  r0['FirstLossResult'][1]
-
-.. seealso:: 
-   For details on first loss run pls refer to :ref:`First Loss Example`
 
 
 Running a pool of assets 
@@ -2134,14 +2089,96 @@ In combination of above three.
                                       ,"B":[("call",("poolBalance",500))]}
                           ,read=True)
 
+Root Finder
+----------------------
+
+.. warning::
+
+  This a collection of advance analytics which involves CPU intenstive task. Pls don't abuse these functions in public server.
+
+
+First Loss Run
+^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 0.42.2
+
+User can input with an assumption with one more field ("Bond Name") compare to single run: 
+
+* deal object
+* pool performance assumption
+* deal run assumption 
+* bond name 
+
+.. versionchanged:: 0.42.6
+
+Using endpoint of ``runRootFinder()``
+
+syntax
+  ``("firstLoss",<deal>,<poolAssump>,<runAssump>,<bondName>)``
+
+
+The engine will stress on the default assumption till the bond incur a 0.01 loss.
+Then engine return a tuple 
+
+* The factor it used and the stressed assumption.
+* The assumption was applied to make the bond  incur first 0.01 loss.
+
+.. warning::
+  The iteration begins with stress 500x on the default assumption. Make sure the default assumption is not zero
+
+.. code-block:: python
+
+  r0 = localAPI.runRootFinder(
+                  ("firstLoss", test01
+                      ,("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
+                              ,None
+                              ,None)
+                      ,[]
+                      ,"A1"
+                  )
+        )
+  # stress factor 
+  r0['FirstLossResult'][0]
+  # stressed scenario
+  r0['FirstLossResult'][1]
+
+.. seealso:: 
+   For details on first loss run pls refer to :ref:`First Loss Example`
+
+
+
+Spread Breakeven 
+^^^^^^^^^^^^^^^^^^^^
+.. versionadded:: 0.45.3
+
+It will tune up the spread/interest rate of a bond gradually till `` pricing of bond equals to originBalance ``
+
+* The pricing curve shall be passed in the runAssump.
+* The bond init rate/original rate should be 0.0
+
+syntax
+  ``("maxSpreadToFace",<deal>,<poolAssump>,<runAssump>,<bondName>)``
+
+.. code-block:: python
+
+    localAPI.runRootFinder(
+                            ("maxSpreadToFace"
+                              , SLYF2501
+                                ,p
+                                ,newRassump
+                                ,"A"
+                            )
+                          ,read=True)
+
+
 
 Retriving Results
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 The result returned from sensitivity run is just a map, with key as identifer for each scenario, the value is the same as single run. 
 
 Plain Python Keys
-""""""""""""""""""
+^^^^^^^^^^^^^^^^^^
 
 To access same component from different sceanrio : 
 
@@ -2157,7 +2194,7 @@ To access same component from different sceanrio :
 
   
 Built-in Comparision functions
-""""""""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. seealso::
   There are couple built-in functions will help user to get result in easier way :ref:`Read Multiple Result Map`
@@ -2165,7 +2202,7 @@ Built-in Comparision functions
 
 
 Compare two results
-""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. versionadded:: 0.43.1
 
