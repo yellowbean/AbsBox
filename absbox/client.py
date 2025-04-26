@@ -246,11 +246,11 @@ class API:
                 _perfAssump = mkAssumpType(perfAssump)
                 _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
                 r = mkTag(("FirstLossReq", [(_deal, _perfAssump, _nonPerfAssump), bn]))
-            case ("MaxSpreadToFaceReq", bn):
+            case ("MaxSpreadToFaceReq", bn, bondFlag, feeFlag):
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = mkAssumpType(perfAssump)
                 _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
-                r = mkTag(("MaxSpreadToFaceReq", [(_deal, _perfAssump, _nonPerfAssump), bn]))
+                r = mkTag(("MaxSpreadToFaceReq", [(_deal, _perfAssump, _nonPerfAssump), bn, bondFlag, feeFlag]))
             case _:
                 raise RuntimeError(f"Failed to match run type:{run_type}")
         
@@ -697,8 +697,8 @@ class API:
         url = f"{self.url}/{Endpoints.RunRootFinder.value}"
         req = None
         match p:
-            case ("maxSpreadToFace",deal,poolAssump,runAssump,bn):
-                req = self.build_run_deal_req(("MaxSpreadToFaceReq",bn), deal, poolAssump, runAssump)
+            case ("maxSpreadToFace",deal,poolAssump,runAssump,bn,bFlag,fFlag):
+                req = self.build_run_deal_req(("MaxSpreadToFaceReq",bn, bFlag, fFlag), deal, poolAssump, runAssump)
             case ("firstLoss",deal,poolAssump,runAssump,bn):
                 req = self.build_run_deal_req(("FirstLoss",bn), deal, poolAssump, runAssump)
         if debug:

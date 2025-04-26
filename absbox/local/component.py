@@ -1621,14 +1621,14 @@ def mkAsset(x):
                         , remainTerms
                         , mkAssetStatus(status)]))
         case ["固定资产",{"起始日":sd,"初始余额":ob,"初始期限":ot,"残值":rb,"周期":p,"摊销":ar,"产能":cap}
-                      ,{"剩余期限":rt}] \
+                      ,{"剩余期限":rt,"余额":bal}] \
              |["FixedAsset",{"start":sd,"originBalance":ob,"originTerm":ot,"residual":rb,"period":p,"amortize":ar
                                 ,"capacity":cap}
-                            ,{"remainTerm":rt}]:
+                            ,{"remainTerm":rt,"balance":bal}]:
             return mkTag(("FixedAsset",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originTerm":vInt(ot),"residualBalance":vNum(rb)
                                             ,"period":freqMap[p],"accRule":mkAccRule(ar)
                                             ,"capacity":mkCapacity(cap)} | mkTag("FixedAssetInfo")
-                                            ,vInt(rt)]))
+                                            ,vNum(bal),vInt(rt)]))
         case ["Invoice", {"start":sd,"originBalance":ob,"originAdvance":oa,"dueDate":dd,"feeType":ft},{"status":status}] :
             obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
             return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":mkInvoiceFeeType(ft),"obligor":obligorInfo} | mkTag("ReceivableInfo")
@@ -1891,9 +1891,10 @@ def mkPerfAssumption(x):
             p = earlyReturnNone(mkAssumpPrepay,mp)
             r = earlyReturnNone(mkAssumpRecovery,mr)
             return mkTag(("InstallmentAssump",[d,p,r,None]))
+        case ("Fixed",utilCurve,priceCurve,extPeriods):
+            return mkTag(("FixedAssetAssump",[mkTs("RatioCurve",utilCurve), mkTs("BalanceCurve",priceCurve),vInt(extPeriods)]))
         case ("Fixed",utilCurve,priceCurve):
-            return mkTag(("FixedAssetAssump",[mkTs("RatioCurve",utilCurve)
-                                              ,mkTs("BalanceCurve",priceCurve)]))
+            return mkTag(("FixedAssetAssump",[mkTs("RatioCurve",utilCurve), mkTs("BalanceCurve",priceCurve),None]))
         case ("Receivable", md, mr, mes):
             d = earlyReturnNone(mkAssumpDefault,md)
             r = earlyReturnNone(mkAssumpRecovery,mr)

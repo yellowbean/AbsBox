@@ -1524,12 +1524,21 @@ This type of asset can be used to model `future flow of securitization` : `Hotel
 ``amortize``
   either ``Straight`` or ``DecliningBalance`` .
 
+
+
+.. warning::
+
+  .. versionchanged:: 0.45.3
+  
+    "Balance" becomes a required field in status of `FixedAsset` type asset.
+
+
 .. code-block:: python
 
   assets = [["FixedAsset" ,{"start":"2023-11-01","originBalance":100_0000,"originTerm":120
                             ,"residual":10_0000,"period":"Monthly","amortize":"Straight"
                             ,"capacity":("Fixed",24*25*120*30)}
-                          ,{"remainTerm":120}]]
+                          ,{"remainTerm":120,"balance":30000}]]
 
 .. warning::
 

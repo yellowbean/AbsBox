@@ -45,7 +45,7 @@ class LIBRARY:
     :rtype: DealLibrary
     """
     url: str = ""
-    token: str = None
+    token = None
     hdrs = {'Content-type': 'application/json', 'Accept': '*/*', 'Accept-Encoding': 'gzip'}
     debug = False
     libraryInfo = None
@@ -82,7 +82,7 @@ class LIBRARY:
         """
         deal_library_url = self.url+f"/{LibraryEndpoints.Token.value}"
         cred = {"user": vStr(user), "password": pw}
-        r = self._send_req(json.dumps(cred), deal_library_url)
+        r:dict = self._send_req(json.dumps(cred), deal_library_url)
         if 'token' in r:
             console.print(f"✅ login successfully, user -> {r['user']},group -> {r['group']}")
             self.token = r['token']

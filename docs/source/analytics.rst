@@ -2151,26 +2151,34 @@ Spread Breakeven
 ^^^^^^^^^^^^^^^^^^^^
 .. versionadded:: 0.45.3
 
-It will tune up the spread/interest rate of a bond gradually till `` pricing of bond equals to originBalance ``
+It will tune up the spread/interest rate of a bond gradually till ``pricing of bond equals to originBalance``
 
 * The pricing curve shall be passed in the runAssump.
 * The bond init rate/original rate should be 0.0
 
 syntax
-  ``("maxSpreadToFace",<deal>,<poolAssump>,<runAssump>,<bondName>)``
+  ``("maxSpreadToFace",<deal>,<poolAssump>,<runAssump>,<bondName>,<TestBondFlag>,<TestFeeFlag>)``
+
+* ``TestBondFlag`` : if `True` , the search algo failed if any the bond in the deal is outstanding
+* ``TestFeeFlag`` : if `True` , the search algo failed if any the fee in the deal is outstanding
 
 .. code-block:: python
 
-    localAPI.runRootFinder(
-                            ("maxSpreadToFace"
-                              , SLYF2501
-                                ,p
-                                ,newRassump
-                                ,"A"
-                            )
-                          ,read=True)
+    r = localAPI.runRootFinder(
+                                ("maxSpreadToFace"
+                                  , SLYF2501
+                                    ,p
+                                    ,newRassump
+                                    ,"A"
+                                    ,True
+                                    ,True
+                                )
+                              ,read=True)
 
+    # to get the result 
+    r['BestSpreadResult'][0]
 
+The result value means "Additional Spread" to the original rate of the bond. Then the pricing of bond equals to 100.00 face value.
 
 Retriving Results
 ---------------------
