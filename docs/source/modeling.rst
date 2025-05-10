@@ -1427,48 +1427,70 @@ Schedule Repayment
 Lease
 ^^^^^^^^^
 
-`Lease` is an asset with have evenly distributed rental as income or step up feature on the rental over the projection timeline.
+`Lease` is an asset with have evenly distributed rental as income or step up/down feature on the rental over the projection timeline.
+
+syntax:
+  [``"Lease"``, {'rental':<Rental Type>,'originTerm':..,'originDate':..}
+              , {'currentBalance':..,'status':<Status>,'remainTerm':..}]
 
 
+Rental Type
+""""""""""""""
+* Rental by days 
+  * DailyRate -> fix amount on each day
+  * Payment Dates -> :ref:`DatePattern`
+
+    .. code-block:: python 
+
+      ("byDay", <DailyRate>, <Payment Dates>)
+
+* Rental by periods
+  * Rental -> a fix amount on each period
+  * Period -> ``Monthly``, ``Weekly``, ``BiWeekly``, ``Quarterly``, ``SemiAnnually``, ``Annually``
+
+    .. code-block:: python 
+
+      ("byPeriod", <Rental each period>, <Period>)
+
+Lease with fixed retnal
+""""""""""""""""""""""""""
 
 .. code-block:: python
 
   ["Lease"
-   ,{"fixRental": 12.0
+   ,{"rental":("byDay", 12.0, ["DayOfMonth",15])
     ,"originTerm": 96
-    ,"freq": ["DayOfMonth",15]
-    ,"originDate": "2022-01-05"
-    ,"status":"Current"
-    ,"remainTerm":80}]
+    ,"originDate": "2022-01-05"}
+    ,{"status":"Current" ,"remainTerm":80 ,"currentBalance":150}]
 
 step up type lease which rental will increase by pct after each accrue period
 
+Lease with various rental
+""""""""""""""""""""""""""
+
+The ``retnal`` can be increasing/decreasing by a fixed rate or a vector of rate.
+
 .. code-block:: python
 
   ["Lease"
-    ,{"initRental": 24.0
-    ,"originTerm": 36
-    ,"freq": ["DayOfMonth",25]
-    ,"originDate": "2023-01-01"
-    ,"status":"Current"
-    ,"remainTerm":30
-    ,"accrue": ["DayOfMonth",1]
-    ,"pct": 0.05}]
+    ,{"originTerm": 36
+      ,"rental":("byDay", 24.0, ["DayOfMonth",25])
+      ,"originDate": "2023-01-01"
+      ,"stepUp": ("flatRate", 0.05)},
+    {"currentBalance":150 ,"status":"Current" ,"remainTerm":30}]
 
 or user can specify the vector for the rental change 
 
 .. code-block:: python
 
   ["Lease"
-   ,{"initRental": 24.0
-    ,"originTerm": 36
-    ,"freq": ["DayOfMonth",25]
-    ,"originDate": "2023-01-01"
-    ,"status":"Current"
-    ,"remainTerm":30
-    ,"accrue": ["DayOfMonth",3]
-    ,"pct": [0.05,0.065,0.06,-0.07]}]
-
+   ,{"originTerm": 36
+      ,"rental":("byDay", 24.0, ["DayOfMonth",25])
+      ,"originDate": "2023-01-01"
+      ,"stepUp": ("byRates",[0.05,0.065,0.06,-0.07])
+      },
+    ,{"status":"Current" ,"remainTerm":30 ,"currentBalance":150}
+    ]
 
 
 Installment

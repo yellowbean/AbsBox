@@ -433,7 +433,7 @@ Lease
 .. code-block:: python
 
    r = localAPI.run(deal
-                  ,poolAssump = ("Pool",("Lease",<turnover gap>,<rental assump>,<end date>)
+                  ,poolAssump = ("Pool",("Lease", <default assumption>,<turnover gap>, <rental assump>, <end type>)
                                           ,<delinq assumption>
                                           ,<defaulted assumption>
                                           )
@@ -442,9 +442,34 @@ Lease
 
 Notes:
 
+  * ``<default assumption>`` ->  optional, assumption on gap days between new lease and old lease
   * ``<turnover gap>`` ->  assumption on gap days between new lease and old lease
   * ``<rental assump>`` -> describe the rental increase/decrease over time
-  * ``<end date>`` -> the date when lease projection ends 
+  * ``<end type>`` 
+    * ``("byDate", "2026-09-20")``-> the date when lease projection ends 
+    * ``("byExtTimes",1)``-> how many times lease will roll over
+
+Lease Default
+""""""""""""""""
+User can pass it as ``None`` or default assumptions as below:
+
+* ``('byConitnuation', <default rate in annual>)``
+* ``('byTermination', <default rate in annual>)``
+
+
+Lease Gap
+""""""""""""""
+
+* ``('days', x)`` : the number of days between old lease and new lease
+* ``('byCurve', c)`` : the number of days between old lease and new lease depends on a curve
+
+
+Lease End
+""""""""""""""
+Describle the end type of lease projection,, either by a ``Date`` or a ``Extend Time``
+
+* ``("byDate", "2026-09-20")`` : the date when lease projection ends
+* ``("byExtTimes", 1)`` : how many times lease will roll over for 1 time
 
 Summary
 """"""""""""""""
@@ -462,10 +487,18 @@ Summary
         Lease -> Defaulted
         Performing -> "Lease Gap"
         Performing -> "Rental Curve"
-        "Lease Gap" -> "{'Days':x}"
-        "Lease Gap" -> "{'DaysByAmount':(tbl,x)}"
-        "Rental Curve" -> "{'AnnualIncrease':x}"
-        "Rental Curve" -> "{'CurveIncrease':x}"
+        Performing -> "Default Assumption"
+        Performing -> "End Type"
+        "Default Assumption" -> "By Continuation"
+        "By Continuation" -> "('byContinuation', x)"
+        "Default Assumption" -> "By Termination"
+        "By Termination" -> "('byTermination', x)"
+        "Lease Gap" -> "('days', x)"
+        "Lease Gap" -> "('byCurve', curve)"
+        "Rental Curve" -> "('byAnnualRate', x)"
+        "Rental Curve" -> "('byRateCurve', x)"
+        "End Type" -> "end by date"
+        "End Type" -> "end by extend time"
     }
 
 

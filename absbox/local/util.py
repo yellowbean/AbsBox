@@ -255,9 +255,9 @@ def guess_pool_flow_header(x, l):
             return (english_loan_flow_d, "Date", False)
         case ('LoanFlow', 10, 'english'):
             return (english_loan_flow_d+english_cumStats, "Date", True)
-        case ('LeaseFlow', 3, 'chinese'):
+        case ('LeaseFlow', 4, 'chinese'):
             return (china_rental_flow_d, "日期", False)
-        case ('LeaseFlow', 3, 'english'):
+        case ('LeaseFlow', 4, 'english'):
             return (english_rental_flow_d, "Date", False)
         case ('FixedFlow', 6, 'chinese'):
             return (china_fixed_flow_d, "日期", False)

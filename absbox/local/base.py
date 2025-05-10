@@ -39,9 +39,9 @@ english_mortgage_flow_fields_d = [english_date] + english_mortgage_flow_fields
 china_mortgage_delinq_flow_fields_d = [china_date] + china_mortgage_delinq_flow_fields
 english_mortgage_delinq_flow_fields_d = [english_date] + english_mortgage_delinq_flow_fields
 
-## Rental
-china_rental_flow = ['待收金额', '租金']
-english_rental_flow = ['Balance', 'Rental']
+## Rental/Lease flow
+china_rental_flow = ['待收金额', '租金', '违约']
+english_rental_flow = ['Balance', 'Rental', 'Default']
 china_rental_flow_d = [china_date] + china_rental_flow
 english_rental_flow_d = [english_date] + english_rental_flow
 

@@ -1410,9 +1410,9 @@ def mkAmortPlan(x) -> dict:
             return mkTag(("NO_FirstN", [n, mkAmortPlan(_pt)]))
         case ("IO_FirstN", n, _pt):
             return mkTag(("IO_FirstN", [n, mkAmortPlan(_pt)]))
-        case ("计划还款", ts, Dp) | ("Schedule", ts, Dp):
+        case ("计划还款", ts, Dp) | ("Schedule", ts, Dp) | ("schedule", ts, Dp):
             return mkTag(("ScheduleRepayment", [mkTs("RatioCurve", ts), mkDatePattern(Dp)]))
-        case ("计划还款", ts) | ("Schedule", ts):
+        case ("计划还款", ts) | ("Schedule", ts) | ("schedule", ts):
             return mkTag(("ScheduleRepayment", [mkTs("RatioCurve", ts), None]))
         case ("Balloon", n):
             return mkTag(("Balloon", n))
@@ -1524,6 +1524,15 @@ def mkLeaseStepUp(x):
             return mkTag(("ByAmountCurve", vList(bs, vNum)))
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkLeaseStepUp")
+
+def mkLeaseCalc(x):
+    match x:
+        case ("byDay", dr, dp):
+            return mkTag(("ByDayRate", [dr, mkDatePattern(dp)]))
+        case ("byPeriod", rental, period):
+            return mkTag(("ByPeriodRetnal", [rental, period]))
+        case _ :
+            raise RuntimeError(f"Failed to match {x}:mkLeaseCalc")
         
 
 def mkAsset(x):
@@ -1600,25 +1609,28 @@ def mkAsset(x):
                 vNum(currentBalance),
                 vInt(remainTerms),
                 mkAssetStatus(status)]))
-        case ["租赁", {"固定租金": dailyRate, "初始期限": originTerm, "频率": dp, "起始日": startDate, "状态": status, "剩余期限": remainTerms}] \
-                | ["Lease", {"fixRental": dailyRate, "originTerm": originTerm, "freq": dp, "originDate": startDate, "status": status, "remainTerm": remainTerms}]:
+        case ["租赁", {"租金": rental, "初始期限": originTerm, "起始日": startDate}
+                    ,{"当前余额": bal, "剩余期限": remainTerms,"状态": status}] \
+                | ["Lease", {"rental": rental, "originTerm": originTerm, "originDate": startDate}
+                , {"currentBalance": bal,"status": status, "remainTerm": remainTerms}]:
             obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
             return mkTag(("RegularLease"
-                            , [{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp), "originRental": dailyRate
+                            , [{"originTerm": originTerm, "startDate": startDate, "originRental": mkLeaseCalc(rental)
                                 ,"obligor": obligorInfo} | mkTag("LeaseInfo")
-                                , 0
-                                , remainTerms
+                                , vNum(bal)
+                                , vInt(remainTerms)
                                 , mkAssetStatus(status)]))
-        case ["租赁", {"初始租金": dailyRate, "初始期限": originTerm, "频率": dp, "起始日": startDate, "状态": status, "剩余期限": remainTerms,"调整":sut}] \
-                | ["Lease", {"initRental": dailyRate, "stepUp":sut, "originTerm": originTerm, "freq": dp, "originDate": startDate, "status": status, "remainTerm": remainTerms}]:
-
+        case ["租赁", {"租金": rental, "初始期限": originTerm, "起始日": startDate, "调整":sut}
+                    ,{"当前余额":bal,"状态": status, "剩余期限": remainTerms}] \
+                | ["Lease", {"rental": rental, "stepUp":sut, "originTerm": originTerm, "originDate": startDate}
+                    ,{"currentBalance":bal, "status": status, "remainTerm": remainTerms}]:
             obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
             _stepUpType = mkLeaseStepUp(sut)
             return mkTag(("StepUpLease"
-                        , [{"originTerm": originTerm, "startDate": startDate, "paymentDates": mkDatePattern(dp), "originRental": dailyRate, "obligor": obligorInfo} | mkTag("LeaseInfo")
+                        , [{"originTerm": originTerm, "startDate": startDate, "originRental": mkLeaseCalc(rental), "obligor": obligorInfo} | mkTag("LeaseInfo")
                         , _stepUpType
-                        , 0
-                        , remainTerms
+                        , vNum(bal)
+                        , vInt(remainTerms)
                         , mkAssetStatus(status)]))
         case ["固定资产",{"起始日":sd,"初始余额":ob,"初始期限":ot,"残值":rb,"周期":p,"摊销":ar,"产能":cap}
                       ,{"剩余期限":rt,"余额":bal}] \
@@ -1745,7 +1757,7 @@ def mkAssumpDefault(x):
         case {"byTerm": rs}:
             return mkTag(("DefaultByTerm", vListOfList(rs, numVal)))
         case _ :
-            raise RuntimeError(f"failed to match {x}")
+            raise RuntimeError(f"failed to match {x}:mkAssumpDefault")
 
 
 def mkAssumpPrepay(x):
@@ -1764,7 +1776,7 @@ def mkAssumpPrepay(x):
         case {"byTerm": rs}:
             return mkTag(("PrepaymentByTerm", vListOfList(rs, numVal)))
         case _ :
-            raise RuntimeError(f"failed to match {x}")
+            raise RuntimeError(f"failed to match {x}:mkAssumpPrepay")
 
 
 def mkAssumpDelinq(x):
@@ -1773,19 +1785,17 @@ def mkAssumpDelinq(x):
         case {"DelinqCDR": cdr, "Lag": lag, "DefaultPct": pct}:
             return mkTag(("DelinqCDR", [cdr, (lag, pct)]))
         case _:
-            raise RuntimeError(f"failed to match {x}")
+            raise RuntimeError(f"failed to match {x}:mkAssumpDelinq")
 
 
 def mkAssumpLeaseGap(x):
     match x:
-        case {"Days":d}:
+        case {"Days":d} | ("days",d):
             return mkTag(("GapDays",vInt(d)))
-        case {"DaysByAmount":(tbl,d)}:
-            return mkTag(("GapDaysByAmount",[tbl, vInt(d)]))
-        case {"DaysByCurve": ts}:
-            return mkTag(("GapDaysByCurve",mkTs("IntCurve",ts)))
+        case ("byCurve", c):
+            return mkTag(("GapDaysByCurve", mkTs("IntCurve",c)))
         case _:
-            raise RuntimeError(f"failed to match {x}")
+            raise RuntimeError(f"failed to match {x}:mkAssumpLeaseGap")
 
 
 def mkAssumpLeaseRent(x):
@@ -1795,18 +1805,26 @@ def mkAssumpLeaseRent(x):
         case {"CurveIncrease":rc} | ("byRateCurve", rc):
             return mkTag(("BaseCurve", mkTs("RateCurve",rc)))
         case _:
-            raise RuntimeError(f"failed to match {x}")
+            raise RuntimeError(f"failed to match {x}:mkAssumpLeaseRent")
 
 
 def mkAssumpLeaseEndType(x):
     match x:
-        case {"byDate":d} | ("byDate",d):
-            return mkTag("CutByDate",vDate(d))
+        case {"byDate":d} | ("byDate", d):
+            return mkTag("CutByDate", vDate(d))
         case {"stopByExtNum":n} | ("byExtTimes",n):
-            return mkTag("StopByExtTimes",vInt(n))
+            return mkTag("StopByExtTimes", vInt(n))
+        case _:
+            raise RuntimeError(f"failed to match {x}:mkAssumpLeaseEndType")
+
+def mkAssumpLeaseDefaultType(x):
+    match x:
+        case ("byContinuation",r):
+            return mkTag(("DefaultByContinuation", vNum(r)))
+        case ("byTermination",r):
+            return mkTag(("DefaultByTermination", vNum(r)))
         case _:
             raise RuntimeError(f"failed to match {x}")
-
 
 
 def mkAssumpRecovery(x):
@@ -1876,7 +1894,7 @@ def mkPerfAssumption(x):
             r = earlyReturnNone(mkAssumpRecovery,mr)
             return mkTag(("MortgageAssump",[d,p,r,mkExtraStress(mes)]))
         case ("Lease", md, gap, rent, endType):
-            return mkTag(("LeaseAssump",[earlyReturnNone(mkAssumpDefault,md)
+            return mkTag(("LeaseAssump",[earlyReturnNone(mkAssumpLeaseDefaultType,md)
                                         ,mkAssumpLeaseGap(gap)
                                         ,mkAssumpLeaseRent(rent)
                                         ,mkEndType(endType)
