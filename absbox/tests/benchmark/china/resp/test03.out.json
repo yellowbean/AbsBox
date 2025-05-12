@@ -3020,6 +3020,10 @@
         ]
       }
     ],
-    {}
+    {
+      "No Pricing": {
+        "tag": "PriceResultNull"
+      }
+    }
   ]
 }

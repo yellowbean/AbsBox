@@ -5133,6 +5133,10 @@
         ]
       }
     ],
-    {}
+    {
+      "No Pricing": {
+        "tag": "PriceResultNull"
+      }
+    }
   ]
 }

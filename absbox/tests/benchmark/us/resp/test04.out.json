@@ -15954,6 +15954,10 @@
         ]
       }
     ],
-    {}
+    {
+      "No Pricing": {
+        "tag": "PriceResultNull"
+      }
+    }
   ]
 }

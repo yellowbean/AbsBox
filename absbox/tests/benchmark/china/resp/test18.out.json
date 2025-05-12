@@ -37758,6 +37758,10 @@
         ]
       }
     ],
-    {}
+    {
+      "No Pricing": {
+        "tag": "PriceResultNull"
+      }
+    }
   ]
 }

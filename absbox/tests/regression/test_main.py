@@ -198,7 +198,10 @@ def test_asset_02(setup_api):
 def test_first_loss(setup_api):
     r0 = setup_api.runFirstLoss(test01
                     ,"A1"
-                    ,poolAssump=("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
+                    ,poolAssump=("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]}
+                                                    ,{"CPR":0.02}
+                                                    ,{"Rate":0.1,"Lag":5}
+                                                    ,None)
                                     ,None
                                     ,None)
                     ,read=True
