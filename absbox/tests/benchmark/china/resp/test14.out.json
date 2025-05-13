@@ -91341,10 +91341,6 @@
         ]
       }
     ],
-    {
-      "No Pricing": {
-        "tag": "PriceResultNull"
-      }
-    }
+    {}
   ]
 }

@@ -5776,10 +5776,6 @@
         ]
       }
     ],
-    {
-      "No Pricing": {
-        "tag": "PriceResultNull"
-      }
-    }
+    {}
   ]
 }

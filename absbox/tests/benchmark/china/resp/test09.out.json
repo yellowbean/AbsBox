@@ -4590,10 +4590,6 @@
         ]
       }
     ],
-    {
-      "No Pricing": {
-        "tag": "PriceResultNull"
-      }
-    }
+    {}
   ]
 }

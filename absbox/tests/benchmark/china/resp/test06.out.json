@@ -28325,10 +28325,6 @@
         ]
       }
     ],
-    {
-      "No Pricing": {
-        "tag": "PriceResultNull"
-      }
-    }
+    {}
   ]
 }

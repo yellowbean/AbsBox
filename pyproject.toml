@@ -36,7 +36,8 @@ dependencies = [
     "htpy",
     "dateparser",
     "more-itertools",
-    "xlsxwriter"
+    "xlsxwriter",
+    "faker",
 ]
 
 

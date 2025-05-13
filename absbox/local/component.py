@@ -2273,6 +2273,8 @@ def readPricingResult(x, locale) -> dict | None:
         h = {"cn": ["静态利差"], "en": ["Z-spread"]}
     elif tag == "IrrResult":
         h = {"cn": ["IRR"], "en": ["IRR"]}
+    elif tag == "PriceResultNull":
+        return None
     else:
         raise RuntimeError(f"Failed to read princing result: {x} with tag={tag}")
 
