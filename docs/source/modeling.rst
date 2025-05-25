@@ -1429,14 +1429,16 @@ Lease
 
 `Lease` is an asset with have evenly distributed rental as income or step up/down feature on the rental over the projection timeline.
 
-syntax:
-  [``"Lease"``, {'rental':<Rental Type>,'originTerm':..,'originDate':..}
-              , {'currentBalance':..,'status':<Status>,'remainTerm':..}]
+.. code-block:: python 
+
+  ["Lease", {'rental':<Rental Type>,'originTerm':..,'originDate':..}
+          , {'currentBalance':..,'status':<Status>,'remainTerm':..}]
 
 
 Rental Type
 """"""""""""""
-* Rental by days 
+* Rental by days
+
   * DailyRate -> fix amount on each day
   * Payment Dates -> :ref:`DatePattern`
 
@@ -1445,6 +1447,7 @@ Rental Type
       ("byDay", <DailyRate>, <Payment Dates>)
 
 * Rental by periods
+
   * Rental -> a fix amount on each period
   * Period -> ``Monthly``, ``Weekly``, ``BiWeekly``, ``Quarterly``, ``SemiAnnually``, ``Annually``
 
@@ -1458,7 +1461,7 @@ Lease with fixed retnal
 .. code-block:: python
 
   ["Lease"
-   ,{"rental":("byDay", 12.0, ["DayOfMonth",15])
+    ,{"rental":("byDay", 12.0, ["DayOfMonth",15])
     ,"originTerm": 96
     ,"originDate": "2022-01-05"}
     ,{"status":"Current" ,"remainTerm":80 ,"currentBalance":150}]
