@@ -1804,6 +1804,8 @@ def mkAssumpLeaseRent(x):
             return mkTag(("BaseAnnualRate",vNum(r)))
         case {"CurveIncrease":rc} | ("byRateCurve", rc):
             return mkTag(("BaseCurve", mkTs("RateCurve",rc)))
+        case ("byRateVec", *rs):
+            return mkTag(("BaseByVec", vList(rs, numVal)))
         case _:
             raise RuntimeError(f"failed to match {x}:mkAssumpLeaseRent")
 

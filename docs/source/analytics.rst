@@ -473,7 +473,7 @@ syntax:
 
   * ``('byAnnualRate', <annual rate>)`` : the rental will increase/decrease by a fixed rate in annual
   * ``('byRateCurve', <curve>)`` : the rental will increase/decrease by a curve, which is a list of [date,rate] pairs
- 
+  * ``('byRateVec', -0.1,-0.3,-0.2) ``: the rental will increase/decrease by a vector of rates, which is applied to each new projected lease.
 
 
 Lease Default
