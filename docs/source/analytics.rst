@@ -430,6 +430,14 @@ syntax:
 Lease
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+*Lease* is an asset type that model contractual cash inflow from leasing out equipments or houses.
+It is differente from other asset type *Loan* or *Mortgage* in the performance assumption.
+
+* No-Prepayment
+  There is little economic motivation to prepay the rental in advance
+* Revovling by default
+  The *Lease* shall base on some physical entity, like the *Room/Hotel* or *CellPhone* , which can be used to generate a series of *Lease contracts*
+
 .. code-block:: python
 
    r = localAPI.run(deal
@@ -449,16 +457,45 @@ Notes:
     * ``("byDate", "2026-09-20")``-> the date when lease projection ends 
     * ``("byExtTimes",1)``-> how many times lease will roll over
 
+Lease Rental 
+""""""""""""""""
+`Rental` is being used to factor in the future rental upside and downside risk.
+
+In this example: it assume the market rental rate is dropping by 30% each year. When a new lease contract was created, the new rental rate depends on the two attributes from `last lease`.
+
+``('byAnnualRate', -0.3)``
+
+
+* `rental rate` from `last lease`
+* `originate date` from `last lease`
+
+syntax:
+
+  * ``('byAnnualRate', <annual rate>)`` : the rental will increase/decrease by a fixed rate in annual
+  * ``('byRateCurve', <curve>)`` : the rental will increase/decrease by a curve, which is a list of [date,rate] pairs
+ 
+
+
 Lease Default
 """"""""""""""""
 User can pass it as ``None`` or default assumptions as below:
 
-* ``('byConitnuation', <default rate in annual>)``
+* ``('byContinuation', <default rate in annual>)``
 * ``('byTermination', <default rate in annual>)``
+
+.. note:: 
+  `byContinuate` vs `byTermination`
+  There are two type of asset being leased out, categorized by how default behaviors affecting cashflow.
+  Like, office lending. The default behavior of first lease won't affect second lease. But for phone leasing, once the default happends, the phone will be lost and can't be lease any more. In the phone case, the default of first lease will affect cashflow of leases afterwards.
+
+  * `byContinuation` : for the phone lease case.
+  * `byTermination` : for the office/hotel room lease case.
+
 
 
 Lease Gap
 """"""""""""""
+`Gap` was to model the blank period between `last lease` and `new lease`. In such period, there isn't any cash flow in. It varies because to model different type of asset. Like, commerial office , on average , has longer gap days than a smart phone.
 
 * ``('days', x)`` : the number of days between old lease and new lease
 * ``('byCurve', c)`` : the number of days between old lease and new lease depends on a curve
@@ -466,7 +503,7 @@ Lease Gap
 
 Lease End
 """"""""""""""
-Describle the end type of lease projection,, either by a ``Date`` or a ``Extend Time``
+Describle the end type of lease projection,either by a ``Date`` or a ``Extend Time``
 
 * ``("byDate", "2026-09-20")`` : the date when lease projection ends
 * ``("byExtTimes", 1)`` : how many times lease will roll over for 1 time
