@@ -1530,7 +1530,7 @@ def mkLeaseCalc(x):
         case ("byDay", dr, dp):
             return mkTag(("ByDayRate", [dr, mkDatePattern(dp)]))
         case ("byPeriod", rental, period):
-            return mkTag(("ByPeriodRetnal", [rental, period]))
+            return mkTag(("ByPeriodRental", [rental, period]))
         case _ :
             raise RuntimeError(f"Failed to match {x}:mkLeaseCalc")
         
