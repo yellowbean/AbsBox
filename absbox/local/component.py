@@ -1609,17 +1609,6 @@ def mkAsset(x):
                 vNum(currentBalance),
                 vInt(remainTerms),
                 mkAssetStatus(status)]))
-        case ["租赁", {"租金": rental, "初始期限": originTerm, "起始日": startDate}
-                    ,{"当前余额": bal, "剩余期限": remainTerms,"状态": status}] \
-                | ["Lease", {"rental": rental, "originTerm": originTerm, "originDate": startDate}
-                , {"currentBalance": bal,"status": status, "remainTerm": remainTerms}]:
-            obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
-            return mkTag(("RegularLease"
-                            , [{"originTerm": originTerm, "startDate": startDate, "originRental": mkLeaseCalc(rental)
-                                ,"obligor": obligorInfo} | mkTag("LeaseInfo")
-                                , vNum(bal)
-                                , vInt(remainTerms)
-                                , mkAssetStatus(status)]))
         case ["租赁", {"租金": rental, "初始期限": originTerm, "起始日": startDate, "调整":sut}
                     ,{"当前余额":bal,"状态": status, "剩余期限": remainTerms}] \
                 | ["Lease", {"rental": rental, "stepUp":sut, "originTerm": originTerm, "originDate": startDate}
@@ -1632,6 +1621,19 @@ def mkAsset(x):
                         , vNum(bal)
                         , vInt(remainTerms)
                         , mkAssetStatus(status)]))
+                        
+        case ["租赁", {"租金": rental, "初始期限": originTerm, "起始日": startDate}
+                    ,{"当前余额": bal, "剩余期限": remainTerms,"状态": status}] \
+                | ["Lease", {"rental": rental, "originTerm": originTerm, "originDate": startDate}
+                , {"currentBalance": bal,"status": status, "remainTerm": remainTerms}]:
+            obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
+            return mkTag(("RegularLease"
+                            , [{"originTerm": originTerm, "startDate": startDate, "originRental": mkLeaseCalc(rental)
+                                ,"obligor": obligorInfo} | mkTag("LeaseInfo")
+                                , vNum(bal)
+                                , vInt(remainTerms)
+                                , mkAssetStatus(status)]))
+
         case ["固定资产",{"起始日":sd,"初始余额":ob,"初始期限":ot,"残值":rb,"周期":p,"摊销":ar,"产能":cap}
                       ,{"剩余期限":rt,"余额":bal}] \
              |["FixedAsset",{"start":sd,"originBalance":ob,"originTerm":ot,"residual":rb,"period":p,"amortize":ar
