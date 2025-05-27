@@ -1468,10 +1468,16 @@ Lease with fixed retnal
 
 step up type lease which rental will increase by pct after each accrue period
 
-Lease with various rental
+Lease with changing rental
 """"""""""""""""""""""""""
 
 The ``retnal`` can be increasing/decreasing by a fixed rate or a vector of rate.
+User can supply with an extra params ``stepUp`` to indicate the contractual rental change:
+
+* ``flatRate`` -> the rental will increase by a fixed rate after each period
+* ``byRates`` -> the rental will increase by a vector of rates, which means the rental will change by each period according to the vector
+* ``flatAmount`` -> the rental will increase by a fixed amount after each period
+* ``byAmounts`` -> the rental will increase by a vector of amounts, which means the rental will change by each period according to the vector
 
 .. code-block:: python
 
@@ -1490,10 +1496,33 @@ or user can specify the vector for the rental change
    ,{"originTerm": 36
       ,"rental":("byDay", 24.0, ["DayOfMonth",25])
       ,"originDate": "2023-01-01"
-      ,"stepUp": ("byRates",[0.05,0.065,0.06,-0.07])
+      ,"stepUp": ("byRates",1.05,1.065,1.06,-1.07)
       },
     ,{"status":"Current" ,"remainTerm":30 ,"currentBalance":150}
     ]
+
+or user can set rental change by amount or vector of amounts.
+
+.. code-block:: python
+
+  l3 = ["Lease"
+          ,{"rental": ("byPeriod", 300, "Monthly")
+            ,"originTerm": 3
+            ,"originDate": "2022-03-15"
+            ,"stepUp": ("flatAmount", 50)}
+          ,{"currentBalance":1
+            ,"status":"Current"
+            ,"remainTerm":3}]
+
+  l3 = ["Lease"
+         ,{"rental": ("byPeriod", 300, "Monthly")
+          ,"originTerm": 3
+          ,"originDate": "2022-03-15"
+          ,"stepUp": ("byAmounts", 50,100)}
+         ,{"currentBalance":1
+          ,"status":"Current"
+          ,"remainTerm":3}]
+
 
 
 Installment
