@@ -275,3 +275,16 @@ def test_bondGrp(setup_api):
     grpFlow = readBondsCf(r['bonds'])['A'].xs('balance',axis=1,level=1)
     assert grpFlow.A1.to_list()[:8] == [1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 993.93]
     assert grpFlow.A2.to_list()[:8] == [510.6, 436.68, 364.06, 290.75, 217.26, 143.1, 68.74, 0.0,]
+
+@pytest.mark.trigger
+def test_trigger_chgBondRate(setup_api):
+    withTrigger = test01 & lens.trigger.set({
+                    "BeforeDistribution":{
+                        "changeBndRt":{"condition":[">=","2021-08-20"]
+                                    ,"effects":("changeBondRate", "A1", {"floater":[0.05, "SOFR1Y",-0.02,"MonthEnd"]}, 0.12)
+                                    ,"status":False
+                                    ,"curable":False}
+                    }
+                    })
+    r = setup_api.run(withTrigger , read=True ,runAssump = [("interest",("SOFR1Y",0.04))])
+    assert r['bonds']['A1'].rate.to_list() == [0.07, 0.12, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02]

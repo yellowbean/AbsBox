@@ -3535,6 +3535,18 @@ Perform Actions
               .... 
               )
 
+Change Bond Rate Type
+  .. versionadded:: 0.45.9
+  Change the rate type of a bond, which will change the way how interest is calculated.
+
+.. code-block:: python
+
+  "effects":("changeBondRate",<Bond Name>,<Rate Type>,<init rate>)
+
+* <Bond Name> : name of the bond
+* <Rate Type> : type of rate, :ref:`Interest` from bond interest rate type section
+* <init rate> : initial rate to be set
+
 Combination of above
   a list of above can be combined together with keyword ``Effects``
 

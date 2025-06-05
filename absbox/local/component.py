@@ -1332,6 +1332,8 @@ def mkTriggerEffect(x):
             return mkTag(("ChangeReserveBalance", [vStr(accName), mkAccType(newReserve)]))
         case ["结果", *efs] | ["Effects", *efs] | ("Effects", *efs):
             return mkTag(("TriggerEffects", [mkTriggerEffect(e) for e in efs]))
+        case ("changeBondRate", bndName, bondRateType, newRate):
+            return mkTag(("ChangeBondRate", [vStr(bndName), mkBondRate(bondRateType), vNum(newRate)]))
         case None:
             return mkTag(("DoNothing"))
         case _:
