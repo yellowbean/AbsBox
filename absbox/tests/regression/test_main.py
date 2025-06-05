@@ -288,3 +288,31 @@ def test_trigger_chgBondRate(setup_api):
                     })
     r = setup_api.run(withTrigger , read=True ,runAssump = [("interest",("SOFR1Y",0.04))])
     assert r['bonds']['A1'].rate.to_list() == [0.07, 0.12, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02]
+
+@pytest.mark.pool
+def test_pool_lease_end(setup_api):
+    """ Lease end date """
+    myPool = {'assets':[l1],'cutoffDate':"2022-01-01"}
+    r = setup_api.runPool(myPool
+                  ,poolAssump=("Pool",("Lease", None, ('days', 20) , ('byAnnualRate', 0.0), ("byExtTimes", 2))
+                                       ,None
+                                       ,None
+                                       )
+                  ,read=True)
+    assert r['PoolConsol'][0].index[-1] == '2024-12-15'
+
+    r = setup_api.runPool(myPool
+                  ,poolAssump=("Pool",("Lease", None, ('days', 20) , ('byAnnualRate', 0.0), ("earlierOf", "2023-11-15", 2))
+                                       ,None
+                                       ,None
+                                       )
+                  ,read=True)
+    assert r['PoolConsol'][0].index[-1] == '2023-12-15'
+
+    r = setup_api.runPool(myPool
+                  ,poolAssump=("Pool",("Lease", None, ('days', 20) , ('byAnnualRate', 0.0), ("laterOf", "2023-11-15", 3))
+                                       ,None
+                                       ,None
+                                       )
+                  ,read=True)
+    assert r['PoolConsol'][0].index[-1] == '2025-12-15'

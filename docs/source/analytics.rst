@@ -507,6 +507,9 @@ Describle the end type of lease projection,either by a ``Date`` or a ``Extend Ti
 
 * ``("byDate", "2026-09-20")`` : the date when lease projection ends
 * ``("byExtTimes", 1)`` : how many times lease will roll over for 1 time
+.. versionadded:: 0.45.9
+* ``("earlierOf", "2026-09-20", 3)`` : the lease projection ends at the earlier of the date or extend time
+* ``("laterOf", "2026-09-20", 3)`` : the lease projection ends at the later of the date or extend time
 
 Summary
 """"""""""""""""
