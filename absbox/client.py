@@ -74,7 +74,7 @@ class RunReqType(str, enum.Enum):
     """ Single Pool With Multiple Assumptions """
     ComboSensitivity = "MultiComboReq"
     """ Multiple sensitivities """
-    RootFinder = "RFReq"
+    RootFinder = "RootFinderReq"
     """ Root Finder Run """
 
 
