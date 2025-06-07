@@ -206,7 +206,7 @@ def test_first_loss(setup_api):
                                     ,None)
                     ,read=True
                     )
-    closeTo(r0['FirstLossResult'][0], 31.60100353659348, r=6)
+    closeTo(r0[0], 31.60100353659348, r=6)
 
 @pytest.mark.analytics
 def test_irr_01(setup_api):

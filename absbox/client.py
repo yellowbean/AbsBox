@@ -668,36 +668,23 @@ class API:
         :return: result of run, a dict of dataframe if `read` is True.
         :rtype: dict
         """
-
-        if (poolAssump is None):
-            raise AbsboxError(f"❌ poolAssump must be set for first loss run")
-
-        url = f"{self.url}/{Endpoints.RunRootFinder.value}"
-
-        req = self.build_run_deal_req(("FL", bName), deal, poolAssump, runAssump)
-
-        if debug:
-            return req
-
-        result = self._send_req(req, url)
-
-        if result is None or 'error' in result or 'Left' in result:
-            leftVal = result.get("Left","")
-            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
-
-        if read:
-            return readAeson(result['Right'])
-        else:
-            result['Right']
+        return self.runRootFinder(deal, poolAssump, runAssump, ("firstLoss", bName), read, debug)
 
     def runRootFinder(self, deal, poolAssump, runAssump, p, read=True, debug=False) -> dict:
         """run root finder with deal and pool assumptions
-
+        :param deal: a deal object
+        :type deal: Generic | SPV
+        :param poolAssump: pool performance assumption, a tuple for single run/ a dict for multi-scenario run, defaults to None
+        :type poolAssump: tuple, optional
+        :param runAssump: deal level assumption, defaults to []
+        :type runAssump: list, optional
+        :param p: a tuple of root finder parameters
+        :type p: tuple/string
         :param read: flag to convert result to pandas dataframe, defaults to True
         :type read: bool, optional
         :param debug: return request text instead of sending out such request, defaults to False
         :type debug: bool, optional
-        :return: result of run, a dict of dataframe if `read` is True.
+        :return: result of run
         :rtype: dict
         """
 
