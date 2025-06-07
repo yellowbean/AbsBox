@@ -2174,6 +2174,7 @@ First Loss Run
 ^^^^^^^^^^^^^^^^^^^^
 
 .. versionadded:: 0.42.2
+.. deprecated:: 0.45.9
 
 User can input with an assumption with one more field ("Bond Name") compare to single run: 
 
@@ -2186,8 +2187,9 @@ User can input with an assumption with one more field ("Bond Name") compare to s
 
 Using endpoint of ``runRootFinder()``
 
+.. versionchanged:: 0.45.9
 syntax
-  ``("firstLoss",<deal>,<poolAssump>,<runAssump>,<bondName>)``
+  ``(<deal>,<poolAssump>,<runAssump>,("firstLoss", <bondName>))``
 
 
 The engine will stress on the default assumption till the bond incur a 0.01 loss.
@@ -2202,18 +2204,19 @@ Then engine return a tuple
 .. code-block:: python
 
   r0 = localAPI.runRootFinder(
-                  ("firstLoss", test01
-                      ,("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
-                              ,None
-                              ,None)
-                      ,[]
-                      ,"A1"
+                  test01
+                  ,("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
+                          ,None
+                          ,None)
+                  ,[]
+                  ,("firstLoss", "A1")
                   )
         )
   # stress factor 
-  r0['FirstLossResult'][0]
-  # stressed scenario
-  r0['FirstLossResult'][1]
+  r0[0]
+  # stressed result
+  r0[1]
+  # a tuple with (<Deal object>, <Pool Perf>, <Run Assump>)
 
 .. seealso:: 
    For details on first loss run pls refer to :ref:`First Loss Example`
@@ -2223,6 +2226,8 @@ Then engine return a tuple
 Spread Breakeven 
 ^^^^^^^^^^^^^^^^^^^^
 .. versionadded:: 0.45.3
+.. versionchanged:: 0.45.9
+.. deprecated:: 0.45.9
 
 It will tune up the spread/interest rate of a bond gradually till ``pricing of bond equals to originBalance``
 
@@ -2230,26 +2235,22 @@ It will tune up the spread/interest rate of a bond gradually till ``pricing of b
 * The bond init rate/original rate should be 0.0
 
 syntax
-  ``("maxSpreadToFace",<deal>,<poolAssump>,<runAssump>,<bondName>,<TestBondFlag>,<TestFeeFlag>)``
+  ``(<deal>,<poolAssump>,<runAssump>,("maxSpreadToFace",<bondName>,<TestBondFlag>,<TestFeeFlag>))``
 
 * ``TestBondFlag`` : if `True` , the search algo failed if any the bond in the deal is outstanding
 * ``TestFeeFlag`` : if `True` , the search algo failed if any the fee in the deal is outstanding
 
 .. code-block:: python
 
-    r = localAPI.runRootFinder(
-                                ("maxSpreadToFace"
-                                  , SLYF2501
-                                    ,p
-                                    ,newRassump
-                                    ,"A"
-                                    ,True
-                                    ,True
-                                )
-                              ,read=True)
+    r = localAPI.runRootFinder( SLYF2501
+                                ,p
+                                ,newRassump
+                                ,("maxSpreadToFace" ,"A" ,True ,True)
+                              )
 
     # to get the result 
-    r['BestSpreadResult'][0]
+    r[0] # spread added 
+    r[1][0] # the final deal object with the spread added to the bond
 
 The result value means "Additional Spread" to the original rate of the bond. Then the pricing of bond equals to 100.00 face value.
 

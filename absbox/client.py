@@ -21,6 +21,7 @@ from .local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkLiqMethod
 from .local.base import ValidationMsg
 from .exception import AbsboxError, VersionMismatch, EngineError
 from .local.interface import mkTag, readAeson
+from .rootFinder import mkTweak, mkStop
 
 VERSION_NUM = version("absbox")
 console = Console()
@@ -73,7 +74,7 @@ class RunReqType(str, enum.Enum):
     """ Single Pool With Multiple Assumptions """
     ComboSensitivity = "MultiComboReq"
     """ Multiple sensitivities """
-    RootFinder = "RootFinderReq"
+    RootFinder = "RFReq"
     """ Root Finder Run """
 
 
@@ -241,6 +242,12 @@ class API:
                 if mRunAssump == {}:
                     mRunAssump = {"Empty":{}}
                 r = mkTag((RunReqType.ComboSensitivity.value, [mDeal, mAssump, mRunAssump]))
+            case ("RootFinder", tweak, stop):
+                _deal = deal.json if hasattr(deal, "json") else deal
+                _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
+                _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
+                dealRunInput= (_deal, _perfAssump, _nonPerfAssump)
+                r = mkTag((RunReqType.RootFinder.value, [dealRunInput, mkTweak(tweak), mkStop(stop)]))
             case ("FirstLoss", bn) | ("FL", bn):
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = mkAssumpType(perfAssump)
@@ -683,7 +690,7 @@ class API:
         else:
             result['Right']
 
-    def runRootFinder(self, p, read=True, debug=False) -> dict:
+    def runRootFinder(self, deal, poolAssump, runAssump, p, read=True, debug=False) -> dict:
         """run root finder with deal and pool assumptions
 
         :param read: flag to convert result to pandas dataframe, defaults to True
@@ -697,10 +704,12 @@ class API:
         url = f"{self.url}/{Endpoints.RunRootFinder.value}"
         req = None
         match p:
-            case ("maxSpreadToFace",deal,poolAssump,runAssump,bn,bFlag,fFlag):
-                req = self.build_run_deal_req(("MaxSpreadToFaceReq",bn, bFlag, fFlag), deal, poolAssump, runAssump)
-            case ("firstLoss",deal,poolAssump,runAssump,bn):
-                req = self.build_run_deal_req(("FirstLoss",bn), deal, poolAssump, runAssump)
+            case ("firstLoss", bn):
+                req = self.build_run_deal_req(("RootFinder", "stressDefault", ("bondIncurLoss", bn)), deal, poolAssump, runAssump)
+            case ("maxSpreadToFace", bn, bFlag, fFlag):
+                req = self.build_run_deal_req(("RootFinder",("maxSpread", bn), ("bondPricingEqOriginBal", bn, bFlag, fFlag)), deal, poolAssump, runAssump)
+            case (tweak,stop):
+                req = self.build_run_deal_req(("RootFinder", tweak, stop), deal, poolAssump, runAssump)
         if debug:
             return req
 
