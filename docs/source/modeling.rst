@@ -3536,7 +3536,7 @@ Perform Actions
               )
 
 Change Bond Rate Type
-  .. versionadded:: 0.45.9
+  .. versionadded:: 0.46.1
   Change the rate type of a bond, which will change the way how interest is calculated.
 
 .. code-block:: python

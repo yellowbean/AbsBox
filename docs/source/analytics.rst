@@ -507,7 +507,7 @@ Describle the end type of lease projection,either by a ``Date`` or a ``Extend Ti
 
 * ``("byDate", "2026-09-20")`` : the date when lease projection ends
 * ``("byExtTimes", 1)`` : how many times lease will roll over for 1 time
-.. versionadded:: 0.45.9
+.. versionadded:: 0.46.1
 * ``("earlierOf", "2026-09-20", 3)`` : the lease projection ends at the earlier of the date or extend time
 * ``("laterOf", "2026-09-20", 3)`` : the lease projection ends at the later of the date or extend time
 
@@ -2174,7 +2174,7 @@ First Loss Run
 ^^^^^^^^^^^^^^^^^^^^
 
 .. versionadded:: 0.42.2
-.. deprecated:: 0.45.9
+.. deprecated:: 0.46.1
 
 User can input with an assumption with one more field ("Bond Name") compare to single run: 
 
@@ -2187,7 +2187,7 @@ User can input with an assumption with one more field ("Bond Name") compare to s
 
 Using endpoint of ``runRootFinder()``
 
-.. versionchanged:: 0.45.9
+.. versionchanged:: 0.46.1
 syntax
   ``(<deal>,<poolAssump>,<runAssump>,("firstLoss", <bondName>))``
 
@@ -2226,8 +2226,8 @@ Then engine return a tuple
 Spread Breakeven 
 ^^^^^^^^^^^^^^^^^^^^
 .. versionadded:: 0.45.3
-.. versionchanged:: 0.45.9
-.. deprecated:: 0.45.9
+.. versionchanged:: 0.46.1
+.. deprecated:: 0.46.1
 
 It will tune up the spread/interest rate of a bond gradually till ``pricing of bond equals to originBalance``
 
