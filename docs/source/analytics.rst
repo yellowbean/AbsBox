@@ -2165,9 +2165,96 @@ In combination of above three.
 Root Finder
 ----------------------
 
+.. versionchanged:: 0.46.1
+
 .. warning::
 
   This a collection of advance analytics which involves CPU intenstive task. Pls don't abuse these functions in public server.
+
+.. warning::
+
+  The root finder has been a major upgrade in version 0.46.1, the old root finder will be deprecated in future release.
+
+`Root Finder` is an advance analytics with enables user to quick find a breakeven point given an range of tweak.
+
+For example, the `First Loss Run`:
+
+* breakeven point is "A specific bond incur a 0.01 loss"
+* "range of tweak" is the `Different level of Default` in `Pool Performance Assumption`.
+
+
+
+`Tweak` and `Stop Condition`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The seperation of `Tweak` and `Stop Condition` is to make the root finder more flexible.
+
+For example, in `First Loss Run`, what if user want to stress the `Recovery Rate` instead of the `Default Rate` ?
+
+The genious design is to *Seperate* the `Tweak` and `Stop Condition`, into a 2-element tuple:
+
+   "FirstLossRun" -> ("Pool Default Stress", "Bond Incur 0.01 Loss")
+
+That would ganrantee long term flexibility of the root finder. User can swap the first element to stress on `Recovery Rate` to find the breakeven point too.
+
+   "FirstLossRun" -> ("Recovery Stress", "Bond Incur 0.01 Loss")
+
+
+syntax
+^^^^^^^^^^^^^^^^
+Use ``runRootFinder()`` to run root finder, it has four parameters:
+
+
+.. code-block:: python
+
+  r0 = api.runRootFinder(
+        <Deal Object>
+        ,<Pool Assumption>
+        ,<Run Assumption>
+        ,(<Tweak>, <Stop Condition>>)
+    )
+
+Tweak
+""""""""
+
+Stress Default
+  It will stress the default component in the pool performance assumption.
+
+  syntax
+    ``stressDefault``
+
+Max Spread
+  It will increase the spread of bond.
+  
+  syntax
+    ``("maxSpread", <bondName>)``
+
+Split Balance
+  It will adjust balance distribution of two bonds. 
+
+  syntax
+    ``("splitBalance", <bondName1>, <bondName2>)``
+
+Stop Condition
+"""""""""""""""""""""
+
+Bond Incur Loss
+  The search stop when a bond incur a loss of 0.01
+  
+  syntax
+    ``("bondIncurLoss", <bondName>)``
+
+Bond Pricing Equals to Face
+  The search stop when a bond pricing equals to face value.
+  
+  syntax
+    ``("bondPricingEqToOrigin", <bondName>, <TestBondFlag>, <TestFeeFlag>)``
+
+Bond with target IRR
+  The search stop when a bond hit a target IRR.
+  
+  syntax
+    ``("bondMetTargetIrr", <bondName>, <targetIRR>)``
 
 
 First Loss Run
@@ -2187,7 +2274,6 @@ User can input with an assumption with one more field ("Bond Name") compare to s
 
 Using endpoint of ``runRootFinder()``
 
-.. versionchanged:: 0.46.1
 syntax
   ``(<deal>,<poolAssump>,<runAssump>,("firstLoss", <bondName>))``
 
@@ -2226,7 +2312,6 @@ Then engine return a tuple
 Spread Breakeven 
 ^^^^^^^^^^^^^^^^^^^^
 .. versionadded:: 0.45.3
-.. versionchanged:: 0.46.1
 .. deprecated:: 0.46.1
 
 It will tune up the spread/interest rate of a bond gradually till ``pricing of bond equals to originBalance``
