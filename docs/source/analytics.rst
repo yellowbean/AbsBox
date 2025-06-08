@@ -2177,6 +2177,10 @@ Root Finder
 
 `Root Finder` is an advance analytics with enables user to quick find a breakeven point given an range of tweak.
 
+A tweak can be apply to a deal object ( mostly for structuring purpose) , or pool assumption or deal run assumption
+A breakeven point can be a *specific shape* on deal run result: can be bond pricing result, pool cashflow, account cashflow/fee cashflow etc.
+
+
 For example, the `First Loss Run`:
 
 * breakeven point is "A specific bond incur a 0.01 loss"
