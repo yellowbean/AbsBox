@@ -2191,7 +2191,7 @@ The seperation of `Tweak` and `Stop Condition` is to make the root finder more f
 
 For example, in `First Loss Run`, what if user want to stress the `Recovery Rate` instead of the `Default Rate` ?
 
-The genious design is to *Seperate* the `Tweak` and `Stop Condition`, into a 2-element tuple:
+The genius design is to *Seperate* the `Tweak` and `Stop Condition`, into a 2-element tuple:
 
    "FirstLossRun" -> ("Pool Default Stress", "Bond Incur 0.01 Loss")
 
