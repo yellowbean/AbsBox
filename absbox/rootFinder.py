@@ -5,6 +5,8 @@ def mkTweak(x):
     match x:
         case "stressDefault":
             return mkTag(("StressPoolDefault"))
+        case "stressPrepayment":
+            return mkTag(("StressPoolPrepayment"))
         case ("maxSpread", bn):
             return mkTag(("MaxSpreadTo", vStr(bn)))
         case ("splitBalance", bn1 ,bn2):

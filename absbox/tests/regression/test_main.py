@@ -217,7 +217,6 @@ def test_irr_01(setup_api):
                     ,runAssump = [("pricing",{"IRR":{"B":("holding",[("2021-04-01",-500)],500)}})]
                     ,read=True
                     )
-    #print(">>>", r0)
     closeTo(r0['pricing']['summary'].loc["B"].IRR, 0.264238, r=6)
 
     r1 = setup_api.run(Irr01
@@ -244,6 +243,17 @@ def test_irr_01(setup_api):
     
     closeTo(r3['pricing']['summary'].loc["A1"].IRR, 0.12248, r=6)
 
+
+@pytest.mark.analytics
+def test_rootfind_stressppy(setup_api):
+    poolPerf = ("Pool",("Mortgage",{"CDR":0.002},{"CPR":0.001},{"Rate":0.1,"Lag":18},None)
+                                 ,None
+                                 ,None)
+    pricing = ("pricing",{"IRR":{"B":("holding",[("2021-04-15",-1000)],1000)}})
+    r = setup_api.runRootFinder(test01, poolPerf ,[pricing]
+        ,("stressPrepayment",("bondMetTargetIrr", "B", 0.25))
+    )
+    assert r[1][1]['PoolLevel'][0]['MortgageAssump'][1] == {'PrepaymentCPR': {'numerator': 3398995543294071, 'denominator': 8796093022208000}} 
 
 @pytest.mark.bond
 def test_pac_01(setup_api):
