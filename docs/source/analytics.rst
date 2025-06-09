@@ -454,6 +454,7 @@ Notes:
   * ``<turnover gap>`` ->  assumption on gap days between new lease and old lease
   * ``<rental assump>`` -> describe the rental increase/decrease over time
   * ``<end type>`` 
+
     * ``("byDate", "2026-09-20")``-> the date when lease projection ends 
     * ``("byExtTimes",1)``-> how many times lease will roll over
 

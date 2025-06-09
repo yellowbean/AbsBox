@@ -6,3 +6,4 @@ Run Deals
 
    run_deal
    Irr_001
+   structuring-lease-doc
