@@ -2251,10 +2251,23 @@ Stop Condition
 """""""""""""""""""""
 
 Bond Incur Loss
-  The search stop when a bond incur a loss of 0.01
+  The search stop when a bond incur a loss of 0.01 (outstanding bond principal or interest due amount)
   
   syntax
     ``("bondIncurLoss", <bondName>)``
+
+Bond Principal Incur Loss
+  The search stop when a bond incur a loss of ``threshold`` on principal amount.
+  
+  syntax
+    ``("bondIncurPrinLoss", <bondName>, <threshold>)``
+
+Bond Interest Incur Loss
+  The search stop when a bond incur a loss of ``threshold`` on interest due amount.
+  
+  syntax
+    ``("bondIncurIntLoss", <bondName>, <threshold>)``
+
 
 Bond Pricing Equals to Face
   The search stop when a bond pricing equals to face value.

@@ -18,6 +18,10 @@ def mkStop(x):
     match x:
         case ("bondIncurLoss", bn):
             return mkTag(("BondIncurLoss", vStr(bn)))
+        case ("bondIncurPrinLoss", bn, amt):
+            return mkTag(("BondIncurPrinLoss", [vStr(bn), amt]))
+        case ("bondIncurIntLoss", bn, amt):
+            return mkTag(("BondIncurIntLoss", [vStr(bn), amt]))
         case ("bondPricingEqOriginBal", bn, f1, f2):
             return mkTag(("BondPricingEqOriginBal", [vStr(bn), f1, f2] ))
         case ("bondMetTargetIrr", bn, irr):
