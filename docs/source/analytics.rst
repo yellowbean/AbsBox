@@ -2228,6 +2228,13 @@ Stress Default
   syntax
     ``stressDefault``
 
+Stress Prepayment
+  It will stress the prepayment component in the pool performance assumption.
+
+  syntax
+    ``stressPrepayment``
+
+
 Max Spread
   It will increase the spread of bond.
   
