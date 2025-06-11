@@ -1,5 +1,5 @@
 from .local.interface import mkTag
-from .validation import vStr
+from .validation import vStr,vBool,vNum
 
 def mkTweak(x):
     match x:
@@ -19,12 +19,12 @@ def mkStop(x):
         case ("bondIncurLoss", bn):
             return mkTag(("BondIncurLoss", vStr(bn)))
         case ("bondIncurPrinLoss", bn, amt):
-            return mkTag(("BondIncurPrinLoss", [vStr(bn), amt]))
+            return mkTag(("BondIncurPrinLoss", [vStr(bn), vNum(amt)]))
         case ("bondIncurIntLoss", bn, amt):
-            return mkTag(("BondIncurIntLoss", [vStr(bn), amt]))
+            return mkTag(("BondIncurIntLoss", [vStr(bn), vNum(amt)]))
         case ("bondPricingEqOriginBal", bn, f1, f2):
-            return mkTag(("BondPricingEqOriginBal", [vStr(bn), f1, f2] ))
+            return mkTag(("BondPricingEqOriginBal", [vStr(bn), vBool(f1), vBool(f2)] ))
         case ("bondMetTargetIrr", bn, irr):
-            return mkTag(("BondMetTargetIrr", [vStr(bn), irr]))
+            return mkTag(("BondMetTargetIrr", [vStr(bn), vNum(irr)]))
         case _:
             raise RuntimeError(f"failed to match {x}:mkStop")

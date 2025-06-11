@@ -2281,6 +2281,8 @@ Bond with target IRR
   syntax
     ``("bondMetTargetIrr", <bondName>, <targetIRR>)``
 
+.. seealso:: 
+   For details on first loss run pls refer to :ref:` A Lease Deal Example with root finder`
 
 First Loss Run
 ^^^^^^^^^^^^^^^^^^^^
