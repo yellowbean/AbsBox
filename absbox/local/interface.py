@@ -13,6 +13,8 @@ def readAeson(x:dict):
     match x:
         case {"tag": tag,"contents": contents} if isinstance(contents,list):
             return {tag: [readAeson(c) for c in contents]}
+        case {"tag": tag,"contents": {'numerator': n,'denominator': de}} :
+            return {tag: (n/de)}
         case {"tag": tag,"contents": contents} if isinstance(contents,dict):
             return {tag: {k: readAeson(v) for k,v in contents.items()} }            
         case {"tag": tag,"contents": contents} if isinstance(contents,str):
@@ -42,9 +44,4 @@ def readAeson(x:dict):
         case _:
             raise RuntimeError("failed to match",x)
 
-def toAeson(x:dict | tuple):
-    pass
 
-
-def fromAeson(x:dict):
-    pass

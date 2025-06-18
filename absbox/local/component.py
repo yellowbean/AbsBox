@@ -1332,6 +1332,8 @@ def mkTriggerEffect(x):
             return mkTag(("ChangeReserveBalance", [vStr(accName), mkAccType(newReserve)]))
         case ["结果", *efs] | ["Effects", *efs] | ("Effects", *efs):
             return mkTag(("TriggerEffects", [mkTriggerEffect(e) for e in efs]))
+        case ("changeBondRate", bndName, bondRateType, newRate):
+            return mkTag(("ChangeBondRate", [vStr(bndName), mkBondRate(bondRateType), vNum(newRate)]))
         case None:
             return mkTag(("DoNothing"))
         case _:
@@ -1815,9 +1817,13 @@ def mkAssumpLeaseRent(x):
 def mkAssumpLeaseEndType(x):
     match x:
         case {"byDate":d} | ("byDate", d):
-            return mkTag("CutByDate", vDate(d))
+            return mkTag(("CutByDate", vDate(d)))
         case {"stopByExtNum":n} | ("byExtTimes",n):
-            return mkTag("StopByExtTimes", vInt(n))
+            return mkTag(("StopByExtTimes", vInt(n)))
+        case ("earlierOf", d, n):
+            return mkTag(("EarlierOf", [vDate(d), vInt(n)]))
+        case ("laterOf", d, n):
+            return mkTag(("LaterOf", [vDate(d), vInt(n)]))
         case _:
             raise RuntimeError(f"failed to match {x}:mkAssumpLeaseEndType")
 
@@ -1855,18 +1861,7 @@ def mkDefaultedAssumption(x):
 
 
 def mkDelinqAssumption(x):
-    #return "DummyDelinqAssump"
-    #return mkTag("DummyDelinqAssump")
     return []
-
-def mkEndType(x):
-    match x:
-        case ("byDate", d):
-            return mkTag(("CutByDate",vDate(d)))
-        case ("byExtTimes",n):
-            return mkTag(("StopByExtTimes", vNum(n)))
-        case _:
-            raise RuntimeError(f"failed to match {x} : mkEndType")
 
 def mkPerfAssumption(x):
     "Make assumption on performing assets"
@@ -1901,7 +1896,7 @@ def mkPerfAssumption(x):
             return mkTag(("LeaseAssump",[earlyReturnNone(mkAssumpLeaseDefaultType,md)
                                         ,mkAssumpLeaseGap(gap)
                                         ,mkAssumpLeaseRent(rent)
-                                        ,mkEndType(endType)
+                                        ,mkAssumpLeaseEndType(endType)
                                         ]))
         case ("Loan",md,mp,mr,mes):
             d = earlyReturnNone(mkAssumpDefault,md)

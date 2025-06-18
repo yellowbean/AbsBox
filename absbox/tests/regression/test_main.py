@@ -206,7 +206,7 @@ def test_first_loss(setup_api):
                                     ,None)
                     ,read=True
                     )
-    closeTo(r0['FirstLossResult'][0], 31.60100353659348, r=6)
+    closeTo(r0[0], 31.60100353659348, r=6)
 
 @pytest.mark.analytics
 def test_irr_01(setup_api):
@@ -217,7 +217,6 @@ def test_irr_01(setup_api):
                     ,runAssump = [("pricing",{"IRR":{"B":("holding",[("2021-04-01",-500)],500)}})]
                     ,read=True
                     )
-    #print(">>>", r0)
     closeTo(r0['pricing']['summary'].loc["B"].IRR, 0.264238, r=6)
 
     r1 = setup_api.run(Irr01
@@ -243,6 +242,31 @@ def test_irr_01(setup_api):
                 ,read=True)
     
     closeTo(r3['pricing']['summary'].loc["A1"].IRR, 0.12248, r=6)
+
+
+@pytest.mark.analytics
+def test_rootfind_stressppy(setup_api):
+    poolPerf = ("Pool",("Mortgage",{"CDR":0.002},{"CPR":0.001},{"Rate":0.1,"Lag":18},None)
+                                 ,None
+                                 ,None)
+    pricing = ("pricing",{"IRR":{"B":("holding",[("2021-04-15",-1000)],1000)}})
+    r = setup_api.runRootFinder(test01, poolPerf ,[pricing]
+        ,("stressPrepayment",("bondMetTargetIrr", "B", 0.25))
+    )
+    assert r[1][1]['PoolLevel'][0]['MortgageAssump'][1] == {'PrepaymentCPR': 0.38642105474696914 } 
+
+@pytest.mark.analytics
+def test_rootfind_stressdef(setup_api):
+    poolPerf = ("Pool",("Mortgage",{"CDR":0.002},{"CPR":0.001},{"Rate":0.1,"Lag":18},None)
+                                 ,None
+                                 ,None)
+    pricing = ("pricing",{"IRR":{"B":("holding",[("2021-04-15",-1000)],1000)}})
+    r = setup_api.runRootFinder(test01, poolPerf ,[pricing]
+        ,("stressDefault",("bondMetTargetIrr", "B", 0.10))
+    )
+    assert r[1][1]['PoolLevel'][0]['MortgageAssump'][0] == {'DefaultCDR': 0.07603587859615266} 
+
+
 
 
 @pytest.mark.bond
@@ -275,3 +299,44 @@ def test_bondGrp(setup_api):
     grpFlow = readBondsCf(r['bonds'])['A'].xs('balance',axis=1,level=1)
     assert grpFlow.A1.to_list()[:8] == [1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 993.93]
     assert grpFlow.A2.to_list()[:8] == [510.6, 436.68, 364.06, 290.75, 217.26, 143.1, 68.74, 0.0,]
+
+@pytest.mark.trigger
+def test_trigger_chgBondRate(setup_api):
+    withTrigger = test01 & lens.trigger.set({
+                    "BeforeDistribution":{
+                        "changeBndRt":{"condition":[">=","2021-08-20"]
+                                    ,"effects":("changeBondRate", "A1", {"floater":[0.05, "SOFR1Y",-0.02,"MonthEnd"]}, 0.12)
+                                    ,"status":False
+                                    ,"curable":False}
+                    }
+                    })
+    r = setup_api.run(withTrigger , read=True ,runAssump = [("interest",("SOFR1Y",0.04))])
+    assert r['bonds']['A1'].rate.to_list() == [0.07, 0.12, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02]
+
+@pytest.mark.pool
+def test_pool_lease_end(setup_api):
+    """ Lease end date """
+    myPool = {'assets':[l1],'cutoffDate':"2022-01-01"}
+    r = setup_api.runPool(myPool
+                  ,poolAssump=("Pool",("Lease", None, ('days', 20) , ('byAnnualRate', 0.0), ("byExtTimes", 2))
+                                       ,None
+                                       ,None
+                                       )
+                  ,read=True)
+    assert r['PoolConsol'][0].index[-1] == '2024-12-15'
+
+    r = setup_api.runPool(myPool
+                  ,poolAssump=("Pool",("Lease", None, ('days', 20) , ('byAnnualRate', 0.0), ("earlierOf", "2023-11-15", 2))
+                                       ,None
+                                       ,None
+                                       )
+                  ,read=True)
+    assert r['PoolConsol'][0].index[-1] == '2023-12-15'
+
+    r = setup_api.runPool(myPool
+                  ,poolAssump=("Pool",("Lease", None, ('days', 20) , ('byAnnualRate', 0.0), ("laterOf", "2023-11-15", 3))
+                                       ,None
+                                       ,None
+                                       )
+                  ,read=True)
+    assert r['PoolConsol'][0].index[-1] == '2025-12-15'

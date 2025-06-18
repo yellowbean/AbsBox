@@ -30,3 +30,9 @@ m1 = ["Mortgage"
             ,"currentRate": 0.075
             ,"remainTerm": 12
             ,"status": "Current"}]
+
+l1 = ["Lease"
+        ,{"rental":("byDay", 12.0, ["DayOfMonth",15])
+        ,"originTerm": 12
+        ,"originDate": "2022-01-05"}
+        ,{"status":"Current" ,"remainTerm":6 ,"currentBalance":150}]

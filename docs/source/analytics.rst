@@ -454,6 +454,7 @@ Notes:
   * ``<turnover gap>`` ->  assumption on gap days between new lease and old lease
   * ``<rental assump>`` -> describe the rental increase/decrease over time
   * ``<end type>`` 
+
     * ``("byDate", "2026-09-20")``-> the date when lease projection ends 
     * ``("byExtTimes",1)``-> how many times lease will roll over
 
@@ -507,6 +508,9 @@ Describle the end type of lease projection,either by a ``Date`` or a ``Extend Ti
 
 * ``("byDate", "2026-09-20")`` : the date when lease projection ends
 * ``("byExtTimes", 1)`` : how many times lease will roll over for 1 time
+.. versionadded:: 0.46.1
+* ``("earlierOf", "2026-09-20", 3)`` : the lease projection ends at the earlier of the date or extend time
+* ``("laterOf", "2026-09-20", 3)`` : the lease projection ends at the later of the date or extend time
 
 Summary
 """"""""""""""""
@@ -2162,15 +2166,129 @@ In combination of above three.
 Root Finder
 ----------------------
 
+.. versionchanged:: 0.46.1
+
 .. warning::
 
   This a collection of advance analytics which involves CPU intenstive task. Pls don't abuse these functions in public server.
 
+.. warning::
+
+  The root finder has been a major upgrade in version 0.46.1, the old root finder will be deprecated in future release.
+
+`Root Finder` is an advance analytics with enables user to quick find a breakeven point given an range of tweak.
+
+A tweak can be apply to a deal object ( mostly for structuring purpose) , or pool assumption or deal run assumption
+A breakeven point can be a *specific shape* on deal run result: can be bond pricing result, pool cashflow, account cashflow/fee cashflow etc.
+
+
+For example, the `First Loss Run`:
+
+* breakeven point is "A specific bond incur a 0.01 loss"
+* "range of tweak" is the `Different level of Default` in `Pool Performance Assumption`.
+
+
+
+`Tweak` and `Stop Condition`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The seperation of `Tweak` and `Stop Condition` is to make the root finder more flexible.
+
+For example, in `First Loss Run`, what if user want to stress the `Recovery Rate` instead of the `Default Rate` ?
+
+The genius design is to *Seperate* the `Tweak` and `Stop Condition`, into a 2-element tuple:
+
+   "FirstLossRun" -> ("Pool Default Stress", "Bond Incur 0.01 Loss")
+
+That would ganrantee long term flexibility of the root finder. User can swap the first element to stress on `Recovery Rate` to find the breakeven point too.
+
+   "FirstLossRun" -> ("Recovery Stress", "Bond Incur 0.01 Loss")
+
+
+syntax
+^^^^^^^^^^^^^^^^
+Use ``runRootFinder()`` to run root finder, it has four parameters:
+
+
+.. code-block:: python
+
+  r0 = api.runRootFinder(
+        <Deal Object>
+        ,<Pool Assumption>
+        ,<Run Assumption>
+        ,(<Tweak>, <Stop Condition>>)
+    )
+
+Tweak
+""""""""
+
+Stress Default
+  It will stress the default component in the pool performance assumption.
+
+  syntax
+    ``stressDefault``
+
+Stress Prepayment
+  It will stress the prepayment component in the pool performance assumption.
+
+  syntax
+    ``stressPrepayment``
+
+
+Max Spread
+  It will increase the spread of bond.
+  
+  syntax
+    ``("maxSpread", <bondName>)``
+
+Split Balance
+  It will adjust balance distribution of two bonds. 
+
+  syntax
+    ``("splitBalance", <bondName1>, <bondName2>)``
+
+Stop Condition
+"""""""""""""""""""""
+
+Bond Incur Loss
+  The search stop when a bond incur a loss of 0.01 (outstanding bond principal or interest due amount)
+  
+  syntax
+    ``("bondIncurLoss", <bondName>)``
+
+Bond Principal Incur Loss
+  The search stop when a bond incur a loss of ``threshold`` on principal amount.
+  
+  syntax
+    ``("bondIncurPrinLoss", <bondName>, <threshold>)``
+
+Bond Interest Incur Loss
+  The search stop when a bond incur a loss of ``threshold`` on interest due amount.
+  
+  syntax
+    ``("bondIncurIntLoss", <bondName>, <threshold>)``
+
+
+Bond Pricing Equals to Face
+  The search stop when a bond pricing equals to face value.
+  
+  syntax
+    ``("bondPricingEqToOrigin", <bondName>, <TestBondFlag>, <TestFeeFlag>)``
+
+Bond with target IRR
+  The search stop when a bond hit a target IRR.
+  
+  syntax
+    ``("bondMetTargetIrr", <bondName>, <targetIRR>)``
+
+.. seealso:: 
+   For details on first loss run pls refer to :ref:`A Lease Deal Example with root finder`
 
 First Loss Run
 ^^^^^^^^^^^^^^^^^^^^
 
 .. versionadded:: 0.42.2
+.. deprecated:: 0.46.1
 
 User can input with an assumption with one more field ("Bond Name") compare to single run: 
 
@@ -2184,7 +2302,7 @@ User can input with an assumption with one more field ("Bond Name") compare to s
 Using endpoint of ``runRootFinder()``
 
 syntax
-  ``("firstLoss",<deal>,<poolAssump>,<runAssump>,<bondName>)``
+  ``(<deal>,<poolAssump>,<runAssump>,("firstLoss", <bondName>))``
 
 
 The engine will stress on the default assumption till the bond incur a 0.01 loss.
@@ -2199,18 +2317,19 @@ Then engine return a tuple
 .. code-block:: python
 
   r0 = localAPI.runRootFinder(
-                  ("firstLoss", test01
-                      ,("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
-                              ,None
-                              ,None)
-                      ,[]
-                      ,"A1"
+                  test01
+                  ,("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
+                          ,None
+                          ,None)
+                  ,[]
+                  ,("firstLoss", "A1")
                   )
         )
   # stress factor 
-  r0['FirstLossResult'][0]
-  # stressed scenario
-  r0['FirstLossResult'][1]
+  r0[0]
+  # stressed result
+  r0[1]
+  # a tuple with (<Deal object>, <Pool Perf>, <Run Assump>)
 
 .. seealso:: 
    For details on first loss run pls refer to :ref:`First Loss Example`
@@ -2220,6 +2339,7 @@ Then engine return a tuple
 Spread Breakeven 
 ^^^^^^^^^^^^^^^^^^^^
 .. versionadded:: 0.45.3
+.. deprecated:: 0.46.1
 
 It will tune up the spread/interest rate of a bond gradually till ``pricing of bond equals to originBalance``
 
@@ -2227,26 +2347,22 @@ It will tune up the spread/interest rate of a bond gradually till ``pricing of b
 * The bond init rate/original rate should be 0.0
 
 syntax
-  ``("maxSpreadToFace",<deal>,<poolAssump>,<runAssump>,<bondName>,<TestBondFlag>,<TestFeeFlag>)``
+  ``(<deal>,<poolAssump>,<runAssump>,("maxSpreadToFace",<bondName>,<TestBondFlag>,<TestFeeFlag>))``
 
 * ``TestBondFlag`` : if `True` , the search algo failed if any the bond in the deal is outstanding
 * ``TestFeeFlag`` : if `True` , the search algo failed if any the fee in the deal is outstanding
 
 .. code-block:: python
 
-    r = localAPI.runRootFinder(
-                                ("maxSpreadToFace"
-                                  , SLYF2501
-                                    ,p
-                                    ,newRassump
-                                    ,"A"
-                                    ,True
-                                    ,True
-                                )
-                              ,read=True)
+    r = localAPI.runRootFinder( SLYF2501
+                                ,p
+                                ,newRassump
+                                ,("maxSpreadToFace" ,"A" ,True ,True)
+                              )
 
     # to get the result 
-    r['BestSpreadResult'][0]
+    r[0] # spread added 
+    r[1][0] # the final deal object with the spread added to the bond
 
 The result value means "Additional Spread" to the original rate of the bond. Then the pricing of bond equals to 100.00 face value.
 

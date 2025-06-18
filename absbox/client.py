@@ -21,6 +21,7 @@ from .local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkLiqMethod
 from .local.base import ValidationMsg
 from .exception import AbsboxError, VersionMismatch, EngineError
 from .local.interface import mkTag, readAeson
+from .rootFinder import mkTweak, mkStop
 
 VERSION_NUM = version("absbox")
 console = Console()
@@ -241,6 +242,12 @@ class API:
                 if mRunAssump == {}:
                     mRunAssump = {"Empty":{}}
                 r = mkTag((RunReqType.ComboSensitivity.value, [mDeal, mAssump, mRunAssump]))
+            case ("RootFinder", tweak, stop):
+                _deal = deal.json if hasattr(deal, "json") else deal
+                _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
+                _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
+                dealRunInput= (_deal, _perfAssump, _nonPerfAssump)
+                r = mkTag((RunReqType.RootFinder.value, [dealRunInput, mkTweak(tweak), mkStop(stop)]))
             case ("FirstLoss", bn) | ("FL", bn):
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = mkAssumpType(perfAssump)
@@ -661,46 +668,35 @@ class API:
         :return: result of run, a dict of dataframe if `read` is True.
         :rtype: dict
         """
+        return self.runRootFinder(deal, poolAssump, runAssump, ("firstLoss", bName), read, debug)
 
-        if (poolAssump is None):
-            raise AbsboxError(f"❌ poolAssump must be set for first loss run")
-
-        url = f"{self.url}/{Endpoints.RunRootFinder.value}"
-
-        req = self.build_run_deal_req(("FL", bName), deal, poolAssump, runAssump)
-
-        if debug:
-            return req
-
-        result = self._send_req(req, url)
-
-        if result is None or 'error' in result or 'Left' in result:
-            leftVal = result.get("Left","")
-            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
-
-        if read:
-            return readAeson(result['Right'])
-        else:
-            result['Right']
-
-    def runRootFinder(self, p, read=True, debug=False) -> dict:
+    def runRootFinder(self, deal, poolAssump, runAssump, p, read=True, debug=False) -> dict:
         """run root finder with deal and pool assumptions
-
+        :param deal: a deal object
+        :type deal: Generic | SPV
+        :param poolAssump: pool performance assumption, a tuple for single run/ a dict for multi-scenario run, defaults to None
+        :type poolAssump: tuple, optional
+        :param runAssump: deal level assumption, defaults to []
+        :type runAssump: list, optional
+        :param p: a tuple of root finder parameters
+        :type p: tuple/string
         :param read: flag to convert result to pandas dataframe, defaults to True
         :type read: bool, optional
         :param debug: return request text instead of sending out such request, defaults to False
         :type debug: bool, optional
-        :return: result of run, a dict of dataframe if `read` is True.
+        :return: result of run
         :rtype: dict
         """
 
         url = f"{self.url}/{Endpoints.RunRootFinder.value}"
         req = None
         match p:
-            case ("maxSpreadToFace",deal,poolAssump,runAssump,bn,bFlag,fFlag):
-                req = self.build_run_deal_req(("MaxSpreadToFaceReq",bn, bFlag, fFlag), deal, poolAssump, runAssump)
-            case ("firstLoss",deal,poolAssump,runAssump,bn):
-                req = self.build_run_deal_req(("FirstLoss",bn), deal, poolAssump, runAssump)
+            case ("firstLoss", bn):
+                req = self.build_run_deal_req(("RootFinder", "stressDefault", ("bondIncurLoss", bn)), deal, poolAssump, runAssump)
+            case ("maxSpreadToFace", bn, bFlag, fFlag):
+                req = self.build_run_deal_req(("RootFinder",("maxSpread", bn), ("bondPricingEqOriginBal", bn, bFlag, fFlag)), deal, poolAssump, runAssump)
+            case (tweak,stop):
+                req = self.build_run_deal_req(("RootFinder", tweak, stop), deal, poolAssump, runAssump)
         if debug:
             return req
 

@@ -59,6 +59,7 @@ minversion = "7.0"
 addopts = "-ra -q --color=yes  --import-mode=importlib"
 markers = [
     "pool","account","bond","fee","interest","collect","asset","performance",
+    "trigger",
     "TB","analytics","dontrun"
 ]
 
