@@ -2568,8 +2568,10 @@ def mkCallOptions(x):
 def mkNonPerfAssumps(r, xs:list) -> dict:
     def translate(y) -> dict:
         match y:
+            case ("stop", dp, *p):
+                return {"stopRunBy": mkTag("StopByPre", [mkDatePattern(dp), lmap(mkPre,p)])}
             case ("stop", d):
-                return {"stopRunBy":vDate(d)}
+                return {"stopRunBy": mkTag("StopByDate", vDate(d))}
             case ("estimateExpense", *projectExps):
                 return {"projectedExpense":[(vStr(fn),mkTs("BalanceCurve",ts)) for (fn, ts) in projectExps]}
             case ("call", *opts):
