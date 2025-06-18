@@ -801,12 +801,24 @@ Deal Assumption
 Stop Run
 ^^^^^^^^^^^^^^
 
+A debugging assumption to stop the deal projection. Either stop by a specific date or by a :ref:`Condition`.
+
 cashflow projection will stop at the date specified.
 
 .. code-block:: python
 
   ("stop","2021-01-01")
 
+.. versionadded:: 0.46.5 
+
+After 0.46.5, the stop run can be specified by a :ref:`Condition` which will be evaluated on each distribution date described by :ref:`DatePattern`.
+
+    ("stop", <DatePattern>, *<Condition>)
+
+.. code-block:: python
+
+    # on each month end, the engine will evaluate two conditions, stop projection when ALL of them are met
+    ("stop", "MonthEnd", [">=","2022-01-01"], [("bondBalance","A1"),"<=",200])
 
 
 Project Expense
