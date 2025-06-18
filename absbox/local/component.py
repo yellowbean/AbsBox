@@ -2564,7 +2564,7 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
     def translate(y) -> dict:
         match y:
             case ("stop", dp, *p):
-                return {"stopRunBy": mkTag("StopByPre", [mkDatePattern(dp), lmap(mkPre,p)])}
+                return {"stopRunBy": mkTag(("StopByPre", [mkDatePattern(dp), lmap(mkPre,p)]))}
             case ("stop", d):
                 return {"stopRunBy": mkTag("StopByDate", vDate(d))}
             case ("estimateExpense", *projectExps):
