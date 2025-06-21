@@ -730,9 +730,9 @@ User supply a list of rules to match assets, each rule will match a set of asset
 .. code-block:: python
 
    #syntax 
-   ("Obligor",("ByTag",<tags>,<match rule>,<assumption>)
-              ,("ById",<ids>,<assumption>)
-              ,("ByDefault",<assumption>))
+   ("ByObligor",("ByTag",<tags>,<match rule>,<assumption>)
+               ,("ById",<ids>,<assumption>)
+               ,("ByDefault",<assumption>))
 
 
 .. seealso::
@@ -755,10 +755,10 @@ Field Match Rule:
 
 .. code-block:: python
 
-   ("Obligor",("ByTag",<tags>,<match rule>,<assumption>)
-              ,("ById",<ids>,<assumption>)
-              ,("ByField",[<field match rule>],<assumption>)
-              ,("ByDefault",<assumption>))
+   ("ByObligor",("ByTag",<tags>,<match rule>,<assumption>)
+               ,("ById",<ids>,<assumption>)
+               ,("ByField",[<field match rule>],<assumption>)
+               ,("ByDefault",<assumption>))
 
 By Pool Name 
 """"""""""""""""""
