@@ -18,7 +18,7 @@ from .local.chart import viz
 from .local.cf import readBondsCf,readToCf,readFeesCf,readAccsCf,readPoolsCf,readFlowsByScenarios,readMultiFlowsByScenarios,readFieldsByScenarios
 from .local.cf import readInspect, readLedgers, readTriggers
 from .local.cf import BondCfHeader
-from .local.interface import readAeson, toAeson, fromAeson
+from .local.interface import readAeson 
 from .report import toHtml,OutputType,toExcel
 
 from . import examples

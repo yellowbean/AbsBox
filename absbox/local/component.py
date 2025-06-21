@@ -304,6 +304,10 @@ def mkDs(x):
                 if pNames:
                     return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), lmap(mkPid,pNames)]))
                 return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), None]))
+            case ("资产池加权利差", pNames) | ("PoolWaSpread", pNames):
+                if pNames:
+                    return mkTag(("PoolWaSpread", lmap(mkPid,pNames)))
+                return mkTag(("PoolWaSpread", None))
             case ("债券系数", bn) | ("bondFactor", bn):
                 return mkTag(("BondFactorOf", bn))
             case ("债券系数",) | ("bondFactor",):

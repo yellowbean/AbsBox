@@ -11,6 +11,5 @@ lenses
 rich
 graphviz
 dateparser
-pyxirr
 more-itertools
 pytest-notebook
