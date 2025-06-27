@@ -606,9 +606,11 @@ Pool assumption can be applied via multiple ways:
         rankdir = LR
         "Asset Assumption" -> "Whole Pool"
         "Asset Assumption" -> "By Pool Name"
+        "Asset Assumption" -> "By Pool Id"
         "Asset Assumption" -> "By Deal Name"
         "Whole Pool" -> "('Pool',<assump>)"
-        "By Pool Name" -> "('ByPoolId',<assump>)"
+        "By Pool Name" -> "('ByName',<assump map>)"
+        "By Pool Id" -> "('ByPoolId',<assump map>)"
         "By Deal Name" -> "('ByDealName',<assump>)"
         "Asset Assumption" -> "By Pool Index"
         "By Pool Index" -> "('ByIndex',(index,<assump>)...)"
@@ -633,11 +635,20 @@ The assump will be applied to *ALL* assets in the pool
 
 .. code-block:: python
    
-   #syntax 
+   # For Loan type asset
    ("Pool",("Loan",<default assump>,<prepay assump>,<recovery assump>,<extra assump>)
                                    ,<delinq assumption>
                                    ,<defaulted assumption>)
 
+   ("Pool",("Mortgage",<default assump>,<prepay assump>,<recovery assump>,<extra assump>)
+                                   ,<delinq assumption>
+                                   ,<defaulted assumption>)
+
+   ("Pool",("Installment",<default assump>,<prepay assump>,<recovery assump>,<extra assump>)
+                                   ,<delinq assumption>
+                                   ,<defaulted assumption>)
+
+   # others
 
 Asset Level By Index
 """"""""""""""""""""""""
@@ -648,8 +659,8 @@ The assumption will be applied to assets by their index position in the pool
    
    #syntax 
    ("ByIndex"
-     ,([<asset id>],(<default assump>,<prepay assump>,<recvoery assump>))
-     ,([<asset id>],(<default assump>,<prepay assump>,<recvoery assump>))
+     ,([<asset id>..],(<performing assump>,<delinq assump>,<defaulted assump>))
+     ,([<asset id>..],(<performing assump>,<delinq assump>,<defaulted assump>))
      ,....
      )
 
@@ -764,11 +775,34 @@ By Pool Name
 """"""""""""""""""
 
 This assumption map with key of assumption to the name of pool.
+It will apply *Pool Level* assumption to pools with same name
 
 .. code-block:: python
 
    #syntax 
-   ("ByPoolName",<assumption>)
+   ("ByName",<assumption map>)
+
+Assumption map
+  Key -> Pool Name/Id
+  Value -> (<performing assumption> ,<delinq assumption> ,<defaulted assumption>)
+
+
+By Pool Id
+""""""""""""""""""
+
+This assumption map with key of assumption to the name of pool.
+It will apply *Any Level* assumption to pools with same name
+
+
+.. code-block:: python
+
+   #syntax 
+   ("ByPoolId",<assumption map>)
+
+Assumption map
+  Key -> Pool Name/Id
+  Value -> <Any Pool Assumption>
+
 
 
 By Deal Name
@@ -1436,7 +1470,7 @@ returns:
 .. code-block:: python
 
   localAPI.run(test01,
-               poolAssump=("Pool",("Mortgage",{"CPR":0.01},{"CDR":0.01},{"Rate":0.7,"Lag":18})
+               poolAssump=("Pool",("Mortgage",{"CPR":0.01},{"CDR":0.01},{"Rate":0.7,"Lag":18},None)
                                  ,None
                                  ,None),
                runAssump =[("pricing"
@@ -1453,10 +1487,10 @@ Pass a map to ``poolAssump`` to run multiple scenarios.
 .. code-block:: python
 
   localAPI.runByScenarios(test01,
-                          poolAssump={"ScenarioA":("Pool",("Mortgage",{"CPR":0.01},{"CDR":0.01},{"Rate":0.7,"Lag":18})
+                          poolAssump={"ScenarioA":("Pool",("Mortgage",{"CPR":0.01},{"CDR":0.01},{"Rate":0.7,"Lag":18},None)
                                             ,None
                                             ,None)
-                                      ,"ScenarioB":("Pool",("Mortgage",{"CPR":0.02},{"CDR":0.02},{"Rate":0.7,"Lag":18})
+                                      ,"ScenarioB":("Pool",("Mortgage",{"CPR":0.02},{"CDR":0.02},{"Rate":0.7,"Lag":18},None)
                                             ,None
                                             ,None)
                                       },
