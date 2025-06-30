@@ -323,6 +323,7 @@ def _read_cf(x, lang):
     ''' read cashflow from a list , and set index to date'''
     if x == []:
         return []
+    assert isinstance(x, list), f"Input is not a list but {type(x)}"
     flow_header, idx, expandFlag = guess_pool_flow_header(x[0], lang)
     result = None
     try:
@@ -331,7 +332,7 @@ def _read_cf(x, lang):
         else:
             result = pd.DataFrame([_['contents'] for _ in x], columns=flow_header)
     except ValueError as e:
-        print(e)
+        logging.error(f"{e}")
         logging.error(f"Failed to match header:{flow_header} with {result}")
         return False
     result.set_index(idx, inplace=True)

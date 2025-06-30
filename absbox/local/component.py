@@ -304,7 +304,7 @@ def mkDs(x):
                 if pNames:
                     return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), lmap(mkPid,pNames)]))
                 return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), None]))
-            case ("资产池加权利差", pNames) | ("PoolWaSpread", pNames):
+            case ("资产池加权利差", pNames) | ("poolWaSpread", pNames):
                 if pNames:
                     return mkTag(("PoolWaSpread", lmap(mkPid,pNames)))
                 return mkTag(("PoolWaSpread", None))
@@ -1967,17 +1967,17 @@ def mkObligorStrategy(x):
 def mkAssumpType(x):
     ''' make assumps either on pool level or asset level '''
     match x:
-        case ("Pool", p, d, f):
+        case ("Pool", p, d, f) | ("pool", p, d, f):
             return mkTag(("PoolLevel",mkPDF(p, d, f)))
-        case ("ByIndex", *ps):
+        case ("ByIndex", *ps) | ("byIndex", *ps):
             return mkTag(("ByIndex",[ [idx, mkPDF(a,b,c)] for (idx,(a,b,c)) in ps ]))
-        case ("ByObligor",*rules):
+        case ("ByObligor",*rules) | ("byObligor",*rules):
             return mkTag(("ByObligor",[mkObligorStrategy(r) for r in rules]))
-        case ("ByName", assumpMap):
+        case ("ByName", assumpMap) | ("byName", assumpMap):
             return mkTag(("ByName",{f"PoolName:{k}":mkPDF(*v) for k,v in assumpMap.items()}))
-        case ("ByPoolId", assumpMap):
+        case ("ByPoolId", assumpMap) | ("byPoolId", assumpMap):
             return mkTag(("ByPoolId",{f"PoolName:{k}": mkAssumpType(v) for k,v in assumpMap.items()}))
-        case ("ByDealName", assumpMap):
+        case ("ByDealName", assumpMap) | ("byDealName", assumpMap):
             return mkTag(("ByDealName",{k:(mkAssumpType(perfAssump),mkNonPerfAssumps({},nonPerfAssump)) 
                                         for k,(perfAssump,nonPerfAssump) in assumpMap.items()}))
         case None:
@@ -2020,18 +2020,6 @@ def mkRevolvingPool(x):
 
 
 def mkPoolType(assetDate, x, mixedFlag) -> dict:
-    # try:
-    #     if 'assets' in x or "清单" in x or "归集表" in x:
-    #         return mkTag(("MultiPool" ,{"PoolConsol":mkPoolComp(vDate(assetDate), x, False)}))
-    #     elif 'deals' in x and isinstance(x['deals'],dict):
-    #         return mkTag(("ResecDeal",{f"{dealObj.json['contents']['name']}:{bn}:{sd}:{str(pct)}": \
-    #                                     {"deal":dealObj.json['contents'],"future":None,"futureScheduleCf":None,"issuanceStat":None}\
-    #                                       for ((bn,pct,sd),dealObj) in x['deals'].items()} ))
-    #     else:
-    #         return mkTag(("MultiPool" ,{f"PoolName:{k}":mkPoolComp(vDate(assetDate),v,mixedFlag) for (k,v) in x.items()}))
-    # except Exception as e:
-    #     print("Error in mk pool type",e)
-
     match x:
         case {"assets": y} | {"清单": y} | {"归集表": y}: 
             return mkTag(("MultiPool" ,{"PoolConsol":mkPoolComp(vDate(assetDate), x, False)}))
@@ -2055,7 +2043,8 @@ def mkPoolComp(asOfDate, x, mixFlag) -> dict:
         , "issuanceStat": tz.pipe(getValWithKs(x, ["issuanceStat", "统计", "发行", "Issuance"],defaultReturn={})
                                 , lambda y: updateKs(y, validCutoffFields)  
                                 )
-        , "futureCf":mkCf(getValWithKs(x, ['cashflow', '现金流归集表', '归集表'], []))
+        , "futureCf":[mkCf(getValWithKs(x, ['cashflow', '现金流归集表', '归集表'], [])),None]
+        , "futureScheduleCf" : [mkCf([]), None]
         , "extendPeriods":mkDatePattern(getValWithKs(x, ['extendBy'], "MonthEnd"))}
     return r
 
@@ -2152,7 +2141,7 @@ def mkLedger(n: str, x: dict=None):
 def mkCf(x:list):
     """ Make project cashflow ( Mortgage Only ) """
     if len(x) == 0:
-        return None
+        return mkTag(("CashFlowFrame", [[0,"1900-01-01",None],[]]))
     else:
         cfs = [mkTag(("MortgageFlow", _x+[0.0]*5+[None,None,None])) for _x in x]
         return mkTag(("CashFlowFrame", [[0,"1900-01-01",None],cfs]))

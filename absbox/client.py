@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import requests
 from rich.console import Console
 import toolz as tz
+from functools import partial
 from lenses import lens
 
 from requests.exceptions import ConnectionError, ReadTimeout
@@ -193,7 +194,7 @@ class API:
         self.session = requests.Session()
         console.print(f"✅Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
 
-    def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=[]) -> str:
+    def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=[], rtn = []) -> str:
         """build run deal requests: (single run, multi-scenario run, multi-struct run) 2
 
         :meta private:
@@ -217,22 +218,22 @@ class API:
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
                 _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
-                r = mkTag((RunReqType.Single.value, [_deal, _perfAssump, _nonPerfAssump]))
+                r = mkTag((RunReqType.Single.value, [rtn, _deal, _perfAssump, _nonPerfAssump]))
             case "MultiScenarios" | "MS":
                 _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
                 _deal = deal.json if hasattr(deal, "json") else deal
                 mAssump = mapValsBy(perfAssump, mkAssumpType)
-                r = mkTag((RunReqType.MultiScenarios.value, [_deal, mAssump, _nonPerfAssump]))
+                r = mkTag((RunReqType.MultiScenarios.value, [rtn, _deal, mAssump, _nonPerfAssump]))
             case "MultiStructs" | "MD" :
                 _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
                 mDeal = {k: v.json if hasattr(v, "json") else v for k, v in deal.items()}
                 _perfAssump = mkAssumpType(perfAssump)
-                r = mkTag((RunReqType.MultiStructs.value, [mDeal, _perfAssump, _nonPerfAssump]))
+                r = mkTag((RunReqType.MultiStructs.value, [rtn, mDeal, _perfAssump, _nonPerfAssump]))
             case "MultiRunScenarios" | "MRS" if isinstance(nonPerfAssump,dict):
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
                 mRunAssump = mapValsBy(nonPerfAssump, lambda x: mkNonPerfAssumps({}, x))
-                r = mkTag((RunReqType.MultiRunScenarios.value, [_deal, _perfAssump, mRunAssump]))
+                r = mkTag((RunReqType.MultiRunScenarios.value, [rtn, _deal, _perfAssump, mRunAssump]))
             case "ComboSensitivity" | "CS" if isinstance(nonPerfAssump,dict) and isinstance(perfAssump,dict) and isinstance(deal,dict):
                 mDeal = {k: v.json if hasattr(v, "json") else v for k, v in deal.items()}
                 mAssump = mapValsBy(perfAssump, mkAssumpType)
@@ -241,7 +242,7 @@ class API:
                 mRunAssump = mapValsBy(nonPerfAssump, lambda x: mkNonPerfAssumps({}, x))
                 if mRunAssump == {}:
                     mRunAssump = {"Empty":{}}
-                r = mkTag((RunReqType.ComboSensitivity.value, [mDeal, mAssump, mRunAssump]))
+                r = mkTag((RunReqType.ComboSensitivity.value, [rtn, mDeal, mAssump, mRunAssump]))
             case ("RootFinder", tweak, stop):
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
@@ -269,7 +270,7 @@ class API:
 
         
 
-    def build_pool_req(self, pool, poolAssump, rateAssumps, isMultiScenario=False) -> str:
+    def build_pool_req(self, pool, poolAssump, rateAssumps, isMultiScenario=False, breakdown = False) -> str:
         """build pool run request: (single run, multi-scenario run)
 
         :meta private:
@@ -298,9 +299,9 @@ class API:
                 return mkTag((assetTag, mkPoolType(assetDate, _p, False)))
 
         if not isMultiScenario:
-            r = mkTag((RunReqType.SinglePool.value, [buildPoolType(pool), mkAssumpType(poolAssump), _rateAssump]))
+            r = mkTag((RunReqType.SinglePool.value, [breakdown, buildPoolType(pool), mkAssumpType(poolAssump), _rateAssump]))
         else:
-            r = mkTag((RunReqType.MultiPoolScenarios.value, [buildPoolType(pool), mapValsBy(poolAssump, mkAssumpType), _rateAssump]))
+            r = mkTag((RunReqType.MultiPoolScenarios.value, [breakdown, buildPoolType(pool), mapValsBy(poolAssump, mkAssumpType), _rateAssump]))
 
         return json.dumps(r, ensure_ascii=False)
 
@@ -320,6 +321,7 @@ class API:
             runAssump=[],
             read=True,
             showWarning=True,
+            rtn = [],
             debug=False) -> dict:
         """ run deal with pool and deal run assumptions
 
@@ -348,7 +350,7 @@ class API:
         url = f"{self.url}/{Endpoints.RunDeal.value}"
 
         # construct request
-        req = self.build_run_deal_req("Single", deal, poolAssump, runAssump)
+        req = self.build_run_deal_req("Single", deal, poolAssump, runAssump, rtn=rtn)
         if debug:
             return req
 
@@ -418,7 +420,7 @@ class API:
         else:
             return result
 
-    def read_single(self, pool_resp) -> tuple:
+    def read_single(self, breakdown, pool_resp) -> tuple:
         """ read pool run response from engine and convert to dataframe
 
         :param pool_resp: (pool raw cashflow, pool statistics)
@@ -426,11 +428,20 @@ class API:
         :return: (pool Cashflow in dataFrame, pool statistics)
         :rtype: tuple
         """
-        (pool_flow, pool_bals) = pool_resp
-        result = _read_cf(pool_flow['contents'][1], self.lang)
-        return (result, pool_bals)
 
-    def runPoolByScenarios(self, pool, poolAssump, rateAssump=None, read=True, debug=False) -> dict :
+        ((pool_flow, pool_bals), pool_breakdown_flow) = pool_resp
+        result = _read_cf(pool_flow['contents'][1], self.lang)
+        if not breakdown:
+            return {"flow":result, "stat":pool_bals}
+        else:
+            assert pool_breakdown_flow is not None, "Breakdown flow is None"
+            assert len(pool_breakdown_flow)>0, "Breakdown flow is empty"
+            return {"flow":result, "stat":pool_bals
+                    ,"breakdown": [ {"flow": _read_cf(_[0]['contents'][1], self.lang), "stat":_[1]}
+                                    for _ in pool_breakdown_flow  ]
+                    }
+
+    def runPoolByScenarios(self, pool, poolAssump, rateAssump=None, read=True, breakdown = False,debug=False) -> dict :
         """ run a pool with multiple scenario ,return result as map , with key same to pool assumption map
 
         :param pool: pool map
@@ -462,10 +473,10 @@ class API:
         result = tz.valmap(lambda x:x['Right'] ,result)
 
         if read:
-            return result & lens.Values().Values().modify(self.read_single)
+            return result & lens.Values().Values().modify(partial(self.read_single, breakdown))
         return result
 
-    def runPool(self, pool, poolAssump=None, rateAssump=None, read=True, debug=False, **kwargs) -> tuple:
+    def runPool(self, pool, poolAssump=None, rateAssump=None, read=True, debug=False, breakdown = False, **kwargs) -> tuple:
         """perform pool run with pool and rate assumptions
 
         :param pool: a pool object
@@ -487,7 +498,7 @@ class API:
 
         url = f"{self.url}/{Endpoints.RunPool.value}"
 
-        req = self.build_pool_req(pool, poolAssump, rateAssump, isMultiScenario=False)
+        req = self.build_pool_req(pool, poolAssump, rateAssump, isMultiScenario=False, breakdown = breakdown)
 
         if debug:
             return req
@@ -497,10 +508,11 @@ class API:
         if result is None or 'error' in result or 'Left' in result:
             leftVal = result.get("Left","")
             raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
+
         result = result['Right']
-        
+
         if read:
-            return result & lens.Values().modify(self.read_single)
+            return result & lens.Values().modify(partial(self.read_single, breakdown))
         else:
             return result
 
