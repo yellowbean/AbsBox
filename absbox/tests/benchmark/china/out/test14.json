@@ -69,7 +69,21 @@
           ],
           "asOfDate": "2021-06-30",
           "issuanceStat": {},
-          "futureCf": null,
+          "futureCf": [
+            {
+              "tag": "CashFlowFrame",
+              "contents": [
+                [
+                  0,
+                  "1900-01-01",
+                  null
+                ],
+                []
+              ]
+            },
+            null
+          ],
+          "futureScheduleCf": null,
           "extendPeriods": {
             "tag": "MonthEnd"
           }

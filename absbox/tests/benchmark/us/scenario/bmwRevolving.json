@@ -1,23 +1,8 @@
 {"inspectOn": [
-        [
-            {"tag": "MonthEnd"
-            },
-            {"tag": "CurrentBondBalance"
-            }
-        ],
-        [
-            {"tag": "MonthFirst"
-            },
-            {"tag": "CurrentPoolBalance","contents":null
-            }
-        ]
+	{"tag":"InspectPt", "contents": [ {"tag": "MonthEnd"}, {"tag":"CurrentBondBalance"} ]},
+        {"tag":"InspectPt", "contents": [ {"tag": "MonthFirst" }, {"tag": "CurrentPoolBalance","contents":null } ]}
     ],
- "interest": [
-        {"tag": "RateFlat", "contents": ["LPR5Y",
-                0.05
-            ]
-        }
-    ],
+ "interest": [ {"tag": "RateFlat", "contents": ["LPR5Y", 0.05 ] } ],
  "revolving": {"tag": "AvailableAssets",
   "contents": [
             {"tag": "ConstantAsset",

@@ -323,7 +323,7 @@ def test_pool_lease_end(setup_api):
                                        ,None
                                        )
                   ,read=True)
-    assert r['PoolConsol'][0].index[-1] == '2024-12-15'
+    assert r['PoolConsol']['flow'].index[-1] == '2024-12-15'
 
     r = setup_api.runPool(myPool
                   ,poolAssump=("Pool",("Lease", None, ('days', 20) , ('byAnnualRate', 0.0), ("earlierOf", "2023-11-15", 2))
@@ -331,7 +331,7 @@ def test_pool_lease_end(setup_api):
                                        ,None
                                        )
                   ,read=True)
-    assert r['PoolConsol'][0].index[-1] == '2023-12-15'
+    assert r['PoolConsol']['flow'].index[-1] == '2023-12-15'
 
     r = setup_api.runPool(myPool
                   ,poolAssump=("Pool",("Lease", None, ('days', 20) , ('byAnnualRate', 0.0), ("laterOf", "2023-11-15", 3))
@@ -339,4 +339,4 @@ def test_pool_lease_end(setup_api):
                                        ,None
                                        )
                   ,read=True)
-    assert r['PoolConsol'][0].index[-1] == '2025-12-15'
+    assert r['PoolConsol']['flow'].index[-1] == '2025-12-15'

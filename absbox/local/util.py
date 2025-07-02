@@ -8,6 +8,7 @@ import toolz as tz
 from .base import *
 from .interface import mkTag
 
+
 def mapNone(x, v):
     ''' return a default value if x is None, other wise, return x '''
     if x is None:

@@ -1,0 +1,19 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+lib/
+etc/
+share
+lib64
+pyvenv.cfg
+.ipynb_checkpoints/
+absbox/__pycache__/
+absbox/examples/__pycache__/
+absbox/local/__pycache__/
+absbox/tests/__pycache__/
+absbox/tests/benchmark/china/__pycache__/
+absbox/tests/benchmark/us/__pycache__/
+absbox/tests/regression/__pycache__/
+absbox/tests/regression/*.ipynb
+absbox.egg-info/
+bin/
+*.ipynb
+

@@ -1675,7 +1675,7 @@ def identify_deal_type(x):
                 return "MDeal"
             case {"assets": [{'tag': 'AdjustRateMortgage'}, *rest]}:
                 return "MDeal"
-            case {"assets": [], "futureCf": cfs} if cfs['contents'][1][0]['tag'] == 'MortgageFlow':
+            case {"assets": [], "futureCf": cfs} if cfs[0]['contents'][1][0]['tag'] == 'MortgageFlow':
                 return "MDeal"
             case {"assets": [{'tag': 'Installment'}, *rest]} :
                 return "IDeal"
@@ -2029,9 +2029,7 @@ def mkPoolType(assetDate, x, mixedFlag) -> dict:
                                           for ((bn,pct,sd),dealObj) in x['deals'].items()} ))
         case x if all([ isinstance(_,dict) for _ in x.values() ]):
             return mkTag(("MultiPool" 
-                        ,{f"PoolName:{k}":mkPoolComp(vDate(assetDate),v,mixedFlag) 
-                            for (k,v) in x.items()})
-                        )
+                        ,{f"PoolName:{k}":mkPoolComp(vDate(assetDate),v,mixedFlag) for (k,v) in x.items()}))
         case _ :
             raise RuntimeError("Failed to match pool type ",x)
 
@@ -2044,7 +2042,7 @@ def mkPoolComp(asOfDate, x, mixFlag) -> dict:
                                 , lambda y: updateKs(y, validCutoffFields)  
                                 )
         , "futureCf":[mkCf(getValWithKs(x, ['cashflow', '现金流归集表', '归集表'], [])),None]
-        , "futureScheduleCf" : [mkCf([]), None]
+        , "futureScheduleCf" : None
         , "extendPeriods":mkDatePattern(getValWithKs(x, ['extendBy'], "MonthEnd"))}
     return r
 

@@ -49,8 +49,7 @@ def translate(d, folder, o):
             json.dump(d.json, newbench, indent=2)
         logging.info(f"Create new case for {o}")
     else:
-        print(">>>>> comparing <<<<<<")
-        print(f"Comparing with benchmark file:{benchfile}")
+        print(f">>>>> comparing <<<<<< \n Comparing with benchmark file:{benchfile}")
         with open(benchfile, 'r') as ofile:
             try:
                 benchmark_out = json.load(ofile)
@@ -101,7 +100,7 @@ def run_deal(input_folder, pair):
                     print(nonPerfInput)
                 else:
                     nonPerfInput = {}
-                req = mkTag(("SingleRunReq", [json.load(dq), json.load(sq), nonPerfInput])) 
+                req = mkTag(("SingleRunReq", [[], json.load(dq), json.load(sq), nonPerfInput])) 
                 print("build req done")
                 hdrs = {'Content-type': 'application/json', 'Accept': '*/*'}
                 tresp = None
@@ -121,7 +120,7 @@ def run_deal(input_folder, pair):
                     s_result = json.loads(tresp.text)
                 except JSONDecodeError as e:
                     logging.error(f"Error parsing {tresp.text}")
-                    #break
+                    raise RuntimeError(f"Failed to parse response for {dinput} with error {e}")
                 local_bench_file = os.path.join(input_resp_folder,eoutput)
                 if not os.path.exists(local_bench_file):
                     print(f"writing to new resp for {local_bench_file}")
@@ -132,6 +131,7 @@ def run_deal(input_folder, pair):
                     print(f"reading benchmark resp for {local_bench_file}")
                     local_result = json.load(eout)
                     assert "Right" in local_result, f"{dinput}:Left error : {local_result['Left']}"
+                    assert "Right" in s_result, f"{dinput}:Left error : {s_result['Left']}"
 
                     print(local_result.keys())
                     print(s_result.keys())

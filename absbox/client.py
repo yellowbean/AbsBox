@@ -247,7 +247,7 @@ class API:
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
                 _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
-                dealRunInput= (_deal, _perfAssump, _nonPerfAssump)
+                dealRunInput= (_deal, _perfAssump, _nonPerfAssump, [])
                 r = mkTag((RunReqType.RootFinder.value, [dealRunInput, mkTweak(tweak), mkStop(stop)]))
             case ("FirstLoss", bn) | ("FL", bn):
                 _deal = deal.json if hasattr(deal, "json") else deal
@@ -429,14 +429,14 @@ class API:
         :rtype: tuple
         """
 
-        ((pool_flow, pool_bals), pool_breakdown_flow) = pool_resp
+        (pool_flow, pool_breakdown_flow) = pool_resp
         result = _read_cf(pool_flow['contents'][1], self.lang)
         if not breakdown:
-            return {"flow":result, "stat":pool_bals}
+            return {"flow":result}
         else:
             assert pool_breakdown_flow is not None, "Breakdown flow is None"
             assert len(pool_breakdown_flow)>0, "Breakdown flow is empty"
-            return {"flow":result, "stat":pool_bals
+            return {"flow":result 
                     ,"breakdown": [ {"flow": _read_cf(_[0]['contents'][1], self.lang), "stat":_[1]}
                                     for _ in pool_breakdown_flow  ]
                     }
@@ -749,13 +749,13 @@ class API:
         
         def readResult(x):
             try:
-                ((cfs, cfBalance), pr) = x
+                (cfs, pr) = x
                 cfs = _read_cf(cfs['contents'][1], self.lang)
                 pricingResult = _read_asset_pricing(pr, self.lang) if pr else None
-                return (cfs, cfBalance, pricingResult)
+                return (cfs, pricingResult)
             except Exception as e:
                 print(f"Failed to read result {x} \n with error {e}")
-                return (None, None, None)
+                return (None,None)
             
         url = f"{self.url}/{Endpoints.RunAsset.value}"
         _assumptions = mkAssumpType(poolAssump) if poolAssump else None
