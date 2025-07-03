@@ -135,26 +135,26 @@ class Generic:
 
         # aggregate accounts
         output['agg_accounts'] = aggAccs(output['accounts'], 'english')
-
-        output['pool'] = {}
         
-        if deal_content['pool']['tag']=='SoloPool':
-            if deal_content['pool']['contents']['futureCf'] is None:
-                output['pool']['flow'] = None
-            else:
-                output['pool']['flow'] = readPoolCf(deal_content['pool']['contents']['futureCf']['contents'])
-        elif deal_content['pool']['tag']=='MultiPool':
-            poolMap = deal_content['pool']['contents']
+        output['pool'] = {}
+        output['pool']['oustanding'] = {k:{"flow": readPoolCf(aggFlow['contents'])
+                                           ,"breakdown": [ readPoolCf(_['contents']) 
+                                                           for _ in breakdownFlows]}
+                                         for k,(aggFlow,breakdownFlows) in resp[4].items()}
+        poolMap = deal_content['pool']['contents']
+
+        
+        if deal_content['pool']['tag']=='MultiPool':
             output['pool']['flow'] = tz.valmap(lambda v: readPoolCf(v['futureCf'][0]['contents']) if (not v['futureCf'] is None) else pd.DataFrame(), poolMap)
             output['pool']['breakdown'] = tz.valmap(lambda v: list(tz.map(readPoolCf, v['futureCf'][1] & lens.Each()['contents'].collect() )) if (v['futureCf'] and (not v['futureCf'][1] is None)) else [], poolMap)
         elif deal_content['pool']['tag']=='ResecDeal':
-            poolMap = deal_content['pool']['contents']
             output['pool']['flow'] = {tz.get([1,2,4],k.split(":")): readPoolCf(v['futureCf']['contents']) for (k,v) in poolMap.items() }
         else:
             raise RuntimeError(f"Failed to match deal pool type:{deal_content['pool']['tag']}")
 
         output['pricing'] = readPricingResult(resp[3], 'en')
         output['result'] = readRunSummary(resp[2], 'en')
+
         return output
 
     def __str__(self):
