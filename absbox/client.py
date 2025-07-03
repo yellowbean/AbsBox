@@ -175,7 +175,7 @@ class API:
         else:
             self.url = isValidUrl(self.url).rstrip("/")
 
-        console.print(f" Connecting engine server -> {self.url}")
+        console.print(f"Connecting engine server -> {self.url}")
 
         if self.lang not in ["chinese", "english"]:
             raise AbsboxError(f"❌Invalid language:{self.lang}, only support 'chinese' or 'english' ")

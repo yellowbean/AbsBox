@@ -71,3 +71,8 @@ def compResult(r1:dict, r2:dict, names=("Left", "Right")):
             comp_result['triggers'][locName] = cmpMap(r1['triggers'][locName], r2['triggers'][locName])
 
     return comp_result
+
+def compTwoEngine(xEngine, yEngine, d, pAssump, rAssump):
+    rx = xEngine.run(d, read=True, poolAssump=pAssump, runAssump=rAssump)
+    ry = xEngine.run(d, read=True, poolAssump=pAssump, runAssump=rAssump)
+    return compResult(rx, ry)
