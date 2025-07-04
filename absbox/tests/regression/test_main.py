@@ -4,6 +4,7 @@ import toolz as tz
 import pytest
 import re, math, json
 from pathlib import Path
+from collections import Counter
 
 from .deals import *
 from .assets import *
@@ -17,6 +18,10 @@ def closeTo(a,b,r=2):
 
 def filterTxn(rs, f, rg):
     return [ r for r in rs if re.match(rg, r[f])] 
+
+def filterRowsByStr(df, f, rg):
+    """ Filter rows by regex on column f """
+    return filterTxn(df.to_dict('records'), f, rg)
 
 def listCloseTo(a,b,r=2):
     assert len(a) == len(b), f"Length not match {len(a)} {len(b)}"
@@ -282,9 +287,6 @@ def test_rootfind_stressdef(setup_api):
     )
     assert r[1][1]['PoolLevel'][0]['MortgageAssump'][0] == {'DefaultCDR': 0.07603587859615266} 
 
-
-
-
 @pytest.mark.bond
 def test_pac_01(setup_api):
     r = setup_api.run(pac01 , read=True , runAssump = [])
@@ -409,3 +411,51 @@ def test_collect_pool_loanlevel_cashflow(setup_api):
     # combined = pd.concat([rWithOsPoolFlow['pool']['flow']['PoolConsol']
     #                       ,rWithOsPoolFlow['pool_outstanding']['flow']['PoolConsol']])
     # eqDataFrame(complete['pool']['flow']['PoolConsol'], combined)
+
+@pytest.mark.report
+def test_reports(setup_api): 
+    """ Test reports on variuos asset class """
+    pairs = {"mortgage01": (test01,None)}
+    r = {}
+    for k, (vd,vp) in pairs.items():
+        r[k] = setup_api.run(vd, poolAssump=vp, read=True, runAssump =[("report", {"dates":"MonthEnd"})])
+
+@pytest.mark.revolving
+def test_revolving_01(setup_api):
+    """ Test revolving pool with collection """
+    revol_asset =  ["Mortgage",{
+                        "originBalance": 1400,
+                        "originRate": ["fix", 0.045],
+                        "originTerm": 30,
+                        "freq": "Monthly",
+                        "type": "Level",
+                        "originDate": "2021-02-01",},
+                    {"currentBalance": 1400,
+                     "currentRate": 0.08,
+                     "remainTerm": 30,
+                     "status": "current",}, ]    
+    r = setup_api.run(test05, read=True, runAssump =[("revolving"
+                                                       ,["constant",revol_asset]
+                                                       ,("Pool",("Mortgage",None,None,None,None)
+                                                                 ,None
+                                                                 ,None))]
+                      ,rtn=["AssetLevelFlow"])
+    revolvingBuyTxn = filterTxn(r['accounts']['acc01'].to_dict(orient="records"),"memo",r".*PurchaseAsset.*")
+    assert len(revolvingBuyTxn) == 3, "Should have 3 purchase asset txn"
+    
+    buyAmts = [ _['change'] for _ in revolvingBuyTxn]
+    assert buyAmts == [-302.44,-75.61,-86.76], "Buy amount should be same with revolving asset"
+
+    buy_asset1_flow = r['pool']['breakdown']['PoolConsol'][2]
+    buy_asset2_flow = r['pool']['breakdown']['PoolConsol'][3]
+    buy_asset3_flow = r['pool']['breakdown']['PoolConsol'][4]
+    assert buy_asset1_flow.Principal.sum().round(2) == 302.44
+    assert buy_asset2_flow.Principal.sum().round(2) == 75.61
+    assert buy_asset3_flow.Principal.sum().round(2) == 86.76
+
+    #breakdown cashflow should tieout with aggregated pool cashflow
+    totalPrins = r['pool']['breakdown']['PoolConsol'] & lens.Each().Principal.collect() & lens.Each().modify(lambda x: x.sum())
+    assert r['pool']['flow']['PoolConsol'].Principal.sum().round(2) == sum(totalPrins).round(2), "Breakdown cashflow should tieout with aggregated pool cashflow"
+
+
+

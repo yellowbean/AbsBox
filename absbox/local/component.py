@@ -1227,7 +1227,10 @@ def mkAction(x:list):
         case ["购买资产", liq, source] | ["buyAsset", liq, source]:
             return mkTag(("BuyAsset", [None, mkLiqMethod(liq), vStr(source), None]))
         ### Revolving buy with all cash and source/target pool 
-        case ["购买资产2", liq, source, _limit, sPool, mPn] | ["buyAsset2", liq, source, _limit, sPool, mPn ]:
+        case ["购买资产2", liq, source, _limit, sPool, mPn] \
+             | ["buyAsset2", liq, source, _limit, sPool, mPn ] \
+             | ["buyAssetFromTo", liq, source, _limit, sPool, mPn ] \
+            :
             return mkTag(("BuyAssetFrom", [mkLimit(_limit), mkLiqMethod(liq), vStr(source), sPool, mkPid(mPn)]))
         ## Trigger
         case ["更新事件", trgName] | ["runTriggers", *trgName] | ["runTrigger", *trgName]:

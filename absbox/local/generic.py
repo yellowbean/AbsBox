@@ -138,13 +138,12 @@ class Generic:
         output['pool'] = {}
 
         outstanding_pool_flow = {k:{"flow": readPoolCf(aggFlow['contents'])
-                                           ,"breakdown": [ readPoolCf(_['contents']) for _ in breakdownFlows]}
-                                         for k,(aggFlow,breakdownFlows) in resp[4].items()}
+                                    ,"breakdown": [ readPoolCf(_['contents']) for _ in breakdownFlows]}
+                                   for k,(aggFlow,breakdownFlows) in resp[4].items()}
         output['pool_outstanding'] = {"flow": { k:v['flow'] for k,v in outstanding_pool_flow.items() }
                                       ,"breakdown": { k:v['breakdown'] for k,v in outstanding_pool_flow.items() } }
         
         poolMap = deal_content['pool']['contents']
-
         
         if deal_content['pool']['tag']=='MultiPool':
             output['pool']['flow'] = tz.valmap(lambda v: readPoolCf(v['futureCf'][0]['contents']) if (not v['futureCf'] is None) else pd.DataFrame(), poolMap)

@@ -341,6 +341,107 @@ test04 = Generic(
     ("PreClosing", "Amortizing"),
 )
 
+test05 = Generic(
+    "TEST05- preclosing - multi-assets- revolving",
+    {
+        "cutoff": "2021-03-01",
+        "closing": "2021-04-15",
+        "firstPay": "2021-07-26",
+        "firstCollect": "2021-04-28",
+        "payFreq": ["DayOfMonth", 20],
+        "poolFreq": "MonthEnd",
+        "stated": "2030-01-01",
+    },
+    {
+        "assets": [
+            [
+                "Mortgage",
+                {
+                    "originBalance": 1400,
+                    "originRate": ["fix", 0.045],
+                    "originTerm": 30,
+                    "freq": "Monthly",
+                    "type": "Level",
+                    "originDate": "2021-02-01",
+                },
+                {
+                    "currentBalance": 1400,
+                    "currentRate": 0.08,
+                    "remainTerm": 30,
+                    "status": "current",
+                },
+            ],
+            [
+                "Mortgage",
+                {
+                    "originBalance": 800,
+                    "originRate": ["fix", 0.045],
+                    "originTerm": 36,
+                    "freq": "Monthly",
+                    "type": "Level",
+                    "originDate": "2021-02-01",
+                },
+                {
+                    "currentBalance": 800,
+                    "currentRate": 0.05,
+                    "remainTerm": 36,
+                    "status": "current",
+                },
+            ]            
+        ]
+    },
+    (("acc01", {"balance": 0}),),
+    (
+        (
+            "A1",
+            {
+                "balance": 1000,
+                "rate": 0.07,
+                "originBalance": 1000,
+                "originRate": 0.07,
+                "startDate": "2020-01-03",
+                "rateType": {"Fixed": 0.08},
+                "bondType": {"Sequential": None},
+            },
+        ),
+        (
+            "B",
+            {
+                "balance": 1000,
+                "rate": 0.0,
+                "originBalance": 1000,
+                "originRate": 0.07,
+                "startDate": "2020-01-03",
+                "rateType": {"Fixed": 0.00},
+                "bondType": {"Equity": None},
+            },
+        ),
+    ),
+    tuple(),
+    {
+        "default": [
+            ["if", ["date", "<", "2021-09-30"]
+                 , ["buyAsset",["Current|Defaulted", 1.0, 0] , "acc01"]
+            ],
+            ["accrueAndPayInt", "acc01", ["A1"]],
+            ["payPrin", "acc01", ["A1"]],
+            ["payPrin", "acc01", ["B"]],
+            ["payIntResidual", "acc01", "B"],
+        ]
+    },
+    [
+        ["CollectedInterest", "acc01"],
+        ["CollectedPrincipal", "acc01"],
+        ["CollectedPrepayment", "acc01"],
+        ["CollectedRecoveries", "acc01"],
+    ],
+    None,
+    None,
+    None,
+    None,
+    ("PreClosing", "Amortizing"),
+)
+
 
 Irr01 = Generic(
     "IRR Case",
