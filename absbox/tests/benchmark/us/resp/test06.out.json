@@ -5307,6 +5307,34 @@
         ]
       }
     ],
-    {}
+    {},
+    {
+      "PoolConsol": [
+        {
+          "tag": "CashFlowFrame",
+          "contents": [
+            [
+              0,
+              "2023-08-31",
+              null
+            ],
+            []
+          ]
+        },
+        [
+          {
+            "tag": "CashFlowFrame",
+            "contents": [
+              [
+                0,
+                "2023-08-31",
+                null
+              ],
+              []
+            ]
+          }
+        ]
+      ]
+    }
   ]
 }

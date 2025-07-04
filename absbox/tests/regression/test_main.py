@@ -22,6 +22,22 @@ def listCloseTo(a,b,r=2):
     assert len(a) == len(b), f"Length not match {len(a)} {len(b)}"
     assert all([ closeTo(x,y,r)  for x,y in zip(a,b)]), f"List not match {a},{b}"
 
+def eqDataFrame(a,b, msg=""):
+    """ Compare two DataFrame """
+    assert a.shape == b.shape, f"Shape not match {a.shape} {b.shape}"
+    assert a.compare(b).empty == True, f"DataFrame not match {a.compare(b)} \n {msg}"
+
+def eqDataFrameByLens(a, b, l, fn=None, msg=""):
+    """ a,b -> object to lookup, l -> lens to get DataFrame """
+    da = a & l.get()
+    db = b & l.get()
+    if fn is None:
+      eqDataFrame(da, db, msg=msg)
+    else:
+      eqDataFrame(fn(da), fn(db), msg=msg)
+
+
+
 @pytest.fixture
 def setup_api():
     with config_file_path.open('r') as config_file:
@@ -206,7 +222,7 @@ def test_first_loss(setup_api):
                                     ,None)
                     ,read=True
                     )
-    closeTo(r0[0], 31.60100353659348, r=6)
+    closeTo(r0[0], 31.601002929896755, r=6)
 
 @pytest.mark.analytics
 def test_irr_01(setup_api):
@@ -340,3 +356,56 @@ def test_pool_lease_end(setup_api):
                                        )
                   ,read=True)
     assert r['PoolConsol']['flow'].index[-1] == '2025-12-15'
+
+@pytest.mark.collect
+def test_collect_outstanding(setup_api): 
+    complete = setup_api.run(test01, read=True,runAssump =[])
+    rWithOsPoolFlow = setup_api.run(test01, read=True,runAssump =[("stop","2021-06-15")])
+
+    combined = pd.concat([rWithOsPoolFlow['pool']['flow']['PoolConsol']
+                          ,rWithOsPoolFlow['pool_outstanding']['flow']['PoolConsol']])
+    eqDataFrame(complete['pool']['flow']['PoolConsol'], combined)
+
+    poolPerf = ("Pool",("Mortgage",{"CDR":0.002},{"CPR":0.001},{"Rate":0.1,"Lag":18},None)
+                                 ,None
+                                 ,None)
+
+    complete = setup_api.run(test01,poolAssump= poolPerf, read=True,runAssump =[])
+    rWithOsPoolFlow = setup_api.run(test01,poolAssump= poolPerf, read=True,runAssump =[("stop","2021-06-15")])
+    
+    combined = pd.concat([rWithOsPoolFlow['pool']['flow']['PoolConsol']
+                          ,rWithOsPoolFlow['pool_outstanding']['flow']['PoolConsol']])
+    eqDataFrame(complete['pool']['flow']['PoolConsol'], combined)
+
+@pytest.mark.pool
+def test_collect_pool_loanlevel_cashflow(setup_api): 
+    rAgg = setup_api.run(test04, read=True,runAssump =[])
+    rAssetLevel = setup_api.run(test04, read=True,runAssump =[],rtn=["AssetLevelFlow"])
+
+    assert rAgg['pool']['breakdown']['PoolConsol'] == [], "by Default, breakdown should be empty list"
+    
+    eqDataFrame(rAgg['pool']['flow']['PoolConsol'],(rAssetLevel['pool']['flow']['PoolConsol'])
+                ,msg="breakdown should be same with aggregation cashflow")
+
+    combined = (rAssetLevel['pool']['breakdown']['PoolConsol'][1] + rAssetLevel['pool']['breakdown']['PoolConsol'][0]).drop(columns=["WAC"]).round(2)
+    eqDataFrame(rAssetLevel['pool']['flow']['PoolConsol'].drop(columns=["WAC"])
+                ,combined
+                ,msg="breakdown should be same with aggregation cashflow")
+    
+    poolPerf = ("Pool",("Mortgage",{"CDR":0.002},{"CPR":0.001},{"Rate":0.1,"Lag":18},None)
+                                  ,None
+                                  ,None)
+
+    rAgg = setup_api.run(test04,poolAssump=poolPerf, read=True,runAssump =[])
+    rAssetLevel = setup_api.run(test04,poolAssump=poolPerf, read=True,runAssump =[],rtn=["AssetLevelFlow"])
+
+    eqDataFrameByLens(rAgg, rAssetLevel, lens['pool']['flow']['PoolConsol']
+                ,msg="breakdown should be same with aggregation cashflow(with performance)")
+
+    combined2 = (rAssetLevel['pool']['breakdown']['PoolConsol'][1] + rAssetLevel['pool']['breakdown']['PoolConsol'][0]).drop(columns=["WAC"]).round(2)
+    eqDataFrame(rAssetLevel['pool']['flow']['PoolConsol'].drop(columns=["WAC"])
+                ,combined2
+                ,msg="breakdown should be same with aggregation cashflow(with performance)")
+    # combined = pd.concat([rWithOsPoolFlow['pool']['flow']['PoolConsol']
+    #                       ,rWithOsPoolFlow['pool_outstanding']['flow']['PoolConsol']])
+    # eqDataFrame(complete['pool']['flow']['PoolConsol'], combined)

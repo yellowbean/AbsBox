@@ -98,8 +98,7 @@ class Generic:
     
     @staticmethod
     def read(resp):
-        read_paths = {
-                     'fees': ('feeStmt', english_fee_flow_fields_d, "fee")
+        read_paths = { 'fees': ('feeStmt', english_fee_flow_fields_d, "fee")
                      , 'accounts': ('accStmt', english_acc_flow_fields_d, "account")
                      , 'liqProvider': ('liqStmt', english_liq_flow_fields_d, "")
                      , 'rateSwap': ('rsStmt', english_rs_flow_fields_d, "")
@@ -137,10 +136,13 @@ class Generic:
         output['agg_accounts'] = aggAccs(output['accounts'], 'english')
         
         output['pool'] = {}
-        output['pool']['oustanding'] = {k:{"flow": readPoolCf(aggFlow['contents'])
-                                           ,"breakdown": [ readPoolCf(_['contents']) 
-                                                           for _ in breakdownFlows]}
+
+        outstanding_pool_flow = {k:{"flow": readPoolCf(aggFlow['contents'])
+                                           ,"breakdown": [ readPoolCf(_['contents']) for _ in breakdownFlows]}
                                          for k,(aggFlow,breakdownFlows) in resp[4].items()}
+        output['pool_outstanding'] = {"flow": { k:v['flow'] for k,v in outstanding_pool_flow.items() }
+                                      ,"breakdown": { k:v['breakdown'] for k,v in outstanding_pool_flow.items() } }
+        
         poolMap = deal_content['pool']['contents']
 
         
