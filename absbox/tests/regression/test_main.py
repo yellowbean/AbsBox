@@ -10,6 +10,7 @@ from .deals import *
 from .assets import *
 
 from absbox import API,EnginePath,readInspect,PickApiFrom,readBondsCf
+from absbox.exception import AbsboxError
 
 config_file_path = Path(__file__).resolve().parent.parent / 'config.json'
 
@@ -225,9 +226,8 @@ def test_first_loss(setup_api):
                                                     ,None)
                                     ,None
                                     ,None)
-                    ,read=True
-                    )
-    closeTo(r0[0], 31.601002929896755, r=6)
+                    ,read=True)
+    closeTo(r0[0], 31.601832129896755, r=6)
 
 @pytest.mark.analytics
 def test_irr_01(setup_api):
@@ -274,7 +274,19 @@ def test_rootfind_stressppy(setup_api):
     r = setup_api.runRootFinder(test01, poolPerf ,[pricing]
         ,("stressPrepayment",("bondMetTargetIrr", "B", 0.25))
     )
-    assert r[1][1]['PoolLevel'][0]['MortgageAssump'][1] == {'PrepaymentCPR': 0.38642105474696914 } 
+    assert r[1][1]['PoolLevel'][0]['MortgageAssump'][1] == {'PrepaymentCPR': 0.38640740263106543 } 
+
+    assert r[0] == 386.40740263106545, "scale factor is off {r[0]}"
+    
+    r = setup_api.runRootFinder(test01, poolPerf ,[pricing]
+        ,(("stressPrepayment", 1,400),("bondMetTargetIrr", "B", 0.25))
+    )
+    assert r[1][1]['PoolLevel'][0]['MortgageAssump'][1] == {'PrepaymentCPR': 0.38640737599372227  } 
+    
+    with pytest.raises(AbsboxError):
+        r = setup_api.runRootFinder(test01, poolPerf ,[pricing]
+            ,(("stressPrepayment", 1,35),("bondMetTargetIrr", "B", 0.25))
+        )
 
 @pytest.mark.analytics
 def test_rootfind_stressdef(setup_api):
@@ -285,7 +297,7 @@ def test_rootfind_stressdef(setup_api):
     r = setup_api.runRootFinder(test01, poolPerf ,[pricing]
         ,("stressDefault",("bondMetTargetIrr", "B", 0.10))
     )
-    assert r[1][1]['PoolLevel'][0]['MortgageAssump'][0] == {'DefaultCDR': 0.07603587859615266} 
+    assert r[1][1]['PoolLevel'][0]['MortgageAssump'][0] == {'DefaultCDR': 0.0760391873750556 } 
 
 @pytest.mark.bond
 def test_pac_01(setup_api):
@@ -457,5 +469,15 @@ def test_revolving_01(setup_api):
     totalPrins = r['pool']['breakdown']['PoolConsol'] & lens.Each().Principal.collect() & lens.Each().modify(lambda x: x.sum())
     assert r['pool']['flow']['PoolConsol'].Principal.sum().round(2) == sum(totalPrins).round(2), "Breakdown cashflow should tieout with aggregated pool cashflow"
 
+
+# @pytest.mark.analytics
+# def test_rootfinder_by_formula(setup_api):
+#     poolPerf = ("Pool",("Mortgage",{"CDR":0.002},{"CPR":0.001},{"Rate":0.1,"Lag":18},None)
+#                                  ,None
+#                                  ,None)
+#     r = setup_api.runRootFinder(test01, poolPerf ,[]
+#         ,("stressPrepayment",("byFormula", ("bondTxnAmt", "<PayInt:B>","B") , 500))
+#     )
+#     assert r[1][1]['PoolLevel'][0]['MortgageAssump'][1] == {'PrepaymentCPR': 0.38642105474696914 } 
 
 
