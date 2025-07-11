@@ -391,6 +391,9 @@ def test_collect_outstanding(setup_api):
                           ,rWithOsPoolFlow['pool_outstanding']['flow']['PoolConsol']])
     eqDataFrame(complete['pool']['flow']['PoolConsol'], combined)
 
+    assert rWithOsPoolFlow['pool_outstanding']['flow']['PoolConsol'].shape == (44, 16), "Outstanding pool cashflow should be non empty"
+    assert rWithOsPoolFlow['result']['logs'].to_dict(orient="records")[-1]['Comment'] == "Oustanding pool cashflow hasn't been collected yet", "Outstanding pool cashflow should have logs"
+
 @pytest.mark.pool
 def test_collect_pool_loanlevel_cashflow(setup_api): 
     rAgg = setup_api.run(test04, read=True,runAssump =[])
@@ -479,5 +482,4 @@ def test_revolving_01(setup_api):
 #         ,("stressPrepayment",("byFormula", ("bondTxnAmt", "<PayInt:B>","B") , 500))
 #     )
 #     assert r[1][1]['PoolLevel'][0]['MortgageAssump'][1] == {'PrepaymentCPR': 0.38642105474696914 } 
-
 
