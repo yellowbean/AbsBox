@@ -9,8 +9,8 @@ project = 'absbox'
 copyright = '2025, Xiaoyu Zhang'
 author = 'Xiaoyu Zhang'
 
-release = "0.50.1"
-release = "0.50.1"
+release = "0.50.2"
+release = "0.50.2"
 
 # -- General configuration
 

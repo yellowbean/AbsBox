@@ -1265,7 +1265,7 @@ def mkStatus(x: tuple|str):
         case "违约" | "Defaulted":
             return mkTag(("DealDefaulted", None))
         case "结束" | "Ended":
-            return mkTag(("Ended"))
+            return mkTag(("Ended", None))
         case ("设计", st) | ("PreClosing", st) | ("preclosing", st):
             return mkTag(("PreClosing", mkStatus(st)))
         case _:
