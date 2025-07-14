@@ -845,7 +845,7 @@ cashflow projection will stop at the date specified.
 
 .. versionadded:: 0.46.5 
 
-After 0.46.5, the stop run can be specified by a :ref:`Condition` which will be evaluated on each distribution date described by :ref:`DatePattern`.
+After 0.46.5, the stop run can be specified by a :ref:`Condition` which will be evaluated on each distribution date described by :ref:`DatePattern`. Any condition met will stop the projection.
 
 .. code-block:: python
 
@@ -853,8 +853,11 @@ After 0.46.5, the stop run can be specified by a :ref:`Condition` which will be 
 
 .. code-block:: python
 
-  # on each month end, the engine will evaluate two conditions, stop projection when ALL of them are met
-  ("stop", "MonthEnd", [">=","2022-01-01"], [("bondBalance","A1"),"<=",200])
+  # on each month end, the engine will evaluate two conditions
+  # , stop projection when ALL of them are met
+
+  ("stop", "MonthEnd"
+         , [">=","2022-01-01"], [("bondBalance","A1"),"<=",200])
 
 
 Project Expense
@@ -1451,6 +1454,9 @@ params:
    * ``showWarning``: if `False`, client won't show warning messages, defualt is `True`
    * ``read`` : if `True` , will try it best to parse the result into `DataFrame`
 
+   .. versionadded:: 0.50.0
+   * ``rtn`` : defaults to [], to get asset level cashflow pass ``["AssetLevelFlow"]``
+
 returns:
    * a map with keys of components like:
   
@@ -1463,6 +1469,8 @@ returns:
      * ``_deal``
      * ``ledgers``
      * ``agg_accounts``
+     .. versionadded:: 0.50.0
+     * ``pool_outstanding``
 
 .. image:: img/deal_cycle_flow.png
   :width: 600
@@ -1692,6 +1700,12 @@ Cashflow Results
    * - ``Ledger flow``
      - if modeled
      - r['ledgers']
+   * - ``Uncollected Pool flow``
+     - if any (after 0.50.0)
+     - r['pool_outstanding']
+   * - ``Asset Level flow``
+     - if any (after 0.50.0) and toggle on
+     - r['pool']['breakdown']
 
 
 * the `run()` function will return a dict which with keys of components like `bonds` `fees` `accounts` `pool`
@@ -1787,6 +1801,8 @@ User have the option to view multiple accounts cashflow in a single dataframe,wi
 Pool Cashflow 
 """"""""""""""""
 
+Pool cashflow collected into SPV.
+
 .. code-block:: python
 
    r['pool']['flow'] # pool cashflow 
@@ -1802,6 +1818,64 @@ The ``readPoolsCf`` function can be used to view multiple pool cashflow.
   readPoolsCf(r['pool']['flow'])
 
 
+Pool cashflow un-collected.
+
+.. versionadded:: 0.50.0
+
+.. code-block:: python
+
+   r['pool_outstanding']['flow'] # pool cashflow to be collected 
+
+Asset level cashflow
+
+.. versionadded:: 0.50.0
+
+.. code-block:: python
+
+   r = api.run(..., rtn=["AssetLevelFlow"], read=True)
+
+   r['pool']['breakdown'] # cashflow list with breakdown
+   r['pool_outstanding']['breakdown'] # cashflow list with breakdown
+
+
+
+Non-Cashflow Results 
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``r['result']`` save the run result other than cashflow.
+
+.. list-table:: Non Cashflow Results
+   :header-rows: 1
+
+   * - Response Component
+     - Condition
+     - Path
+   * - ``Deal Status flow``
+     - /
+     - r['result']['status']
+   * - ``Bond Summary``
+     - /
+     - r['result']['bonds']
+   * - ``Bond Pricing``
+     - if `pricing` in deal assumption
+     - r['pricing']
+   * - ``Variable Inspect``
+     - if `inspect` in deal assumption
+     - r['result']['inspect']
+   * - ``Variable Inspect``
+     - if `inspect` in deal waterfall
+     - r['result']['waterfallInspect']
+   * - ``Deal Run Logs``
+     - /
+     - r['result']['logs']
+   * - ``Waterfall Run``
+     - /
+     - r['result']['waterfall']
+   * - ``Financial Reports``
+     - if `reports` in deal assumption
+     - r['result']['report']
+
+Bond Pricing 
 Non-Cashflow Results 
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -2276,11 +2350,17 @@ Stress Default
   syntax
     ``stressDefault``
 
+    .. versionadded:: 0.50.1
+    ``("stressDefault", <min factor:float>, <max factor:float>)``
+
 Stress Prepayment
   It will stress the prepayment component in the pool performance assumption.
 
   syntax
     ``stressPrepayment``
+
+    .. versionadded:: 0.50.1
+    ``("stressPrepayment", <min factor:float>, <max factor:float>)``
 
 
 Max Spread
@@ -2288,6 +2368,9 @@ Max Spread
   
   syntax
     ``("maxSpread", <bondName>)``
+
+    .. versionadded:: 0.50.1
+    ``("maxSpread", <min factor:float>, <max factor:float>)``
 
 Split Balance
   It will adjust balance distribution of two bonds. 

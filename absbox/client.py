@@ -516,7 +516,7 @@ class API:
         else:
             return result
 
-    def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, runAssump=None, read=True, debug=False) -> dict:
+    def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, runAssump=None, rtn=[], read=True, debug=False) -> dict:
         """run multiple deals with same assumption
 
         :param deals: a dict of deals
@@ -540,7 +540,8 @@ class API:
         _poolAssump = mkAssumpType(poolAssump) if poolAssump else None 
         _nonPerfAssump = mkNonPerfAssumps({}, mapNone(nonPoolAssump,[]) + mapNone(runAssump,[]))
         req = json.dumps(mkTag(("MultiDealRunReq"
-                                 ,[ tz.valmap(lambda x:x.json, deals)
+                                 ,[rtn
+                                   ,tz.valmap(lambda x:x.json, deals)
                                    ,_poolAssump
                                    ,_nonPerfAssump]))
                          ,ensure_ascii=False)

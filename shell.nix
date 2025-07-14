@@ -8,12 +8,12 @@ pkgs.mkShell {
     pkgs.python313Packages.meson-python
     pkgs.python313Packages.pillow 
     pkgs.python313Packages.rpds-py 
-
     pkgs.python313Packages.cython
     pkgs.zeromq
     pkgs.gcc
     pkgs.pkg-config
     pkgs.glibcLocales
+    pkgs.graphviz
   ];
   LANG = "en_US.UTF-8";
   LC_ALL = "en_US.UTF-8";
