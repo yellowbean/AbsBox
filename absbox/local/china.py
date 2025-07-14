@@ -127,21 +127,22 @@ class SPV:
         output['agg_accounts'] = aggAccs(output['accounts'], 'chinese')
 
         output['pool'] = {}
-        mFutureFlow = tz.get_in(['pool','contents','futureCf'], deal_content, default=None)
-        if mFutureFlow is None:
-            output['pool']['flow'] = None
+        poolMap = deal_content['pool']['contents']
+        
+        if deal_content['pool']['tag']=='MultiPool':
+            output['pool']['flow'] = tz.valmap(lambda v: readPoolCf(v['futureCf'][0]['contents']) if (not v['futureCf'] is None) else pd.DataFrame(), poolMap)
+            output['pool']['breakdown'] = tz.valmap(lambda v: list(tz.map(readPoolCf, v['futureCf'][1] & lens.Each()['contents'].collect() )) if (v['futureCf'] and (not v['futureCf'][1] is None)) else [], poolMap)
+        elif deal_content['pool']['tag']=='ResecDeal':
+            output['pool']['flow'] = {tz.get([1,2,4],k.split(":")): readPoolCf(v['futureCf']['contents']) for (k,v) in poolMap.items() }
         else:
-            _pool_cf_header, _, expandFlag = guess_pool_flow_header(mFutureFlow['contents'][1][0], "chinese")
-            if not expandFlag:
-                output['pool']['flow'] = pd.DataFrame([_['contents'] for _ in mFutureFlow['contents'][1]]
-                                                      , columns=_pool_cf_header)
-            else:
-                output['pool']['flow'] = pd.DataFrame([_['contents'][:-1]+mapNone(_['contents'][-1],[None]*6) for _ in mFutureFlow['contents'][1]]
-                                                      , columns=_pool_cf_header)                
-            
-            pool_idx = "日期"
-            output['pool']['flow'] = output['pool']['flow'].set_index(pool_idx)
-            output['pool']['flow'].index.rename(pool_idx, inplace=True)
+            raise RuntimeError(f"Failed to match deal pool type:{deal_content['pool']['tag']}")
+
+        outstanding_pool_flow = {k:{"flow": readPoolCf(aggFlow['contents'])
+                                    ,"breakdown": [ readPoolCf(_['contents']) for _ in breakdownFlows]}
+                                   for k,(aggFlow,breakdownFlows) in resp[4].items()}
+        output['pool_outstanding'] = {"flow": { k:v['flow'] for k,v in outstanding_pool_flow.items() }
+                                      ,"breakdown": { k:v['breakdown'] for k,v in outstanding_pool_flow.items() } }
+ 
 
         output['pricing'] = readPricingResult(resp[3], 'cn')
         output['result'] = readRunSummary(resp[2], 'cn')

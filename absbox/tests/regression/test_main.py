@@ -392,7 +392,9 @@ def test_collect_outstanding(setup_api):
     eqDataFrame(complete['pool']['flow']['PoolConsol'], combined)
 
     assert rWithOsPoolFlow['pool_outstanding']['flow']['PoolConsol'].shape == (44, 16), "Outstanding pool cashflow should be non empty"
-    assert rWithOsPoolFlow['result']['logs'].to_dict(orient="records")[-1]['Comment'] == "Oustanding pool cashflow hasn't been collected yet", "Outstanding pool cashflow should have logs"
+    assert rWithOsPoolFlow['result']['logs'].to_dict(orient="records")[-1]['Comment'].startswith("Oustanding pool cashflow hasn't been collected yet"), "Outstanding pool cashflow should have logs"
+    
+    assert complete['result']['logs'] is None , "in a complete run, there shouldn't be oustanding pool warning logs"
 
 @pytest.mark.pool
 def test_collect_pool_loanlevel_cashflow(setup_api): 
@@ -439,16 +441,8 @@ def test_reports(setup_api):
 def test_revolving_01(setup_api):
     """ Test revolving pool with collection """
     revol_asset =  ["Mortgage",{
-                        "originBalance": 1400,
-                        "originRate": ["fix", 0.045],
-                        "originTerm": 30,
-                        "freq": "Monthly",
-                        "type": "Level",
-                        "originDate": "2021-02-01",},
-                    {"currentBalance": 1400,
-                     "currentRate": 0.08,
-                     "remainTerm": 30,
-                     "status": "current",}, ]    
+                        "originBalance": 1400, "originRate": ["fix", 0.045], "originTerm": 30, "freq": "Monthly", "type": "Level", "originDate": "2021-02-01",},
+                    {"currentBalance": 1400, "currentRate": 0.08, "remainTerm": 30, "status": "current",}, ]    
     r = setup_api.run(test05, read=True, runAssump =[("revolving"
                                                        ,["constant",revol_asset]
                                                        ,("Pool",("Mortgage",None,None,None,None)

@@ -8,7 +8,7 @@ from .client import API, Endpoints, EnginePath, PickApiFrom
 from .library import LIBRARY, LibraryEndpoints, LibraryPath
 from .local.util import *
 from .local.base import *
-from .local.cmp import compResult
+from .local.cmp import compResult,compDf
 from .local.china import 信贷ABS, SPV
 from .local.generic import Generic
 from .deal import mkDeal, mkDealsBy, setDealsBy, prodDealsBy, setAssumpsBy, prodAssumpsBy

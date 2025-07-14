@@ -134,52 +134,52 @@ from absbox.local.china import SPV
 )
 
 
-if __name__ == '__main__':
-    from absbox import API
-    localAPI = API("https://absbox.org/api/latest")
-    
-    
-    revol_asset = ["Mortgage"
-                    ,{"originBalance":220,"originRate":["fix",0.043],"originTerm":48
-                      ,"freq":"Monthly","type":"Level","originDate":"2021-07-01"}
-                      ,{"currentBalance":220
-                      ,"currentRate":0.043
-                      ,"remainTerm":36
-                      ,"status":"current"}]
-
-    r = localAPI.run(德宝天元202301,
-              runAssump = [
-                  ("revolving"
-                    ,["constant",revol_asset]
-                    ,("Pool",("Mortgage",{"CDR":0.01},None,None,None)
-                              ,None
-                              ,None))
-                  ,("call",{"bondFactor":0.05})
-                  ,("report",{"dates":"MonthEnd"})
-              ],
-              poolAssump = ("Pool",("Mortgage",{"CDR":0.0012},None,None,None)
-                              ,None
-                              ,None)
-              ,read=True)
-    
-    # view pool balance changes
-    r['pool']['flow']['余额'].iloc[2:,].plot.area(rot=45
-                                                 ,title="循环资产池余额变化"
-                                                 ,ylabel="资产池余额"
-                                                 )
-    # view balance sheet
-    bs = r['result']['report']['balanceSheet']
-    
-    # view capital structure
-    col_to_keep = [('asset', 'Pool Performing')
-                   ,('asset', '现金储备分账户')
-                   ,('liability', 'A')
-                   ,('liability', '次级')
-                   #,('ratio',"A-OC")
-                  ]
-    start_index = 25
-    chart = bs.iloc[start_index:50,][col_to_keep].plot.area(rot=45,stacked=True,secondary_y=['OC-A'])
-    chart.set_title("资产负债结构")
+# if __name__ == '__main__':
+#     from absbox import API
+#     localAPI = API("https://absbox.org/api/latest")
+#     
+#     
+#     revol_asset = ["Mortgage"
+#                     ,{"originBalance":220,"originRate":["fix",0.043],"originTerm":48
+#                       ,"freq":"Monthly","type":"Level","originDate":"2021-07-01"}
+#                       ,{"currentBalance":220
+#                       ,"currentRate":0.043
+#                       ,"remainTerm":36
+#                       ,"status":"current"}]
+# 
+#     r = localAPI.run(德宝天元202301,
+#               runAssump = [
+#                   ("revolving"
+#                     ,["constant",revol_asset]
+#                     ,("Pool",("Mortgage",{"CDR":0.01},None,None,None)
+#                               ,None
+#                               ,None))
+#                   ,("call",{"bondFactor":0.05})
+#                   ,("report",{"dates":"MonthEnd"})
+#               ],
+#               poolAssump = ("Pool",("Mortgage",{"CDR":0.0012},None,None,None)
+#                               ,None
+#                               ,None)
+#               ,read=True)
+#     
+#     # view pool balance changes
+#     r['pool']['flow']['余额'].iloc[2:,].plot.area(rot=45
+#                                                  ,title="循环资产池余额变化"
+#                                                  ,ylabel="资产池余额"
+#                                                  )
+#     # view balance sheet
+#     bs = r['result']['report']['balanceSheet']
+#     
+#     # view capital structure
+#     col_to_keep = [('asset', 'Pool Performing')
+#                    ,('asset', '现金储备分账户')
+#                    ,('liability', 'A')
+#                    ,('liability', '次级')
+#                    #,('ratio',"A-OC")
+#                   ]
+#     start_index = 25
+#     chart = bs.iloc[start_index:50,][col_to_keep].plot.area(rot=45,stacked=True,secondary_y=['OC-A'])
+#     chart.set_title("资产负债结构")
     
     
     ## scenario analysis on revolving

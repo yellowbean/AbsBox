@@ -14478,6 +14478,10 @@
           "2027-09-30",
           "No Pool Cashflow/All Account is zero/Not revolving"
         ]
+      },
+      {
+        "tag": "WarningMsg",
+        "contents": "Oustanding pool cashflow hasn't been collected yetfromList [(PoolConsol,399)]"
       }
     ],
     {},
