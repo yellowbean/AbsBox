@@ -136,9 +136,8 @@ class Generic:
         output['agg_accounts'] = aggAccs(output['accounts'], 'english')
         
         output['pool'] = {}
-
         outstanding_pool_flow = {k:{"flow": readPoolCf(aggFlow['contents'])
-                                    ,"breakdown": [ readPoolCf(_['contents']) for _ in breakdownFlows]}
+                                    ,"breakdown": [ readPoolCf(_['contents']) for _ in breakdownFlows ] if breakdownFlows else []}
                                    for k,(aggFlow,breakdownFlows) in resp[4].items()}
         output['pool_outstanding'] = {"flow": { k:v['flow'] for k,v in outstanding_pool_flow.items() }
                                       ,"breakdown": { k:v['breakdown'] for k,v in outstanding_pool_flow.items() } }

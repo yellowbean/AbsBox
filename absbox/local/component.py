@@ -2030,7 +2030,7 @@ def mkPoolType(assetDate, x, mixedFlag) -> dict:
             return mkTag(("MultiPool" ,{"PoolConsol":mkPoolComp(vDate(assetDate), x, False)}))
         case {"deals": y} if isinstance(y, dict):
             return mkTag(("ResecDeal",{f"{dealObj.json['contents']['name']}:{bn}:{sd}:{str(pct)}": \
-                                        {"deal":dealObj.json['contents'],"future":None,"futureScheduleCf":None,"issuanceStat":None}\
+                                        {"deal":dealObj.json['contents'],"futureCf":None,"futureScheduleCf":None,"issuanceStat":None}\
                                           for ((bn,pct,sd),dealObj) in x['deals'].items()} ))
         case x if all([ isinstance(_,dict) for _ in x.values() ]):
             return mkTag(("MultiPool" 
