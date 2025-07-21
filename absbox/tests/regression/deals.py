@@ -696,9 +696,7 @@ pac02 = Generic(
     {
         "default": [
             ["accrueAndPayInt", "acc01", ["A1", "A2"]],
-            ["payPrinBySeq", "acc01", ["A1", "A2"]]
-            # ,['inspect',"isPaidoff",("isPaidOff","A2")]
-            ,
+            ["payPrinBySeq", "acc01", ["A1", "A2"]] ,
             ["payPrin", "acc01", ["A1"]],
             ["payIntResidual", "acc01", "B"],
         ],
@@ -766,7 +764,6 @@ pac03 = Generic(
     ,{"default":[
          ["accrueAndPayIntByGroup","acc01","A", "byName"]
          ,["payPrinByGroup","acc01","A", "byName"]
-         #,["payPrin","acc01",["A1"]]
          ,["payIntResidual","acc01","B"]
      ],
      }
@@ -984,3 +981,18 @@ bondGrp = Generic(
     None,
     "Amortizing",
 )
+
+import datetime
+from dateutil.relativedelta import relativedelta
+
+
+cf = [[ (datetime.datetime.strptime("2021-03-01", "%Y-%m-%d") + relativedelta(months=_)).strftime("%Y-%m-%d"), (29-_)*75] 
+      for _ in range(30) ]
+
+fixPct = (1.00,0.07)
+# floatPcts = [(0.50, 0.05, 0.02, "LIBOR1M")]
+floatPcts = []
+projCf =  ["ProjectedByFactor", cf, "MonthEnd", fixPct, floatPcts] 
+
+test06 = test01 & lens.name.set("TEST06 - ProjectByFactor")\
+                & lens.pool['assets'].set([projCf])

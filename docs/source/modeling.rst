@@ -1675,42 +1675,43 @@ syntax
 Projected Cashflow
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-It's possible that to build a deal model with ``Projected Cashflow`` which means the there is no way to get loan level data of `Assets` but only cashflow derived from these assets.
+.. versionchanged:: 0.51.0
 
-There are two type of ``Projected Cashflow``
+It's possible that to build a asset model with ``Projected Cashflow`` which means the there is no way to get loan level data of `Assets` but only projected cashflow derived from these assets.
 
-* Fixed Projected Flow -> the cashflow is projected via assets with fix rate.
-* Mixed Projected Flow -> the cashflow is projected via a pool of assets with %x of fixed rate asset and %y1 %y2 ...
-
-Fix Rate Flow
+ProjectedByFactor
 """"""""""""""""""""
 
-syntax 
-  ``["ProjectedFlowFix" ,{"flows":[["2024-09-01",<Balance>,<Principal>,<Interest>]....] ,"beginDate":"2024-06-01","beginBalance":1000},"MonthEnd"]``
+syntax
+  .. code-block:: python
+  
+      ["ProjectedByFactor"
+      , [["2024-09-01",100]
+        ,["2024-10-01",50]
+        ,["2024-11-01",30]
+        ,["2024-12-01",0]
+        ]
+      ,"MonthEnd" 
+      ,(0.5, 0.08) 
+      ,[(0.5, 0.02, "LIBOR1M")]
+      ]
+* ``[[<Date>, <Balance>]...]``
 
-* ``MonthEnd``
+  Expected balance and dates
 
-  Means if there is default/recovery lag how the cashflow periods extended
-
-
-Mix Rate Flow
-""""""""""""""""""""
-
-syntax 
-  ``["ProjectedFlowMix" ,{"flows":[["2024-09-01",100,10,10]] ,"beginDate":"2024-06-01" ,"beginBalance":110} ,"MonthEnd" ,(.5,0.08) ,[(1.0,0.02,"LIBOR1M")]]``
 
 * ``(0.5,0.08)``
 
   Means, 50% of projected cashflow are attributed to fix rate assets with fix rate of 8%
-* ``[(1.0,0.02,"LIBOR1M")]``
+* ``[(0.5,0.02,"LIBOR1M")]``
 
-  Means 100% of rest cashflow are generated from floater asset with spread of 2% and index of `LIBOR1M`
+  Means 50% of rest cashflow are generated from floater asset with spread of 2% and index of `LIBOR1M`
+
+.. warning::
+
+  Only `Mortgage` assumptions are supported
 
 
-Assumption
-""""""""""""""""""
-
-Only `Mortgage` assumptions are supported
 
 
 Collection Rules 
@@ -3404,6 +3405,8 @@ examples:
     * ``"byStartDate"`` -> pay bonds by start date, the earlier start date bond will be paid first
     .. versionadded:: 0.43.1
     * ``("byName", name1, name2...)`` -> pay bonds by order of name1, name2...
+    .. versionadded:: 0.50.3
+    * ``("reverse", <ordering>)`` -> reverse the order of <ordering>
 
 
 Trigger

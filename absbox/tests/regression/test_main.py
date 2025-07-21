@@ -5,6 +5,7 @@ import pytest
 import re, math, json
 from pathlib import Path
 from collections import Counter
+from itertools import dropwhile
 
 from .deals import *
 from .assets import *
@@ -42,6 +43,14 @@ def eqDataFrameByLens(a, b, l, fn=None, msg=""):
     else:
       eqDataFrame(fn(da), fn(db), msg=msg)
 
+
+def seniorTest(x, y):
+    xx = pd.concat([x.rename("Left"),y.rename("Right")],axis=1).fillna(0)
+    xflags = xx["Left"]- xx["Right"] == xx["Left"]
+    yflags = xx["Right"] - xx["Left"] == xx["Right"]
+    rflags = xflags | yflags
+    f = dropwhile( lambda y: not y, dropwhile(lambda x:x ,xflags))
+    return len(list(f)) == 0 & Counter(rflags).get("False",0) <= 1
 
 
 @pytest.fixture
@@ -330,6 +339,69 @@ def test_bondGrp(setup_api):
     assert grpFlow.A1.to_list()[:8] == [1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 993.93]
     assert grpFlow.A2.to_list()[:8] == [510.6, 436.68, 364.06, 290.75, 217.26, 143.1, 68.74, 0.0,]
 
+    assert seniorTest(r['bonds']['A']['A2'].principal,r['bonds']['A']['A1'].principal), "A2 should be senior to A1"
+
+    r = setup_api.run(bondGrp & lens.waterfall['default'][1][3].set("byName")
+                      , read=True , runAssump = [])
+    assert seniorTest(r['bonds']['A']['A1'].principal,r['bonds']['A']['A2'].principal), "byName: A1 should be senior to A2"
+    
+    r = setup_api.run(bondGrp & lens.waterfall['default'][1][3].set(('reverse',"byName")))
+    assert seniorTest(r['bonds']['A']['A2'].principal,r['bonds']['A']['A1'].principal), "byName: A2 should be senior to A1"
+
+    r = setup_api.run(bondGrp & lens.waterfall['default'][1][3].set("byProrata")
+                      , read=True , runAssump = [])
+    allEqTo08 = (r['bonds']['A']['A2'].principal / r['bonds']['A']['A1'].principal).round(2) == 0.8
+    assert all(allEqTo08), "byProrata: A2 should be 0.8 of A1"
+
+    r = setup_api.run(bondGrp & lens.waterfall['default'][1][3].set("byCurRate")
+                          & lens.bonds[0][1][1]["A1"]['rate'].set(0.06)
+                  , read=True , runAssump = [])
+    assert seniorTest(r['bonds']['A']['A2'].principal,r['bonds']['A']['A1'].principal), "A2 should be senior to A1"
+
+    r = setup_api.run(bondGrp & lens.waterfall['default'][1][3].set(("reverse", "byCurRate"))
+                          & lens.bonds[0][1][1]["A1"]['rate'].set(0.06)
+                  , read=True , runAssump = [])
+    assert seniorTest(r['bonds']['A']['A1'].principal,r['bonds']['A']['A2'].principal), "A1 should be senior to A2"
+
+    #test by maturity date
+    d = bondGrp & lens.bonds[0][1][1]["A1"].modify(lambda x: tz.assoc(x,"maturityDate","2026-01-01"))\
+        & lens.bonds[0][1][1]["A2"].modify(lambda x: tz.assoc(x,"maturityDate","2025-01-01"))\
+        & lens.waterfall['default'][1][3].set("byMaturity")
+
+    r = setup_api.run(d, read=True , runAssump = [])
+    assert seniorTest(r['bonds']['A']['A2'].principal,r['bonds']['A']['A1'].principal), "A2 should be senior to A1"
+
+    d = bondGrp & lens.bonds[0][1][1]["A2"].modify(lambda x: tz.assoc(x,"startDate","2020-01-02"))\
+        & lens.waterfall['default'][1][3].set("byStartDate")
+
+    r = setup_api.run(d, read=True , runAssump = [])
+    assert seniorTest(r['bonds']['A']['A2'].principal,r['bonds']['A']['A1'].principal), "A2 should be senior to A1"
+
+@pytest.mark.trigger
+def test_trigger_chgBondRate(setup_api):
+    withTrigger = test01 & lens.trigger.set({
+                    "BeforeDistribution":{
+                        "changeBndRt":{"condition":[">=","2021-08-20"]
+                                    ,"effects":("changeBondRate", "A1", {"floater":[0.05, "SOFR1Y",-0.02,"MonthEnd"]}, 0.12)
+                                    ,"status":False
+                                    ,"curable":False}
+                    }
+                    })
+    r = setup_api.run(withTrigger , read=True ,runAssump = [("interest",("SOFR1Y",0.04))])
+    assert r['bonds']['A1'].rate.to_list() == [0.07, 0.12, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02]
+
+@pytest.mark.pool
+def test_pool_lease_end(setup_api):
+    """ Lease end date """
+    myPool = {'assets':[l1],'cutoffDate':"2022-01-01"}
+    r = setup_api.runPool(myPool
+                  ,poolAssump=("Pool",("Lease", None, ('days', 20) , ('byAnnualRate', 0.0), ("byExtTimes", 2))
+                                       ,None
+                                       ,None
+                                       )
+                  ,read=True)
+    assert r['PoolConsol']['flow'].index[-1] == '2024-12-15'
+
 @pytest.mark.trigger
 def test_trigger_chgBondRate(setup_api):
     withTrigger = test01 & lens.trigger.set({
@@ -425,9 +497,6 @@ def test_collect_pool_loanlevel_cashflow(setup_api):
     eqDataFrame(rAssetLevel['pool']['flow']['PoolConsol'].drop(columns=["WAC"])
                 ,combined2
                 ,msg="breakdown should be same with aggregation cashflow(with performance)")
-    # combined = pd.concat([rWithOsPoolFlow['pool']['flow']['PoolConsol']
-    #                       ,rWithOsPoolFlow['pool_outstanding']['flow']['PoolConsol']])
-    # eqDataFrame(complete['pool']['flow']['PoolConsol'], combined)
 
 @pytest.mark.report
 def test_reports(setup_api): 
@@ -466,7 +535,10 @@ def test_revolving_01(setup_api):
     totalPrins = r['pool']['breakdown']['PoolConsol'] & lens.Each().Principal.collect() & lens.Each().modify(lambda x: x.sum())
     assert r['pool']['flow']['PoolConsol'].Principal.sum().round(2) == sum(totalPrins).round(2), "Breakdown cashflow should tieout with aggregated pool cashflow"
 
-
+@pytest.mark.asset
+def test_06(setup_api):
+    r = setup_api.run(test06 , read=True , runAssump = [])
+    assert r['pool']['flow']['PoolConsol'].Principal.sum() == 2175, "Total principal should be 2175.0"
 # @pytest.mark.analytics
 # def test_rootfinder_by_formula(setup_api):
 #     poolPerf = ("Pool",("Mortgage",{"CDR":0.002},{"CPR":0.001},{"Rate":0.1,"Lag":18},None)

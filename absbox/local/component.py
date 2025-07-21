@@ -1023,6 +1023,8 @@ def mkOrder(x):
             return mkTag("ByStartDate")
         case ("byName", *names):
             return mkTag(("ByCustomNames", vList(names, str)))
+        case ("reverse", order):
+            return mkTag(("ReverseSeq", mkOrder(order)))
 
 
 def mkAction(x:list):
@@ -1337,7 +1339,7 @@ def mkTriggerEffect(x):
             return mkTag(("AddTrigger", mkTrigger(trg)))
         case ["新储备目标", accName, newReserve] | ["newReserveBalance", accName, newReserve] | ("newReserveBalance", accName, newReserve):
             return mkTag(("ChangeReserveBalance", [vStr(accName), mkAccType(newReserve)]))
-        case ["结果", *efs] | ["Effects", *efs] | ("Effects", *efs):
+        case ["结果", *efs] | ["Effects", *efs] | ("Effects", *efs) |("effects", *efs) :
             return mkTag(("TriggerEffects", [mkTriggerEffect(e) for e in efs]))
         case ("changeBondRate", bndName, bondRateType, newRate):
             return mkTag(("ChangeBondRate", [vStr(bndName), mkBondRate(bondRateType), vNum(newRate)]))
@@ -1660,13 +1662,9 @@ def mkAsset(x):
                                         ,mkAssetStatus(status)]))
         case ["Invoice", {"start":sd,"originBalance":ob,"originAdvance":oa,"dueDate":dd},{"status":status}] :
             obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
-            return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":None,"obligor":obligorInfo} | mkTag("ReceivableInfo")
-                                        ,mkAssetStatus(status)]))
-        case ["ProjectedFlowFix", cf, dp]:
-            return mkTag(("ProjectedFlowFixed",[mkCashFlowFrame(cf) ,mkDatePattern(dp)]))
-        case ['ProjectedFlowMix', cf, dp, fixPct, floatPcts]:
-            return mkTag(("ProjectedFlowMixFloater",[mkCashFlowFrame(cf) ,mkDatePattern(dp)
-                                                    , fixPct, floatPcts]))
+            return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":None,"obligor":obligorInfo} | mkTag("ReceivableInfo") ,mkAssetStatus(status)]))
+        case ["ProjectedByFactor", cfs, dp, fixPct, floatPcts] :
+            return mkTag(("ProjectedByFactor" ,[cfs, mkDatePattern(dp), fixPct, floatPcts]))
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 
@@ -1692,7 +1690,7 @@ def identify_deal_type(x):
                 return "FDeal"
             case {"assets": [{'tag': 'Invoice'}, *rest]}:
                 return "VDeal"
-            case {"assets": [{'tag': 'ProjectedFlowMix'}, *rest]} | {"assets": [{'tag': 'ProjectedFlowMixFloater'}, *rest]}:
+            case {"assets": [{'tag': 'ProjectedByFactor'}, *rest]} :
                 return "PDeal"
             case {"assets": [{'tag': 'IL'}, *rest]} | {"assets": [{'tag': 'MO'}, *rest]} | \
                 {"assets": [{'tag': 'LO'}, *rest]} | {"assets": [{'tag': 'LS'}, *rest]} | \
@@ -2156,7 +2154,8 @@ def mkCashFlowFrame(x):
     begBal = x.get("beginBalance",0)
     begDate = x.get("beginDate","1900-01-01")
     accInt = x.get("accruedInterest",None)
-    return mkTag(("CashFlowFrame", [[begBal,begDate,accInt], [ mkTag(("MortgageFlow", f+[0.0]*5+[None,None,None] )) for f in flows] ]))
+    return mkTag(("CashFlowFrame", [[begBal,begDate,accInt]
+                                    , [ mkTag(("MortgageFlow", f+[0.0]*5+[None,None,None] )) for f in flows] ]))
 
 
 def mkPid(x):

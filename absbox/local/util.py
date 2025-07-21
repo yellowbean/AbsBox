@@ -290,7 +290,7 @@ def inferPoolTypeFromAst(x:dict) -> str:
             return "FPool"
         case {"assets":[["Invoice",*fields],*ast]} | {'清单': [['应收账款', *fields], *ast]}:
             return "VPool"
-        case {"assets":[["ProjectedFlowMix",*fields],*ast]} | {"assets":[["ProjectedFlowFix",*fields],*ast]} :
+        case {"assets":[["ProjectedByFactor",*fields],*ast]} :
             return "PPool"
         case _:
             raise RuntimeError(f"Failed to find pool type from assets:{x}")
