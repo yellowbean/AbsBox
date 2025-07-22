@@ -145,7 +145,6 @@ class API:
     """url of engine server"""
     lang: str = "english"
     """language of response from server, defaults to 'english' """
-
     check: bool = True
     """ flag to ensure version match between client and server """
     server_info = {}
@@ -195,7 +194,7 @@ class API:
         console.print(f"✅Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
 
     def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=[], rtn = []) -> str:
-        """build run deal requests: (single run, multi-scenario run, multi-struct run) 2
+        """build run deal requests: (single run, multi-scenario run, multi-struct run)
 
         :meta private:
         :param run_type: type of run request, RunReqType.Single.value, RunReqType.MultiScenarios.value, RunReqType.MultiStructs.value

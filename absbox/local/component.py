@@ -2039,15 +2039,15 @@ def mkPoolType(assetDate, x, mixedFlag) -> dict:
 
 def mkPoolComp(asOfDate, x, mixFlag) -> dict:
     assetFactory = mkAssetUnion if mixFlag else mkAsset
-    r = {"assets": [assetFactory(y) for y in getValWithKs(x, ['assets', "清单"], defaultReturn=[])]
+    return {
+        "assets": [assetFactory(y) for y in getValWithKs(x, ['assets', "清单"], defaultReturn=[])]
         , "asOfDate": asOfDate
         , "issuanceStat": tz.pipe(getValWithKs(x, ["issuanceStat", "统计", "发行", "Issuance"],defaultReturn={})
-                                , lambda y: updateKs(y, validCutoffFields)  
-                                )
-        , "futureCf":[mkCf(getValWithKs(x, ['cashflow', '现金流归集表', '归集表'], [])),None]
+                                , lambda y: updateKs(y, validCutoffFields))
+        , "futureCf": None
         , "futureScheduleCf" : None
-        , "extendPeriods":mkDatePattern(getValWithKs(x, ['extendBy'], "MonthEnd"))}
-    return r
+        , "extendPeriods":mkDatePattern(getValWithKs(x, ['extendBy'], "MonthEnd"))
+    }
 
 
 def mkPool(x: dict):
