@@ -539,6 +539,60 @@ def test_revolving_01(setup_api):
 def test_06(setup_api):
     r = setup_api.run(test06 , read=True , runAssump = [])
     assert r['pool']['flow']['PoolConsol'].Principal.sum() == 2175, "Total principal should be 2175.0"
+
+
+@pytest.mark.waterfall
+def test_limit_01(setup_api):
+    formulaPay = \
+      ["IfElse",["date","<=","2021-10-20"]
+      ,[['payPrin', 'acc01', ['A1'],{"limit":{"formula":("const",30)}}]]
+      ,[['payPrin', 'acc01', ['A1']]]
+      ]
+
+    test01_ = test01 & lens.waterfall['default'][1].set(formulaPay)
+    r = setup_api.run(test01_,read=True)
+    assert r['bonds']['A1'][:"2021-10-20"].principal.to_list() == [30.0, 30.0, 30.0, 30.0]
+    assert r['bonds']['A1'].loc["2021-11-20"].principal.item() == 75.92
+
+    formulaPay = \
+      ["IfElse",["date","<=","2021-10-20"]
+      ,[['payPrin', 'acc01', ['A1'],{"limit":{"balPct":0.4}}]]
+      ,[['payPrin', 'acc01', ['A1']]]
+      ]
+
+    test01_ = test01 & lens.waterfall['default'][1].set(formulaPay)
+    r =  setup_api.run(test01_,read=True)
+    assert r['bonds']['A1'][:"2021-11-20"].principal.to_list() == [122.01, 30.78, 30.44, 30.58, 76.48]
+
+    formulaPay = ['payPrin', 'acc01', ['A1'],{"limit":{"balCapAmt":75}}]
+    
+    test01_ = test01 & lens.waterfall['default'][1].set(formulaPay)
+    r = setup_api.run(test01_,read=True)
+    r['bonds']['A1'].principal.to_list() == [75]*13+[25]
+
+@pytest.mark.waterfall
+def test_support_account(setup_api):
+    """ Test support account """
+    test01_ = test01 & lens.accounts.set((('acc01', {'balance': 0}),('acc02', {'balance': 200})))\
+                 & lens.waterfall['default'][0].modify(lambda x: x+[{"support":["account","acc02"]}])
+    r =setup_api.run(test01_,read=True
+                    ,poolAssump = ("Pool",("Mortgage",{"CDR":0.75},None,None,None)
+                                           ,None
+                                           ,None))
+    assert r['accounts']['acc01'].loc['2023-09-20'].change.item() == -2.56
+    assert r['accounts']['acc02'].loc['2023-09-20'].change.item() == -0.13
+
+    test01_ = test01 & lens.accounts.set((('acc01', {'balance': 0}),('acc02', {'balance': 10}),('acc03', {'balance': 50})))\
+                 & lens.waterfall['default'][0].modify(lambda x: x+[{"support":["support",("account","acc02"),("account","acc03")]}])
+    r = setup_api.run(test01_,read=True
+                    ,poolAssump = ("Pool",("Mortgage",{"CDR":0.75},None,None,None)
+                                           ,None
+                                           ,None)
+                  )
+    assert r['accounts']['acc01'].loc['2023-09-20'].change.item() == -2.56
+    assert r['accounts']['acc02'].loc['2023-09-20'].change.item() == -0.13
+    assert r['accounts']['acc02'].loc['2024-01-20'].change.item() == -1.96
+    assert r['accounts']['acc03'].loc['2024-01-20'].change.item() == -0.73
 # @pytest.mark.analytics
 # def test_rootfinder_by_formula(setup_api):
 #     poolPerf = ("Pool",("Mortgage",{"CDR":0.002},{"CPR":0.001},{"Rate":0.1,"Lag":18},None)

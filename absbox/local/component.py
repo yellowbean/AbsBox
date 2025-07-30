@@ -993,15 +993,15 @@ def mkBookType(x: list):
 
 def mkSupport(x:list):
     match x:
-        case ["account", accName, (direction,ledgerName)] | ["suppportAccount", accName, (direction,ledgerName)] | ["支持账户", accName, (direction,ledgerName)] if direction in bookDirection.keys():
+        case ("account", accName, (direction,ledgerName)) | ["account", accName, (direction,ledgerName)] | ["suppportAccount", accName, (direction,ledgerName)] | ["支持账户", accName, (direction,ledgerName)] if direction in bookDirection.keys():
             return mkTag(("SupportAccount", [vStr(accName), [vStr(bookDirection[direction]),vStr(ledgerName)]]))
-        case ["account", accName] | ["suppportAccount", accName] | ["支持账户", accName]:
+        case ("account", accName) | ["account", accName] | ["suppportAccount", accName] | ["支持账户", accName]:
             return mkTag(("SupportAccount", [vStr(accName), None]))
-        case ["facility", liqName] | ["suppportFacility", liqName] | ["支持机构", liqName]:
+        case ("facility", liqName) | ["facility", liqName] | ["suppportFacility", liqName] | ["支持机构", liqName]:
             return mkTag(("SupportLiqFacility", vStr(liqName)))
-        case ["support", *supports] | ["multiSupport", *supports] | ["多重支持", *supports]:
+        case ("support", *supports) | ["support", *supports] | ["multiSupport", *supports] | ["多重支持", *supports]:
             return mkTag(("MultiSupport", lmap(mkSupport, supports)))
-        case ["withCondition", pre, s] | ["条件支持", pre, s]:
+        case ("withCondition", pre, s) | ["withCondition", pre, s] | ["条件支持", pre, s]:
             return mkTag(("WithCondition", [mkPre(pre), mkSupport(s)]))
         case None:
             return None
@@ -2003,7 +2003,7 @@ def mkAssetUnion(x):
             return mkTag(("FA", mkAsset(x)))
         case "应收帐款" | "Invoice" : 
             return mkTag(("RE", mkAsset(x)))
-        case "ProjectedFlowFix" | "ProjectedFlowMix" :
+        case "ProjectedByFactor" :
             return mkTag(("PF", mkAsset(x)))
         case _:
             raise RuntimeError(f"Failed to match AssetUnion {x}")
@@ -2596,3 +2596,7 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
             return r
         case [x,*rest]:
             return mkNonPerfAssumps(r | translate(x),rest)
+from enum import Enum
+import itertools
+import sys
+import functools

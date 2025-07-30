@@ -118,6 +118,10 @@ class Generic:
                 if x[comp_v[0]]:
                     ir = list(tz.pluck('contents', x[comp_v[0]]))
                     output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("date")
+                elif x[comp_v[0]] is None:
+                    output[comp_name][k] = pd.DataFrame([], columns=comp_v[1]).set_index("date")
+                else:
+                    pass
             output[comp_name] = collections.OrderedDict(sorted(output[comp_name].items()))
         # aggregate fees
         output['fees'] = {f: v.groupby('date').agg({"balance": "min", "payment": "sum", "due": "min"})

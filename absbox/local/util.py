@@ -2,6 +2,7 @@ import pandas as pd
 import functools,json,copy,logging,re,itertools
 from functools import reduce
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from lenses import lens, ui, optics
 import toolz as tz
 
@@ -463,3 +464,32 @@ def patchDicts(dict1:dict,dict2:dict)-> dict:
 def getNumCols(df:pd.DataFrame)-> list:
     numeric_columns = [col for col in df.columns if pd.to_numeric(df[col], errors='coerce').notna().all()]
     return numeric_columns
+
+def get_earlier_date(date_str, n_months, input_format="%Y-%m-%d", output_format="%Y-%m-%d"):
+    """
+    Returns a date string that is n_months earlier than the input date.
+    
+    Parameters:
+    date_str (str): Input date string
+    n_months (int): Number of months to subtract
+    input_format (str): Format of input date string (default: YYYY-MM-DD)
+    output_format (str): Format of output date string (default: YYYY-MM-DD)
+    
+    Returns:
+    str: Date string that is n_months earlier
+    """
+    try:
+        # Parse input date string to datetime
+        input_date = datetime.strptime(date_str, input_format)
+        
+        # Subtract n months
+        earlier_date = input_date - relativedelta(months=n_months)
+        
+        # Format output date
+        return earlier_date.strftime(output_format)
+    except ValueError as e:
+        return f"Error: Invalid date format or value. {str(e)}"
+
+
+
+

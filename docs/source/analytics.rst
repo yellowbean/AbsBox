@@ -2404,7 +2404,7 @@ Bond Pricing Equals to Face
   The search stop when a bond pricing equals to face value.
   
   syntax
-    ``("bondPricingEqToOrigin", <bondName>, <TestBondFlag>, <TestFeeFlag>)``
+    ``("bondPricingEqOrigin", <bondName>, <TestBondFlag>, <TestFeeFlag>)``
 
 Bond with target IRR
   The search stop when a bond hit a target IRR.
