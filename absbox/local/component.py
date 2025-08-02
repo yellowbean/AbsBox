@@ -1695,7 +1695,7 @@ def identify_deal_type(x):
                 return "FDeal"
             case {"assets": [{'tag': 'Invoice'}, *rest]}:
                 return "VDeal"
-            case {"assets": [{'tag': 'ProjectedByFactor'}, *rest]} :
+            case {"assets": [{'tag': 'ProjectedByFactor'}, *rest]} | {"assets": [{'tag': 'ProjectedCashflow'}, *rest]}:
                 return "PDeal"
             case {"assets": [{'tag': 'IL'}, *rest]} | {"assets": [{'tag': 'MO'}, *rest]} | \
                 {"assets": [{'tag': 'LO'}, *rest]} | {"assets": [{'tag': 'LS'}, *rest]} | \
