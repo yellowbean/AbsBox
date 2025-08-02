@@ -1711,7 +1711,21 @@ syntax
 
   Only `Mortgage` assumptions are supported
 
+ProjectedCashflow
+""""""""""""""""""""""""""
 
+syntax
+  .. code-block:: python
+
+      cfs = [["2024-09-01",100,10]
+            ,["2024-10-01",50,8]
+            ,["2024-11-01",30,5]
+            ,["2024-12-01",20,2]]
+      ["ProjectedCashflow", <begBal>, <begDate>, <cfs> ,"MonthEnd"]
+
+* ``[<Date>, <Principal>, <Interest>]``
+
+  a single date flow with principal and interest
 
 
 Collection Rules 

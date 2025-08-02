@@ -1663,8 +1663,13 @@ def mkAsset(x):
         case ["Invoice", {"start":sd,"originBalance":ob,"originAdvance":oa,"dueDate":dd},{"status":status}] :
             obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
             return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":None,"obligor":obligorInfo} | mkTag("ReceivableInfo") ,mkAssetStatus(status)]))
+
         case ["ProjectedByFactor", cfs, dp, fixPct, floatPcts] :
             return mkTag(("ProjectedByFactor" ,[cfs, mkDatePattern(dp), fixPct, floatPcts]))
+
+        case ["ProjectedCashflow", begBal, begDate, flows, dp]:
+            return mkTag(("ProjectedCashflow" ,[(vNum(begBal),vDate(begDate)), flows, mkDatePattern(dp)]))
+
         case _:
             raise RuntimeError(f"Failed to match {x}:mkAsset")
 

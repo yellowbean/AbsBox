@@ -457,14 +457,14 @@ def test_collect_outstanding(setup_api):
                                  ,None)
 
     complete = setup_api.run(test01,poolAssump= poolPerf, read=True,runAssump =[])
-    rWithOsPoolFlow = setup_api.run(test01,poolAssump= poolPerf, read=True,runAssump =[("stop","2021-06-15")])
+    rWithOsPoolFlow = setup_api.run(test01, poolAssump= poolPerf, read=True, runAssump =[("stop","2021-06-15")])
     
     combined = pd.concat([rWithOsPoolFlow['pool']['flow']['PoolConsol']
                           ,rWithOsPoolFlow['pool_outstanding']['flow']['PoolConsol']])
     eqDataFrame(complete['pool']['flow']['PoolConsol'], combined)
 
     assert rWithOsPoolFlow['pool_outstanding']['flow']['PoolConsol'].shape == (44, 16), "Outstanding pool cashflow should be non empty"
-    assert rWithOsPoolFlow['result']['logs'].to_dict(orient="records")[-1]['Comment'].startswith("Oustanding pool cashflow hasn't been collected yet"), "Outstanding pool cashflow should have logs"
+    assert rWithOsPoolFlow['result']['logs'].to_dict(orient="records")[-1]['Comment'].startswith("Outstanding pool cashflow"), "Outstanding pool cashflow should have logs"
     
     assert complete['result']['logs'] is None , "in a complete run, there shouldn't be oustanding pool warning logs"
 
@@ -593,6 +593,9 @@ def test_support_account(setup_api):
     assert r['accounts']['acc02'].loc['2023-09-20'].change.item() == -0.13
     assert r['accounts']['acc02'].loc['2024-01-20'].change.item() == -1.96
     assert r['accounts']['acc03'].loc['2024-01-20'].change.item() == -0.73
+
+
+
 # @pytest.mark.analytics
 # def test_rootfinder_by_formula(setup_api):
 #     poolPerf = ("Pool",("Mortgage",{"CDR":0.002},{"CPR":0.001},{"Rate":0.1,"Lag":18},None)
