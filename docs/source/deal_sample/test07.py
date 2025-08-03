@@ -72,7 +72,6 @@ BMW202301 = Generic(
       ]
       ,'issuanceStat':{'IssuanceBalance':8000000001.8}
       }
-     ,"extendBy":"MonthEnd"}
       ,(("distAcc",{"balance":0})
        ,("cashReserve",{"balance":80_000_000.02
                          ,"type":{"fixReserve":80_000_000.02}})
