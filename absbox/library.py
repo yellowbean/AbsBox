@@ -84,12 +84,11 @@ class LIBRARY:
         cred = {"user": vStr(user), "password": pw}
         r:dict = self._send_req(json.dumps(cred), deal_library_url)
         if 'token' in r:
-            console.print(f"✅ login successfully, user -> {r['user']},group -> {r['group']}")
+            console.print(f"✅ Login successfully, user -> {r['user']},group -> {r['group']}")
             self.token = r['token']
         else:
-            if hasattr(self, 'token'):
-                delattr(self, 'token')
             console.print(f"❌ Failed to login,{r['msg']}")
+            self.token = None
             return None
     
     def ack(self):
@@ -130,8 +129,10 @@ class LIBRARY:
             raise AbsboxError(f"❌ No token found , please call loginLibrary() to login")
 
         deal_library_url = self.url+f"/{LibraryEndpoints.Query.value}"
-        result = self._send_req(json.dumps({"q":k}), deal_library_url, headers={"Authorization": f"Bearer {self.token}"})
-        console.print(f"✅ query success")
+        result = self._send_req(json.dumps({"q":k})
+                                , deal_library_url
+                                , headers={"Authorization": f"Bearer {self.token}"})
+        console.print(f"✅ Query success: {k}")
         if read:
             if 'data' in result:
                 return pd.DataFrame(result['data'], columns=result['header'])
@@ -140,44 +141,6 @@ class LIBRARY:
         else:
             return result
 
-    def add(self, d, **p):
-        """add deal to library"""
-
-        if not hasattr(self, "token"):
-            raise AbsboxError(f"❌ No token found, please call login() to login")
-        deal_library_url = self.url+f"/{LibraryEndpoints.Add.value}"
-
-        data = {
-            "deal":d
-            ,"json": d.json
-            ,"buildVersion": VERSION_NUM
-            ,"name": d.name
-            ,"version": p.get("version",0)
-            ,"period": p.get("period",0)
-            ,"stage": p.get("stage","draft")
-            ,"comment": p.get("comment","")
-            ,"permission": p.get("permission","700")
-            ,"tags": p.get("tags",[])
-            ,"group": p.get("group","")
-        }
-
-        bData = pickle.dumps(data)
-
-        r = self._send_req(bData, deal_library_url
-                            , headers={"Authorization": f"Bearer {self.token}"
-                                        ,"Content-Type":"application/octet-stream"})
-
-        console.print(f"✅ add success with deal id={r['dealId']}, name={r['name']}")
-
-    def cmd(self, p):
-        if not hasattr(self, "token"):
-            raise AbsboxError(f"❌ No token found, please call login() to login")
-
-        deal_library_url = self.url+f"/{LibraryEndpoints.Cmd.value}"
-
-        r = self._send_req(pickle.dumps(p), deal_library_url,headers={"Authorization": f"Bearer {self.token}"} )
-
-        return r
 
     def get(self, q):
         if not hasattr(self, "token"):
@@ -189,7 +152,7 @@ class LIBRARY:
                                         ,"Content-Type":"application/octet-stream"})
         
         return r
-        console.print(f"✅ get deal success")
+        #console.print(f"✅ Get deal success")
 
     def run(self, _id, **p):
         """send deal id with assumptions to remote server and get result back
@@ -216,7 +179,9 @@ class LIBRARY:
 
         runReq = {"q": _id, "runType": runType 
                 ,"runAssump": runAssump, "poolAssump": poolAssump
-                ,"engine": p.get("engine",None) }
+                ,"engine": p.get("engine",None) 
+                ,"tweak": p.get("tweak",None),"stop": p.get("stop",None)
+                }
         
         bRunReq = pickle.dumps(runReq)
 
@@ -228,7 +193,7 @@ class LIBRARY:
         try:
             result = r['result']
             runInfo = tz.dissoc(r, 'result')
-            console.print(f"✅ run success with deal: {runInfo['deal']['name']}|{runInfo['deal']['id']}")
+            console.print(f"✅ Run success with deal: {runInfo['deal']['name']}|{runInfo['deal']['period']}|{runInfo['deal']['id']}")
         except Exception as e:
             raise AbsboxError(f"❌ message from API server:\n,{e}")
         try:       
