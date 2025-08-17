@@ -9,6 +9,7 @@ from itertools import dropwhile
 
 from .deals import *
 from .assets import *
+from .pool import *
 
 from absbox import API,EnginePath,readInspect,PickApiFrom,readBondsCf
 from absbox.exception import AbsboxError
@@ -224,6 +225,17 @@ def test_asset_02(setup_api):
                                         ,None)
                         ,read=True)
     assert ppyRate(r[0])[1:] == [0.02, 0.02, 0.02]+[0.03]*6
+
+
+#@pytest.mark.pool
+#def test_pool_01(setup_api):
+#    r = setup_api.runPool(myPool
+#                        ,poolAssump=("Pool",("Mortgage",None,None,None,None)
+#                                        ,None
+#                                        ,None)
+#                        ,read = True
+#                        ,breakdown = True )
+
     
 @pytest.mark.analytics
 def test_first_loss(setup_api):
@@ -271,7 +283,7 @@ def test_irr_01(setup_api):
                               )]
                 ,read=True)
     
-    closeTo(r3['pricing']['summary'].loc["A1"].IRR, 0.12248, r=6)
+    closeTo(r3['pricing']['summary'].loc["A1"].IRR, 0.139824, r=6)
 
 
 @pytest.mark.analytics

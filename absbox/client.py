@@ -436,7 +436,7 @@ class API:
             assert pool_breakdown_flow is not None, "Breakdown flow is None"
             assert len(pool_breakdown_flow)>0, "Breakdown flow is empty"
             return {"flow":result 
-                    ,"breakdown": [ {"flow": _read_cf(_[0]['contents'][1], self.lang), "stat":_[1]}
+                    ,"breakdown": [ _read_cf(_['contents'][1], self.lang)
                                     for _ in pool_breakdown_flow  ]
                     }
 
