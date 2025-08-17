@@ -227,16 +227,24 @@ def test_asset_02(setup_api):
     assert ppyRate(r[0])[1:] == [0.02, 0.02, 0.02]+[0.03]*6
 
 
-#@pytest.mark.pool
-#def test_pool_01(setup_api):
-#    r = setup_api.runPool(myPool
-#                        ,poolAssump=("Pool",("Mortgage",None,None,None,None)
-#                                        ,None
-#                                        ,None)
-#                        ,read = True
-#                        ,breakdown = True )
+@pytest.mark.pool
+def test_pool_01(setup_api):
+    r = setup_api.runPool(myPool
+                        ,poolAssump=("Pool",("Mortgage",None,None,None,None)
+                                        ,None
+                                        ,None)
+                        ,read = True
+                        ,breakdown = False)
+    assert 'breakdown' not in r['PoolConsol'], "breakdown should not be in PoolConsol"
+    r = setup_api.runPool(myPool
+                        ,poolAssump=("Pool",("Mortgage",None,None,None,None)
+                                        ,None
+                                        ,None)
+                        ,read = True
+                        ,breakdown = True)
+    assert 'breakdown' in r['PoolConsol'], "breakdown should be in PoolConsol"  
+    assert 2 == len(r['PoolConsol']['breakdown']), "breakdown should have 2 items"
 
-    
 @pytest.mark.analytics
 def test_first_loss(setup_api):
     r0 = setup_api.runFirstLoss(test01
