@@ -79,20 +79,7 @@
             "IssuanceBalance": 7573626700,
             "HistoryDefaults": 81403764.08
           },
-          "futureCf": [
-            {
-              "tag": "CashFlowFrame",
-              "contents": [
-                [
-                  0,
-                  "1900-01-01",
-                  null
-                ],
-                []
-              ]
-            },
-            null
-          ],
+          "futureCf": null,
           "futureScheduleCf": null,
           "extendPeriods": {
             "tag": "MonthEnd"

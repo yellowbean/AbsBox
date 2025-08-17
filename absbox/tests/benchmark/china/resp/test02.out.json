@@ -111,42 +111,6 @@
               {
                 "tag": "AccTxn",
                 "contents": [
-                  "2021-06-26",
-                  0,
-                  0,
-                  "<PayInt:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-06-26",
-                  0,
-                  0,
-                  "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-06-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-06-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
                   "2021-06-30",
                   0,
                   0,
@@ -178,42 +142,6 @@
                   0,
                   0,
                   "<Pool:CollectedRecoveries>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-07-26",
-                  0,
-                  0,
-                  "<PayInt:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-07-26",
-                  0,
-                  0,
-                  "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-07-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-07-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
                 ]
               },
               {
@@ -255,42 +183,6 @@
               {
                 "tag": "AccTxn",
                 "contents": [
-                  "2021-08-26",
-                  0,
-                  0,
-                  "<PayInt:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-08-26",
-                  0,
-                  0,
-                  "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-08-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-08-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
                   "2021-08-31",
                   0,
                   0,
@@ -322,42 +214,6 @@
                   0,
                   0,
                   "<Pool:CollectedRecoveries>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-09-26",
-                  0,
-                  0,
-                  "<PayInt:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-09-26",
-                  0,
-                  0,
-                  "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-09-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-09-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
                 ]
               },
               {
@@ -399,42 +255,6 @@
               {
                 "tag": "AccTxn",
                 "contents": [
-                  "2021-10-26",
-                  0,
-                  0,
-                  "<PayInt:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-10-26",
-                  0,
-                  0,
-                  "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-10-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-10-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
                   "2021-10-31",
                   0,
                   0,
@@ -466,42 +286,6 @@
                   0,
                   0,
                   "<Pool:CollectedRecoveries>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-11-26",
-                  0,
-                  0,
-                  "<PayInt:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-11-26",
-                  0,
-                  0,
-                  "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-11-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-11-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
                 ]
               },
               {
@@ -543,42 +327,6 @@
               {
                 "tag": "AccTxn",
                 "contents": [
-                  "2021-12-26",
-                  0,
-                  0,
-                  "<PayInt:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-12-26",
-                  0,
-                  0,
-                  "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-12-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2021-12-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
                   "2021-12-31",
                   0,
                   0,
@@ -610,42 +358,6 @@
                   0,
                   0,
                   "<Pool:CollectedRecoveries>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-01-26",
-                  0,
-                  0,
-                  "<PayInt:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-01-26",
-                  0,
-                  0,
-                  "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-01-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-01-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
                 ]
               },
               {
@@ -687,42 +399,6 @@
               {
                 "tag": "AccTxn",
                 "contents": [
-                  "2022-02-26",
-                  0,
-                  0,
-                  "<PayInt:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-02-26",
-                  0,
-                  0,
-                  "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-02-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-02-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
                   "2022-02-28",
                   0,
                   0,
@@ -754,42 +430,6 @@
                   0,
                   0,
                   "<Pool:CollectedRecoveries>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-03-26",
-                  0,
-                  0,
-                  "<PayInt:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-03-26",
-                  0,
-                  0,
-                  "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-03-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-03-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
                 ]
               },
               {
@@ -849,24 +489,6 @@
               {
                 "tag": "AccTxn",
                 "contents": [
-                  "2022-04-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-04-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
                   "2022-04-30",
                   0.7,
                   0.7,
@@ -916,24 +538,6 @@
                   0,
                   -12.9,
                   "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-05-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-05-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
                 ]
               },
               {
@@ -993,24 +597,6 @@
               {
                 "tag": "AccTxn",
                 "contents": [
-                  "2022-06-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-06-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
                   "2022-06-30",
                   0.53,
                   0.53,
@@ -1060,24 +646,6 @@
                   0,
                   -12.41,
                   "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-07-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-07-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
                 ]
               },
               {
@@ -1137,24 +705,6 @@
               {
                 "tag": "AccTxn",
                 "contents": [
-                  "2022-08-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-08-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
                   "2022-08-31",
                   0.37,
                   0.37,
@@ -1204,24 +754,6 @@
                   0,
                   -11.96,
                   "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-09-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-09-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
                 ]
               },
               {
@@ -1281,24 +813,6 @@
               {
                 "tag": "AccTxn",
                 "contents": [
-                  "2022-10-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-10-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
                   "2022-10-31",
                   0.22,
                   0.22,
@@ -1348,24 +862,6 @@
                   0,
                   -11.53,
                   "<PayPrin:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-11-26",
-                  0,
-                  0,
-                  "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2022-11-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
                 ]
               },
               {
@@ -1434,15 +930,6 @@
               {
                 "tag": "AccTxn",
                 "contents": [
-                  "2022-12-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
                   "2022-12-31",
                   0.07,
                   0.07,
@@ -1480,36 +967,9 @@
                 "tag": "AccTxn",
                 "contents": [
                   "2023-01-26",
-                  11.11,
-                  0,
-                  "<PayInt:A1>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2023-01-26",
-                  11.11,
-                  0,
-                  "<PayPrin:>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2023-01-26",
                   0,
                   -11.11,
                   "<PayPrin:B>"
-                ]
-              },
-              {
-                "tag": "AccTxn",
-                "contents": [
-                  "2023-01-26",
-                  0,
-                  0,
-                  "<PayYield:B>"
                 ]
               }
             ]
