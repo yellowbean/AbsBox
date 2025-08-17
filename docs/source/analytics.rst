@@ -143,7 +143,7 @@ Performing
   recovery assumption for performing asset
     
     * ``{"Rate":0.7,"Lag":18}`` means 70% of current balance will be recovered at 18 periods after defaulted date
-
+    * ``{"Rate":0.45,"Timing":[0.3,0.3,0.4]}``, recovery rate is 45% of current balance, and the recovery will be distributed to 3 periods after defaulted date with 30%,30% and 40% respectively 
 
 
 Non-Performing

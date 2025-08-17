@@ -1855,7 +1855,6 @@ def mkAssumpRecovery(x):
         case {"Rate":r,"Lag":lag}:
             return mkTag(("Recovery",[vNum(r),vInt(lag)]))
         case {"Rate":r,"Timing":ts}:
-            assert sum(ts)==1.0,f"Recvoery timing should sum up to 100%,but current sum up to {sum(ts)}"
             return mkTag(("RecoveryTiming",[vNum(r),vList(ts, numVal)]))
         case {"Rate":r, "ByDays": lst}:
             return mkTag(("RecoveryByDays",[vNum(r),lst]))
