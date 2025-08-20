@@ -10,7 +10,7 @@ from schema import Or
 from rich.console import Console
 
 
-from .interface import mkTag
+from .interface import mkTag,readAeson
 from .util import mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
 from .util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from .util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
@@ -18,6 +18,7 @@ from .util import filter_by_tags, enumVals, lmap, readTagMap, patchDicts,updateK
 from .base import *
 
 from ..validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple, vListOfList
+
 
 numVal = Or(float,int)
 console = Console()
@@ -2369,9 +2370,10 @@ def readRunSummary(x, locale) -> dict:
     r['waterfallInspect'] = None
     waterfall_inspect_vars = filter_by_tags(x, ["InspectWaterfall"])
     if waterfall_inspect_vars:
-        waterfall_inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),ds,dsv) 
+        waterfall_inspect_df = pd.DataFrame(data = [ (c['contents'][0], str(c['contents'][1]), readAeson(ds), dsv) 
                                                         for c in waterfall_inspect_vars
-                                                         for (ds,dsv) in zip(c['contents'][2],c['contents'][3]) ]
+                                                        for (ds,dsv) in zip(c['contents'][2],c['contents'][3])
+                                                    ]
                                             ,columns = ["Date","Comment","DealStats","Value"])
         r['waterfallInspect'] = waterfall_inspect_df
     
