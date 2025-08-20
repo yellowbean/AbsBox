@@ -51,14 +51,13 @@ class Generic:
 
     @property
     def json(self) -> dict:
-        parsedDates = mkDate(self.dates)
-        (lastAssetDate, lastCloseDate) = getStartDate(self.dates)
+        (lastAssetDate, _) = getStartDate(self.dates)
         mixedAssetFlag = isMixedDeal(self.pool)
         """
         get the json formatted string
         """
         _r = {
-            "dates": parsedDates,
+            "dates": mkDate(self.dates),
             "name": vStr(self.name),
             "status":mkStatus(self.status),
             "pool":mkPoolType(lastAssetDate, self.pool, mixedAssetFlag),

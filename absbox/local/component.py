@@ -44,25 +44,25 @@ def mkDatePattern(x):
             return mkTag(("DayOfMonth", vInt(_d)))
         case ["MonthDayOfYear", _m, _d] | ["每年", _m, _d] | ("每年", _m, _d):
             return mkTag(("MonthDayOfYear",[vInt(_m), vInt(_d)]))
-        case ["CustomDate", *_ds] | ["Custom", *_ds] :
+        case ["CustomDate", *_ds] | ["Custom", *_ds] | ("Custom", *_ds) :
             return mkTag(("CustomDate", _ds))
-        case ["EveryNMonth", d, n]:
+        case ["EveryNMonth", d, n] | ("EveryNMonth", d, n):
             return mkTag(("EveryNMonth", [vDate(d), vInt(n)]))
         case ["Weekday", n] if n >= 0 and n <= 6:
             return mkTag(("Weekday", vInt(n)))
-        case ["all", *_dps] | ["All", *_dps] | ["AllDatePattern", *_dps] | ["+", *_dps]:
+        case ["all", *_dps] | ["All", *_dps] | ["AllDatePattern", *_dps] | ["+", *_dps] | ("+", *_dps) | ("all", *_dps) | ("AllDatePattern", *_dps):
             return mkTag(("AllDatePattern", lmap(mkDatePattern, _dps)))
-        case [">", _d, dp] | ["After", _d, dp] | ["之后", _d, dp]:
+        case [">", _d, dp] | ["After", _d, dp] | ["之后", _d, dp] | (">", _d, dp) | ("After", _d, dp):
             return mkTag(("StartsAt", ["Exc", vDate(_d), mkDatePattern(dp) ]))
-        case [">=", _d, dp] :
+        case [">=", _d, dp] | (">=", _d, dp):
             return mkTag(("StartsAt", ["Inc", vDate(_d), mkDatePattern(dp) ]))
-        case ["<", _d, dp] | ["Before", _d, dp] | ["之前", _d, dp]:
+        case ["<", _d, dp] | ["Before", _d, dp] | ["之前", _d, dp] | ("<", _d, dp) | ("Before", _d, dp):
             return mkTag(("EndsAt", ["Exc", vDate(_d), mkDatePattern(dp) ]))
-        case ["<=", _d, dp] :
+        case ["<=", _d, dp] | ("<=", _d, dp):
             return mkTag(("EndsAt", ["Inc", vDate(_d), mkDatePattern(dp) ]))
-        case ["Exclude", _d, _dps] | ["ExcludeDatePattern", _d, _dps] | ["排除", _d, _dps] | ["-", _d, _dps]:
+        case ["Exclude", _d, _dps] | ["ExcludeDatePattern", _d, _dps] | ["排除", _d, _dps] | ["-", _d, _dps] | ("Exclude", _d, _dps) | ("-", _d, _dps):
             return mkTag(("Exclude", [mkDatePattern(_d), [mkDatePattern(_) for _ in _dps]]))
-        case ["Offset", _dp, n] | ["OffsetDateDattern", _dp, n] | ["平移", _dp, n]:
+        case ["Offset", _dp, n] | ["OffsetDateDattern", _dp, n] | ["平移", _dp, n] | ("Offset", _dp, n):
             return mkTag(("OffsetBy", [mkDatePattern(_dp), vInt(n)]))
         case _x if (_x in datePattern.values()):
             return mkTag((_x))
@@ -73,7 +73,7 @@ def mkDatePattern(x):
         case _:
             raise RuntimeError(f"Failed to match {x}")
 
-
+# TODO need to deprecate it
 def getStartDate(x:dict) -> tuple:
     match x:
         case {"封包日": a, "起息日": b, "首次兑付日": c, "法定到期日": d, "收款频率": pf, "付款频率": bf} | \
@@ -87,6 +87,8 @@ def getStartDate(x:dict) -> tuple:
             return (vDate(lastCollected), vDate(pp))
         case {"lastCollect":a,"lastPay":b}:
             return (a, b)
+        case ("accrue", m):
+            return getStartDate(m)
         case _:
             raise RuntimeError(f"Failed to get Start Date from {x}")
 
@@ -94,7 +96,11 @@ def getStartDate(x:dict) -> tuple:
 def mkDate(x):
     ''' make dates component for deal '''
     match x:
-        case {"cutoff": a, "closing": b, "firstPay": c,"firstCollect": d, "stated": e, "poolFreq": pf, "payFreq": bf, "cust":cust} if isinstance(cust, dict):
+        case ("accrue", m):
+            return mkDate(m) | {"tag": "AccruedGenericDates"}
+        
+        case {"cutoff": a, "closing": b, "firstPay": c,"firstCollect": d, "stated": e, "poolFreq": pf, "payFreq": bf}:
+            cust = x.get("cust", {})
             custom = {f"CustomExeDates {k}":mkDatePattern(v) for k,v in cust.items()}
             m = {
                 "CutoffDate":mkDatePattern(vDate(a)),
@@ -106,7 +112,8 @@ def mkDate(x):
                 "CollectionDates":mkDatePattern(pf),
             } | custom
             return mkTag(("GenericDates",m))
-        case {"lastCollect": a, "lastPay": b, "nextPay": c,"nextCollect": d, "stated": e, "poolFreq": pf, "payFreq": bf, "cust":cust} if isinstance(cust, dict): 
+        case {"lastCollect": a, "lastPay": b, "nextPay": c,"nextCollect": d, "stated": e, "poolFreq": pf, "payFreq": bf} : 
+            cust = x.get("cust", {})
             custom = {f"CustomExeDates {k}":mkDatePattern(v) for k,v in cust.items()}
             m = {
                 "LastCollectDate":mkDatePattern(vDate(a)),
@@ -128,8 +135,7 @@ def mkDate(x):
                 "DistributionDates":mkDatePattern(bf),
                 "CollectionDates":mkDatePattern(pf),
             }
-            y = mkTag(("GenericDates",m))
-            return y
+            return mkTag(("GenericDates",m))
         case {"封包日": a, "起息日": b, "首次兑付日": c, "法定到期日": d, "收款频率": pf, "付款频率": bf} | \
                 {"cutoff": a, "closing": b, "firstPay": c, "stated": d, "poolFreq": pf, "payFreq": bf} if (not "cust" in x):
             firstCollection = x.get("首次归集日", b)
@@ -2600,7 +2606,4 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
             return r
         case [x,*rest]:
             return mkNonPerfAssumps(r | translate(x),rest)
-from enum import Enum
-import itertools
-import sys
-import functools
+

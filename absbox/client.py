@@ -186,6 +186,8 @@ class API:
         if _r is None:
             raise RuntimeError(f"Failed to get version from url:{self.url}")
         self.server_info = self.server_info | json.loads(_r)
+        if "_version" not in self.server_info:
+            raise RuntimeError(f"Failed to get version info from server:{self.server_info}")
         engine_version = self.server_info['_version'].split(".")
         if self.check and (self.version[1] != engine_version[1]):
             console.print("pls upgrade your api package by: pip -U absbox")

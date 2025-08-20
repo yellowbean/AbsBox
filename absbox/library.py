@@ -89,7 +89,7 @@ class LIBRARY:
         else:
             console.print(f"❌ Failed to login,{r['msg']}")
             self.token = None
-            return None
+        return r
     
     def ack(self):
         """acknowledge library connection
@@ -152,7 +152,6 @@ class LIBRARY:
                                         ,"Content-Type":"application/octet-stream"})
         
         return r
-        #console.print(f"✅ Get deal success")
 
     def run(self, _id, **p):
         """send deal id with assumptions to remote server and get result back
