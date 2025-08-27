@@ -9,8 +9,7 @@ project = 'absbox'
 copyright = '2025, Xiaoyu Zhang'
 author = 'Xiaoyu Zhang'
 
-release = "0.50.2"
-release = "0.50.2"
+release = "0.51.6"
 
 # -- General configuration
 
@@ -25,8 +24,6 @@ extensions = [
     'sphinxemoji.sphinxemoji',
     'sphinx.ext.graphviz',
     'sphinx_changelog',
-    #'autoapi.extension'
-    #'nbsphinx'
     'myst_nb',
     'sphinxcontrib.googleanalytics'
 ]

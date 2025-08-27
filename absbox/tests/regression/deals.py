@@ -9,7 +9,6 @@ test01 = Generic(
         "cutoff": "2021-03-01",
         "closing": "2021-04-15",
         "firstPay": "2021-07-26",
-        "firstCollect": "2021-04-28",
         "payFreq": ["DayOfMonth", 20],
         "poolFreq": "MonthEnd",
         "stated": "2030-01-01",
@@ -990,9 +989,53 @@ cf = [[ (datetime.datetime.strptime("2021-03-01", "%Y-%m-%d") + relativedelta(mo
       for _ in range(30) ]
 
 fixPct = (1.00,0.07)
-# floatPcts = [(0.50, 0.05, 0.02, "LIBOR1M")]
 floatPcts = []
 projCf =  ["ProjectedByFactor", cf, "MonthEnd", fixPct, floatPcts] 
 
 test06 = test01 & lens.name.set("TEST06 - ProjectByFactor")\
                 & lens.pool['assets'].set([projCf])
+
+### current deal 
+
+currentDates = {"collect":["2021-04-01","2021-06-01"]
+                ,"pay":["2021-04-26","2021-07-15"]
+                ,"stated":"2030-01-01"
+                ,"poolFreq":"MonthEnd"
+                ,"payFreq":["DayOfMonth",20]
+                }
+
+test07 = test01 & lens.name.set("TEST07 - CurrentDeal")\
+                & lens.status.set("amortizing")\
+                & lens.pool.modify(lambda x: tz.assoc(x
+                                                      , "issuanceStat"
+                                                      ,{"IssuanceBalance":1800}))\
+                & lens.dates.set(currentDates)
+                
+test08 = test01 & lens.name.set("TEST08 - CurrentDeal&CustomeDate")\
+                & lens.status.set("amortizing")\
+                & lens.pool.modify(lambda x: tz.assoc(x
+                                                      , "issuanceStat"
+                                                      ,{"IssuanceBalance":1800}))\
+                & lens.dates.set({"collect":["2021-04-01","2021-06-01"]
+                                ,"pay":["2021-04-26","2021-07-15"]
+                                ,"stated":"2030-01-01"
+                                ,"poolFreq":["CustomDate","2021-07-01","2021-08-01","2021-09-01","2021-10-01"]
+                                ,"payFreq":["CustomDate","2021-08-15","2021-09-15","2021-10-15"]
+                                })
+                
+test09 = test01 & lens.name.set("TEST09 - PreClosingDeal&CustomeDate")\
+                & lens.status.set(("PreClosing","amortizing"))\
+                & lens.pool.modify(lambda x: tz.assoc(x
+                                                      , "issuanceStat"
+                                                      ,{"IssuanceBalance":1800}))\
+                & lens.dates.set({
+                                "cutoff": "2021-03-01",
+                                "closing": "2021-04-15",
+                                "firstPay": "2021-07-26",
+                                "payFreq": ["CustomDate","2021-08-15","2021-09-15","2021-10-15"],
+                                "poolFreq": ["CustomDate","2021-07-01","2021-08-01","2021-09-01","2021-10-01"],
+                                "stated": "2030-01-01",
+                                })\
+                & lens.pool.modify(lambda x: tz.assoc(x
+                                                      , "issuanceStat"
+                                                      ,{"IssuanceBalance":1800}))

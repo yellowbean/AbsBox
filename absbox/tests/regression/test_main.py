@@ -30,6 +30,9 @@ def listCloseTo(a,b,r=2):
     assert len(a) == len(b), f"Length not match {len(a)} {len(b)}"
     assert all([ closeTo(x,y,r)  for x,y in zip(a,b)]), f"List not match {a},{b}"
 
+def allEq(xs, x):
+    return all([ _ == x for _ in xs])
+
 def eqDataFrame(a,b, msg=""):
     """ Compare two DataFrame """
     assert a.shape == b.shape, f"Shape not match {a.shape} {b.shape}"
@@ -64,8 +67,9 @@ def setup_api():
 
 @pytest.mark.pool
 def test_01(setup_api):
-    r = setup_api.run(test01 , read=True , runAssump = [])
+    r = setup_api.run(test01 , read=True , runAssump = [("stop","2021-06-15")])
     assert r['pool']['flow'].keys() == {"PoolConsol"}
+    #assert r['pool']['flow']['PoolConsol']['Principal'].sum() == 2200.0
     assert r['pool']['flow']['PoolConsol'].to_records()[0][0]== '2021-04-15'
 
 
@@ -433,6 +437,7 @@ def test_trigger_chgBondRate(setup_api):
                     }
                     })
     r = setup_api.run(withTrigger , read=True ,runAssump = [("interest",("SOFR1Y",0.04))])
+    print(r['bonds']['A1'].rate.to_list())
     assert r['bonds']['A1'].rate.to_list() == [0.07, 0.12, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02]
 
 @pytest.mark.pool
@@ -614,15 +619,41 @@ def test_support_account(setup_api):
     assert r['accounts']['acc02'].loc['2024-01-20'].change.item() == -1.96
     assert r['accounts']['acc03'].loc['2024-01-20'].change.item() == -0.73
 
-
-
-# @pytest.mark.analytics
-# def test_rootfinder_by_formula(setup_api):
-#     poolPerf = ("Pool",("Mortgage",{"CDR":0.002},{"CPR":0.001},{"Rate":0.1,"Lag":18},None)
-#                                  ,None
-#                                  ,None)
-#     r = setup_api.runRootFinder(test01, poolPerf ,[]
-#         ,("stressPrepayment",("byFormula", ("bondTxnAmt", "<PayInt:B>","B") , 500))
-#     )
-#     assert r[1][1]['PoolLevel'][0]['MortgageAssump'][1] == {'PrepaymentCPR': 0.38642105474696914 } 
-
+@pytest.mark.dates 
+def test_dates_preClosing(setup_api):
+    preclosingDeal = test01
+    pDates = preclosingDeal.dates
+    bondNames = preclosingDeal.bonds & lens.Each()[0].collect()
+    r = setup_api.run(preclosingDeal,read=True)
+    
+    # test for preclosing date 
+    assert r['pool']['flow']['PoolConsol'].index[0] == pDates['closing']
+    assert allEq([ r['bonds'][b].index[0] for b in bondNames ],pDates['firstPay'])
+    
+@pytest.mark.dates 
+def test_dates_current(setup_api):
+    currentDeal = test07 
+    pDates = currentDeal.dates
+    bondNames = currentDeal.bonds & lens.Each()[0].collect()
+    r = setup_api.run(currentDeal,read=True)
+    # test for current date
+    assert r['pool']['flow']['PoolConsol'].index[0] == pDates['collect'][1]
+    assert allEq([ r['bonds'][b].index[0] for b in bondNames ],pDates['pay'][1])
+    
+@pytest.mark.dates
+def test_dates_custom(setup_api):
+    customDeal = test08 
+    pDates = customDeal.dates
+    bondNames = customDeal.bonds & lens.Each()[0].collect()
+    r = setup_api.run(customDeal,read=True)
+    # test for custom date
+    assert r['pool']['flow']['PoolConsol'].index.to_list() == [pDates['collect'][1]]+pDates['poolFreq'][1:]
+    assert allEq([ r['bonds'][b].index.to_list() for b in bondNames ],[pDates['pay'][1]]+pDates['payFreq'][1:])
+    
+    customDeal = test09
+    pDates = customDeal.dates
+    bondNames = customDeal.bonds & lens.Each()[0].collect()
+    r = setup_api.run(customDeal,read=True)
+    # test for custom date
+    assert r['pool']['flow']['PoolConsol'].index.to_list() == [pDates['closing']]+pDates['poolFreq'][1:]
+    assert allEq([ r['bonds'][b].index.to_list() for b in bondNames ],[pDates['firstPay']]+pDates['payFreq'][1:])

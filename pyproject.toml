@@ -58,7 +58,9 @@ minversion = "7.0"
 addopts = "-ra -q --color=yes  --import-mode=importlib"
 markers = [
     "pool","account","bond","fee","interest","collect","asset","performance",
-    "trigger","report","revolving","TB","analytics","dontrun","waterfall"
+    "trigger","report","revolving","TB","analytics","dontrun","waterfall",
+    "dates",
+
 ]
 
 
@@ -75,6 +77,7 @@ test = [
     "deepdiff",
     "ipykernel",
     "pytest-notebook",
+    "marimo",
 ]
 
 [tool.towncrier]

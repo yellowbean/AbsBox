@@ -2117,12 +2117,17 @@ def mkLiqProvider(n: str, x: dict):
                                 ,("creditCalc","liqCreditCalc")
                                 ]
                                 ,opt_key=True)
-
+    def mkCredit(y): 
+        match y:
+            case None:
+                return "Unlimit"
+            case amt:
+                return mkTag(("ByAvailAmount", vNum(amt)))
     r = {
         "liqName": vStr(n),
         "liqType": mkLiqProviderType(x_transformed["liqType"]),
         "liqBalance":(x_transformed.get("liqBalance",0)),
-        "liqCredit":(x_transformed.get("liqCredit",None)),
+        "liqCredit":mkCredit(x_transformed.get("liqCredit",None)),
         "liqCreditCalc":(x_transformed.get("liqCreditCalc",None)),
         "liqRateType": mkRateType(x_transformed.get("liqRateType",None)),
         "liqPremiumRateType": mkRateType(x_transformed.get("liqPremiumRateType",None)),

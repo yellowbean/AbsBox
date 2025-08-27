@@ -12,7 +12,7 @@ update-version version:
     sed -i "s/^release = .*/release = \"{{version}}\"/g"   docs/source/conf.py
     sed -i "s/^version = .*/version = \"{{version}}\"/g"   docs/source/conf.py
 
-tag version:
+tag env version:
     echo "Tagging"
     git add pyproject.toml setup.cfg
     git commit -m "bump version to-> < {{version}} >"
@@ -31,3 +31,7 @@ push-tag:
 push-code:
     echo "Pushing Code"
     git push origin HEAD
+
+live-doc:
+    echo "Live Doc"
+    sphinx-autobuild docs/source docs/build/html --open-browser --watch docs/source
