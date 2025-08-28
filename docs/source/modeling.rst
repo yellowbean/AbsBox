@@ -938,7 +938,8 @@ syntax
 .. code-block:: python
   
   ("issuance_fee"
-      ,{"type":{"fixFee":100}})
+      ,{"type":{"fixFee":100}
+        ,"feeStart":"2022-01-01"})
 
 recurrance fee
 ^^^^^^^^^^^^^^^^
@@ -951,7 +952,8 @@ syntax
 .. code-block:: python
     
    ,("rating_fee"
-    ,{"type":{"recurFee":[["MonthDayOfYear",6,30],15]}})
+    ,{"type":{"recurFee":[["MonthDayOfYear",6,30],15]}
+      ,"feeStart":"2022-01-01"})
 
 
 percentage fee
@@ -972,10 +974,12 @@ syntax
 .. code-block:: python
   
   ("bond_service_fee"
-      ,{"type":{"pctFee":[("bondBalance",),0.02]}})
+      ,{"type":{"pctFee":[("bondBalance",),0.02]}
+       ,"feeStart":"2022-01-01"})
   
   ("bond_service_fee"
-      ,{"type":{"pctFee":[("cumPoolDefaultedBalance",),0.03]}})
+      ,{"type":{"pctFee":[("cumPoolDefaultedBalance",),0.03]}
+       ,"feeStart":"2022-01-01"})
 
 
 annualized fee
@@ -990,7 +994,8 @@ syntax
 .. code-block:: python
   
   ("servicer_fee"
-      ,{"type":{"annualPctFee":[("poolBalance",),0.02]}})
+      ,{"type":{"annualPctFee":[("poolBalance",),0.02]}
+       ,"feeStart":"2022-01-01"})
 
 
 custom fee flow
@@ -1007,7 +1012,8 @@ syntax
   
    ,("irregulargfee"
     ,{"type":{"customFee":[["2024-01-01",100]
-                          ,["2024-03-15",50]]}})
+                          ,["2024-03-15",50]]}
+      ,"feeStart":"2022-01-01"})
 
 custom fee flow by index
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1043,7 +1049,8 @@ syntax
 .. code-block:: python
   
    ,("borrowerFee"
-    ,{"type":{"numFee":[["DayOfMonth",20],("borrowerNumber",),1]}}
+    ,{"type":{"numFee":[["DayOfMonth",20],("borrowerNumber",),1]}
+      ,"feeStart":"2022-01-01"})
 
 target amount fee 
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -1056,7 +1063,8 @@ syntax
 .. code-block:: python 
 
    ("VAT"
-     ,{"type":{"targetBalanceFee":[("poolBalance",),("bondBalance",)]))
+     ,{"type":{"targetBalanceFee":[("poolBalance",),("bondBalance",)]}
+     ,"feeStart":"2022-01-01"})
 
    # the fee is total funded amount * 1%
    ("upfrontFee"

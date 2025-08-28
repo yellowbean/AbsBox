@@ -43,8 +43,6 @@ Email & Slack
   :width: 200
   :alt: Support Email 
 
-``absbox & hastructure`` -> https://absboxhastructure.slack.com
-
 
 Consulting & Training
 ----------------------------
