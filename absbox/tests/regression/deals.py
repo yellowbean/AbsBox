@@ -2,6 +2,9 @@ from absbox import Generic
 import toolz as tz
 from lenses import lens
 
+def insert_functional(lst, index, element):
+    return lst[:index] + [element] + lst[index:]
+
 
 test01 = Generic(
     "TEST01- preclosing",
@@ -43,7 +46,7 @@ test01 = Generic(
                 "rate": 0.07,
                 "originBalance": 1000,
                 "originRate": 0.07,
-                "startDate": "2020-01-03",
+                "startDate": "2021-04-15",
                 "rateType": {"Fixed": 0.08},
                 "bondType": {"Sequential": None},
             },
@@ -55,7 +58,7 @@ test01 = Generic(
                 "rate": 0.0,
                 "originBalance": 1000,
                 "originRate": 0.07,
-                "startDate": "2020-01-03",
+                "startDate": "2021-04-15",
                 "rateType": {"Fixed": 0.00},
                 "bondType": {"Equity": None},
             },
@@ -696,7 +699,7 @@ pac02 = Generic(
         "default": [
             ["accrueAndPayInt", "acc01", ["A1", "A2"]],
             ["payPrinBySeq", "acc01", ["A1", "A2"]] ,
-            ["payPrin", "acc01", ["A1"]],
+            ["payPrin", "acc01", ["B"]],
             ["payIntResidual", "acc01", "B"],
         ],
     },
@@ -1039,3 +1042,201 @@ test09 = test01 & lens.name.set("TEST09 - PreClosingDeal&CustomeDate")\
                 & lens.pool.modify(lambda x: tz.assoc(x
                                                       , "issuanceStat"
                                                       ,{"IssuanceBalance":1800}))
+                
+                     
+accruedDeal = test01 & lens.name.set("TEST10 - AccruedDeal")\
+                     & lens.waterfall['default'][0][0].set('payInt')\
+                     & lens.dates.modify(lambda x : ("accrued", x) )
+
+test01Fee = test01 & lens.name.set("TEST11 - With Fix Fee")\
+                   & lens.fees.modify(lambda x: x + (("issuance_fee"
+                                                      ,{"type":{"fixFee":400}
+                                                       ,"feeStart":"2021-04-15"})
+                                                     ,))\
+                   & lens.waterfall['default'].modify(lambda xs: [["calcAndPayFee","acc01",["issuance_fee"]]]+xs)
+
+test02Fee = test01 & lens.name.set("TEST12 - With Recur Fee")\
+                   & lens.fees.modify(lambda x: x + (("test_fee"
+                                                        ,{"type":("recurFee","QuarterEnd",20)
+                                                        ,"feeStart":"2021-04-15"})
+                                                        ,))\
+                   & lens.waterfall['default'].modify(lambda xs: [["calcAndPayFee","acc01",["test_fee"]]]+xs)
+
+test03Fee = test02Fee & lens.name.set("TEST13 - With pct fee")\
+                    & lens.fees.modify(lambda x: x + (("test_fee"
+                                                            ,{"type":("pctFee",("bondBalance","A1"),0.01)
+                                                            ,"feeStart":"2021-04-15"})
+                                                            ,))
+
+test04Fee = test02Fee & lens.name.set("TEST14 - With annual pct fee")\
+                    & lens.fees.modify(lambda x: x + (("test_fee"
+                                                            ,{"type":("annualPctFee",("poolBalance","A1"),0.02)
+                                                            ,"feeStart":"2021-04-15"})
+                                                            ,))
+                    
+
+
+test05Fee = test02Fee & lens.name.set("TEST15 - With custom fee")\
+                      & lens.fees.set((("test_fee"
+                                        ,{"type":("customFee",[["2021-08-01",100]
+                                                              ,["2021-12-20",50]])
+                                        ,"feeStart":"2021-04-15"})
+                                        ,))
+
+test06Fee = test02Fee & lens.name.set("TEST16 - flow by bond period")\
+                      & lens.fees.set((("test_fee"
+                                        ,{"type":("flowByBondPeriod",[ [1,50],[2,80],[3,85] ])
+                                        ,"feeStart":"2021-07-26"})
+                                        ,))
+
+test07Fee = test02Fee & lens.name.set("TEST17 - With count type fee")\
+                      & lens.fees.set((("test_fee"
+                                        ,{"type":("numFee",["DayOfMonth",20],("activeBondNum",), 8)
+                                        ,"feeStart":"2021-07-26"})
+                                        ,))
+
+
+test08Fee = test02Fee & lens.name.set("TEST18 - With target fee")\
+                      & lens.fees.set((("test_fee"
+                                        ,{"type":("targetBalanceFee"
+                                                  , ("*"
+                                                     , ("cumPoolCollection", None, "Interest")
+                                                     , 0.03)
+                                                  , ("feeTxnAmt",None,"test_fee"))
+                                        ,"feeStart":"2021-04-15"})
+                                        ,))\
+                      & lens.waterfall['default'][0].set(["calcAndPayFee","acc01",["test_fee"]])
+
+
+test09Fee = test02Fee & lens.name.set("TEST19 - With pool period fee")\
+                      & lens.fees.set((("test_fee"
+                                        ,{"type":("byPeriod",15)
+                                        ,"feeStart":"2021-04-15"})
+                                        ,))
+                      
+test10Fee = test02Fee & lens.name.set("TEST20 - With custom fee")\
+                      & lens.fees.set((("test_fee"
+                                        ,{"type":("byTable"
+                                                    ,"MonthEnd"
+                                                    ,("*",("poolBalance",),0.02)
+                                                    ,[(0,5),(15,10),(30,15)]
+                                                 ),
+                                          "feeStart":"2021-04-15"
+                                          })
+                                        ,))\
+                      & lens.waterfall['default'][0].set(["payFee","acc01",["test_fee"]])
+                      
+
+test11Fee = test01 & lens.name.set("TEST21 - With two fees")\
+                   & lens.fees.modify(lambda x: x + (("fee1",{"type":{"fixFee":400},"feeStart":"2021-04-15"})
+                                                 ,("fee2",{"type":{"fixFee":400},"feeStart":"2021-04-15"})))\
+                   & lens.waterfall['default'].modify(lambda xs: [["calcFee","fee1","fee2"],["payFeeBySeq","acc01",["fee1","fee2"]]]+xs)
+
+
+test2Bonds = Generic(
+    "TEST01- PreClosing-Two Bonds",
+    {
+        "cutoff": "2021-03-01",
+        "closing": "2021-04-15",
+        "firstPay": "2021-07-26",
+        "payFreq": ["DayOfMonth", 20],
+        "poolFreq": "MonthEnd",
+        "stated": "2030-01-01",
+    },
+    {
+        "assets": [
+            [
+                "Mortgage",
+                {
+                    "originBalance": 2200,
+                    "originRate": ["fix", 0.045],
+                    "originTerm": 30,
+                    "freq": "Monthly",
+                    "type": "Level",
+                    "originDate": "2021-02-01",
+                },
+                {
+                    "currentBalance": 2200,
+                    "currentRate": 0.08,
+                    "remainTerm": 30,
+                    "status": "current",
+                },
+            ]
+        ]
+    },
+    (("acc01", {"balance": 0}),),
+    (
+        (
+            "A1",
+            {
+                "balance": 400,
+                "rate": 0.07,
+                "originBalance": 400,
+                "originRate": 0.07,
+                "startDate": "2021-04-15",
+                "rateType": {"Fixed": 0.07},
+                "bondType": {"Sequential": None},
+            },
+        ),
+        (
+            "A2",
+            {
+                "balance": 600,
+                "rate": 0.08,
+                "originBalance": 600,
+                "originRate": 0.08,
+                "startDate": "2021-04-15",
+                "rateType": {"Fixed": 0.08},
+                "bondType": {"Sequential": None},
+            },
+        ),
+        (
+            "B",
+            {
+                "balance": 1000,
+                "rate": 0.0,
+                "originBalance": 1000,
+                "originRate": 0.07,
+                "startDate": "2021-04-15",
+                "rateType": {"Fixed": 0.00},
+                "bondType": {"Equity": None},
+            },
+        ),
+    ),
+    (("issuance_fee"
+        ,{"type":{"fixFee":10}
+        ,"feeStart":"2021-04-15"})
+     ,),
+    {
+        "default": [
+            ["payFee", "acc01", ["issuance_fee"]],
+            ["accrueAndPayInt", "acc01", ["A1","A2"]],
+            ["payPrin", "acc01", ["A1","A2"]],
+            ["payPrin", "acc01", ["B"]],
+            ["payIntResidual", "acc01", "B"],
+        ]
+    },
+    [
+        ["CollectedInterest", "acc01"],
+        ["CollectedPrincipal", "acc01"],
+        ["CollectedPrepayment", "acc01"],
+        ["CollectedRecoveries", "acc01"],
+    ],
+    None,
+    None,
+    None,
+    None,
+    ("PreClosing", "Amortizing"),
+)
+
+test2BondsIntBySeq = test2Bonds & lens.name.set("TEST01- PreClosing-Two Bonds")\
+                                & lens.fees[0][1]['type']['fixFee'].set(305)\
+                                & lens.waterfall['default'][1][0].set("accrueAndPayIntBySeq")
+                                
+                                
+threeAccounts = test01 & lens.name.set("TEST03- PreClosing- Three Accounts")\
+                    & lens.accounts.modify(lambda x: x+(('acc02', {'balance': 50}),('acc03', {'balance': 30})))\
+                    & lens.waterfall['default'].modify(lambda xs: insert_functional(xs, 0, ["transferM"
+                                                                                            ,[("acc02",{"formula": ("const",10)})
+                                                                                                ,("acc03",{"formula": ("const",10)})]
+                                                                                            ,"acc01"]) )

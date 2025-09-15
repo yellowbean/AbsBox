@@ -88,7 +88,7 @@ def getStartDate(x:dict) -> tuple:
             return (vDate(lastCollected), vDate(pp))
         case {"lastCollect":a,"lastPay":b}:
             return (a, b)
-        case ("accrue", m):
+        case ("accrue", m) | ("accrued", m):
             return getStartDate(m)
         case _:
             raise RuntimeError(f"Failed to get Start Date from {x}")
@@ -97,8 +97,8 @@ def getStartDate(x:dict) -> tuple:
 def mkDate(x):
     ''' make dates component for deal '''
     match x:
-        case ("accrue", m):
-            return mkDate(m) | {"tag": "AccruedGenericDates"}
+        # case ("accrue", m) | ("accrued", m):
+        #    return mkDate(m) | {"tag": "AccruedGenericDates"}
         
         case {"cutoff": a, "closing": b, "firstPay": c,"firstCollect": d, "stated": e, "poolFreq": pf, "payFreq": bf}:
             cust = x.get("cust", {})
@@ -108,6 +108,19 @@ def mkDate(x):
                 "ClosingDate":mkDatePattern(vDate(b)),
                 "FirstPayDate":mkDatePattern(vDate(c)),
                 "FirstCollectDate":mkDatePattern(vDate(d)),
+                "StatedMaturityDate":mkDatePattern(vDate(e)),
+                "DistributionDates":mkDatePattern(bf),
+                "CollectionDates":mkDatePattern(pf),
+            } | custom
+            return mkTag(("GenericDates",m))
+        case {"cutoff": a, "closing": b, "firstPay": c, "stated": e, "poolFreq": pf, "payFreq": bf}:
+            cust = x.get("cust", {})
+            custom = {f"CustomExeDates {k}":mkDatePattern(v) for k,v in cust.items()}
+            m = {
+                "CutoffDate":mkDatePattern(vDate(a)),
+                "ClosingDate":mkDatePattern(vDate(b)),
+                "FirstPayDate":mkDatePattern(vDate(c)),
+                "FirstCollectDate":mkDatePattern(vDate(b)),
                 "StatedMaturityDate":mkDatePattern(vDate(e)),
                 "DistributionDates":mkDatePattern(bf),
                 "CollectionDates":mkDatePattern(pf),
@@ -167,28 +180,28 @@ def mkDsRate(x):
 
 def mkFeeType(x):
     match x:
-        case {"年化费率": [base, rate]} | {"annualPctFee": [base, rate]}:
+        case {"年化费率": [base, rate]} | {"annualPctFee": [base, rate]} | ("annualPctFee", base, rate):
             return mkTag(("AnnualRateFee", [mkDs(base), mkDsRate(rate)]))
-        case {"百分比费率": [base, _rate]} | {"pctFee": [base, _rate]}:
+        case {"百分比费率": [base, _rate]} | {"pctFee": [base, _rate]} | ("pctFee", base, _rate):
             rate = mkDsRate(_rate)
             return mkTag(("PctFee", [mkDs(base), rate]))
-        case {"固定费用": amt} | {"fixFee": amt}:
+        case {"固定费用": amt} | {"fixFee": amt} | ("fixFee", amt):
             return mkTag(("FixFee", vNum(amt)))
-        case {"周期费用": [p, amt]} | {"recurFee": [p, amt]}:
+        case {"周期费用": [p, amt]} | {"recurFee": [p, amt]} | ("recurFee", p, amt):
             return mkTag(("RecurFee", [mkDatePattern(p), vNum(amt)]))
-        case {"自定义": fflow} | {"customFee": fflow}:
+        case {"自定义": fflow} | {"customFee": fflow} | ("customFee", fflow):
             return mkTag(("FeeFlow", mkTs("BalanceCurve", fflow)))
-        case {"计数费用": [p, s, amt]} | {"numFee": [p, s, amt]}:
+        case {"计数费用": [p, s, amt]} | {"numFee": [p, s, amt]} | ("numFee", p, s, amt):
             return mkTag(("NumFee", [mkDatePattern(p), mkDs(s), amt]))
-        case {"差额费用": [ds1, ds2]} | {"targetBalanceFee": [ds1, ds2]}:
+        case {"差额费用": [ds1, ds2]} | {"targetBalanceFee": [ds1, ds2]} | ("targetBalanceFee", ds1, ds2):
             return mkTag(("TargetBalanceFee", [mkDs(ds1), mkDs(ds2)]))
-        case {"回款期间费用": amt} | {"byPeriod": amt}:
+        case {"回款期间费用": amt} | {"byPeriod": amt} | ("byPeriod", amt):
             return mkTag(("ByCollectPeriod", amt))
-        case {"分段费用": [dp, ds, tbl]} | {"byTable": [dp, ds, tbl]}:
+        case {"分段费用": [dp, ds, tbl]} | {"byTable": [dp, ds, tbl]} | ("byTable", dp, ds, tbl):
             return mkTag(("AmtByTbl", [mkDatePattern(dp), mkDs(ds), tbl]))
-        case {"flowByBondPeriod": curve}:
+        case {"flowByBondPeriod": curve} | ("flowByBondPeriod", curve):
             return mkTag(("FeeFlowByBondPeriod", mkTag(("CurrentVal", curve))))
-        case {"flowByPoolPeriod": curve}:
+        case {"flowByPoolPeriod": curve} | ("flowByPoolPeriod", curve):
             return mkTag(("FeeFlowByPoolPeriod", mkTag(("CurrentVal", curve))))
         case _:
             raise RuntimeError(f"Failed to match on fee type:{x}")
@@ -245,6 +258,8 @@ def mkDs(x):
                 return mkTag(("CurrentBondBalanceOf", vList(bnds, str)))
             case ("债券应付本金", *bnds) | ("bondDuePrin", *bnds):
                 return mkTag(("BondDuePrin", vList(bnds, str)))
+            case ("待偿债券数量",) | ("activeBondNum",):
+                return mkTag("ActiveBondNum")
             case ("初始债券余额",*bnds) | ("originalBondBalance",*bnds):
                 if bnds:
                     return mkTag(("OriginalBondBalanceOf", vList(bnds, str)))
@@ -307,6 +322,8 @@ def mkDs(x):
                 if pNames:
                     return mkTag(("PoolCurCollectionStats", [idx, lmap(mkPoolSource,i), lmap(mkPid,pNames)]))
                 return mkTag(("PoolCollectionStats", [idx, lmap(mkPoolSource,i), None]))
+            case ("poolIssuanceBalance", *pNames):
+                return mkTag(("PoolIssuanceBalance", lmap(mkPid,pNames)))
             case ("计划资产池估值", pricingMethod, *pNames) | ("schedulePoolValuation", pricingMethod, *pNames):
                 if pNames:
                     return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), lmap(mkPid,pNames)]))

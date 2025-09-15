@@ -6,6 +6,9 @@ import re, math, json
 from pathlib import Path
 from collections import Counter
 from itertools import dropwhile
+import numpy_financial as npf
+from datetime import datetime
+
 
 from .deals import *
 from .assets import *
@@ -29,6 +32,10 @@ def filterRowsByStr(df, f, rg):
 def listCloseTo(a,b,r=2):
     assert len(a) == len(b), f"Length not match {len(a)} {len(b)}"
     assert all([ closeTo(x,y,r)  for x,y in zip(a,b)]), f"List not match {a},{b}"
+
+def listCloseByAbs(a,b, tol=0.01):
+    assert len(a) == len(b), f"Length not match {len(a)} {len(b)}"
+    assert all([ abs(x-y) <= tol  for x,y in zip(a,b)]), f"List not match {a},{b}"
 
 def allEq(xs, x):
     return all([ _ == x for _ in xs])
@@ -56,6 +63,31 @@ def seniorTest(x, y):
     f = dropwhile( lambda y: not y, dropwhile(lambda x:x ,xflags))
     return len(list(f)) == 0 & Counter(rflags).get("False",0) <= 1
 
+def insert_functional(lst, index, element):
+    return lst[:index] + [element] + lst[index:]
+
+def days_between_dates(date1, date2):
+    """
+    Calculate the number of days between two dates.
+    
+    Args:
+        date1 (str): First date in "YYYY-MM-DD" format
+        date2 (str): Second date in "YYYY-MM-DD" format
+    
+    Returns:
+        int: Absolute number of days between the two dates
+    """
+    try:
+        # Convert string dates to datetime objects
+        d1 = datetime.datetime.strptime(date1, "%Y-%m-%d")
+        d2 = datetime.datetime.strptime(date2, "%Y-%m-%d")
+        
+        # Calculate the difference and return absolute value in days
+        delta = abs(d2 - d1)
+        return delta.days
+        
+    except ValueError as e:
+        raise ValueError(f"Invalid date format. Please use 'YYYY-MM-DD'. Error: {e}")
 
 @pytest.fixture
 def setup_api():
@@ -67,10 +99,16 @@ def setup_api():
 
 @pytest.mark.pool
 def test_01(setup_api):
-    r = setup_api.run(test01 , read=True , runAssump = [("stop","2021-06-15")])
+    testFlag = []
+    r = setup_api.run(test01 , read=True , runAssump = testFlag)
     assert r['pool']['flow'].keys() == {"PoolConsol"}
-    #assert r['pool']['flow']['PoolConsol']['Principal'].sum() == 2200.0
+    assert r['pool']['flow']['PoolConsol']['Principal'].sum() == 2200.0
     assert r['pool']['flow']['PoolConsol'].to_records()[0][0]== '2021-04-15'
+    assert r['bonds']['A1'].interest.to_list()[0] == 19.56
+    
+    r2 = setup_api.run(accruedDeal, read=True, runAssump = testFlag)
+    #assert r['pool']['flow']['PoolConsol'] == r2['pool']['flow']['PoolConsol']
+    #assert r['bonds']['A1'].interest.to_list() == r2['bonds']['A1'].interest.to_list()
 
 
 @pytest.mark.collect
@@ -148,14 +186,17 @@ def test_collect_01(setup_api):
             r['pool']['flow']['PoolB'].loc[:'2021-04-15']["Principal"].values.sum())*0.3
             , filterTxn( r['accounts']['acc03'].loc[:'2021-04-15'].to_dict('records'), 'memo', ".*CollectedPrincipal.*")[0]['change'])
 
-def toCprRates(mflow):
-    return [ round(_, 3) for _ in  (1 - (1 - mflow.Prepayment.shift(-1) / mflow.Balance)**12).to_list() ]
+def toCprRates(mflow, rnd=3):
+    return [ round(_, rnd) for _ in  (1 - (1 - mflow.Prepayment.shift(-1) / mflow.Balance)**12).to_list() ]
 
-def ppyRate(mflow):
-    return [ round(_, 3) for _ in  (mflow.Prepayment / mflow.Balance.shift(1)).to_list() ]
+def ppyRate(mflow, rnd=3):
+    return [ round(_, rnd) for _ in  (mflow.Prepayment / mflow.Balance.shift(1)).to_list() ]
 
-def defRate(mflow):
-    return [ round(_, 3) for _ in  (mflow.Default / mflow.Balance.shift(1)).to_list() ]
+def defRate(mflow, rnd=3):
+    return [ round(_, rnd) for _ in  (mflow.Default / mflow.Balance.shift(1)).to_list() ]
+
+def toCdrRates(mflow, rnd=3):
+    return [ round(_, rnd) for _ in  (1 - (1 - mflow.Default.shift(-1) / mflow.Balance)**12).to_list() ]
 
 
 @pytest.mark.asset
@@ -189,6 +230,79 @@ def test_asset_01(setup_api):
                                     ,None)
                      ,read=True)
     assert toCprRates(r[0])[:10] == ([0.06]*10)
+
+    # test on cutoff date
+    r1 = setup_api.runAsset("2021-10-01"
+                    ,[m]
+                    ,poolAssump=("Pool"
+                                    ,("Mortgage", None, None, None, None)
+                                    ,None
+                                    ,None)
+                    ,read=True)
+    assert r1[0].index[0]=='2021-10-01'
+
+    
+    # test on mortgage asset
+    r = setup_api.runAsset("2021-02-01"
+                    ,[m]
+                    ,poolAssump=("Pool"
+                                    ,("Mortgage", None, None, None, None)
+                                    ,None
+                                    ,None)
+                    ,read=True)
+    assert r[0].Principal.sum().item()==10000.0
+    assert set(r[0].WAC.to_list()) == {0.075}
+    assert r[0].shape == (81,16)
+    testPmt = set((r[0].Principal + r[0].Interest).round(1))  - {0.0}
+    pyPmt = npf.pmt(m[2]['currentRate']/12,m[2]['remainTerm'],-m[2]['currentBalance']).round(1)
+    assert set([pyPmt.item()]) == testPmt
+    
+@pytest.mark.asset
+def test_asset_03(setup_api):    
+    ## Mortgage Performance
+    r = setup_api.runAsset("2021-02-01"
+                    ,[m]
+                    ,poolAssump=("Pool"
+                                    ,("Mortgage", {"CDR":0.01}, None, None, None)
+                                    ,None
+                                    ,None)
+                    ,read=True)
+    assert set(toCdrRates(r[0],2)[:-1]) == {0.01}
+    
+    r = setup_api.runAsset("2021-02-01"
+                    ,[m]
+                    ,poolAssump=("Pool"
+                                    ,("Mortgage", {"CDR":0.01}, None, {"Rate":0.3,"Lag":5}, None)
+                                    ,None
+                                    ,None)
+                    ,read=True)
+    assert set(toCdrRates(r[0].iloc[:-5],2)[:-1]) == {0.01}
+    assert round(r[0].CumRecovery.iloc[-1] / r[0].CumDefault.iloc[-1],2) == 0.3
+    #assert listCloseTo((r[0].Default.iloc[:-5] * 0.3).round(1).to_list()
+    #                    , r[0].Recovery.shift(-5).iloc[:-5].round(1).to_list()
+    #                    ,r=2)
+    r = setup_api.runAsset("2021-02-01"
+                    ,[m]
+                    ,poolAssump=("Pool"
+                                    ,("Mortgage", None, {"CPR":0.01}, None, None)
+                                    ,None
+                                    ,None)
+                    ,read=True)
+    assert set(toCprRates(r[0],2)[:-1]) == {0.01}    
+
+    r = setup_api.runAsset("2021-02-01"
+                    ,[m]
+                    ,poolAssump=("Pool"
+                                    ,("Mortgage", {"CDR":0.02}, {"CPR":0.01}, None, None)
+                                    ,None
+                                    ,None)
+                    ,read=True)
+    assert set(toCprRates(r[0],2)[:-1]) == {0.01}
+    assert set(toCdrRates(r[0],2)[:-1]) == {0.02}
+    
+    
+    
+
 
 
 @pytest.mark.asset
@@ -268,7 +382,8 @@ def test_irr_01(setup_api):
                     ,poolAssump=("Pool",("Mortgage",{"CDRPadding":[0.01,0.02]},{"CPR":0.02},{"Rate":0.1,"Lag":5},None)
                                     ,None
                                     ,None)
-                    ,runAssump = [("pricing",{"IRR":{"B":("holding",[("2021-04-01",-500)],500)}})]
+                    ,runAssump = [("pricing",{"IRR":{"B":("holding",[("2021-04-01",-500)],500)}
+                                              })]
                     ,read=True
                     )
     closeTo(r0['pricing']['summary'].loc["B"].IRR, 0.264238, r=6)
@@ -291,6 +406,7 @@ def test_irr_01(setup_api):
                                 ,None)
                 ,runAssump = [("pricing",{"IRR":
                                           {"A1":("buy","2021-08-01",("byFactor",0.99),("byCash",200))}
+                                          
                                          }
                               )]
                 ,read=True)
@@ -303,7 +419,8 @@ def test_rootfind_stressppy(setup_api):
     poolPerf = ("Pool",("Mortgage",{"CDR":0.002},{"CPR":0.001},{"Rate":0.1,"Lag":18},None)
                                  ,None
                                  ,None)
-    pricing = ("pricing",{"IRR":{"B":("holding",[("2021-04-15",-1000)],1000)}})
+    pricing = ("pricing",{"IRR":{"B":("holding",[("2021-04-15",-1000)],1000)}
+                          })
     r = setup_api.runRootFinder(test01, poolPerf ,[pricing]
         ,("stressPrepayment",("bondMetTargetIrr", "B", 0.25))
     )
@@ -326,7 +443,8 @@ def test_rootfind_stressdef(setup_api):
     poolPerf = ("Pool",("Mortgage",{"CDR":0.002},{"CPR":0.001},{"Rate":0.1,"Lag":18},None)
                                  ,None
                                  ,None)
-    pricing = ("pricing",{"IRR":{"B":("holding",[("2021-04-15",-1000)],1000)}})
+    pricing = ("pricing",{"IRR":{"B":("holding",[("2021-04-15",-1000)],1000)}
+                          })
     r = setup_api.runRootFinder(test01, poolPerf ,[pricing]
         ,("stressDefault",("bondMetTargetIrr", "B", 0.10))
     )
@@ -341,8 +459,11 @@ def test_pac_01(setup_api):
 @pytest.mark.bond
 def test_pac_02(setup_api):
     r = setup_api.run(pac02 , read=True , runAssump = [])
-    assert r['bonds']["A1"].loc["2021-07-26":"2021-11-20"].balance.to_list() == [800.0, 750.0, 694.21, 617.05, 539.56] 
+    assert r['bonds']["A1"].loc["2021-07-26":"2021-11-20"].balance.to_list() == [800.0, 750.0, 700.0, 622.87, 545.42, ] 
 
+    r = setup_api.run(pac02 & lens.bonds[0][1]['bondType'].modify(lambda x: tz.dissoc(x,"anchorBonds"))
+                    , read=True , runAssump=[])
+    assert r['bonds']['A1'].loc['2021-10-20'].balance.item() == 650
 
 @pytest.mark.bond
 def test_pac_03(setup_api):
@@ -639,6 +760,42 @@ def test_dates_current(setup_api):
     # test for current date
     assert r['pool']['flow']['PoolConsol'].index[0] == pDates['collect'][1]
     assert allEq([ r['bonds'][b].index[0] for b in bondNames ],pDates['pay'][1])
+
+@pytest.mark.formula    
+def test_formula_01(setup_api):
+    
+    # test issuance stats
+    ## issuance balance 
+    ### Balance
+    ### Pool Factor
+    issueBal = test07.pool['issuanceStat']['IssuanceBalance']
+    r = setup_api.run(test07 , read=True , runAssump = [("inspect",("MonthEnd",("poolFactor",)))])
+    x = pd.concat([readInspect(r['result']),(r['pool']['flow']['PoolConsol'].Balance / issueBal).rename("bench")],axis=1).sort_index()["2021-06-30":]
+    assert all(abs(x['<PoolFactor>'] - x['bench']) < 0.001)
+    
+    ### cumu default balance - 0
+    begDefaultBalance = 500
+    test07WithDef = test07 & lens.pool['issuanceStat'].modify(lambda x: tz.assoc(x,'HistoryDefaults',begDefaultBalance))
+    r = setup_api.run(test07WithDef , read=True , runAssump = [("inspect",("MonthEnd",("cumPoolDefaultedBalance",)))])
+    assert set(r['pool']['flow']['PoolConsol'].CumDefault.to_list()) == {500}, "CumuDefault should be either 0 or 500"
+    
+    ### cumu default balance - 1
+    
+    r = setup_api.run(test07WithDef , read=True ,poolAssump=("Pool",("Mortgage",{"CDR":0.1},None,None,None)
+                                                                , None
+                                                                , None)
+                                                , runAssump = [("inspect",("MonthEnd",("cumPoolDefaultedBalance",))
+                                                                         ,("MonthEnd",("cumPoolDefaultedRate",)))
+                                                               ])
+    listCloseByAbs((r['pool']['flow']['PoolConsol'].Default.cumsum() + begDefaultBalance).to_list()
+                    , r['pool']['flow']['PoolConsol'].CumDefault.to_list())
+    listCloseByAbs((r['pool']['flow']['PoolConsol'].Default.cumsum() + begDefaultBalance)["2021-06-30":].to_list()
+                   , readInspect(r['result'])['<CumulativePoolDefaultedBalance>']["2021-06-30":].to_list())
+    
+    ### by different pool
+    
+    
+    
     
 @pytest.mark.dates
 def test_dates_custom(setup_api):
@@ -657,3 +814,80 @@ def test_dates_custom(setup_api):
     # test for custom date
     assert r['pool']['flow']['PoolConsol'].index.to_list() == [pDates['closing']]+pDates['poolFreq'][1:]
     assert allEq([ r['bonds'][b].index.to_list() for b in bondNames ],[pDates['firstPay']]+pDates['payFreq'][1:])
+    
+@pytest.mark.fees
+def test_fee(setup_api):
+    r = setup_api.run(test01Fee,read=True)
+    fp = -324.6
+    sp = -75.40
+    assert (fp+sp)*-1 == test01Fee.fees[0][1]['type']['fixFee']
+    assert r['accounts']['acc01'].loc["2021-07-26"].change == fp
+    assert r['accounts']['acc01'].loc["2021-08-20"].iloc[0].change == sp
+    
+    
+    r = setup_api.run(test02Fee , read=True , runAssump=[])
+    feeCashFlow = r['fees']['test_fee'].loc[r['fees']['test_fee'].payment>0,].payment
+    assert set(feeCashFlow.to_list()) == {20.0}
+    flowDates = ['2021-07-26','2021-10-20','2022-01-20','2022-04-20','2022-07-20','2022-10-20','2023-01-20','2023-04-20','2023-07-20']
+    assert feeCashFlow.index.to_list() == flowDates
+    
+    r = setup_api.run(test03Fee , read=True , runAssump=[]) 
+    cmp = pd.concat([r['fees']['test_fee'][['payment']].shift(-1),r['bonds']['A1'][['balance']]/100],axis=1)
+    assert all(abs((cmp['payment'] - cmp['balance']).fillna(0))<0.01)
+    
+    #TODO missing fee type: annualized fee
+    
+    r = setup_api.run(test05Fee , read=True , runAssump=[])
+    assert r['fees']['test_fee'].loc['2021-08-20'].to_list() == [18.85, 81.15, 0.0]
+    assert r['fees']['test_fee'].loc['2021-09-20'].to_list() == [0.0, 18.85, 0.0]
+    assert r['fees']['test_fee'].loc['2021-12-20'].to_list() == [0.0, 50.0, 0.0]
+    
+    r = setup_api.run(test06Fee , read=True , runAssump=[])
+    assert r['fees']['test_fee'].loc['2021-07-26':"2021-09-20"].payment.to_list() == [50,30,5]
+    
+    r = setup_api.run(test07Fee , read=True , runAssump=[])
+    assert r['fees']['test_fee'].loc["2021-08-20"].payment.item() == 16
+    assert r['fees']['test_fee'].loc["2022-08-20"].payment.item() == 8
+    
+    r = setup_api.run(test08Fee , read=True , runAssump=[]) 
+    #pInt = r['pool']['flow']['PoolConsol'].Interest.fillna(0).rename("poolBalance")
+    #r['fees']['test_fee'].payment.cumsum()
+    #pCumuInt = pInt.cumsum()
+    #valid_df = pd.concat([ r['fees']['test_fee'].payment,r['fees']['test_fee'].payment.cumsum(), pInt,pCumuInt,(pCumuInt*0.03).round(3)],axis=1).sort_index()
+    #valid_df
+    assert r['fees']['test_fee'].payment.to_list()[:8] == [1.67, 0.39, 0.37, 0.36, 0.35,0.33,0.31,0.31,]
+    
+    # by collection period fee
+    r = setup_api.run(test09Fee , read=True , runAssump=[]) 
+    assert r['fees']['test_fee'].loc['2021-07-26'].payment.item() == 60
+    assert r['fees']['test_fee'].loc['2021-08-20'].payment.item() == 15
+    
+    # by fee table
+    r = setup_api.run(test10Fee , read=True , runAssump=[])
+    pBalance = r['pool']['flow']['PoolConsol'].Balance 
+    valid_df = pd.concat([ r['fees']['test_fee'], pBalance, pBalance * 0.02],axis=1).sort_index()
+    
+    assert valid_df.loc["2021-07-26"].payment.item() == 45.0
+    assert valid_df.loc["2021-08-20"].payment.item() == 15.0
+    assert valid_df.loc["2022-02-20"].payment.item() == 10.0
+    assert valid_df.loc["2022-12-20"].payment.item() == 5.0
+    
+@pytest.mark.waterfall
+def test_waterfall_bond(setup_api):
+    # pay fee by seq
+    #test11Fee
+    r = setup_api.run(test11Fee , read=True , runAssump=[])
+    seniorTest(r['fees']['fee1'].payment,r['fees']['fee2'].payment)
+    
+    r = setup_api.run(test2BondsIntBySeq , read=True , runAssump=[])
+    assert r['bonds']['A1'].loc['2021-07-26'].interest.item() == 7.82
+    assert r['bonds']['A2'].loc['2021-07-26'].interest.item() == 11.78
+    
+@pytest.mark.account
+def test_account(setup_api):
+    r = setup_api.run(threeAccounts , read=True , runAssump=[])
+    
+    assert r['accounts']['acc03'].change.to_list() == [-10,-10,-10]
+    assert r['accounts']['acc02'].change.to_list() == [-10] * 5
+    assert r['accounts']['acc01'].loc['2021-08-20'].change.to_list()[:2] == [10.0]*2 
+    
