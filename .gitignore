@@ -14,6 +14,11 @@ absbox/tests/benchmark/us/__pycache__/
 absbox/tests/regression/__pycache__/
 absbox/tests/regression/*.ipynb
 absbox.egg-info/
+include/
+jupyter_execute
 bin/
 *.ipynb
-
+docs/build/
+absbox/tests/config.json
+.gitignore
+publish.sh
