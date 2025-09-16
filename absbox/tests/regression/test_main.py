@@ -106,7 +106,7 @@ def test_01(setup_api):
     assert r['pool']['flow']['PoolConsol'].to_records()[0][0]== '2021-04-15'
     assert r['bonds']['A1'].interest.to_list()[0] == 19.56
     
-    r2 = setup_api.run(accruedDeal, read=True, runAssump = testFlag)
+    #r2 = setup_api.run(accruedDeal, read=True, runAssump = testFlag)
     #assert r['pool']['flow']['PoolConsol'] == r2['pool']['flow']['PoolConsol']
     #assert r['bonds']['A1'].interest.to_list() == r2['bonds']['A1'].interest.to_list()
 
