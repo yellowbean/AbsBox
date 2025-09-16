@@ -13,3 +13,4 @@ graphviz
 dateparser
 more-itertools
 pytest-notebook
+numpy-financial

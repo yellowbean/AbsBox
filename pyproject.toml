@@ -37,6 +37,7 @@ dependencies = [
     "more-itertools",
     "xlsxwriter",
     "faker",
+    "numpy-financial",
 ]
 
 

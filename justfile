@@ -35,3 +35,10 @@ push-code:
 live-doc:
     echo "Live Doc"
     sphinx-autobuild docs/source docs/build/html --open-browser --watch docs/source
+
+publish env version:
+    echo "Pushing to PyPI {{env}}"
+    just test
+    just update-version {{version}}
+    just tag {{env}} {{version}}
+    just push-code
