@@ -8,6 +8,7 @@ from collections import Counter
 from itertools import dropwhile
 import numpy_financial as npf
 from datetime import datetime
+import numpy as np
 
 
 from .deals import *
@@ -891,3 +892,93 @@ def test_account(setup_api):
     assert r['accounts']['acc02'].change.to_list() == [-10] * 5
     assert r['accounts']['acc01'].loc['2021-08-20'].change.to_list()[:2] == [10.0]*2 
     
+@pytest.mark.sensitivity
+def test_sensitivity_01(setup_api):
+    # senstivity on structs
+    test02 = test01 & lens.bonds.Each()[1]['balance'].modify(lambda x: 0.9*x)
+    dealMap = {
+        "Normal":test01,"Shrink":test02
+    }
+    
+    rs = setup_api.runStructs(dealMap, read=True)
+    
+    assert rs.keys() == {"Normal","Shrink"}, "sensitivity run should have two results"
+    
+    assert rs['Shrink']['bonds']['A1'].principal.sum().item() == 900
+    assert closeTo(rs['Normal']['bonds']['A1'].principal.sum().item() ,1000)
+
+
+@pytest.mark.sensitivity
+def test_sensitivity_02(setup_api):
+    # senstivity on pool assump 
+    myAssumption = ("Pool",("Mortgage",{"CDR":0.01},None,None,None)
+                                ,None
+                                ,None)
+
+    myAssumption2 = ("Pool",("Mortgage",None,{"CPR":0.01},None,None)
+                                    ,None
+                                    ,None)
+    
+    rs = setup_api.runByScenarios(test01
+                                ,poolAssump={"withCdr":myAssumption
+                                            ,"withCpr":myAssumption2}
+                                ,read=True)
+    
+    assert rs.keys() == {"withCdr","withCpr"}
+    
+    assert rs['withCdr']['pool']['flow']['PoolConsol'].Default.sum().item() > 0
+    assert rs['withCdr']['pool']['flow']['PoolConsol'].Prepayment.sum().item() == 0
+    
+    assert rs['withCpr']['pool']['flow']['PoolConsol'].Prepayment.sum().item() > 0
+    assert rs['withCpr']['pool']['flow']['PoolConsol'].Default.sum().item() == 0
+    
+
+@pytest.mark.sensitivity
+def test_sensitivity_03(setup_api):
+    # senstivity on run assumption 
+    runAssumption01 = []
+    runAssumption02 = [("call", ("if", ["date", ">", "2022-10-01"]))]
+    
+    rAssump = {
+        "r0":runAssumption01
+        ,"r1":runAssumption02
+    }
+
+    rs = setup_api.runByDealScenarios(test01
+                                    ,runAssump=rAssump
+                                    ,read=True)
+    
+    assert rs.keys() == {"r0","r1"}
+    
+    assert rs['r1']['result']['status'].loc[2].to_list() == ['2022-10-20', '', 'DealEnd', 'Clean Up']
+
+@pytest.mark.sensitivity
+def test_sensitivity_04(setup_api):
+    # senstivity on combo  
+    test02 = test01 & lens.bonds.Each()[1]['balance'].modify(lambda x: 0.9*x)
+    dealMap = {
+        "Normal":test01,"Shrink":test02
+    }
+    
+    myAssumption = ("Pool",("Mortgage",{"CDR":0.01},None,None,None)
+                            ,None
+                            ,None)
+
+    myAssumption2 = ("Pool",("Mortgage",None,{"CPR":0.01},None,None)
+                                    ,None
+                                    ,None)
+    
+    runAssumption01 = []
+    runAssumption02 = [("call", ("if", ["date", ">", "2022-10-01"]))]
+    
+    rAssump = {
+        "r0":runAssumption01
+        ,"r1":runAssumption02
+    }        
+    rs = setup_api.runByCombo(dealMap
+                        ,poolAssump={"withCdr":myAssumption
+                                    ,"withCpr":myAssumption2}
+                        ,runAssump = rAssump
+                        ,read=True)
+    
+    assert len(rs.keys())==8

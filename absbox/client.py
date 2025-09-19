@@ -654,14 +654,16 @@ class API:
 
         assert isinstance(result, dict), f"Result should be a dict but got {type(result)}, {result}"
 
-        rawWarnMsgByScen = {"^".join(k): self._getWarningMsg(v[RunResp.LogResp.value],showWarning) for k, v in result.items()}
+        rawWarnMsgByScen = { tuple(k.split("^")): self._getWarningMsg(v[RunResp.LogResp.value], showWarning) 
+                            for k, v in result.items()}
         for scen, msgs in rawWarnMsgByScen.items():
             if len(msgs)>0:
                 console.print(f"Warning Message from server for {scen}:"+"\n".join(msgs))
 
         if read:
             return {
-                tuple(k.split("^")): dealMap[k.split("^")[0]].read(v) for k,v in result.items()
+                tuple(k.split("^")): dealMap[k.split("^")[0]].read(v)
+                for k,v in result.items()
             }
         else:
             return result
