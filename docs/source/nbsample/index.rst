@@ -19,3 +19,5 @@ Feel free to raise any question or report any error here ->  :ref:`Support`
    debugExamples
    refinance
    IC_Test
+   Irr_001
+   Irr_002

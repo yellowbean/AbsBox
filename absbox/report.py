@@ -35,31 +35,31 @@ def buildSectionFlat(lst:list, title_=h2, anchor=False):
 
 
 def consolResp(r:dict):
+    '''
+        input a single run response and return a consolidate map with value type of DataFrame
+    '''
     bondDf = ("Bond", tz.valfilter(lambda x: isinstance(x, pd.DataFrame), r['bonds']))
-    bondGrpDf = ("BondGroup", 
-                  tz.pipe(tz.valfilter(lambda x: not isinstance(x, pd.DataFrame), r['bonds'])
-                          ,lambda x : {f"{k}-{k2}":v2 for k,v in x.items()
-                                         for k2,v2 in v.items()}))
+    bondGrpDf = ("BondGroup"
+                ,tz.pipe(tz.valfilter(lambda x: not isinstance(x, pd.DataFrame), r['bonds'])
+                        ,lambda x : {f"{k}-{k2}":v2 for k,v in x.items()
+                                        for k2,v2 in v.items()}))
     poolDf = ("Pool", r['pool']['flow'])
     accDf = ("Accounts", r['accounts'])
     feeDf = ("Fee", r['fees'])
-
     reportDf = ("Finanical Reports", r['result'].get('report', {}))
-    
     results = dict([("Status",r['result']['status'])
                     ,("Pricing",r["pricing"])
                     ,("Bond Summary",r['result']['bonds'])
                     ,("Log",r['result']['logs'])
                     ,("Waterfall",r['result']['waterfall'])
                     ,("Inspect",readInspect(r['result']))])
-    
 
     jointDfs =[("MultiFee",readFeesCf(feeDf[1]))
-               ,("MultiBond",readBondsCf(bondDf[1],popColumns=[]))
-               ,("MultiAccounts",readAccsCf(accDf[1]))
-               ,("MultiPools", readPoolsCf(poolDf[1]))
-               ,("MultiLedger", readLedgers(r.get("ledgers",{})))
-               ,("MultiTrigger", readTriggers(r.get("triggers",{})))]
+                ,("MultiBond",readBondsCf(bondDf[1],popColumns=[]))
+                ,("MultiAccounts",readAccsCf(accDf[1]))
+                ,("MultiPools", readPoolsCf(poolDf[1]))
+                ,("MultiLedger", readLedgers(r.get("ledgers",{})))
+                ,("MultiTrigger", readTriggers(r.get("triggers",{})))]
     return dict(
         [bondDf]+[bondGrpDf]+[poolDf]+[accDf]+[feeDf]\
         +[reportDf]+[("result",results)]+[ (x[0],{x[0]:x[1]}) for x in jointDfs ]
@@ -72,10 +72,10 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
 
     bondDf = ("Bond", tz.valfilter(lambda x: isinstance(x, pd.DataFrame), r['bonds']))
     bondGrpDf = ("BondGroup", 
-                 tz.pipe(tz.valfilter(lambda x: not isinstance(x, pd.DataFrame), r['bonds'])
-                         ,lambda x : {f"{k}-{k2}":v2 for k,v in x.items()
+                tz.pipe(tz.valfilter(lambda x: not isinstance(x, pd.DataFrame), r['bonds'])
+                        ,lambda x : {f"{k}-{k2}":v2 for k,v in x.items()
                                         for k2,v2 in v.items()}
-                         )
+                        )
                 )
 
     section0 = buildSection([bondDf,bondGrpDf])
@@ -140,8 +140,6 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
 def toExcel(r:dict, p:str,exlude=[],headerFormat={'bold': True, 'bg_color': '#9fdd92','align':'center'}):
     x = consolResp(r)
 
-    #filter out empty in m
-
     def annotateLoc(m:dict, skip=3):
         assert isinstance(m, dict),"annotateLoc must be a dict"
         if not m:
@@ -175,6 +173,3 @@ def toExcel(r:dict, p:str,exlude=[],headerFormat={'bold': True, 'bg_color': '#9f
             currentSheet.autofit()
 
     return os.path.abspath(os.path.join(os.getcwd(),p))
-
-
-

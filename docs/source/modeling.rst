@@ -246,6 +246,9 @@ Bond
 
     .. versionadded:: 0.43.1
     * ``("bondTargetBalance","A","B")`` -> sum of target balance of the bonds
+  
+    .. versionadded:: 0.52.3
+    * ``("irrOfBond","A")`` -> internal rate of return of bond "A".(Make sure there is negative cash statment in the bond "A"), :ref:`IRR Example (continue)`
 
 Pool 
 """""""
@@ -2257,14 +2260,28 @@ By Ref Balance
 
 .. versionadded:: 0.43.0
 
-The bond interest will be calculated by a base from a :ref:`Formula`
+Instead of accrue interest on bond's outstanding balance
 
-It use a composite syntax: ``("byRefBalance",<formula>,<rate object>)``
+The bond interest will be calculated by a base balance described by a :ref:`Formula`
+
+It use a composite syntax: ``("byRefBalance",<formula>, <rate object>)``
 
 syntax
   :code:`"rateType":("refBalance",("*",("bondBalance","A","B"), 0.3) ,{"Fixed":0.06})`
   
-  :code:`"rateType":("byRefBalance",("poolBalance",),("fix",0.0569))`
+
+By Ref Formula
+"""""""""""""""""""
+
+.. versionadded:: 0.52.2
+
+Instead of using bond interest rate from `Bond Object` per-se, the bond interest will use a :ref:`Formula` to determine the rate to accrue interest.
+
+
+syntax
+  :code:`"rateType":("ref", 0.05, ("poolWaRate",), 1.0, "MonthEnd")`
+
+In the example above, it says, the bond will accrue interest by 100% * Pool Weighted Average Coupon. The rate will be reset by every end of the month.(Which described by a :ref:`DatePattern`)
 
 
 

@@ -332,6 +332,10 @@ def mkDs(x):
                 if pNames:
                     return mkTag(("PoolWaSpread", lmap(mkPid,pNames)))
                 return mkTag(("PoolWaSpread", None))
+            case ("poolAccruedInterest", *pNames) | ("资产池应计利息", *pNames):
+                if pNames:
+                    return mkTag(("PoolAccruedInterest", lmap(mkPid,pNames)))
+                return mkTag(("PoolAccruedInterest", None))
             case ("债券系数", bn) | ("bondFactor", bn):
                 return mkTag(("BondFactorOf", bn))
             case ("债券系数",) | ("bondFactor",):
@@ -436,6 +440,8 @@ def mkDs(x):
                 return mkTag(("IsPaidOff", bns))
             case ("isOutstanding", *bns):
                 return mkTag(("IsOutstanding", bns))
+            case ("isAnyOutstanding", *bns):
+                return mkTag(("IsAnyOutstanding", bns))
             case ("逾期", *bns) | ("hasPassedMaturity", *bns):
                 return mkTag(("HasPassedMaturity",bns))
             case ("比率测试", ds, op, r) | ("rateTest", ds, op, r):
@@ -470,6 +476,9 @@ def mkDs(x):
                 return mkTag(("AvgRatio", [mkDs(_) for _ in ds]))
             case ("amountForTargetIrr", irr, bn):
                 return mkTag(("AmountRequiredForTargetIRR", [irr, bn]))
+            case ("irrOfBond", bndName) | ("债券内部收益率", bndName):
+                return mkTag(("IrrOfBond", bndName))
+            
             case ("dealStat", _t, s):
                 match _t :
                     case "int":
@@ -699,6 +708,8 @@ def mkBondRate(x:dict)->dict:
             return mkTag(("FloorRate", [mkBondRate(br), vNum(floor)]))
         case ("罚息", pRateInfo,bRateInfo) | ("withIntOverInt", pRateInfo, bRateInfo):
             return mkTag(("WithIoI", [mkBondRate(bRateInfo), mkBondIoItype(pRateInfo)]))
+        case ("ref", _rate, ds, factor, reset): # | RefRate IRate DealStats Float RateReset 
+            return mkTag(("RefRate", [vNum(_rate), mkDs(ds), vNum(factor), mkDatePattern(reset)]))
         case None :
             return mkTag(("Fix",[0, DC.DC_ACT_365F])) 
         case _:
