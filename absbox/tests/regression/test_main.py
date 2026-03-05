@@ -21,7 +21,7 @@ from absbox.exception import AbsboxError
 config_file_path = Path(__file__).resolve().parent.parent / 'config.json'
 
 def closeTo(a,b,r=2):
-    assert math.floor(a * 10**r)/10**r == math.floor(b * 10**r)/10**r
+    assert math.floor(a * 10**r)/10**r == math.floor(b * 10**r)/10**r, f"Not close to {a}/{math.floor(a * 10**r)/10**r} {b}/{math.floor(b * 10**r)/10**r}"
 
 def filterTxn(rs, f, rg):
     return [ r for r in rs if re.match(rg, r[f])] 
@@ -51,9 +51,9 @@ def eqDataFrameByLens(a, b, l, fn=None, msg=""):
     da = a & l.get()
     db = b & l.get()
     if fn is None:
-      eqDataFrame(da, db, msg=msg)
+        eqDataFrame(da, db, msg=msg)
     else:
-      eqDataFrame(fn(da), fn(db), msg=msg)
+        eqDataFrame(fn(da), fn(db), msg=msg)
 
 
 def seniorTest(x, y):
@@ -215,21 +215,21 @@ def test_asset_01(setup_api):
 
     # m with 60 remaining term
     r = setup_api.runAsset("2020-01-02"
-                     ,[m & lens[2]['remainTerm'].set(60)]
-                     ,poolAssump=("Pool"
-                                    ,("Mortgage", None, {"PSA":1.0}, None, None)
-                                    ,None
-                                    ,None)
-                     ,read=True)
+                    ,[m & lens[2]['remainTerm'].set(60)]
+                    ,poolAssump=("Pool"
+                                ,("Mortgage", None, {"PSA":1.0}, None, None)
+                                ,None
+                                ,None)
+                    ,read=True)
     assert toCprRates(r[0])[:60] == ([ _/1000 for _ in  range(2,62,2)][20:] + [0.06]*50)
 
     r = setup_api.runAsset("2020-01-02"
-                     ,[m & lens[2]['remainTerm'].set(10)]
-                     ,poolAssump=("Pool"
-                                    ,("Mortgage", None, {"PSA":1.0}, None, None)
-                                    ,None
-                                    ,None)
-                     ,read=True)
+                    ,[m & lens[2]['remainTerm'].set(10)]
+                    ,poolAssump=("Pool"
+                                ,("Mortgage", None, {"PSA":1.0}, None, None)
+                                ,None
+                                ,None)
+                    ,read=True)
     assert toCprRates(r[0])[:10] == ([0.06]*10)
 
     # test on cutoff date
@@ -905,7 +905,7 @@ def test_sensitivity_01(setup_api):
     assert rs.keys() == {"Normal","Shrink"}, "sensitivity run should have two results"
     
     assert rs['Shrink']['bonds']['A1'].principal.sum().item() == 900
-    assert closeTo(rs['Normal']['bonds']['A1'].principal.sum().item() ,1000)
+    closeTo(float(rs['Normal']['bonds']['A1'].principal.sum().item()) ,1000)
 
 
 @pytest.mark.sensitivity
