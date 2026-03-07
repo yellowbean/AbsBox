@@ -269,6 +269,9 @@ Pool
     .. versionadded:: 0.24.1
     * ``("schedulePoolValuation", <pricing method>, <pool name1>, <pool name2>..)`` -> get valuation on schedule cashflow from specific pool or all pools with :ref:`Pricing Method` 
   
+    .. versionadded:: 0.52.3
+    * ``(poolAccruedInterest, )`` -> get accrued interest of the pool
+
 Accounts
 """""""""""""
     * ``("accountBalance",)`` -> sum of all account balance
@@ -365,7 +368,8 @@ Bool Type
     .. versionadded:: 0.28.10
     * ``("isOutstanding", "A", "B", "C"...)`` -> True if all "A","B","C" bonds are ALL active
 
-
+    .. versionadded:: 0.52.3
+    * ``("isAnyOutstanding", "A", "B", "C"...)`` -> True if any of "A","B","C" bonds are active
 
 Or `formula` can be an arithmetic calculation on itselfies.
 
@@ -3469,7 +3473,9 @@ examples:
   source of funds:
     * :ref:`Accounts`
     * :ref:`Liquidity Provider`
-    * a combination of above
+    * a combination of abovef
+    .. versionadded:: 0.52.3
+    * with a :ref:`Condition` to trigger the support ( if the test return True, then the support will be triggered)
 
   syntax:
     ``["payFee", {Account}, [<Fee>], {'support':<supports>}]``
@@ -3483,9 +3489,13 @@ examples:
     * supported by liquidity provider: 
     
       *  ``["facility","liquidity provider name"]``
-    * supported by mix (draw via sequence)
+    * supported by mix (draw funds sequentially)
     
       *  ``["support" ,["account","accountName1"] ,["facility","liquidity provider name"] ,["account","accountName2"]]``
+
+    * conditionally support
+  
+      * ``["withCondition", <Condition>, <support>]``
 
 <ordering>
 """"""""""""""""
