@@ -99,14 +99,14 @@ english_ledger_flow_fields_d = ["date", "balance", "amount", "comment"]
 
 
 datePattern = {"月末": "MonthEnd", "季度末": "QuarterEnd", "年末": "YearEnd", "月初": "MonthFirst",
-               "季度初": "QuarterFirst", "年初": "YearFirst", "每年": "MonthDayOfYear", "每月": "DayOfMonth", "每周": "DayOfWeek"}
+            "季度初": "QuarterFirst", "年初": "YearFirst", "每年": "MonthDayOfYear", "每月": "DayOfMonth", "每周": "DayOfWeek"}
 
 freqMap = {"每月": "Monthly", "每季度": "Quarterly", "每半年": "SemiAnnually", "每年": "Annually", "Monthly": "Monthly", "Quarterly": "Quarterly", "SemiAnnually": "SemiAnnually", "Annually": "Annually", "monthly": "Monthly", "quarterly": "Quarterly", "semiAnnually": "SemiAnnually", "annually": "Annually" 
-           ,"Weekly":"Weekly","weekly":"Weekly","每周":"Weekly","BiWeekly":"BiWeekly","biweekly":"BiWeekly","每两周":"BiWeekly"}
+        ,"Weekly":"Weekly","weekly":"Weekly","每周":"Weekly","BiWeekly":"BiWeekly","biweekly":"BiWeekly","每两周":"BiWeekly"}
 
 rateLikeFormula = set(["bondFactor", "bondFactorOf", "poolFactor", "cumPoolDefaultedRate","poolWaRate","bondWaRate", "资产池累计违约率", "债券系数", "资产池系数"
-                      ,"cumPoolNetLossRate","cumPoolDefaultedRateTill","比例","ratio","avgRatio"
-                      ,"平均比例","irrOfBond"])
+                    ,"cumPoolNetLossRate","cumPoolDefaultedRateTill","比例","ratio","avgRatio"
+                    ,"平均比例","irrOfBond"])
 intLikeFormula = set(["borrowerNumber", "monthsTillMaturity", "periodNum"])
 boolLikeFormula = set(["trigger", "事件", "isMostSenior", "最优先", "isPaidOff","清偿完毕","rateTest","allTest","anyTest","比率测试","任一测试","所有测试"
                         "isOutstanding","isAnyOutstanding"])
@@ -122,16 +122,16 @@ op_map = {">": "G", ">=": "GE", "<": "L", "<=": "LE", "=": "E"}
 
 #Deal Cycle
 chinaDealCycle = {"回收后":"EndCollection"
-                 ,"回收动作后":"EndCollectionWF"
-                 ,"分配前":"BeginDistributionWF"
-                 ,"分配后":"EndDistributionWF"
-                 ,"分配中":"InWF"}
+                ,"回收动作后":"EndCollectionWF"
+                ,"分配前":"BeginDistributionWF"
+                ,"分配后":"EndDistributionWF"
+                ,"分配中":"InWF"}
 
 englishDealCycle = {"BeforeCollect":"EndCollection"
-                   ,"AfterCollect":"EndCollectionWF"
-                   ,"BeforeDistribution":"BeginDistributionWF"
-                   ,"AfterDistribution":"EndDistributionWF"
-                   ,"InDistribution":"InWF"}
+                ,"AfterCollect":"EndCollectionWF"
+                ,"BeforeDistribution":"BeginDistributionWF"
+                ,"AfterDistribution":"EndDistributionWF"
+                ,"InDistribution":"InWF"}
 
 dealCycleMap = chinaDealCycle | englishDealCycle
 
@@ -156,7 +156,7 @@ validCutoffFields = {
 }
 
 dealStatusLog = {'cn': [china_date, "旧状态", "新状态", "备注"]
-                 ,'en': [english_date, "From", "To", "Comment"]}
+                ,'en': [english_date, "From", "To", "Comment"]}
 
 dealStatusMap = {"en": {'amort': "Amortizing", 'def': "Defaulted", 'acc': "Accelerated", 'end': "Ended",
                         'called': "Called",

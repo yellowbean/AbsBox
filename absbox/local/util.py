@@ -463,3 +463,19 @@ def patchDicts(dict1:dict,dict2:dict)-> dict:
 def getNumCols(df:pd.DataFrame)-> list:
     numeric_columns = [col for col in df.columns if pd.to_numeric(df[col], errors='coerce').notna().all()]
     return numeric_columns
+
+
+
+def genDescList(lst, n, reverse=False):
+    """
+    Return a list of lists, where the first element is the original list,
+    and each subsequent list is the previous one with its last element removed.
+    The process stops after producing n lists.
+    """
+    # Create an infinite sequence: original, then without last, then without last, ...
+    assert len(lst) >= n, f"List length should be less than n, got {len(lst)} and n={n}"
+    seq = tz.iterate(lambda x: x[:-1], lst)
+    # Take the first n items and convert to a list
+    if reverse:
+        return list(reversed(list(tz.take(n, seq))))
+    return list(tz.take(n, seq))

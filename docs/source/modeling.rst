@@ -552,6 +552,10 @@ Pricing by Balance
   * ``["Current|Defaulted", a, b]``  -> Applies ``a`` as factor to current balance of a performing asset; ``b`` as factor to current balance of a defaulted asset
   * ``["Current|Delinquent|Defaulted", a, b, c]`` -> same as above ,but with a ``b`` applies to an asset in deliquency.
   * ``["PV|Defaulted", a, b]`` ->  using ``a`` as pricing curve to discount future cashflow of performing asset while use ``b`` as factor to current balance of defautled asset.
+  .. versionadded:: 0.52.3
+  * ``{"currentFactor": a, "defaultFactor": b}`` -> same as above but with more key strike
+
+
 
 Pricing by Cashflow 
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -563,6 +567,55 @@ Pricing by a rate
 
   * ``[PvRate, r]``  -> price with a fixed annualized rate
   * ``[PvRate, <rate formula> ]`` -> using a rate formula, :ref:`Ratio Type`
+  .. versionadded:: 0.52.3
+  * ``{"PvRate": r}`` -> same as above but with more key strike
+
+
+RateType
+-----------------------------
+
+``RateType`` is a building block of an asset, which can be used to model a rate of an asset.
+
+``RateType`` can be either ``Fix`` or ``Floater``
+
+Fix Rate
+^^^^^^^^^^^^^^^^^^
+
+syntax
+  
+  ``{"fix": <rate> }`` | ``{"fix":<rate>, "dayCount": <day count> }``
+
+  ``("fix", <rate>)`` | ``("fix", <rate>, <day count>)``
+
+  ``["fix", <rate>]`` | ``["fix", <rate>, <day count>]``
+  
+  <day count> should be :ref:`Day Count`, if no ``dayCount`` provided, engine will use ``DC_ACT_365F`` as default day count to calculate interest.
+
+
+Floater Rate
+^^^^^^^^^^^^^^^^^^
+
+syntax
+
+  ``{"index": <index>, "spread": <spread>, "reset": <reset>, "rate": <current rate>}``
+
+  ``("floater", <current rate>, {"index": <index>, "spread": <spread>, "reset": <reset>})``
+
+  ``["floater", <current rate>, {"index": <index>, "spread": <spread>, "reset": <reset>}]``
+
+  where 
+    ``reset`` ->  :ref:`DatePattern`, which means the rate will reset on those dates.
+
+    ``index`` -> :ref:`Indexes`, which means the rate will reference to that index.
+    
+    ``spread`` -> a fixed spread on top of index
+    
+    ``rate`` -> current rate, which is used to calculate interest before next reset date.
+
+    User can also pass ``floor`` / ``cap`` in the dict to set floor / cap for the floater rate.
+
+
+
 
 
 Constants
@@ -861,6 +914,11 @@ Deal Status Enums
 ``Ended`` 
   Means deal stop projection cashflow.
 
+.. versionadded:: 0.52.3  
+``{"current":"PreClosing","next":"Amortizing"}``
+  same as ``("PreClosing","Amortizing")``
+
+
 Changing Deal Status
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -927,6 +985,7 @@ with a oustanding balance and will be paid off once it paid down to zero
 
 syntax
   ``("fixFee", <balance>)`` : total oustanding fee amount to be paid
+
   ``{"fixFee": <balance>}`` : total oustanding fee amount to be paid
 
 .. code-block:: python
@@ -942,7 +1001,11 @@ a fix amount fee which occurs by defined :ref:`DatePattern`
 
 syntax
   ``("recurFee", <DatePattern>, <new due amount on each DatePattern>) ``
+
   ``{"recurFee":[ <DatePattern>,<new due amount on each DatePattern> ]}``
+
+  .. versionadded:: 0.52.3
+  ``{"recurFeeAmt": <new due amount on each DatePattern>, "recurDates": <DatePattern> }``
 
 .. code-block:: python
     
@@ -965,7 +1028,12 @@ like a fee is base on
 
 syntax 
   ``("pctFee", <Formula>, <percentage>)``
+
   ``{"pctFee":[ <Formula>,<percentage> ]}``
+
+
+  .. versionadded:: 0.52.3
+  ``{"pctFeeRate": <percentage>, "base": <Formula> }``
 
 
 
@@ -973,11 +1041,11 @@ syntax
   
   ("bond_service_fee"
       ,{"type":{"pctFee":[("bondBalance",),0.02]}
-       ,"feeStart":"2022-01-01"})
+        ,"feeStart":"2022-01-01"})
   
   ("bond_service_fee"
       ,{"type":{"pctFee":[("cumPoolDefaultedBalance",),0.03]}
-       ,"feeStart":"2022-01-01"})
+        ,"feeStart":"2022-01-01"})
 
 
 annualized fee
@@ -988,7 +1056,11 @@ either reference to pool balance  or bond balance , etc.... it will accure type 
 
 syntax 
   ``("annualPctFee", <Formula>, <percentage> )``
+
   ``{"annualPctFee":[ <Formula>,<percentage> ] }``
+
+  .. versionadded:: 0.52.3
+  ``{"annualPctFeeRate": <percentage>, "base": <Formula> }``
 
 
 available formula options:
@@ -1015,27 +1087,37 @@ like 100 USD at 2022-1-20 and incur other 20 USD at 2024-3-2
 
 syntax 
   ``("customFee", [ [<Date>,<Amount>] .... ])``
-  ``{"customFee":[ [<Date>,<Amount>] .... ]}``
+
+  .. versionadded:: 0.52.3
+  ``{"customFee":[ {"date":<Date>,"amount":<Amount>} .... ]}``
 
 .. code-block:: python
   
-   ,("irregulargfee"
-    ,{"type":{"customFee":[["2024-01-01",100]
-                          ,["2024-03-15",50]]}
-      ,"feeStart":"2022-01-01"})
+    ("irregulargfee"
+      ,{"type":{"customFee":[["2024-01-01",100]
+                            ,["2024-03-15",50]]}
+        ,"feeStart":"2022-01-01"}
+      )
 
 custom fee flow by index
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. versionadded:: 0.42.1 
 
-A custom fee flow with index (Either bond paid or pool collection period)
+A custom fee flow with index (Either bond paid period or pool collection period)
 The ``Amount`` will be the ``Total`` amount of fee due on that index date.
 
 
 syntax
   ``("flowByBondPeriod", [ [<Index>,<Amount>] .... ])``
+
   ``{"flowByPoolPeriod":[ [<Index>,<Amount>] .... ]}``
+  
+  .. versionadded:: 0.52.3
+  ``("flowByBondPeriod", [ {"index":<Int>,"amount":<Amount>} .... ])``
+
+  ``{"flowByPoolPeriod":[ {"index":<Int>,"amount":<Amount>} .... ]}``
+  
 
 .. code-block:: python
 
@@ -1054,7 +1136,11 @@ The fee due equals to a number multiply a unit fee. The number is a formula refe
 
 syntax 
   ``("numFee", <DatePattern>, <Formula>, <Amount> )``
+
   ``{"numFee":[ <DatePattern>, <Formula>, <Amount> ]}``
+
+  .. versionadded:: 0.52.3
+  ``{ "numFeeAmt": <Amount> ,"numFeeDates": <DatePattern>, "base": <Formula>}``
 
 .. code-block:: python
   
@@ -1069,7 +1155,11 @@ The fee due amount is equal to ``max ( <Formula 1> - <Formula 2>,0)``
 
 syntax
   ``("targetBalanceFee, <Formula 1>, <Formula 2>)``
+
   ``{"targetBalanceFee:[<Formula 1>,<Formula 2>]}``
+
+  .. versionadded:: 0.52.3
+  ``{ "targetBalDue": <Formula> ,"targetBalOffset": <Formula>}``
 
 .. code-block:: python 
 
@@ -1090,6 +1180,7 @@ The fee due amount depends on the number of collection peirods collected.
 
 syntax
   ``("byPeriod", <Amount Per Period>)``
+
   ``{"byPeriod":<Amount Per Period>}``
 
 .. code-block:: python
@@ -1105,7 +1196,11 @@ The fee due amount depends on a :ref:`Formula` based value and look up in table.
 
 syntax
   ``("byTable", <DatePattern>, <Formula>, <Table>)``
+
   ``{"byTable": [ <DatePattern>, <Formula>, <Table>]}``
+
+  .. versionadded:: 0.52.3
+  ``{"tableDates":<DatePattern>,"tableRef":<Formula>,"table":<Table>}``
 
 .. code-block:: python
 
@@ -1262,6 +1357,8 @@ It's possible to model CDO^2 or ABS CDO.
 Asset Types 
 -------------------
 
+
+
 Mortgage
 ^^^^^^^^^^^
 
@@ -1285,6 +1382,10 @@ Mortgage
 
 ``freq`` 
   `freq` -> :ref:`Period`
+
+``originRate`` 
+  ``originRate`` can be either a `Fix` rate or a `Floater` rate, see :ref:`RateType`
+
 
 .. code-block:: python
 
@@ -1444,6 +1545,10 @@ Loan
 
   * ``i_p`` : interest only in all periods,the principal balance repayment at last term
   * ``schedule`` : principal repayment schdule
+
+``originRate`` 
+  ``originRate`` can be either a `Fix` rate or a `Floater` rate, see :ref:`RateType`
+
 
 .. code-block:: python
 
@@ -1923,7 +2028,12 @@ The rule was defined as a *List*, each element is a *List* with 2 elements.
 syntax
   * ``[<Proceeds from pool>, <Account to be deposit>]``
   * ``[<Proceeds from pool>, [<Allocation ration1>,<Account01>],[<Allocation ration2>,<Account02>]... ]``
-
+  
+  .. versionadded:: 0.52.3
+  * ``{"source":<Proceeds from pool>,"account":<Account01>}``
+  * ``{"poolId":['PoolA','PoolB'],"source":<Proceeds from pool>,"account":<Account01>}``
+  * ``{"source":<Proceeds from pool>,"accountByPct":{<Account01>:0.8} }``
+  * ``{"poolId":['PoolA','PoolC'],"source":<Proceeds from pool>,"accountByPct":{<Account01>:0.8} }``
 
 exmaple:
 
@@ -1941,6 +2051,19 @@ exmaple:
   [[["PoolA",],"CollectedInterest","acc01"]
     ,[["PoolB",],"CollectedInterest","acc03"]
     ,[["PoolA","PoolB"],"CollectedPrincipal",[0.7,"acc02"],[0.3,"acc03"]]
+    ]
+
+  # using dict syntax 
+  [
+    {"source":"CollectedInterest"
+      ,"accountByPct":{"acc01":0.8,"acc02":0.2}}
+    
+    ,{"poolId":['PoolA','PoolB'], "source":"CollectedPrincipal"
+      ,"accountByPct":{"acc01":0.8,"acc02":0.2}}
+    
+    ,{"source":"CollectedPrepayment","account":"acc01"}
+    
+    ,{"poolId":['PoolA','PoolB'], "source":"CollectedRecoveries","account":"acc01"}
     ]
 
 Collect Proceeds from multiple pools
@@ -2223,6 +2346,14 @@ syntax
 
     :code:`"rateType":("cap", 0.10, {"floater":[0.05, "SOFR1Y",-0.0169,"MonthEnd"]})`
 
+    .. versionadded:: 0.52.3 
+    :code:`rateType:{"rate": 0.03, "reset": "QuarterEnd", "index": "SOFR1Y", "spread": -0.0169, "dayCount": "DC_ACT_365"}`
+
+    :code:`rateType:{"rate": 0.03, "reset": "QuarterEnd", "index": "SOFR1Y", "spread": -0.0169, "dayCount": "DC_ACT_365", "cap": 0.10 }`
+
+    :code:`rateType:{"rate": 0.03, "reset": "QuarterEnd", "index": "SOFR1Y", "spread": -0.0169, "dayCount": "DC_ACT_365", "floor": 0.05 }`
+
+
 Step-Up Rate
 """"""""""""""
 
@@ -2238,6 +2369,12 @@ syntax
     
     :code:`{"stepUp":("ladder","2024-01-01",0.01,"QuarterEnd")}`
     
+    .. versionadded:: 0.52.3
+    :code:`{"date": "2024-01-01", "spread": 0.01}`
+
+    :code:`{"date": "2025-01-01", "spread": 0.01, "changeDates": "QuarterEnd"}`
+
+
 .. seealso:: 
 
   :ref:`Step-Up Coupon`
@@ -2273,6 +2410,10 @@ It use a composite syntax: ``("byRefBalance",<formula>, <rate object>)``
 syntax
   :code:`"rateType":("refBalance",("*",("bondBalance","A","B"), 0.3) ,{"Fixed":0.06})`
   
+  .. versionadded:: 0.52.3
+
+  :code:`"rateType":{"refBalance":<Formula> , "rateType":<Rate> }`
+  
 
 By Ref Formula
 """""""""""""""""""
@@ -2284,6 +2425,10 @@ Instead of using bond interest rate from `Bond Object` per-se, the bond interest
 
 syntax
   :code:`"rateType":("ref", 0.05, ("poolWaRate",), 1.0, "MonthEnd")`
+
+  .. versionadded:: 0.52.3
+
+  :code:`"rateType":{"rate":0.05, "refRate": ("poolWaRate",), "factor":1.0, "reset":"MonthEnd"}`
 
 In the example above, it says, the bond will accrue interest by 100% * Pool Weighted Average Coupon. The rate will be reset by every end of the month.(Which described by a :ref:`DatePattern`)
 
@@ -2305,13 +2450,17 @@ Two ways of Interest Over Interest:
 * `spread` : using the rate by adding a `spread` over current bond rate to calculate interest over interest
 
 syntax
-  
   :code:`"rateType":("withIntOverInt", ("inflate", 0.2), {"fix":0.0569})`
 
   :code:`"rateType":("withIntOverInt", ("spread", 0.02), {"fix":0.0569})`
 
   :code:`"rateType":("withIntOverInt", ("spread", 0.02), ("cap",0.06, ("floor",0.005 ,{"floater":[0.05, "SOFR1Y",-0.0169,"MonthEnd"]})))`
 
+  .. versionadded:: 0.52.3
+
+  :code:`"rateType":{"intOverInt": {"inflate": 0.03}, "rateType":<RateType>}`
+
+  :code:`"rateType":{"intOverInt": {"spread": 0.03}, "rateType":<RateType>}`
 
 
 Principal 
@@ -3192,7 +3341,8 @@ Liquidation
 
     .. versionadded:: 0.29.9
     ``["sellAsset", {pricing method}, {Account}, [{PoolId}]]`` , liquidate pools in the list
-      
+    
+
   Pricing Method:
     * ``"PvRate"`` : sell the assets with price of PV of asset or defaulted price
     * ``"Current|Defaulted"`` : sell the assets with price of Current price or defaulted price
@@ -3204,6 +3354,12 @@ Liquidation
     
     ["sellAsset", ["Current|Defaulted", 0.9, 0.2], "acc01"] 
     # 90% of current performing balance and 20% un-recovered defaulted balance
+
+    
+
+    ["sellAsset", {"currentFactor": 0.9, "defaultFactor": 0.2}, "acc01"]
+
+    ["sellAsset", {"PvRate": 0.05}, "acc01"]
 
   .. note::
     After version 0.29.11

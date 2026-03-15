@@ -10,15 +10,15 @@ from schema import Or
 from rich.console import Console
 
 
-from .interface import mkTag,readAeson
+from .interface import mkTag,readAeson,mkCurve
 from .util import mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
 from .util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from .util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
 from .util import filter_by_tags, enumVals, lmap, readTagMap, patchDicts,updateKs, ensureKeysInMap
 from .base import *
 
-from ..validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple, vListOfList
-
+from ..validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple, vListOfList, vListOfDict, vMap, vEnum, vOr, vOpt, vAny
+from ..validation import isListOfDict
 
 numVal = Or(float,int)
 console = Console()
@@ -180,27 +180,45 @@ def mkDsRate(x):
 
 def mkFeeType(x):
     match x:
-        case {"年化费率": [base, rate]} | {"annualPctFee": [base, rate]} | ("annualPctFee", base, rate):
+        case {"年化费率": [base, rate]} | {"annualPctFee": [base, rate]} | ("annualPctFee", base, rate) | {"base":base,"annualisedRate": rate}:
             return mkTag(("AnnualRateFee", [mkDs(base), mkDsRate(rate)]))
-        case {"百分比费率": [base, _rate]} | {"pctFee": [base, _rate]} | ("pctFee", base, _rate):
+        case {"百分比费率": [base, _rate]} | {"pctFee": [base, _rate]} | ("pctFee", base, _rate) | {"base":base,"pctFeeRate": _rate}:
             rate = mkDsRate(_rate)
             return mkTag(("PctFee", [mkDs(base), rate]))
         case {"固定费用": amt} | {"fixFee": amt} | ("fixFee", amt):
             return mkTag(("FixFee", vNum(amt)))
-        case {"周期费用": [p, amt]} | {"recurFee": [p, amt]} | ("recurFee", p, amt):
+        case {"周期费用": [p, amt]} | {"recurFee": [p, amt]} | ("recurFee", p, amt) | {"recurFeeAmt": amt, "recurDates": p}:
             return mkTag(("RecurFee", [mkDatePattern(p), vNum(amt)]))
+        case {"customFee": fflow} if isListOfDict(fflow):
+            vs = [ [m['date'],m['amount']] for m in fflow ]
+            return mkTag(("FeeFlow", mkTs("BalanceCurve", vs)))
         case {"自定义": fflow} | {"customFee": fflow} | ("customFee", fflow):
             return mkTag(("FeeFlow", mkTs("BalanceCurve", fflow)))
-        case {"计数费用": [p, s, amt]} | {"numFee": [p, s, amt]} | ("numFee", p, s, amt):
+        case {"计数费用": [p, s, amt]} | {"numFee": [p, s, amt]} | ("numFee", p, s, amt) | {"numFeeDates": p, "base": s, "numFeeAmount": amt}:
             return mkTag(("NumFee", [mkDatePattern(p), mkDs(s), amt]))
+        
+        case {"targetBalDue": ds1, "targetBalOffset": ds2 }:
+            return mkTag(("TargetBalanceFee", [mkDs(ds1), mkDs(ds2)]))
         case {"差额费用": [ds1, ds2]} | {"targetBalanceFee": [ds1, ds2]} | ("targetBalanceFee", ds1, ds2):
             return mkTag(("TargetBalanceFee", [mkDs(ds1), mkDs(ds2)]))
+        
         case {"回款期间费用": amt} | {"byPeriod": amt} | ("byPeriod", amt):
             return mkTag(("ByCollectPeriod", amt))
+        
+        case {"tableDates":dp,"tableRef":ds,"table":tbl} :
+            return mkTag(("AmtByTbl", [mkDatePattern(dp), mkDs(ds), tbl]))
+        
         case {"分段费用": [dp, ds, tbl]} | {"byTable": [dp, ds, tbl]} | ("byTable", dp, ds, tbl):
             return mkTag(("AmtByTbl", [mkDatePattern(dp), mkDs(ds), tbl]))
+        
+        case {"flowByBondPeriod": fflow } if isListOfDict(fflow):
+            vs = [ [m['index'],m['amount']] for m in fflow ]
+            return mkTag(("FeeFlowByBondPeriod", mkTs("CurrentVal", vs)))
         case {"flowByBondPeriod": curve} | ("flowByBondPeriod", curve):
             return mkTag(("FeeFlowByBondPeriod", mkTag(("CurrentVal", curve))))
+        case {"flowByPoolPeriod": fflow } if isListOfDict(fflow):
+            vs = [ [m['index'],m['amount']] for m in fflow ]
+            return mkTag(("FeeFlowByPoolPeriod", mkTs("CurrentVal", vs)))
         case {"flowByPoolPeriod": curve} | ("flowByPoolPeriod", curve):
             return mkTag(("FeeFlowByPoolPeriod", mkTag(("CurrentVal", curve))))
         case _:
@@ -494,8 +512,6 @@ def mkDs(x):
     except TypeError as e:
         raise RuntimeError(f"Failed to match DS/Formula: {x}", e)
 
-def mkCurve(tag, xs):
-    return mkTag((tag, xs))
 
 
 def mkPre(p):
@@ -667,9 +683,9 @@ def mkBondType(x):
 
 def mkBondIoItype(x):
     match x:
-        case ("上浮", f) | ("inflate", f):
+        case ("上浮", f) | ("inflate", f) | {"inflate": f}:
             return mkTag(("OverCurrRateBy", vNum(f)))
-        case ("利差", spd) | ("spread", spd):
+        case ("利差", spd) | ("spread", spd) | {"spread": spd}:
             return mkTag(("OverFixSpread", vNum(spd)))
         case _:
             raise RuntimeError(f"Failed to match bond IoI type:{x}")
@@ -684,9 +700,10 @@ def mkBondRate(x:dict)->dict:
             return mkTag(("Floater", [r, _index, Spread, mkDatePattern(resetInterval), dc, None, None]))
         # floater rate with default daycount
         case {"浮动": [r, _index, Spread, resetInterval]} | \
-             {"floater": [r, _index, Spread, resetInterval]} | \
-             ("floater", (r, _index, Spread, resetInterval)) :
+            {"floater": [r, _index, Spread, resetInterval]} | \
+            ("floater", (r, _index, Spread, resetInterval)) :
             return mkTag(("Floater", [r, _index, Spread, mkDatePattern(resetInterval), DC.DC_ACT_365F.value, None, None]))
+        
         # fix rate with day count
         case {"固定": _rate, "日历": dc} | {"fix": _rate, "dayCount": dc}:
             return mkTag(("Fix", [vNum(_rate), dc]))
@@ -696,31 +713,50 @@ def mkBondRate(x:dict)->dict:
         # fix rate with default day count
         case {"固定": _rate} | {"Fixed": _rate} | {"fix": _rate} | ("fix", _rate) | ["fix", _rate]:
             return mkTag(("Fix", [vNum(_rate), DC.DC_ACT_365F.value]))
-        case {"期间收益": _yield} | {"interimYield": _yield}:
-            return mkTag(("InterestByYield", vNum(_yield)))
-        case ("refBalance", ds, ii):
+        
+        case ("refBalance", ds, ii) | {"refBalance": ds, "rateType": ii}:
             return mkTag(("RefBal", [mkDs(ds), mkBondRate(ii)]))
+        case ("ref", _rate, ds, factor, reset) | {"rate":_rate, "refRate": ds, "factor": factor, "reset": reset}: # | RefRate IRate DealStats Float RateReset 
+            return mkTag(("RefRate", [vNum(_rate), mkDs(ds), vNum(factor), mkDatePattern(reset)]))        
+        
         # rate with cap
         case ("上限", cap, br) | ("cap", cap, br):
             return mkTag(("CapRate", [mkBondRate(br), vNum(cap)]))
         # rate with floor
         case ("下限", floor, br) | ("floor", floor, br):
             return mkTag(("FloorRate", [mkBondRate(br), vNum(floor)]))
-        case ("罚息", pRateInfo,bRateInfo) | ("withIntOverInt", pRateInfo, bRateInfo):
+        
+        case ("罚息", pRateInfo,bRateInfo) | ("withIntOverInt", pRateInfo, bRateInfo)\
+            | {"intOverInt": pRateInfo, "rateType": bRateInfo} :
             return mkTag(("WithIoI", [mkBondRate(bRateInfo), mkBondIoItype(pRateInfo)]))
-        case ("ref", _rate, ds, factor, reset): # | RefRate IRate DealStats Float RateReset 
-            return mkTag(("RefRate", [vNum(_rate), mkDs(ds), vNum(factor), mkDatePattern(reset)]))
+
         case None :
-            return mkTag(("Fix",[0, DC.DC_ACT_365F])) 
+            return mkTag(("Fix",[0, DC.DC_ACT_365F]))
+        
+        case {"rate": rate,"index": idx, "spread": spd, "reset": resetInterval, **p} :
+            dc = p.get("dayCount", DC.DC_ACT_365F.value)
+            cap = p.get("cap", None)
+            floor = p.get("floor", None)
+            match (cap,floor):
+                case (None, None):
+                    return mkTag(("Floater", [vNum(rate), idx, vNum(spd), mkDatePattern(resetInterval), dc, None, None]))
+                case (None, floor):
+                    return mkBondRate(("floor", floor, tz.dissoc(x,'floor')))
+                case (cap, None):
+                    return mkBondRate(("cap", cap, tz.dissoc(x,'cap')))
+                case _ :
+                    raise RuntimeError(f"Failed to match bond rate with both cap and floor: {x}")
+        
+        
         case _:
             raise RuntimeError(f"Failed to match bond rate type:{x}")
 
 
 def mkStepUp(x):
     match x:
-        case ("ladder", d, spd, dp):
+        case ("ladder", d, spd, dp) | {"date": d, "spread": spd, "changeDates": dp}:
             return mkTag(("PassDateLadderSpread", [vDate(d), vNum(spd), mkDatePattern(dp)]))
-        case ("once", d, spd):
+        case ("once", d, spd) | {"date": d, "spread": spd}:
             return mkTag(("PassDateSpread", [vDate(d), vNum(spd)]))
         case _:
             raise RuntimeError(f"Failed to match bond step up type:{x}")
@@ -783,13 +819,13 @@ def mkBnd(bn, x:dict):
     mStmt = mkTxn("bond", mTxns) if mTxns else None
     match x:
         case {"balance": bndBalance
-              , "rates": bndRates
-              , "rateTypes": bndInterestInfos
-              , "bondType": bndType
-              , "originBalance": originBalance
-              , "originRate": originRate
-              , "startDate": originDate
-              }:
+                , "rates": bndRates
+                , "rateTypes": bndInterestInfos
+                , "bondType": bndType
+                , "originBalance": originBalance
+                , "originRate": originRate
+                , "startDate": originDate
+                }:
             l = len(bndInterestInfos)
             dueInts = getValWithKs(x, ["应付利息", "dueInt"], defaultReturn=[0]*l)
             dueIntOverInts = getValWithKs(x, ["拖欠利息", "dueIntOverInt"], defaultReturn=[0]*l)
@@ -830,7 +866,7 @@ def mkBnd(bn, x:dict):
 
 def mkLiqMethod(x):
     match x:
-        case ["正常|违约", a, b] | ["Current|Defaulted", a, b]:
+        case ["正常|违约", a, b] | ["Current|Defaulted", a, b] | {"currentFactor": a, "defaultFactor": b}:
             return mkTag(("BalanceFactor", [vNum(a), vNum(b)]))
         case ["正常|拖欠|违约", a, b, c] | ["Current|Delinquent|Defaulted", a, b, c]:
             return mkTag(("BalanceFactor2", [vNum(a), vNum(b), vNum(c)]))
@@ -838,7 +874,7 @@ def mkLiqMethod(x):
             return mkTag(("PV", [a, b]))
         case ["贴现曲线", ts] | ["PVCurve", ts]:
             return mkTag(("PVCurve", mkTs("PricingCurve", ts)))
-        case ["贴现率", r] | ["PvRate", r] | ("PvRate", r) if isinstance(r, float):
+        case ["贴现率", r] | ["PvRate", r] | ("PvRate", r) | {"PvRate": r} if isinstance(r, float):
             return mkTag(("PvRate", r))
         case ["贴现率", r] | ["PvRate", r] | ("PvRate", r):
             return mkTag(("PvByRef", mkDs(r)))
@@ -988,25 +1024,34 @@ def mkRateCap(x):
 def mkRateType(x):
     match x :
         case {"fix":r, "dayCount":dc} | {"固定":r, "日历":dc} |\
-              ["fix", r, dc] | ["固定", r, dc] | ("fix", r, dc) | ("固定", r, dc):
+            ["fix", r, dc] | ["固定", r, dc] | ("fix", r, dc) | ("固定", r, dc):
             return mkTag(("Fix", [dc, vNum(r)]))
         case {"fix":r} | {"固定":r} | ["fix", r] | ["固定", r] | ("fix", r) | ("固定", r):
             return mkTag(("Fix", [DC.DC_ACT_365F.value, vNum(r)]))
+        
         case {"floater":(idx, spd), "rate":r, "reset":dp, **p} | \
             {"浮动":(idx, spd), "利率":r, "重置":dp, **p}:
             mf, mc, mrnd = tz.get(["floor", "cap", "rounding"], p, None)
             dc = p.get("dayCount", DC.DC_ACT_365F.value)
             return mkTag(("Floater",[dc, vStr(idx), vNum(spd), vNum(r), mkDatePattern(dp), mf, mc, mrnd]))
+        
+        case {"index":idx,"spread":spd,"reset":dp, "rate":r, **p} : 
+            mf, mc, mrnd = tz.get(["floor", "cap", "rounding"], p, None)
+            dc = p.get("dayCount", DC.DC_ACT_365F.value)
+            return mkTag(("Floater",[dc, vStr(idx), vNum(spd), vNum(r), mkDatePattern(dp), mf, mc, mrnd]))
+    
         case ["浮动", r, {"基准":idx, "利差":spd, "重置频率":dp, **p}] | \
              ["floater", r, {"index":idx, "spread":spd, "reset":dp, **p}] :
             mf, mc, mrnd = tz.get(["floor", "cap", "rounding"], p, None)
             dc = p.get("dayCount", DC.DC_ACT_365F.value)
             return mkTag(("Floater", [dc, vStr(idx), vNum(spd), vNum(r), mkDatePattern(dp), mf, mc, mrnd]))
+
         case ("浮动", r, {"基准":idx, "利差":spd, "重置频率":dp, **p}) | \
              ("floater", r, {"index":idx, "spread":spd, "reset":dp, **p}) :
             mf, mc, mrnd = tz.get(["floor", "cap", "rounding"], p, None)
             dc = p.get("dayCount", DC.DC_ACT_365F.value)
             return mkTag(("Floater", [dc, vStr(idx), vNum(spd), vNum(r), mkDatePattern(dp), mf, mc, mrnd]))
+
         case None:
             return None
         case _ :
@@ -1303,6 +1348,8 @@ def mkStatus(x: tuple|str):
             return mkTag(("DealDefaulted", None))
         case "结束" | "Ended":
             return mkTag(("Ended", None))
+        case {"current": "PreClosing", "next":st}:
+            return mkTag(("PreClosing", mkStatus(st)))
         case ("设计", st) | ("PreClosing", st) | ("preclosing", st):
             return mkTag(("PreClosing", mkStatus(st)))
         case _:
@@ -2220,14 +2267,32 @@ def mkCollection(x):
             return mkTag(("Collect",[None, mkPoolSource(s), acc]))
         case [s, *pcts] if isinstance(pcts, list) and isinstance(s, str):
             return mkTag(("CollectByPct" ,[None, mkPoolSource(s), pcts]))
+        
         case [None, s, acc] if isinstance(acc, str):
             return mkTag(("Collect",[None, mkPoolSource(s), acc]))
         case [None, s, *pcts] if isinstance(pcts, list):
             return mkTag(("CollectByPct" ,[None, mkPoolSource(s), pcts]))
+        
         case [mPids, s, acc] if isinstance(acc, str):
             return mkTag(("Collect",[lmap(mkPid,mPids), mkPoolSource(s), acc]))
         case [mPids, s, *pcts] if isinstance(pcts, list):
             return mkTag(("CollectByPct" ,[lmap(mkPid,mPids), mkPoolSource(s), pcts]))
+        
+        case {"source":s, "account":acc}:
+            if(_pids:=x.get("poolId", False)):
+                pids = lmap(mkPid, _pids)
+            else:
+                pids = None
+            return mkTag(("Collect",[pids, mkPoolSource(s), acc]))
+
+        case {"source":s, "accountByPct":accs}:
+            if(_pids:=x.get("poolId", False)):
+                pids = lmap(mkPid, _pids)
+            else:
+                pids = None
+            accsWithPct = [ [vNum(accPct),vStr(accName)] for accName,accPct in accs.items() ]
+            return mkTag(("CollectByPct",[pids, mkPoolSource(s), accsWithPct]))
+        
         case _:
             raise RuntimeError(f"Failed to match collection rule {x}")
 

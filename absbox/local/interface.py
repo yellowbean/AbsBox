@@ -9,6 +9,12 @@ def mkTag(x: tuple | str) -> dict:
         case (tagName):
             return {"tag": tagName}
 
+def mkCurve(tag, xs):
+    return mkTag((tag, xs))
+
+
+
+
 def readAeson(x:dict):
     match x:
         case {"tag": tag,"contents": contents} if isinstance(contents,list):

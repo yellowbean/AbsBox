@@ -11,6 +11,7 @@ pkgs.mkShell {
     pkgs.python313Packages.cython
     pkgs.zeromq
     pkgs.gcc
+    pkgs.uv
     pkgs.pkg-config
     pkgs.glibcLocales
     pkgs.graphviz

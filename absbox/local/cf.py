@@ -103,6 +103,7 @@ def patchMissingIndex(df,idx:set)-> pd.DataFrame:
     missingIdx = idx - curIdx
     return df.reindex(df.index.values.tolist()+list(missingIdx)).sort_index()
 
+
 def buildJointCf(m:dict, popColumns=[]) -> pd.DataFrame:
     if len(m)==0:
         return pd.DataFrame()
@@ -147,6 +148,7 @@ def readPoolsCf(pMap) -> pd.DataFrame:
     df = pd.concat(pFlows,axis=1)
     df.columns = headerIndex
     return df
+
 
 def readTriggers(tMap) -> pd.DataFrame:
     ''' read a map of triggers in dataframes to a single dataframe, with key as 1st level index'''
