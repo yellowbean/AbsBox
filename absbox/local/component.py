@@ -17,7 +17,7 @@ from .util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNon
 from .util import filter_by_tags, enumVals, lmap, readTagMap, patchDicts,updateKs, ensureKeysInMap
 from .base import *
 
-from ..validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple, vListOfList, vListOfDict, vMap, vEnum, vOr, vOpt, vAny
+from ..validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple, vListOfList
 from ..validation import isListOfDict
 
 numVal = Or(float,int)

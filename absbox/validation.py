@@ -67,3 +67,6 @@ def validation(deal):
         return False, errors, warnings
     else:
         return True, [], warnings
+    
+def isListOfDict(xs) -> bool:
+    return isinstance(xs, list) and all(isinstance(x, dict) for x in xs)
