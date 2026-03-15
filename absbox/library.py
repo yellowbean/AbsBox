@@ -13,12 +13,12 @@ import toolz as tz
 from requests.exceptions import ReadTimeout
 from json import JSONDecodeError
 
-from .client import VERSION_NUM
 from .local.generic import Generic
 
 console = Console()
 
 from .validation import vStr
+import functools
 
 __all__ = ["LibraryEndpoints",]
 
@@ -26,21 +26,35 @@ class LibraryEndpoints(str, enum.Enum):
     """Endpoints for deal library"""
     Ack = "ack"
     Token = "token"
-    Query = "query"
+    Query = "query" 
     Run = "run" # run a deal from the library
     Add = "add" # add new deal to library
-    Cmd = "cmd" # add new deal to library
     Get = "get" # get deal from library
 
 
 class LibraryPath(str, enum.Enum):
     """ Enum class representing shortcut to deal library and data service """
-    LDN = "https://ldn.spv.run/api"
+    CN = "https://absbox.com.cn/api"
+
+        # add near top of the module (above the LIBRARY class)
+
+def require_token(func):
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        if not getattr(self, "token", None):
+            raise AbsboxError("❌ No token found, please call login() to login")
+        return func(self, *args, **kwargs)
+    return wrapper
 
 
 @dataclass
 class LIBRARY:
-    """ Deal Library class for deal library operations 
+    """ Deal Library class for deal library operations
+    
+        * Query data in the library
+        * Query available deals in the library
+        * Run a deal with assumptions 
+    
     :return: Deal Library instance
     :rtype: DealLibrary
     """
@@ -60,9 +74,7 @@ class LIBRARY:
         if _r.status_code == 200:
             self.session = requests.Session()
             self.libraryInfo = json.loads(_r.text)
-            console.print(f"✅ Connected to library server")
-            console.print(f"absbox version:{self.libraryInfo['absbox']}")
-            console.print(f"Hastructure:{self.libraryInfo['Hastructure']}")
+            console.print(f"✅ Connected to library server {{self.libraryInfo['absbox']}}/{self.libraryInfo['Hastructure']}")
         else:
             console.print(f"❌ Failed to connect to library server")
 
@@ -113,20 +125,18 @@ class LIBRARY:
         except Exception as e:
             raise AbsboxError(f"❌ Failed during library login {e}")
 
+    @require_token
     def query(self, k = {}, read=True):
         """query deal library with bond ids
 
         :param ks: bond Ids
         :type ks: list
         :param q: query parameters:
-
                     - if {"read":True}, return a dataframe, else return raw result;
         :return: a list of bonds found in library
         :rtype: pd.DataFrame or raw result
         
         """
-        if not hasattr(self, "token"):
-            raise AbsboxError(f"❌ No token found , please call loginLibrary() to login")
 
         deal_library_url = self.url+f"/{LibraryEndpoints.Query.value}"
         result = self._send_req(json.dumps({"q":k})
@@ -141,18 +151,16 @@ class LIBRARY:
         else:
             return result
 
-
+    @require_token
     def get(self, q):
-        if not hasattr(self, "token"):
-            raise AbsboxError(f"❌ No token found, please call login() to login")
         deal_library_url = self.url+f"/{LibraryEndpoints.Get.value}"
 
         r = self._send_req(pickle.dumps({"q":q}), deal_library_url
                             , headers={"Authorization": f"Bearer {self.token}"
                                         ,"Content-Type":"application/octet-stream"})
-        
         return r
-
+    
+    @require_token
     def run(self, _id, **p):
         """send deal id with assumptions to remote server and get result back
 
@@ -167,8 +175,6 @@ class LIBRARY:
         :return: raw string or dataframe
         :rtype: string | pd.DataFrame
         """
-        if not hasattr(self, "token"):
-            raise AbsboxError(f"❌ No token found, please call login() to login")
 
         deal_library_url = self.url+f"/{LibraryEndpoints.Run.value}"
         read = p.get("read", True)
