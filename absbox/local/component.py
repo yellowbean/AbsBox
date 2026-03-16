@@ -446,6 +446,11 @@ def mkDs(x):
                 return mkTag(("Substract", lmap(mkDs, ds)))
             case ("常数", n) | ("constant", n) | ("const", n):
                 return mkTag(("Constant", n))
+            case ("always", b) if b in [True, False]:
+                if b:
+                    return mkTag(("ConstTrue"))
+                else:
+                    return mkTag(("ConstFalse"))
             case ("储备账户缺口", *accs) | ("reserveGap", *accs):
                 return mkTag(("ReserveGap", accs))
             case ("储备账户盈余", *accs) | ("reserveExcess", *accs):

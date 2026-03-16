@@ -370,6 +370,10 @@ Bool Type
 
     .. versionadded:: 0.52.3
     * ``("isAnyOutstanding", "A", "B", "C"...)`` -> True if any of "A","B","C" bonds are active
+    
+    .. versionadded:: 0.52.4
+    * ``("always", True)`` -> always return True
+    * ``("always", False)`` -> always return False
 
 Or `formula` can be an arithmetic calculation on itselfies.
 
@@ -688,6 +692,7 @@ Trigger Locations
 * ``AfterCollect``  -> after pool collection waterfall
 * ``BeforeDistribution`` -> before bond pay waterfall
 * ``AfterDistribution``  -> after bond pay waterfall
+* ``InDistribution`` -> in the pay waterfall
 
 Pool Sources
 ^^^^^^^^^^^^^^^^^

@@ -109,7 +109,7 @@ rateLikeFormula = set(["bondFactor", "bondFactorOf", "poolFactor", "cumPoolDefau
                     ,"平均比例","irrOfBond"])
 intLikeFormula = set(["borrowerNumber", "monthsTillMaturity", "periodNum"])
 boolLikeFormula = set(["trigger", "事件", "isMostSenior", "最优先", "isPaidOff","清偿完毕","rateTest","allTest","anyTest","比率测试","任一测试","所有测试"
-                        "isOutstanding","isAnyOutstanding"])
+                        "isOutstanding","isAnyOutstanding","always"])
 
 bookDirection = {"Credit":"Credit" ,"Debit":"Debit"
                 ,"借方":"Debit" ,"贷方":"Credit"
