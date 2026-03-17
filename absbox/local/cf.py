@@ -29,9 +29,12 @@ def readToCf(xs, header=None, idx=None, sort_index=False) -> pd.DataFrame:
 def buildDaySeq(_df):
     """  https://stackoverflow.com/questions/23435270/add-a-sequential-counter-column-on-groups-to-a-pandas-dataframe """
     df = _df.reset_index()
-    dfGrp = df['date'].ne(df['date'].shift()).cumsum()
-    df['daySeq'] = df['date'].groupby(dfGrp).cumcount()
-    return df.set_index(["date", "daySeq"])
+    date_col = 'date' if 'date' in df.columns else ('Date' if 'Date' in df.columns else None)
+    if date_col is None:
+        raise KeyError("Neither 'date' nor 'Date' column found in DataFrame.")
+    dfGrp = df[date_col].ne(df[date_col].shift()).cumsum()
+    df['daySeq'] = df[date_col].groupby(dfGrp).cumcount()
+    return df.set_index([date_col, "daySeq"])
 
 
 def buildDaySeq2(_df):
@@ -133,6 +136,10 @@ def readFeesCf(fMap, popColumns=["due","剩余支付"]) -> pd.DataFrame:
 def readLedgers(lMap, **k) -> pd.DataFrame:
     return buildJointCf(lMap, **k)
 
+def readPoolsCfBreakdown(cfs) -> pd.DataFrame:
+    m = dict(zip(range(len(cfs)), cfs))
+    return buildJointCf(m)
+
 
 def readPoolsCf(pMap) -> pd.DataFrame:
     ''' read a map of pools in dataframes to a single dataframe, with key as 1st level index'''
@@ -148,6 +155,7 @@ def readPoolsCf(pMap) -> pd.DataFrame:
     df = pd.concat(pFlows,axis=1)
     df.columns = headerIndex
     return df
+
 
 
 def readTriggers(tMap) -> pd.DataFrame:

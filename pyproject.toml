@@ -88,46 +88,20 @@ filename = "CHANGELOG.rst"
 
 start_string = ".. towncrier release notes start\n"
 underlines = ["-", "~", "\""]
-title_format = "`{version} <https://github.com/yellowbean/AbsBox/tree/{version}>`_ - {project_date}"
+title_format = "{version} - {project_date}"
 issue_format = "`{issue} <https://github.com/yellowbean/AbsBox/issues/{issue}>`_"
 
 [[tool.towncrier.type]]
-directory = "security"
-name = "Security"
+directory = "feature"
+name = "Features"
 showcontent = true
-
-[[tool.towncrier.type]]
-directory = "removed"
-name = "Removed"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "deprecated"
-name = "Deprecated"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "added"
-name = "Added"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "changed"
-name = "Changed"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "fixed"
-name = "Fixed"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "performance"
-name = "Performance"
-showcontent = true
-
 
 [[tool.towncrier.type]]
 directory = "enhance"
 name = "Enhance"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "bug"
+name = "Bug"
 showcontent = true

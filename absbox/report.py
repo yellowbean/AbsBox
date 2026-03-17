@@ -4,7 +4,7 @@ import pandas as pd
 import json, enum, os, pathlib, re
 from htpy import body, h1, head, html, li, title, ul, div, span, h3, h2, a, h4,h5, h6
 from markupsafe import Markup
-from .local.cf import readInspect
+from .local.cf import readInspect,readPoolsCfBreakdown
 from .local.cf import readBondsCf,readFeesCf,readAccsCf,readPoolsCf,readLedgers,readTriggers
 
 class OutputType(int, enum.Enum):
@@ -82,17 +82,18 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
 
     # section 1
     poolDf = ("Pool", r['pool']['flow'])
+    poolOsDf = ("Pool-OS", r['pool_outstanding']['flow'])
     accDf = ("Accounts", r['accounts'])
     feeDf = ("Fee", r['fees'])
-    section1 = buildSection([poolDf, feeDf, accDf])
+    section1 = buildSection([poolDf, poolOsDf, feeDf, accDf])
 
     # section 2
     section2 = buildSectionFlat([("Status",r['result']['status'])
-                               ,("Pricing",r["pricing"])
-                               ,("Bond Summary",r['result']['bonds'])
-                               ,("Log",r['result']['logs'])
-                               ,("Waterfall",r['result']['waterfall'])
-                               ,("Inspect",readInspect(r['result']))])
+                                ,("Pricing",r["pricing"])
+                                ,("Bond Summary",r['result']['bonds'])
+                                ,("Log",r['result']['logs'])
+                                ,("Waterfall",r['result']['waterfall'])
+                                ,("Inspect",readInspect(r['result']))])
     # section 3
     #section3 = [div[h2(id=f"anchor-{_t}")[_t], mapToList(x)]
     #            for (_t, x) in [("Finanical Reports", r['result'].get('report', {}))]]
@@ -102,18 +103,28 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
     # section 4
     ledgerDf = ("Ledger", r.get("ledgers",{}))
     section4 = buildSectionFlat([("MultiFee",readFeesCf(feeDf[1]))
-                               ,("MultiBond",readBondsCf(bondDf[1],popColumns=[]))
-                               ,("MultiAccounts",readAccsCf(accDf[1]))
-                               ,("MultiPools", readPoolsCf(poolDf[1]))
-                               ,("MultiLedger", readLedgers(ledgerDf[1]))
-                               ,("MultiTrigger", readTriggers(r.get("triggers",{})))
-                               ])
+                                ,("MultiBond",readBondsCf(bondDf[1],popColumns=[]))
+                                ,("MultiAccounts",readAccsCf(accDf[1]))
+                                ,("MultiPools", readPoolsCf(poolDf[1]))
+                                ,("MultiOsPools", readPoolsCf(poolOsDf[1]))
+                                ,("MultiLedger", readLedgers(ledgerDf[1]))
+                                ,("MultiTrigger", readTriggers(r.get("triggers",{})))
+                                ])
 
+    # section 5 : breakdown cashflow 
+    if r['pool']['breakdown']:
+        section5 = buildSectionFlat([(f"PoolBreakdown_{k}", readPoolsCfBreakdown(vs)) 
+                                        for k,vs in r['pool']['breakdown'].items()]
+                                    )
+    else:
+        section5 = [] 
+    # section5 
 
-    dealName = r['_deal']['contents']['name']
+    dealName = r['_deal'] & lens.Values()['name'].get() 
+    
     c = html[
         head[title[dealName]],
-        body[section0, section1, section2, section3 ,section4],
+        body[section0, section1, section2, section3 ,section4, section5],
     ]
 
     if debug:
