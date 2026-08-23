@@ -105,3 +105,8 @@ showcontent = true
 directory = "bug"
 name = "Bug"
 showcontent = true
+
+[dependency-groups]
+dev = [
+    "marimo>=0.24.0",
+]
