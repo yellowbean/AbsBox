@@ -108,5 +108,7 @@ showcontent = true
 
 [dependency-groups]
 dev = [
+    "deepdiff>=9.1.0",
     "marimo>=0.24.0",
+    "pytest>=9.1.1",
 ]

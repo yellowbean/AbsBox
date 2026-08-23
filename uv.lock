@@ -49,7 +49,9 @@ test = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "deepdiff" },
     { name = "marimo" },
+    { name = "pytest" },
 ]
 
 [package.metadata]
@@ -78,7 +80,11 @@ requires-dist = [
 provides-extras = ["test"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "marimo", specifier = ">=0.24.0" }]
+dev = [
+    { name = "deepdiff", specifier = ">=9.1.0" },
+    { name = "marimo", specifier = ">=0.24.0" },
+    { name = "pytest", specifier = ">=9.1.1" },
+]
 
 [[package]]
 name = "anyio"

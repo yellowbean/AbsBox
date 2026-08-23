@@ -1794,7 +1794,8 @@ def identify_deal_type(x):
     y = None
     match x:
         # single pool
-        case {"pool":{"tag":"MultiPool","contents":{"PoolConsol":{"assets":[]}}}} if len(x['pool']['contents']['PoolConsol']['futureCf'])>0:
+        case {"pool":{"tag":"MultiPool","contents":{"PoolConsol":{"assets":[]}}}} \
+                if x['pool']['contents']['PoolConsol']['futureCf'] is not None and len(x['pool']['contents']['PoolConsol']['futureCf'])>0:
             return id_by_pool_assets(x['pool']['contents']['PoolConsol'])
         case {"pool":{"tag":"MultiPool","contents":{"PoolConsol":{"assets":assetList}}}} if len(assetList) > 1: 
             return id_by_pool_assets(x['pool']['contents']['PoolConsol'])
