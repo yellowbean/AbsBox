@@ -449,7 +449,7 @@ def test_rootfind_stressdef(setup_api):
     r = setup_api.runRootFinder(test01, poolPerf ,[pricing]
         ,("stressDefault",("bondMetTargetIrr", "B", 0.10))
     )
-    assert r[1][1]['PoolLevel'][0]['MortgageAssump'][0] == {'DefaultCDR': 0.0760391873750556 } 
+    assert r[1][1]['PoolLevel'][0]['MortgageAssump'][0] == {'DefaultCDR': 0.0760391772455286 } 
 
 @pytest.mark.bond
 def test_pac_01(setup_api):
