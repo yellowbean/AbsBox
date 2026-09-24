@@ -1,4 +1,5 @@
 import json, getpass, enum, os, pickle
+import urllib3
 from importlib.metadata import version
 from json.decoder import JSONDecodeError
 from dataclasses import dataclass
@@ -106,9 +107,11 @@ def PickApiFrom(Apilist:list, **kwargs):
     :param Apilist: list of API urls
     :type Apilist: list
     """
+    verify = kwargs.get("verify", False)
+
     def pingApi(x):
         try:
-            r = requests.get(f"{x.value}/{Endpoints.Version.value}", verify=False, timeout=5 ,headers={"Origin":"http://localhost:8001"}).text 
+            r = requests.get(f"{x.value}/{Endpoints.Version.value}", verify=verify, timeout=5 ,headers={"Origin":"http://localhost:8001"}).text 
             return json.loads(r) 
         except Exception as e:
             return ("Error",e)
@@ -145,6 +148,9 @@ class API:
     """language of response from server, defaults to 'english' """
     check: bool = True
     """ flag to ensure version match between client and server """
+    verify: bool = False
+    """TLS certificate verification flag; defaults to False to keep working with
+       self-signed / internal engine servers. Set True to enable verification. """
     server_info = {}
     """ internal """
     version = VERSION_NUM.split(".")
@@ -177,8 +183,11 @@ class API:
         if self.lang not in ["chinese", "english"]:
             raise AbsboxError(f"❌Invalid language:{self.lang}, only support 'chinese' or 'english' ")
 
+        if not self.verify:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
         try:
-            _r = requests.get(f"{self.url}/{Endpoints.Version.value}", verify=False, timeout=5, headers = {"Origin":"http://localhost:8001"}).text
+            _r = requests.get(f"{self.url}/{Endpoints.Version.value}", verify=self.verify, timeout=5, headers = {"Origin":"http://localhost:8001"}).text
         except (ConnectionRefusedError, ConnectionError):
             raise AbsboxError(f"❌Error: Can't not connect to API server {self.url}")
         if _r is None:
@@ -261,7 +270,8 @@ class API:
             case _:
                 raise RuntimeError(f"Failed to match run type:{run_type}")
         
-        assert r is not None, f"Failed to build request for run type:{run_type}"
+        if r is None:
+            raise AbsboxError(f"❌ Failed to build request for run type:{run_type}")
         try:
             return json.dumps(r, ensure_ascii=False)
         except TypeError as e:
@@ -315,6 +325,32 @@ class API:
         else:
             return []
 
+    def _unwrap_single(self, result) -> dict:
+        """Validate a single-run response and return its `Right` payload."""
+        if result is None or 'error' in result or 'Left' in result:
+            leftVal = (result or {}).get("Left", "")
+            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
+        return result['Right']
+
+    def _unwrap_map(self, result) -> dict:
+        """Validate a multi-scenario response and return a map of `Right` payloads."""
+        if result is None or 'error' in result or "Left" in set(tz.concat([_.keys() for _ in result.values()])):
+            leftVal = {k: v['Left'] for k, v in result.items() if "Left" in v}
+            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
+        return tz.valmap(lambda x: x['Right'], result)
+
+    def _print_warnings(self, result, showWarning:bool, scenario=None) -> None:
+        """Print warning messages from a single-run response."""
+        msgs = self._getWarningMsg(result[RunResp.LogResp.value], showWarning)
+        if msgs:
+            where = f" for {scenario}" if scenario is not None else ""
+            console.print(f"Warning Message from server{where}:" + "\n".join(msgs))
+
+    def _print_warnings_map(self, result, showWarning:bool) -> None:
+        """Print warning messages for each scenario of a multi-run response."""
+        for scen, v in result.items():
+            self._print_warnings(v, showWarning, scenario=scen)
+
     def run(self, deal,
             poolAssump=None,
             runAssump=[],
@@ -355,13 +391,8 @@ class API:
 
         result = self._send_req(req, url)
 
-        if result is None or 'error' in result or 'Left' in result:
-            leftVal = result.get("Left","")
-            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
-        result = result['Right']
-
-        if (wMsgs:=self._getWarningMsg(result[RunResp.LogResp.value], showWarning)):
-            console.print("Warning Message from server:"+"\n".join(wMsgs))
+        result = self._unwrap_single(result)
+        self._print_warnings(result, showWarning)
 
         if read:
             return deal.read(result)
@@ -403,16 +434,8 @@ class API:
         else:
             result = self._send_req(req, url, timeout=30)
 
-        if result is None or 'error' in result or "Left" in set(tz.concat([ _.keys() for _ in result.values()])):
-            leftVal = { k:v['Left'] for k,v in result.items() if "Left" in v }
-            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
-        
-        result = tz.valmap(lambda x:x['Right'] ,result)
-
-        rawWarnMsgByScen = {k: self._getWarningMsg(v[RunResp.LogResp.value],showWarning) for k, v in result.items()}
-        for scen, msgs in rawWarnMsgByScen.items():
-            if len(msgs)>0:
-                console.print(f"Warning Message from server for {scen}:"+"\n".join(msgs))
+        result = self._unwrap_map(result)
+        self._print_warnings_map(result, showWarning)
 
         if read:
             return tz.valmap(deal.read, result)
@@ -433,8 +456,10 @@ class API:
         if not breakdown:
             return {"flow":result}
         else:
-            assert pool_breakdown_flow is not None, "Breakdown flow is None"
-            assert len(pool_breakdown_flow)>0, "Breakdown flow is empty"
+            if pool_breakdown_flow is None:
+                raise AbsboxError("❌ Breakdown flow is None")
+            if len(pool_breakdown_flow) == 0:
+                raise AbsboxError("❌ Breakdown flow is empty")
             return {"flow":result 
                     ,"breakdown": [ _read_cf(_['contents'][1], self.lang)
                                     for _ in pool_breakdown_flow  ]
@@ -465,11 +490,7 @@ class API:
 
         result = self._send_req(req, url)
         
-        if result is None or 'error' in result or "Left" in set(tz.concat([ _.keys() for _ in result.values()])):
-            leftVal = { k:v['Left'] for k,v in result.items() if "Left" in v }
-            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
-        
-        result = tz.valmap(lambda x:x['Right'] ,result)
+        result = self._unwrap_map(result)
 
         if read:
             return result & lens.Values().Values().modify(partial(self.read_single, breakdown))
@@ -504,11 +525,7 @@ class API:
 
         result = self._send_req(req, url, **kwargs)
 
-        if result is None or 'error' in result or 'Left' in result:
-            leftVal = result.get("Left","")
-            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
-
-        result = result['Right']
+        result = self._unwrap_single(result)
 
         if read:
             return result & lens.Values().modify(partial(self.read_single, breakdown))
@@ -533,7 +550,8 @@ class API:
         :return: a map of results
         :rtype: dict
         """
-        assert isinstance(deals, dict), f"Deals should be a dict but got {type(deals)}"
+        if not isinstance(deals, dict):
+            raise AbsboxError(f"❌ Deals should be a dict but got {type(deals)}")
 
         url = f"{self.url}/{Endpoints.RunMultiDeal.value}" 
         _poolAssump = mkAssumpType(poolAssump) if poolAssump else None 
@@ -549,11 +567,7 @@ class API:
             return req
         result = self._send_req(req, url)
 
-        if result is None or 'error' in result or "Left" in set(tz.concat([ _.keys() for _ in result.values()])):
-            leftVal = { k:v['Left'] for k,v in result.items() if "Left" in v }
-            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
-
-        result = tz.valmap(lambda x:x['Right'] ,result)
+        result = self._unwrap_map(result)
         
         if read:
             return {k: deals[k].read(v) for k, v in result.items()}    
@@ -592,16 +606,8 @@ class API:
 
         result = self._send_req(req, url, timeout=30)
 
-        if result is None or 'error' in result or "Left" in set(tz.concat([ _.keys() for _ in result.values()])):
-            leftVal = { k:v['Left'] for k,v in result.items() if "Left" in v }
-            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
-
-        result = tz.valmap(lambda x:x['Right'] ,result)
-
-        rawWarnMsgByScen = {k: self._getWarningMsg(v[RunResp.LogResp.value],showWarning) for k, v in result.items()}
-        for scen, msgs in rawWarnMsgByScen.items():
-            if len(msgs)>0:
-                console.print(f"Warning Message from server for {scen}:"+"\n".join(msgs))
+        result = self._unwrap_map(result)
+        self._print_warnings_map(result, showWarning)
 
         if read:
             return tz.valmap(deal.read, result)
@@ -644,13 +650,10 @@ class API:
         
         result = self._send_req(req, url, timeout=30)
 
-        if result is None or 'error' in result or "Left" in set(tz.concat([ _.keys() for _ in result.values()])):
-            leftVal = { k:v['Left'] for k,v in result.items() if "Left" in v }
-            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
+        result = self._unwrap_map(result)
 
-        result = tz.valmap(lambda x:x['Right'] ,result)
-
-        assert isinstance(result, dict), f"Result should be a dict but got {type(result)}, {result}"
+        if not isinstance(result, dict):
+            raise AbsboxError(f"❌ Result should be a dict but got {type(result)}, {result}")
 
         rawWarnMsgByScen = { tuple(k.split("^")): self._getWarningMsg(v[RunResp.LogResp.value], showWarning) 
                             for k, v in result.items()}
@@ -716,13 +719,11 @@ class API:
 
         result = self._send_req(req, url)
 
-        if result is None or 'error' in result or 'Left' in result:
-            leftVal = result.get("Left","")
-            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
+        result = self._unwrap_single(result)
         if read:
-            return readAeson(result['Right'])
+            return readAeson(result)
         else:
-            return result['Right']
+            return result
 
 
 
@@ -747,7 +748,8 @@ class API:
         :return: (cashflow, balance, pricing result)
         :rtype: tuple
         """
-        assert isinstance(_assets, list), f"Assets passed in must be a list"
+        if not isinstance(_assets, list):
+            raise AbsboxError(f"❌ Assets passed in must be a list but got {type(_assets)}")
         
         def readResult(x):
             try:
@@ -770,11 +772,7 @@ class API:
         
         result = self._send_req(req, url)
 
-        if result is None or 'error' in result or 'Left' in result:
-            leftVal = result.get("Left","")
-            raise AbsboxError(f"❌ Failed to get response from run: {leftVal}")
-        
-        result = result['Right']
+        result = self._unwrap_single(result)
         if read:
             return readResult(result)
         else:
@@ -810,12 +808,13 @@ class API:
         :return: response in dict
         :rtype: dict | None
         """
-        assert _req is not None, f"❌request body is None, please check your request"
+        if _req is None:
+            raise AbsboxError("❌ request body is None, please check your request")
         try:
             hdrs = self.hdrs | headers
             r = None
             if self.session:
-                r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
+                r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=self.verify, timeout=timeout)
             else:
                 raise AbsboxError("❌: None type for session")
         except (ConnectionRefusedError, ConnectionError):
@@ -827,4 +826,4 @@ class API:
         try:
             return json.loads(r.text)
         except JSONDecodeError as e:
-            raise EngineError(e)
+            raise EngineError(f"Failed to decode JSON response: {e}")

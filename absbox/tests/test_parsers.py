@@ -1,0 +1,274 @@
+"""Offline unit tests for the pure deal-parsing helpers.
+
+These tests do not require an engine server and are meant to run in CI:
+they cover the DSL builders in ``absbox.local.component`` and the
+response decoder in ``absbox.local.interface``.
+"""
+import pytest
+
+from absbox.local.interface import mkTag, mkCurve, readAeson
+from absbox.local.component import (
+    mkDate,
+    mkDatePattern,
+    mkBnd,
+    mkBndComp,
+    mkPid,
+    mkTradeType,
+    mkOrder,
+    mkCustom,
+    mkFee,
+    mkAcc,
+    mkCollection,
+    mkNonPerfAssumps,
+    getStartDate,
+)
+from absbox.local.util import (
+    ensure100,
+    renameKs,
+    subMap,
+    subMap2,
+    updateKs,
+    getValWithKs,
+)
+from absbox.local.base import china_bondflow_fields_s, english_bondflow_fields_s
+from absbox.local.readers import readComponentStmts
+
+
+def test_mkTag_and_mkCurve():
+    assert mkTag("Equity") == {"tag": "Equity"}
+    assert mkTag(("Fix", [1.0, "DC_ACT_365F"])) == {
+        "tag": "Fix",
+        "contents": [1.0, "DC_ACT_365F"],
+    }
+    assert mkCurve("IRateCurve", [[1, 0.02]]) == {
+        "tag": "IRateCurve",
+        "contents": [[1, 0.02]],
+    }
+
+
+def test_readAeson_shapes():
+    assert readAeson(None) is None
+    assert readAeson(1.5) == 1.5
+    assert readAeson(True) is True
+    assert readAeson("hello") == "hello"
+    assert readAeson([{"tag": "X", "contents": [1, 2]}]) == [{"X": [1, 2]}]
+    assert readAeson({"tag": "Frac", "contents": {"numerator": 1, "denominator": 2}}) == {"Frac": 0.5}
+    assert readAeson({"tag": "Only"}) == "Only"
+    assert readAeson({"numerator": 3, "denominator": 4}) == 0.75
+    assert readAeson({"a": {"b": [1]}}) == {"a": {"b": [1]}}
+    # tag plus several extra keys keeps the tag and recurses into the rest
+    assert readAeson({"tag": "Bond", "bndBalance": 5, "bndName": "B1"}) == {
+        "bndBalance": 5,
+        "bndName": "B1",
+        "tag": "Bond",
+    }
+    with pytest.raises(RuntimeError):
+        readAeson(object())
+
+
+def test_mkDate_last_collect_case():
+    d = mkDate(
+        {
+            "lastCollect": "2024-01-01",
+            "lastPay": "2024-01-15",
+            "nextPay": "2024-02-15",
+            "nextCollect": "2024-02-01",
+            "stated": "2030-01-01",
+            "poolFreq": "每月",
+            "payFreq": "每月",
+        }
+    )
+    assert d["tag"] == "GenericDates"
+    assert "LastCollectDate" in d["contents"]
+
+
+def test_mkDatePattern():
+    assert mkDatePattern("月末") == {"tag": "MonthEnd"}
+    assert mkDatePattern(["每月", 15]) == {"tag": "DayOfMonth", "contents": 15}
+    with pytest.raises(Exception):
+        mkDatePattern("not-a-date-pattern")
+
+
+def test_mkBond_origin_date_is_validated_as_date():
+    bnd = mkBnd(
+        "A1",
+        {
+            "balance": 100.0,
+            "rate": 0.05,
+            "originBalance": 100.0,
+            "originRate": 0.05,
+            "startDate": "2021-01-01",
+            "rateType": ["fix", 0.05],
+            "bondType": "Sequential",
+        },
+    )
+    assert bnd["tag"] == "Bond"
+    assert bnd["bndOriginInfo"]["originDate"] == "2021-01-01"
+    # a non-date origin date must be rejected
+    with pytest.raises(Exception):
+        mkBnd(
+            "A1",
+            {
+                "balance": 100.0,
+                "rate": 0.05,
+                "originBalance": 100.0,
+                "originRate": 0.05,
+                "startDate": 20210101,
+                "rateType": ["fix", 0.05],
+                "bondType": "Sequential",
+            },
+        )
+
+
+def test_mkBndComp_single_and_group():
+    single = mkBndComp(
+        "A1",
+        (
+            "bond",
+            {
+                "balance": 100.0,
+                "rate": 0.05,
+                "originBalance": 100.0,
+                "originRate": 0.05,
+                "startDate": "2021-01-01",
+                "rateType": ["fix", 0.05],
+                "bondType": "Sequential",
+            },
+        ),
+    )
+    assert single["tag"] == "Bond"
+
+    group = mkBndComp(
+        "Grp",
+        (
+            "bondGroup",
+            {
+                "A1": {
+                    "balance": 100.0,
+                    "rate": 0.05,
+                    "originBalance": 100.0,
+                    "originRate": 0.05,
+                    "startDate": "2021-01-01",
+                    "rateType": ["fix", 0.05],
+                    "bondType": "Sequential",
+                }
+            },
+        ),
+    )
+    assert group["tag"] == "BondGroup"
+
+
+def test_mkPid_underlying_deal():
+    assert mkPid(None) is None
+    assert mkPid("PoolA") == {"tag": "PoolName", "contents": "PoolA"}
+    # `Deal-` prefix must take precedence over the generic pool-name branch
+    assert mkPid("Deal-ABC:BN1") == {
+        "tag": "UnderlyingDeal",
+        "contents": ["Deal-ABC", "BN1"],
+    }
+
+
+def test_mkTradeType():
+    assert mkTradeType(("byCash", 50)) == {"tag": "ByCash", "contents": 50}
+    assert mkTradeType(("byBalance", 100)) == {"tag": "ByBalance", "contents": 100}
+
+
+def test_mkOrder_and_fallbacks():
+    assert mkOrder("byName") == {"tag": "ByName"}
+    with pytest.raises(RuntimeError):
+        mkOrder("bogus")
+
+
+def test_mkCustom_and_fallback():
+    assert mkCustom({"const": 5}) == {"tag": "CustomConstant", "contents": 5}
+    with pytest.raises(RuntimeError):
+        mkCustom({"unsupported": 1})
+
+
+def test_mkNonPerfAssumps_fallback_raises():
+    assert mkNonPerfAssumps({}, []) == {}
+    assert "stopRunBy" in mkNonPerfAssumps({}, [("stop", "2021-01-01")])
+    with pytest.raises(RuntimeError):
+        mkNonPerfAssumps({}, [("not-a-real-assumption",)])
+
+
+def test_mkFee_mkAcc_mkCollection():
+    fee = mkFee({"name": "svc", "type": ("fixFee", 10), "feeStart": "2021-01-01"})
+    assert fee["feeName"] == "svc"
+
+    acc = mkAcc("acc01", {"balance": 0})
+    assert acc["accName"] == "acc01"
+
+    coll = mkCollection(["CollectedInterest", "acc01"])
+    assert coll["tag"] == "Collect"
+
+
+def test_util_helpers():
+    ensure100([0.1, 0.2, 0.7])  # float rounding must be tolerated
+    with pytest.raises(AssertionError):
+        ensure100([0.1, 0.2, 0.6])
+
+    assert renameKs({"a": 1, "b": 2}, [("a", "x")]) == {"x": 1, "b": 2}
+    assert renameKs({"b": 2}, [("a", "x")], opt_key=True) == {"b": 2}
+    assert subMap({"a": 1}, [("a", 0), ("b", 9)]) == {"a": 1, "b": 9}
+    assert subMap2({"余额": 1}, [("余额", "balance", 0)]) == {"balance": 1}
+    assert updateKs({"x": 1, "y": 2}, {"x": "a"}) == {"a": 1, "y": 2}
+    assert getValWithKs({"a": 1}, ["z", "a"], defaultReturn=0) == 1
+    assert getValWithKs({}, ["z"], defaultReturn=7) == 7
+
+
+def test_get_start_date():
+    assert getStartDate(
+        {
+            "cutoff": "2021-01-01",
+            "closing": "2021-01-02",
+            "firstPay": "2021-02-01",
+            "stated": "2030-01-01",
+            "poolFreq": "每月",
+            "payFreq": "每月",
+        }
+    ) == ("2021-01-01", "2021-01-02")
+    assert getStartDate({"lastCollect": "2021-01-01", "lastPay": "2021-01-05"}) == (
+        "2021-01-01",
+        "2021-01-05",
+    )
+
+
+def test_bond_header_columns_parity():
+    # regression: a missing comma had concatenated two header names
+    assert len(china_bondflow_fields_s) == len(english_bondflow_fields_s) == 9
+    assert "罚息本金系数" not in china_bondflow_fields_s
+
+
+def test_read_component_stmts():
+    deal_content = {
+        "fees": {"f1": {"feeStmt": [{"contents": ["2021-01-01", 1, 2, 3, 4]}]}},
+        "accounts": None,
+        "liqProvider": {"p1": {"liqStmt": None}},
+    }
+    read_paths = {
+        "fees": ("feeStmt", ["date", "a", "b", "c", "d"], "fee"),
+        "accounts": ("accStmt", ["date", "x"], "acc"),
+        "liqProvider": ("liqStmt", ["date", "y"], ""),
+    }
+    # English reader: None statements become empty frames
+    out = readComponentStmts(deal_content, read_paths, date_key="date", handle_none=True)
+    assert set(out.keys()) == {"fees", "liqProvider"}
+    assert out["fees"]["f1"].index.name == "date"
+    assert out["fees"]["f1"].shape == (1, 4)
+    assert out["liqProvider"]["p1"].empty
+
+    # Chinese reader: Chinese date column, None statements are skipped
+    cn_content = {
+        "fees": {"f1": {"feeStmt": [{"contents": ["2021-01-01", 1, 2, 3, 4]}]}},
+        "liqProvider": {"p1": {"liqStmt": None}},
+    }
+    cn_paths = {
+        "fees": ("feeStmt", ["日期", "a", "b", "c", "d"], "费用"),
+        "liqProvider": ("liqStmt", ["日期", "y"], ""),
+    }
+    out_cn = readComponentStmts(cn_content, cn_paths, date_key="日期", handle_none=False)
+    assert set(out_cn.keys()) == {"fees", "liqProvider"}
+    assert out_cn["liqProvider"] == {}
+    assert out_cn["fees"]["f1"].index.name == "日期"
+

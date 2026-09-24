@@ -10,7 +10,7 @@ from schema import Or
 from rich.console import Console
 
 
-from .interface import mkTag,readAeson,mkCurve
+from .interface import mkTag,readAeson,mkCurve,preview
 from .util import mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
 from .util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from .util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
@@ -19,6 +19,7 @@ from .base import *
 
 from ..validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple, vListOfList
 from ..validation import isListOfDict
+from ..exception import AbsboxParseError
 
 numVal = Or(float,int)
 console = Console()
@@ -87,7 +88,7 @@ def getStartDate(x:dict) -> tuple:
                 {"collect": (lastCollected, nextCollect), "pay": (pp, np), "stated": c, "poolFreq": pf, "payFreq": bf}:
             return (vDate(lastCollected), vDate(pp))
         case {"lastCollect":a,"lastPay":b}:
-            return (a, b)
+            return (vDate(a), vDate(b))
         case ("accrue", m) | ("accrued", m):
             return getStartDate(m)
         case _:
@@ -138,17 +139,6 @@ def mkDate(x):
                 "DistributionDates":mkDatePattern(bf),
                 "CollectionDates":mkDatePattern(pf),
             } | custom
-            return mkTag(("GenericDates",m))
-        case {"lastCollect": a, "lastPay": b, "nextPay": c,"nextCollect": d, "stated": e, "poolFreq": pf, "payFreq": bf}: 
-            m = {
-                "LastCollectDate":mkDatePattern(vDate(a)),
-                "LastPayDate":mkDatePattern(vDate(b)),
-                "NextPayDate":mkDatePattern(vDate(c)),
-                "NextCollectDate":mkDatePattern(vDate(d)),
-                "StatedMaturityDate":mkDatePattern(vDate(e)),
-                "DistributionDates":mkDatePattern(bf),
-                "CollectionDates":mkDatePattern(pf),
-            }
             return mkTag(("GenericDates",m))
         case {"封包日": a, "起息日": b, "首次兑付日": c, "法定到期日": d, "收款频率": pf, "付款频率": bf} | \
                 {"cutoff": a, "closing": b, "firstPay": c, "stated": d, "poolFreq": pf, "payFreq": bf} if (not "cust" in x):
@@ -859,7 +849,7 @@ def mkBnd(bn, x:dict):
         case {"初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
              {"originBalance": originBalance, "originRate": originRate, "startDate": originDate, "rateType": bndInterestInfo, "bondType": bndType}:
             return {"bndName": vStr(bn), "bndBalance": vNum(originBalance), "bndRate": vNum(originRate)
-                    , "bndOriginInfo": {"originBalance": vNum(originBalance), "originDate": vNum(originDate), "originRate": vNum(originRate)} | {"maturityDate": md}
+                    , "bndOriginInfo": {"originBalance": vNum(originBalance), "originDate": vDate(originDate), "originRate": vNum(originRate)} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
                     , "bndDuePrin": vNum(duePrin), "bndDueInt": vNum(dueInt), "bndDueIntOverInt": vNum(dueIntOverInt), "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
                     , "bndLastIntPayDate": lastIntPayDate
@@ -1110,6 +1100,8 @@ def mkOrder(x):
             return mkTag(("ByCustomNames", vList(names, str)))
         case ("reverse", order):
             return mkTag(("ReverseSeq", mkOrder(order)))
+        case _:
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:mkOrder")
 
 
 def mkAction(x:list):
@@ -2163,6 +2155,8 @@ def mkCustom(x: dict):
             return mkTag(("CustomCurve", mkTs("BalanceCurve", ts)))
         case {"公式": ds} | {"Formula": ds} | {"ds": ds}:
             return mkTag(("CustomDS", mkDs(ds)))
+        case _:
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:mkCustom")
 
 
 def mkLiqProviderType(x):
@@ -2259,11 +2253,11 @@ def mkPid(x):
     match x:
         case None:
             return None
-        case x if isinstance(x,str):
-            return mkTag((f"PoolName",x))
-        case x if isinstance(x,str) and x.startswith("Deal-"):
-            dealName,bondName = x.split(":")
-            return mkTag(("UnderlyingDeal",[dealName,bondName]))
+        case x if isinstance(x, str) and x.startswith("Deal-"):
+            dealName, bondName = x.split(":")
+            return mkTag(("UnderlyingDeal", [dealName, bondName]))
+        case x if isinstance(x, str):
+            return mkTag((f"PoolName", x))
 
 
 def mkCollection(x):
@@ -2338,7 +2332,7 @@ def mkTradeType(x):
         case ("byCash", cash):
             return mkTag(("ByCash", vNum(cash)))
         case ("byBalance", balance):
-            return mkTag(("ByBalance", vNum(cash)))
+            return mkTag(("ByBalance", vNum(balance)))
         case _:
             raise RuntimeError(f"Failed to match trade Type: {x}")
 
@@ -2705,6 +2699,8 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
                 return {"issueBondSchedule": lmap(mkFundingPlan,issuancePlan)  }
             case ("refinance", *refiPlans):
                 return {"refinance": lmap(mkRefiPlan,refiPlans)  }
+            case _:
+                raise AbsboxParseError(f"Unsupported non-performance assumption: {preview(y)}")
     match xs:
         case None:
             return {}

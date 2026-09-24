@@ -9,6 +9,7 @@ import pandas as pd
 from .exception import *
 import requests
 import toolz as tz
+import urllib3
 
 from requests.exceptions import ReadTimeout
 from json import JSONDecodeError
@@ -59,6 +60,9 @@ class LIBRARY:
     :rtype: DealLibrary
     """
     url: str = ""
+    verify: bool = False
+    """TLS certificate verification flag; defaults to False for self-signed /
+       internal library servers. Set True to enable verification. """
     token = None
     hdrs = {'Content-type': 'application/json', 'Accept': '*/*', 'Accept-Encoding': 'gzip'}
     debug = False
@@ -67,14 +71,16 @@ class LIBRARY:
 
     def __post_init__(self):
 
+        if not self.verify:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         try:
-            _r = requests.post(f"{self.url}/ack", verify=False)
+            _r = requests.post(f"{self.url}/ack", verify=self.verify)
         except Exception as e:
             raise AbsboxError(f"❌ Failed to connect to library server:{e}")
         if _r.status_code == 200:
             self.session = requests.Session()
             self.libraryInfo = json.loads(_r.text)
-            console.print(f"✅ Connected to library server {{self.libraryInfo['absbox']}}/{self.libraryInfo['Hastructure']}")
+            console.print(f"✅ Connected to library server {self.libraryInfo['absbox']}/{self.libraryInfo['Hastructure']}")
         else:
             console.print(f"❌ Failed to connect to library server")
 
@@ -155,6 +161,9 @@ class LIBRARY:
     def get(self, q):
         deal_library_url = self.url+f"/{LibraryEndpoints.Get.value}"
 
+        # NOTE: the library wire protocol uses pickle for the payload. Only send
+        # to library servers you trust; do not unpickle responses from untrusted
+        # sources.
         r = self._send_req(pickle.dumps({"q":q}), deal_library_url
                             , headers={"Authorization": f"Bearer {self.token}"
                                         ,"Content-Type":"application/octet-stream"})
@@ -190,6 +199,7 @@ class LIBRARY:
         
         bRunReq = pickle.dumps(runReq)
 
+        # See the note in ``get``: the library wire protocol uses pickle.
         r = self._send_req(bRunReq, deal_library_url
                             , headers={"Authorization": f"Bearer {self.token}"
                                         ,"Content-Type":"application/octet-stream"})
@@ -231,9 +241,9 @@ class LIBRARY:
             hdrs = self.hdrs | headers
             r = None
             if self.session and not isinstance(_req, bytes):
-                r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=False, timeout=timeout)
+                r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=self.verify, timeout=timeout)
             elif self.session :
-                r = self.session.post(_url, data=_req, headers=hdrs, verify=False, timeout=timeout)
+                r = self.session.post(_url, data=_req, headers=hdrs, verify=self.verify, timeout=timeout)
             else:
                 raise AbsboxError(f"❌ None type for session")
         except (ConnectionRefusedError, ConnectionError):
@@ -245,4 +255,4 @@ class LIBRARY:
         try:
             return json.loads(r.text)
         except JSONDecodeError as e:
-            raise EngineError(e)
+            raise EngineError(f"Failed to decode JSON response: {e}")

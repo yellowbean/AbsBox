@@ -56,7 +56,7 @@ def plotPool(p:pd.DataFrame):
     fieldsToRemove = set(china_cumStats+english_cumStats+china_non_balance_flow+english_non_balance_flow)
     
     flows = tz.pipe(p.fillna(0)
-                    ,p.to_dict(orient='list')
+                    ,lambda x: x.to_dict(orient='list')
                     ,lambda x: tz.keyfilter( lambda y: y not in fieldsToRemove , x)
     )
 

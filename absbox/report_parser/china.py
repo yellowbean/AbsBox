@@ -4,7 +4,7 @@ import toolz as tz
 from lenses import lens
 
 def rmDigitsInLine(x):
-    return re.sub("\n\d+\n","",x)
+    return re.sub(r"\n\d+\n","",x)
 
 def rmHeader(x):
     h1 = "归集日期 期初剩余本金 回收本金 回收利息 期末剩余本金"

@@ -2,8 +2,12 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+include = ["absbox*"]
+exclude = ["absbox.tests*", "docs*", "notebooks*"]
+
 [project]
-dynamic = ["version"]
+version = "0.52.3"
 name = "absbox"
 description = "an analytical library for cashflow modeling on ABS/MBS products"
 readme = "README.md"
@@ -20,7 +24,7 @@ classifiers = [
     ,"Intended Audience :: Financial and Insurance Industry"
     ,"Topic :: Software Development :: Build Tools"
     ,"Topic :: Software Development :: Libraries"
-    ,"License :: OSI Approved :: MIT License"
+    ,"License :: OSI Approved :: Apache Software License"
 ]
 
 dependencies = [
@@ -33,10 +37,11 @@ dependencies = [
     "graphviz",
     "schema",
     "htpy",
+    "markupsafe",
     "dateparser",
     "more-itertools",
     "xlsxwriter",
-    "faker",
+    "matplotlib",
     "numpy-financial",
 ]
 
@@ -58,9 +63,9 @@ changelog = "https://github.com/yellowbean/AbsBox/blob/main/CHANGELOG.rst"
 minversion = "7.0"
 addopts = "-ra -q --color=yes  --import-mode=importlib"
 markers = [
-    "pool","account","bond","fee","interest","collect","asset","performance",
+    "pool","account","bond","fee","fees","interest","collect","asset","performance",
     "trigger","report","revolving","TB","analytics","dontrun","waterfall",
-    "dates","formula"
+    "dates","formula","sensitivity"
 
 ]
 
@@ -111,4 +116,26 @@ dev = [
     "deepdiff>=9.1.0",
     "marimo>=0.24.0",
     "pytest>=9.1.1",
+    "ruff>=0.6",
+    "mypy>=1.10",
 ]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 127
+extend-exclude = ["docs", "notebooks", "absbox.egg-info"]
+
+[tool.ruff.lint]
+# Start with the same high-signal checks the previous flake8 CI used (syntax
+# errors and undefined names). Expand gradually (e.g. add "E", "F", "B") once
+# the tree is clean.
+select = ["E9", "F63", "F7", "F82"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_configs = true
+warn_redundant_casts = true
+check_untyped_defs = false
+# Public API modules to type-check incrementally.
+files = ["absbox/client.py", "absbox/deal.py", "absbox/library.py", "absbox/local/interface.py"]

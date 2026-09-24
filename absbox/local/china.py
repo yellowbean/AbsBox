@@ -1,7 +1,7 @@
 import logging, os, re, itertools
 import requests, shutil, json
 from dataclasses import dataclass, field
-import functools, pickle, collections
+import functools, pickle
 import pandas as pd
 import numpy as np
 from urllib.request import unquote
@@ -10,6 +10,7 @@ import toolz as tz
 from .base import *
 from .util import *
 from .component import *
+from .readers import readComponentStmts, readPoolFlows
 from .interface import mkTag
 
 def readBondStmt(respBond):
@@ -99,20 +100,10 @@ class SPV:
         assert isinstance(resp,list),f"<read>:resp should be list,but it is {type(resp)} => {resp}"
         deal_content = resp[0]['contents']
         output = {}
-        for comp_name, comp_v in read_paths.items():
-            if (not comp_name in deal_content) or (deal_content[comp_name] is None):
-                continue
-            output[comp_name] = {}
-            for k, x in deal_content[comp_name].items():
-                ir = None
-                if x[comp_v[0]]:
-                    ir = list(tz.pluck('contents', x[comp_v[0]]))
-                    output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index("日期")
-            output[comp_name] = collections.OrderedDict(sorted(output[comp_name].items()))
+        output.update(readComponentStmts(deal_content, read_paths, date_key="日期", handle_none=False))
         # aggregate fees
         output['fees'] = {f: v.groupby('日期').agg({"余额": "min", "支付": "sum", "剩余支付": "min"})
                           for f, v in output['fees'].items()}
-
         
         # read bonds
         output['bonds'] = {k :readBondStmt(v) for k,v in deal_content['bonds'].items()}
@@ -126,23 +117,7 @@ class SPV:
         # aggregate accounts
         output['agg_accounts'] = aggAccs(output['accounts'], 'chinese')
 
-        output['pool'] = {}
-        poolMap = deal_content['pool']['contents']
-        
-        if deal_content['pool']['tag']=='MultiPool':
-            output['pool']['flow'] = tz.valmap(lambda v: readPoolCf(v['futureCf'][0]['contents']) if (not v['futureCf'] is None) else pd.DataFrame(), poolMap)
-            output['pool']['breakdown'] = tz.valmap(lambda v: list(tz.map(readPoolCf, v['futureCf'][1] & lens.Each()['contents'].collect() )) if (v['futureCf'] and (not v['futureCf'][1] is None)) else [], poolMap)
-        elif deal_content['pool']['tag']=='ResecDeal':
-            output['pool']['flow'] = {tz.get([1,2,4],k.split(":")): readPoolCf(v['futureCf']['contents']) for (k,v) in poolMap.items() }
-        else:
-            raise RuntimeError(f"Failed to match deal pool type:{deal_content['pool']['tag']}")
-
-        outstanding_pool_flow = {k:{"flow": readPoolCf(aggFlow['contents'])
-                                    ,"breakdown": [ readPoolCf(_['contents']) for _ in breakdownFlows]}
-                                   for k,(aggFlow,breakdownFlows) in resp[4].items()}
-        output['pool_outstanding'] = {"flow": { k:v['flow'] for k,v in outstanding_pool_flow.items() }
-                                      ,"breakdown": { k:v['breakdown'] for k,v in outstanding_pool_flow.items() } }
- 
+        output['pool'], output['pool_outstanding'] = readPoolFlows(resp, deal_content)
 
         output['pricing'] = readPricingResult(resp[3], 'cn')
         output['result'] = readRunSummary(resp[2], 'cn')

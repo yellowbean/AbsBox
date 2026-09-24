@@ -7,17 +7,23 @@ import dataclasses
 from .local.component import * 
 from .local.util import * 
 from .local.generic import Generic
+from .exception import AbsboxError
 
 console = Console()
+
+def _require(m: dict, ks: list, label: str):
+    """Return the first present key among `ks`, raising if none is found."""
+    v = getValWithKs(m, ks)
+    if v is None:
+        raise AbsboxError(f"❌ {label} is required but not found in deal")
+    return v
 
 def mkDeal(x:dict, preCheck=True):
     name = getValWithKs(x, ['name', "名称", "comment", '备注'], defaultReturn="")
     
-    dates = getValWithKs(x, ['dates', "date", "日期"])
-    assert dates is not None, f"dates shouldn't be None"
+    dates = _require(x, ['dates', "date", "日期"], "dates")
     
-    accs = list((accName,acc) for accName,acc in getValWithKs(x, ['accounts', "account", "账户", "帐户"]).items())
-    assert accs is not None, f"accounts shouldn't be None"
+    accs = list(_require(x, ['accounts', "account", "账户", "帐户"], "accounts").items())
     
     fees = list((fn,fv|{"name":fn,"名称":fn})
                 for (fn,fv) in getValWithKs(x
@@ -26,15 +32,11 @@ def mkDeal(x:dict, preCheck=True):
     
     pool = getValWithKs(x, ['pool', "collateral", "资产池"])
 
-    bonds = list((bn,bo)
-                for bn,bo in getValWithKs(x, ['bond', "bonds", "notes", "债券", "支持证券"]).items())
-    assert bonds is not None, f"bonds shouldn't be None"
+    bonds = list(_require(x, ['bond', "bonds", "notes", "债券", "支持证券"], "bonds").items())
 
-    waterfall = getValWithKs(x, ['waterfall', "现金流分配", "分配规则"])
-    assert waterfall is not None, f"waterfall shouldn't be None"
+    waterfall = _require(x, ['waterfall', "现金流分配", "分配规则"], "waterfall")
     
-    collection = getValWithKs(x,['collect','colleciton', 'collectionRule', 'aggregation', '归集规则', '归集'])
-    assert collection is not None , f"collection shouldn't be None"
+    collection = _require(x,['collect','colleciton', 'collectionRule', 'aggregation', '归集规则', '归集'], "collection")
 
     liqFacility = getValWithKs(x, ['liqFacility', 'liqProvider', "insurance"
                                     ,"cashAdvance", "liquidity", "流动性支持"

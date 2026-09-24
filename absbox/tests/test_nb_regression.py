@@ -1,11 +1,12 @@
 import pathlib,os,sys
+import pytest
 try:
     # Python <= 3.8
     from importlib_resources import files
 except ImportError:
     from importlib.resources import files
 # from pytest_notebook import example_nbs
-from pytest_notebook.nb_regression import NBRegressionFixture
+NBRegressionFixture = pytest.importorskip("pytest_notebook.nb_regression").NBRegressionFixture
 
 #sys.path.prepend(os.path.abspath("absbox"))
 #sys.path = ['../../'] + sys.path

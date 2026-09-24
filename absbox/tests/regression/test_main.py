@@ -2,7 +2,7 @@ import pandas as pd
 from lenses import lens
 import toolz as tz
 import pytest
-import re, math, json
+import re, math, json, os
 from pathlib import Path
 from collections import Counter
 from itertools import dropwhile
@@ -19,6 +19,12 @@ from absbox import API,EnginePath,readInspect,PickApiFrom,readBondsCf
 from absbox.exception import AbsboxError
 
 config_file_path = Path(__file__).resolve().parent.parent / 'config.json'
+
+# Engine-dependent regression tests hit an external server and are therefore
+# non-hermetic. Skip them in CI by default; set ABSBOX_REGRESSION=1 to force.
+def _should_skip_server_tests() -> bool:
+    forced = str(os.environ.get("ABSBOX_REGRESSION", "")).lower() in ("1", "true", "yes")
+    return bool(os.environ.get("CI")) and not forced
 
 def closeTo(a,b,r=2):
     assert math.floor(a * 10**r)/10**r == math.floor(b * 10**r)/10**r, f"Not close to {a}/{math.floor(a * 10**r)/10**r} {b}/{math.floor(b * 10**r)/10**r}"
@@ -90,11 +96,20 @@ def days_between_dates(date1, date2):
     except ValueError as e:
         raise ValueError(f"Invalid date format. Please use 'YYYY-MM-DD'. Error: {e}")
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup_api():
+    if _should_skip_server_tests():
+        pytest.skip("engine-dependent regression tests are skipped in CI "
+                    "(set ABSBOX_REGRESSION=1 to force)")
+    if not config_file_path.exists():
+        pytest.skip(f"engine server config not found at {config_file_path}; "
+                    "skipping engine-dependent regression test")
     with config_file_path.open('r') as config_file:
         config = json.load(config_file)
-    api = API(config['test_server'], check=False, lang='english')
+    try:
+        api = API(config['test_server'], check=False, lang='english')
+    except Exception as e:
+        pytest.skip(f"engine server {config.get('test_server')} not reachable: {e}")
     return api
 
 

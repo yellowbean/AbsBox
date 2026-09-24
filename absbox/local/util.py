@@ -226,7 +226,7 @@ def updateKs(m: dict, kmapping:dict) -> dict:
 
 
 def ensure100(xs, msg=""):
-    assert sum(xs) == 1.0, f"Doesn't not sum up 100%: {msg}"
+    assert abs(sum(xs) - 1.0) < 1e-6, f"Doesn't not sum up 100%: {msg} (sum={sum(xs)})"
 
 
 def guess_pool_flow_header(x, l):

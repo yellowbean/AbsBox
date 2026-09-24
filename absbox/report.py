@@ -34,15 +34,21 @@ def buildSectionFlat(lst:list, title_=h2, anchor=False):
             for (_t, x) in lst if x is not None]
 
 
-def consolResp(r:dict):
-    '''
-        input a single run response and return a consolidate map with value type of DataFrame
-    '''
+def _split_bonds(r:dict):
+    """Split a run response's bonds into (single bonds, flattened bond groups)."""
     bondDf = ("Bond", tz.valfilter(lambda x: isinstance(x, pd.DataFrame), r['bonds']))
     bondGrpDf = ("BondGroup"
                 ,tz.pipe(tz.valfilter(lambda x: not isinstance(x, pd.DataFrame), r['bonds'])
                         ,lambda x : {f"{k}-{k2}":v2 for k,v in x.items()
                                         for k2,v2 in v.items()}))
+    return bondDf, bondGrpDf
+
+
+def consolResp(r:dict):
+    '''
+        input a single run response and return a consolidate map with value type of DataFrame
+    '''
+    bondDf, bondGrpDf = _split_bonds(r)
     poolDf = ("Pool", r['pool']['flow'])
     accDf = ("Accounts", r['accounts'])
     feeDf = ("Fee", r['fees'])
@@ -70,13 +76,7 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
     r : must be a result from "read=True"
     """
 
-    bondDf = ("Bond", tz.valfilter(lambda x: isinstance(x, pd.DataFrame), r['bonds']))
-    bondGrpDf = ("BondGroup", 
-                tz.pipe(tz.valfilter(lambda x: not isinstance(x, pd.DataFrame), r['bonds'])
-                        ,lambda x : {f"{k}-{k2}":v2 for k,v in x.items()
-                                        for k2,v2 in v.items()}
-                        )
-                )
+    bondDf, bondGrpDf = _split_bonds(r)
 
     section0 = buildSection([bondDf,bondGrpDf])
 

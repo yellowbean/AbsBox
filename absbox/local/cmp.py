@@ -77,7 +77,7 @@ def compResult(r1:dict, r2:dict, names=("Left", "Right")):
 
 def compTwoEngine(xEngine, yEngine, d, pAssump, rAssump):
     rx = xEngine.run(d, read=True, poolAssump=pAssump, runAssump=rAssump)
-    ry = xEngine.run(d, read=True, poolAssump=pAssump, runAssump=rAssump)
+    ry = yEngine.run(d, read=True, poolAssump=pAssump, runAssump=rAssump)
     return compResult(rx, ry)
 
 

@@ -7,14 +7,13 @@ test:
 
 update-version version:
     echo "Update Version: {version}"
-    # sed -i "s/^version = .*/version = \"{version}\"/g"  pyproject.toml   
-    sed -i "s/^version = .*/version = {{version}}/g"  setup.cfg
+    sed -i "s/^version = .*/version = \"{{version}}\"/g"  pyproject.toml
     sed -i "s/^release = .*/release = \"{{version}}\"/g"   docs/source/conf.py
     sed -i "s/^version = .*/version = \"{{version}}\"/g"   docs/source/conf.py
 
 tag env version:
     echo "Tagging"
-    git add pyproject.toml setup.cfg
+    git add pyproject.toml
     git commit -m "bump version to-> < {{version}} >"
     git tag -a {{env}}{{version}} -m "{{env}}{{version}}"
     git push origin HEAD --tag

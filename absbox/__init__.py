@@ -1,7 +1,7 @@
 import sys
 from importlib.metadata import version
 
-if (sys.version_info.major >= 3 and sys.version_info.minor < 10):
+if sys.version_info < (3, 10):
     raise ImportError("AbsBox support Python with version 3.10+ only")
 
 from .client import API, Endpoints, EnginePath, PickApiFrom
