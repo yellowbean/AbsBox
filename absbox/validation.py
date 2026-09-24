@@ -60,13 +60,5 @@ def vTable(x, msg:str = None):
     return Schema([[Or(int, float) ,Or(int, float)]]).validate(x)
 
 
-def validation(deal):
-    errors = []
-    warnings = []
-    if len(errors) > 0:
-        return False, errors, warnings
-    else:
-        return True, [], warnings
-    
 def isListOfDict(xs) -> bool:
     return isinstance(xs, list) and all(isinstance(x, dict) for x in xs)

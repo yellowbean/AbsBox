@@ -1,10 +1,9 @@
 import logging, os, re, itertools
-import requests, shutil, json
+import requests, shutil
 from dataclasses import dataclass, field
 import functools, pickle
 import pandas as pd
 import numpy as np
-from urllib.request import unquote
 from functools import reduce 
 import toolz as tz
 from .base import *
@@ -38,18 +37,17 @@ class SPV:
     费用: tuple
     分配规则: dict
     归集规则: tuple
-    流动性支持: dict = None
-    利率对冲: dict = None
-    汇率对冲: dict = None
-    触发事件: dict = None
+    流动性支持: dict | None = None
+    利率对冲: dict | None = None
+    汇率对冲: dict | None = None
+    触发事件: dict | None = None
     状态: str = "摊销"
-    自定义: dict = None
-    科目: dict = None
+    自定义: dict | None = None
+    科目: dict | None = None
 
     @property
     def json(self):
         parsedDates = mkDate(self.日期)
-        defaultStartDate = self.日期.get("起息日", None) or self.日期['归集日'][0]
         mixedAssetFlag = isMixedDeal(self.资产池)
         (lastAssetDate,lastCloseDate) = getStartDate(self.日期)
         """

@@ -1,12 +1,10 @@
 from dataclasses import dataclass
-from datetime import datetime
 import pickle
 from rich.console import Console
-from rich import print_json
 import enum
 import getpass ,json
 import pandas as pd
-from .exception import *
+from .exception import AbsboxError, EngineError
 import requests
 import toolz as tz
 import urllib3
@@ -82,7 +80,7 @@ class LIBRARY:
             self.libraryInfo = json.loads(_r.text)
             console.print(f"✅ Connected to library server {self.libraryInfo['absbox']}/{self.libraryInfo['Hastructure']}")
         else:
-            console.print(f"❌ Failed to connect to library server")
+            console.print("❌ Failed to connect to library server")
 
     def login(self, user, pw, **q):
         """login to deal library with user and password
@@ -245,11 +243,11 @@ class LIBRARY:
             elif self.session :
                 r = self.session.post(_url, data=_req, headers=hdrs, verify=self.verify, timeout=timeout)
             else:
-                raise AbsboxError(f"❌ None type for session")
+                raise AbsboxError("❌ None type for session")
         except (ConnectionRefusedError, ConnectionError):
             raise AbsboxError(f"❌ Failed to talk to server {_url}")
         except ReadTimeout:
-            raise AbsboxError(f"❌ Failed to get response from server")
+            raise AbsboxError("❌ Failed to get response from server")
         if r.status_code != 200:
             raise EngineError(r)
         try:

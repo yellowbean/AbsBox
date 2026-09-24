@@ -1,8 +1,7 @@
-from enum import Enum
-import itertools
 import sys
 import functools
 import logging
+from functools import reduce
 import toolz as tz
 from lenses import lens
 import pandas as pd
@@ -23,21 +22,6 @@ from ..exception import AbsboxParseError
 
 numVal = Or(float,int)
 console = Console()
-
-def mkLiq(x):
-    ''' make pricing method '''
-    match x:
-        case {"正常余额折价": cf, "违约余额折价": df}:
-            return mkTag(("BalanceFactor", [vNum(cf), vNum(df)]))
-        case {"CurrentFactor": cf, "DefaultFactor": df}:
-            return mkTag(("BalanceFactor", [vNum(cf), vNum(df)]))
-        case {"贴现计价": df, "违约余额回收率": r}:
-            return mkTag(("PV", [df, vNum(r)]))
-        case {"PV": df, "DefaultRecovery": r}:
-            return mkTag(("PV", [df, vNum(r)]))
-        case _:
-            raise RuntimeError(f"Failed to match {x} in Liquidation Method")
-
 
 def mkDatePattern(x):
     ''' make date pattern, to describe a series of dates'''
@@ -73,7 +57,7 @@ def mkDatePattern(x):
         case d if isinstance(d, str) and vDate(x):
             return mkTag(("SingletonDate", d))
         case _:
-            raise RuntimeError(f"Failed to match {x}")
+            raise AbsboxParseError(f"Failed to match {preview(x)}")
 
 # TODO need to deprecate it
 def getStartDate(x:dict) -> tuple:
@@ -92,7 +76,7 @@ def getStartDate(x:dict) -> tuple:
         case ("accrue", m) | ("accrued", m):
             return getStartDate(m)
         case _:
-            raise RuntimeError(f"Failed to get Start Date from {x}")
+            raise AbsboxParseError(f"Failed to get Start Date from {preview(x)}")
 
 
 def mkDate(x):
@@ -156,9 +140,9 @@ def mkDate(x):
                                             [vDate(np), mkDatePattern(bf)]]))
         case {"回款日": cdays, "分配日": ddays, "封包日": cutoffDate, "起息日": closingDate} | \
                 {"poolCollection": cdays, "distirbution": ddays, "cutoff": cutoffDate, "closing": closingDate}:
-            raise RuntimeError("Deprecated")
+            raise AbsboxParseError("Deprecated")
         case _:
-            raise RuntimeError(f"Failed to match:{x} in Dates but got: {x.keys()}")
+            raise AbsboxParseError(f"Failed to match:{preview(x)} in Dates")
 
 
 def mkDsRate(x):
@@ -212,7 +196,7 @@ def mkFeeType(x):
         case {"flowByPoolPeriod": curve} | ("flowByPoolPeriod", curve):
             return mkTag(("FeeFlowByPoolPeriod", mkTag(("CurrentVal", curve))))
         case _:
-            raise RuntimeError(f"Failed to match on fee type:{x}")
+            raise AbsboxParseError(f"Failed to match on fee type:{preview(x)}")
 
 
 def mkDateVector(x):
@@ -222,7 +206,7 @@ def mkDateVector(x):
         case [dp, *p] if (dp in datePattern.keys()):
             return mkTag((datePattern[dp], p))
         case _:
-            raise RuntimeError(f"not match found: {x}")
+            raise AbsboxParseError(f"not match found: {preview(x)}")
 
 
 def mkPoolSource(x):
@@ -252,7 +236,7 @@ def mkPoolSource(x):
         case "期初余额" | "BegBalance":
             return "CurBegBalance"
         case _ :
-            raise RuntimeError(f"not match found: {x} :make Pool Source")
+            raise AbsboxParseError(f"not match found: {preview(x)} :make Pool Source")
 
 
 @functools.lru_cache(maxsize=128)
@@ -408,7 +392,7 @@ def mkDs(x):
                 return mkTag(("ProjCollectPeriodNum"))
             case ("事件", loc, idx) | ("trigger", loc, idx):
                 if not loc in dealCycleMap:
-                    raise RuntimeError(f" {loc} not in map {dealCycleMap}")
+                    raise AbsboxParseError(f" {preview(loc)} not in map {preview(dealCycleMap)}")
                 return mkTag(("TriggersStatus", [dealCycleMap[loc], idx]))
             case ("阶段", st) | ("status", st):
                 return mkTag(("IsDealStatus", mkStatus(st)))
@@ -503,9 +487,9 @@ def mkDs(x):
                     case "rate" | "ratio" | "percent":
                         return mkTag(("DealStatRate", s))
             case _:
-                raise RuntimeError(f"Failed to match DS/Formula: {x}")
+                raise AbsboxParseError(f"Failed to match DS/Formula: {preview(x)}")
     except TypeError as e:
-        raise RuntimeError(f"Failed to match DS/Formula: {x}", e)
+        raise AbsboxParseError(f"Failed to match DS/Formula: {preview(x)}", e)
 
 
 
@@ -572,9 +556,9 @@ def mkPre(p):
             case [op, _d]:
                 return mkTag(("IfDate", [op_map[op], _d]))
             case _:
-                raise RuntimeError(f"Failed to match on Pre: {p}")
+                raise AbsboxParseError(f"Failed to match on Pre: {preview(p)}")
     except TypeError as e:
-        raise RuntimeError(f"Failed to match on Pre: {p}", e)
+        raise AbsboxParseError(f"Failed to match on Pre: {preview(p)}", e)
 
 def mkAccInt(x):
     match x:
@@ -589,7 +573,7 @@ def mkAccInt(x):
         case None:
             return None
         case _:
-            raise RuntimeError(
+            raise AbsboxParseError(
                 f"Failed to match on account interest definition: {x}")
 
 
@@ -630,7 +614,7 @@ def mkAccType(x):
         case None:
             return None
         case _:
-            raise RuntimeError(f"Failed to match {x} for account reserve type")
+            raise AbsboxParseError(f"Failed to match {preview(x)} for account reserve type")
 
 
 def mkAccTxn(xs: list):
@@ -654,7 +638,7 @@ def mkAcc(an, x=None):
         case {} :
             return mkAcc(vStr(an), {"balance": 0})
         case _:
-            raise RuntimeError(f"Failed to match account: {an},{x}")
+            raise AbsboxParseError(f"Failed to match account: {preview(an)},{preview(x)}")
 
 
 def mkBondType(x):
@@ -674,7 +658,7 @@ def mkBondType(x):
         case "IO":
             return mkTag(("IO"))
         case _:
-            raise RuntimeError(f"Failed to match bond type: {x}")
+            raise AbsboxParseError(f"Failed to match bond type: {preview(x)}")
 
 def mkBondIoItype(x):
     match x:
@@ -683,7 +667,7 @@ def mkBondIoItype(x):
         case ("利差", spd) | ("spread", spd) | {"spread": spd}:
             return mkTag(("OverFixSpread", vNum(spd)))
         case _:
-            raise RuntimeError(f"Failed to match bond IoI type:{x}")
+            raise AbsboxParseError(f"Failed to match bond IoI type:{preview(x)}")
 
 
 def mkBondRate(x:dict)->dict:
@@ -740,11 +724,11 @@ def mkBondRate(x:dict)->dict:
                 case (cap, None):
                     return mkBondRate(("cap", cap, tz.dissoc(x,'cap')))
                 case _ :
-                    raise RuntimeError(f"Failed to match bond rate with both cap and floor: {x}")
+                    raise AbsboxParseError(f"Failed to match bond rate with both cap and floor: {preview(x)}")
         
         
         case _:
-            raise RuntimeError(f"Failed to match bond rate type:{x}")
+            raise AbsboxParseError(f"Failed to match bond rate type:{preview(x)}")
 
 
 def mkStepUp(x):
@@ -754,7 +738,7 @@ def mkStepUp(x):
         case ("once", d, spd) | {"date": d, "spread": spd}:
             return mkTag(("PassDateSpread", [vDate(d), vNum(spd)]))
         case _:
-            raise RuntimeError(f"Failed to match bond step up type:{x}")
+            raise AbsboxParseError(f"Failed to match bond step up type:{preview(x)}")
 
 
 def mkBndComp(bn,bo):
@@ -778,7 +762,7 @@ def mkBndComp(bn,bo):
         case (bondGroupName, bndMap) if isinstance(bndMap ,dict) : # bond group
             return mkTag(("BondGroup", [{k:mkBnd(k,v) for k,v in bndMap.items() }, None]))
         case _ :
-            raise RuntimeError(f"Failed to match bond component")
+            raise AbsboxParseError("Failed to match bond component")
 
 def mkTxn(tn:str, xs:list)-> list:
     """ Make bond statement, accept a list of bond transaction """
@@ -798,7 +782,7 @@ def mkTxn(tn:str, xs:list)-> list:
         case "trg" | "trigger" :
             return [ mkTag(("TrgTxn", _)) for _ in xs ]
         case _:
-            raise RuntimeError(f"Failed to match txn: {tn}")
+            raise AbsboxParseError(f"Failed to match txn: {preview(tn)}")
 
 
 def mkBnd(bn, x:dict):
@@ -856,7 +840,7 @@ def mkBnd(bn, x:dict):
                     , "bndStmt": mStmt
                     , "tag": "Bond"}
         case _:
-            raise RuntimeError(f"Failed to match bond:{bn},{x}:mkBnd")
+            raise AbsboxParseError(f"Failed to match bond:{preview(bn)},{preview(x)}:mkBnd")
 
 
 def mkLiqMethod(x):
@@ -874,7 +858,7 @@ def mkLiqMethod(x):
         case ["贴现率", r] | ["PvRate", r] | ("PvRate", r):
             return mkTag(("PvByRef", mkDs(r)))
         case _:
-            raise RuntimeError(f"Failed to match {x}:mkLiqMethod")
+            raise AbsboxParseError(f"Failed to match {preview(x)}:mkLiqMethod")
 
 
 def mkLimit(x:dict):
@@ -888,7 +872,7 @@ def mkLimit(x:dict):
         case None:
             return None
         case _:
-            raise RuntimeError(f"Failed to match :{x}:mkLimit")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:mkLimit")
 
 
 def mkComment(x):
@@ -910,7 +894,7 @@ def mkComment(x):
         case {"direction": d} | ("txnDirection", d):
             return mkTag(("TxnDirection", d))
         case _:
-            raise RuntimeError(f"Failed to match :{x}:mkComment")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:mkComment")
 
 
 def mkLiqDrawType(x):
@@ -924,7 +908,7 @@ def mkLiqDrawType(x):
         case "债券本金" | "principal":
             return "LiqToBondPrin"
         case _:
-            raise RuntimeError(f"Failed to match :{x}:Liquidation Draw Type")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:Liquidation Draw Type")
 
 
 def mkLiqRepayType(x):
@@ -938,7 +922,7 @@ def mkLiqRepayType(x):
         case x if isinstance(x, list):
             return mkTag(("LiqRepayTypes", lmap(mkLiqRepayType, x)))
         case _:
-            raise RuntimeError(f"Failed to match :{x}:Liquidation Repay Type")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:Liquidation Repay Type")
 
 
 def mkRateSwapType(pr, rr):
@@ -958,7 +942,7 @@ def mkRateSwapType(pr, rr):
         case (True, True):
             return mkTag(("FloatingToFloating", [pr, rr]))
         case _:
-            raise RuntimeError(f"Failed to match :{rr,pr}:Interest Swap Type")
+            raise AbsboxParseError(f"Failed to match :{preview((rr,pr))}:Interest Swap Type")
 
 
 def mkRsBase(x):
@@ -970,7 +954,7 @@ def mkRsBase(x):
         case {"schedule": tbl} | {"计划": tbl}:
             return mkTs("Balance", tbl)
         case _:
-            raise RuntimeError(f"Failed to match :{x}:Interest Swap Base")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:Interest Swap Base")
 
 
 def mkRateSwap(x):
@@ -994,7 +978,7 @@ def mkRateSwap(x):
                     "rsStmt": p.get("stmt", None)
                     }
         case _:
-            raise RuntimeError(f"Failed to match :{x}:Interest Swap")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:Interest Swap")
 
 
 def mkRateCap(x):
@@ -1013,7 +997,7 @@ def mkRateCap(x):
                     "rcStmt": p.get("stmt", None)
                     }
         case _:
-            raise RuntimeError(f"Failed to match :{x}:Interest Cap")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:Interest Cap")
 
 
 def mkRateType(x):
@@ -1050,7 +1034,7 @@ def mkRateType(x):
         case None:
             return None
         case _ :
-            raise RuntimeError(f"Failed to match :{x}: Rate Type")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}: Rate Type")
 
 
 def mkBookType(x: list):
@@ -1063,7 +1047,7 @@ def mkBookType(x: list):
         case ["till", ledger, dr, ds] : 
             return mkTag(("Till", [vStr(ledger), bookDirection[dr], mkDs(ds)]))
         case _:
-            raise RuntimeError(f"Failed to match :{x}:mkBookType")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:mkBookType")
 
 
 def mkSupport(x:list):
@@ -1081,7 +1065,7 @@ def mkSupport(x:list):
         case None:
             return None
         case _:
-            raise RuntimeError(f"Failed to match :{x}:SupportType")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:SupportType")
 
 
 def mkOrder(x):
@@ -1324,7 +1308,7 @@ def mkAction(x:list):
         case None:
             return mkTag(("Placeholder",[]))
         case _:
-            raise RuntimeError(f"Failed to match :{x}:mkAction")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:mkAction")
 
 
 def mkStatus(x: tuple|str):
@@ -1350,7 +1334,7 @@ def mkStatus(x: tuple|str):
         case ("设计", st) | ("PreClosing", st) | ("preclosing", st):
             return mkTag(("PreClosing", mkStatus(st)))
         case _:
-            raise RuntimeError(f"Failed to match :{x}:mkStatus")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:mkStatus")
 
 
 def readStatus(x: dict, locale: str):
@@ -1373,7 +1357,7 @@ def readStatus(x: dict, locale: str):
         case {"tag": "Warehousing"}:
             return m[locale]['warehousing']
         case _:
-            raise RuntimeError(
+            raise AbsboxParseError(
                 f"Failed to read deal status:{x} with locale: {locale}")
 
 
@@ -1388,7 +1372,7 @@ def mkThreshold(x):
         case "<=":
             return "EqBelow"
         case _:
-            raise RuntimeError(f"Failed to match :{x}:mkThreshold")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:mkThreshold")
 
 
 def mkTrigger(x: dict):
@@ -1403,7 +1387,7 @@ def mkTrigger(x: dict):
                     ,"trgStatus":vBool(status)
                     ,"trgCurable":vBool(curable)}
         case _:
-            raise RuntimeError(f"Failed to match :{x}:mkTrigger")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:mkTrigger")
 
 
 def mkTriggerEffect(x):
@@ -1425,7 +1409,7 @@ def mkTriggerEffect(x):
         case None:
             return mkTag(("DoNothing"))
         case _:
-            raise RuntimeError(f"Failed to match :{x}:mkTriggerEffect")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:mkTriggerEffect")
 
 
 def mkWaterfall(r, x):
@@ -1444,31 +1428,31 @@ def mkWaterfall(r, x):
     _w_tag = None
     match _k:
         case ("兑付日", "加速清偿") | ("amortizing", "accelerated") | "Accelerated" :
-            _w_tag = f"DistributionDay (DealAccelerated Nothing)"
+            _w_tag = "DistributionDay (DealAccelerated Nothing)"
         case ("兑付日", "违约") | ("amortizing", "defaulted") | "Defaulted" | "违约后":
-            _w_tag = f"DistributionDay (DealDefaulted Nothing)"
+            _w_tag = "DistributionDay (DealDefaulted Nothing)"
         case "Revolving" | "循环" | "revolving" | ("兑付日", "循环") :
-            _w_tag = f"DistributionDay Revolving"
+            _w_tag = "DistributionDay Revolving"
         case ("兑付日","储备") | ("DistributionDay", "Warehousing"):
-            _w_tag = f"DistributionDay (Warehousing Nothing)"
+            _w_tag = "DistributionDay (Warehousing Nothing)"
         case ("兑付日", _st) | ("amortizing", _st):
             _w_tag = f"DistributionDay {mapping.get(_st, _st)}"
         case "兑付日" | "未违约" | "amortizing" | "Amortizing" | "摊销":
-            _w_tag = f"DistributionDay Amortizing"
+            _w_tag = "DistributionDay Amortizing"
         case "清仓回购" | "cleanUp":
             _w_tag = "CleanUp"
         case "回款日" | "回款后" | "endOfCollection":
-            _w_tag = f"EndOfPoolCollection"
+            _w_tag = "EndOfPoolCollection"
         case "设立日" | "closingDay":
-            _w_tag = f"OnClosingDay"
+            _w_tag = "OnClosingDay"
         case "默认" | "default":
-            _w_tag = f"DefaultDistribution"
+            _w_tag = "DefaultDistribution"
         case "储备" | "Warehousing" | ('Warehousing', None):
-            _w_tag = f"Warehousing Nothing"
+            _w_tag = "Warehousing Nothing"
         case ("custom",wName): 
             _w_tag = f"CustomWaterfall {wName}"
         case _:
-            raise RuntimeError(f"Failed to match :{x}:mkWaterfall with key {_k}")
+            raise AbsboxParseError(f"Failed to match :{preview(x)}:mkWaterfall with key {preview(_k)}")
     
     r[_w_tag] = lmap(mkAction, _v)
     return mkWaterfall(r, x)
@@ -1481,7 +1465,7 @@ def mkRoundingType(x):
         case ["ceiling", r]:
             return mkTag(("RoundCeil", r))
         case _:
-            raise RuntimeError(f"Failed to match {x}:mkRoundingType")
+            raise AbsboxParseError(f"Failed to match {preview(x)}:mkRoundingType")
 
 
 def mkAmortPlan(x) -> dict:
@@ -1507,7 +1491,7 @@ def mkAmortPlan(x) -> dict:
         case ("Balloon", n):
             return mkTag(("Balloon", n))
         case _:
-            raise RuntimeError(f"Failed to match AmortPlan {x}:mkAmortPlan")
+            raise AbsboxParseError(f"Failed to match AmortPlan {preview(x)}:mkAmortPlan")
 
 
 def mkArm(x:dict):
@@ -1516,7 +1500,7 @@ def mkArm(x:dict):
             exs = tz.get(["firstCap", "periodicCap", "lifeCap", "lifeFloor"], x, None)
             return mkTag(("ARM", [ip]+list(exs)))
         case _:
-            raise RuntimeError(f"Failed to match ARM  {x}:mkArm")
+            raise AbsboxParseError(f"Failed to match ARM  {preview(x)}:mkArm")
 
 
 def mkAssetStatus(x):
@@ -1528,7 +1512,7 @@ def mkAssetStatus(x):
         case ("违约", d) | ("Defaulted", d) | ("defaulted", d):
             return mkTag(("Defaulted", vDate(d)))
         case _:
-            raise RuntimeError(f"Failed to match asset statuts {x}:mkAssetStatus")
+            raise AbsboxParseError(f"Failed to match asset statuts {preview(x)}:mkAssetStatus")
 
 
 def mkPrepayPenalty(x):
@@ -1551,7 +1535,7 @@ def mkPrepayPenalty(x):
         case {"stepDown": ps} | {"阶梯": [ps]}:
             return mkTag(("StepDown", ps))
         case _ :
-            raise RuntimeError(f"Failed to match {x}:mkPrepayPenalty")
+            raise AbsboxParseError(f"Failed to match {preview(x)}:mkPrepayPenalty")
 
 
 def mkAccRule(x):
@@ -1561,7 +1545,7 @@ def mkAccRule(x):
         case "余额递减" | "DecliningBalance" :
             return "DecliningBalance"
         case _ :
-            raise RuntimeError(f"Failed to match {x}:mkAccRule")
+            raise AbsboxParseError(f"Failed to match {preview(x)}:mkAccRule")
 
 
 def mkInvoiceFeeType(x):
@@ -1577,7 +1561,7 @@ def mkInvoiceFeeType(x):
         case ("CompoundFee", *fs) | ("复合计费", *fs):
             return mkTag(("CompoundFee", lmap(mkInvoiceFeeType, fs)))
         case _:
-            raise RuntimeError(f"Failed to match {x}:mkInvoiceFeeType")
+            raise AbsboxParseError(f"Failed to match {preview(x)}:mkInvoiceFeeType")
 
 
 def mkCapacity(x):
@@ -1587,7 +1571,7 @@ def mkCapacity(x):
         case ("按年限", cs) | ("ByTerm", cs):
             return mkTag(("CapacityByTerm", cs))
         case _ :
-            raise RuntimeError(f"Failed to match {x}:mkCapacity")
+            raise AbsboxParseError(f"Failed to match {preview(x)}:mkCapacity")
 
 
 def mkObligor(x:dict) -> dict:
@@ -1613,7 +1597,7 @@ def mkLeaseStepUp(x):
         case ("byAmounts", *bs):
             return mkTag(("ByAmountCurve", vList(bs, vNum)))
         case _ :
-            raise RuntimeError(f"Failed to match {x}:mkLeaseStepUp")
+            raise AbsboxParseError(f"Failed to match {preview(x)}:mkLeaseStepUp")
 
 def mkLeaseCalc(x):
     match x:
@@ -1622,7 +1606,7 @@ def mkLeaseCalc(x):
         case ("byPeriod", rental, period):
             return mkTag(("ByPeriodRental", [rental, period]))
         case _ :
-            raise RuntimeError(f"Failed to match {x}:mkLeaseCalc")
+            raise AbsboxParseError(f"Failed to match {preview(x)}:mkLeaseCalc")
         
 
 def mkAsset(x):
@@ -1750,7 +1734,7 @@ def mkAsset(x):
             return mkTag(("ProjectedCashflow" ,[(vNum(begBal),vDate(begDate)), flows, mkDatePattern(dp)]))
 
         case _:
-            raise RuntimeError(f"Failed to match {x}:mkAsset")
+            raise AbsboxParseError(f"Failed to match {preview(x)}:mkAsset")
 
 def identify_deal_type(x):
     """ identify deal type from 1st asset in asset list  """
@@ -1782,7 +1766,7 @@ def identify_deal_type(x):
                 {"assets": [{'tag': 'PF'}, *rest]} :
                 return "UDeal"
             case _:
-                raise RuntimeError(f"Failed to identify pool type {z}")
+                raise AbsboxParseError(f"Failed to identify pool type {preview(z)}")
     y = None
     match x:
         # single pool
@@ -1807,7 +1791,7 @@ def identify_deal_type(x):
             else:
                 return list(assetTypes)[0]
         case _:
-            raise RuntimeError(f"Failed to match pool type {x}")
+            raise AbsboxParseError(f"Failed to match pool type {preview(x)}")
 
 
 def mkCallOptionsLegacy(x):
@@ -1830,7 +1814,7 @@ def mkCallOptionsLegacy(x):
         case {"全部满足": xs} | {"and": xs} | ("all", *xs) | ("all", *xs):
             return mkTag(("And", lmap(mkCallOptionsLegacy, xs)))
         case _:
-            raise RuntimeError(f"Failed to match {x}:mkCallOptionsLegacy")
+            raise AbsboxParseError(f"Failed to match {preview(x)}:mkCallOptionsLegacy")
 
 
 def mkAssumpDefault(x):
@@ -1853,7 +1837,7 @@ def mkAssumpDefault(x):
         case {"byTerm": rs}:
             return mkTag(("DefaultByTerm", vListOfList(rs, numVal)))
         case _ :
-            raise RuntimeError(f"failed to match {x}:mkAssumpDefault")
+            raise AbsboxParseError(f"failed to match {preview(x)}:mkAssumpDefault")
 
 
 def mkAssumpPrepay(x):
@@ -1872,7 +1856,7 @@ def mkAssumpPrepay(x):
         case {"byTerm": rs}:
             return mkTag(("PrepaymentByTerm", vListOfList(rs, numVal)))
         case _ :
-            raise RuntimeError(f"failed to match {x}:mkAssumpPrepay")
+            raise AbsboxParseError(f"failed to match {preview(x)}:mkAssumpPrepay")
 
 
 def mkAssumpDelinq(x):
@@ -1881,7 +1865,7 @@ def mkAssumpDelinq(x):
         case {"DelinqCDR": cdr, "Lag": lag, "DefaultPct": pct}:
             return mkTag(("DelinqCDR", [cdr, (lag, pct)]))
         case _:
-            raise RuntimeError(f"failed to match {x}:mkAssumpDelinq")
+            raise AbsboxParseError(f"failed to match {preview(x)}:mkAssumpDelinq")
 
 
 def mkAssumpLeaseGap(x):
@@ -1891,7 +1875,7 @@ def mkAssumpLeaseGap(x):
         case ("byCurve", c):
             return mkTag(("GapDaysByCurve", mkTs("IntCurve",c)))
         case _:
-            raise RuntimeError(f"failed to match {x}:mkAssumpLeaseGap")
+            raise AbsboxParseError(f"failed to match {preview(x)}:mkAssumpLeaseGap")
 
 
 def mkAssumpLeaseRent(x):
@@ -1903,7 +1887,7 @@ def mkAssumpLeaseRent(x):
         case ("byRateVec", *rs):
             return mkTag(("BaseByVec", vList(rs, numVal)))
         case _:
-            raise RuntimeError(f"failed to match {x}:mkAssumpLeaseRent")
+            raise AbsboxParseError(f"failed to match {preview(x)}:mkAssumpLeaseRent")
 
 
 def mkAssumpLeaseEndType(x):
@@ -1917,7 +1901,7 @@ def mkAssumpLeaseEndType(x):
         case ("laterOf", d, n):
             return mkTag(("LaterOf", [vDate(d), vInt(n)]))
         case _:
-            raise RuntimeError(f"failed to match {x}:mkAssumpLeaseEndType")
+            raise AbsboxParseError(f"failed to match {preview(x)}:mkAssumpLeaseEndType")
 
 def mkAssumpLeaseDefaultType(x):
     match x:
@@ -1926,7 +1910,7 @@ def mkAssumpLeaseDefaultType(x):
         case ("byTermination",r):
             return mkTag(("DefaultByTermination", vNum(r)))
         case _:
-            raise RuntimeError(f"failed to match {x}")
+            raise AbsboxParseError(f"failed to match {preview(x)}")
 
 
 def mkAssumpRecovery(x):
@@ -1939,7 +1923,7 @@ def mkAssumpRecovery(x):
         case {"Rate":r, "ByDays": lst}:
             return mkTag(("RecoveryByDays",[vNum(r),lst]))
         case _:
-            raise RuntimeError(f"failed to match {x}")
+            raise AbsboxParseError(f"failed to match {preview(x)}")
 
 
 def mkDefaultedAssumption(x):
@@ -2008,7 +1992,7 @@ def mkPerfAssumption(x):
             r = earlyReturnNone(mkAssumpRecovery,mr)
             return mkTag(("ReceivableAssump",[d, r, mkExtraStress(mes)]))
         case _:
-            raise RuntimeError(f"failed to match {x}")
+            raise AbsboxParseError(f"failed to match {preview(x)}")
 
 
 def mkPDF(a, b, c):
@@ -2036,7 +2020,7 @@ def mkObligorStrategy(x):
             case (f, "range",rng,lowVal,highVal):
                 return mkTag(("FieldInRange",[f,rng,lowVal,highVal]))
             case _:
-                raise RuntimeError(f"failed to match {z}, mkFieldRule")
+                raise AbsboxParseError(f"failed to match {preview(z)}, mkFieldRule")
 
     match x:
         case ("ById",ids,assumps)| ("ByID",ids,assumps):
@@ -2048,7 +2032,7 @@ def mkObligorStrategy(x):
         case ("ByDefault",assumps) | ("_",assumps):
             return mkTag(("ObligorByDefault",mkPDF(*assumps)))
         case _:
-            raise RuntimeError(f"failed to match {x}, mkObligorStrategy")
+            raise AbsboxParseError(f"failed to match {preview(x)}, mkObligorStrategy")
 
 
 def mkAssumpType(x):
@@ -2070,7 +2054,7 @@ def mkAssumpType(x):
         case None:
             return None
         case _ :
-            raise RuntimeError(f"failed to match {x} | mkAssumpType")
+            raise AbsboxParseError(f"failed to match {preview(x)} | mkAssumpType")
 
 
 def mkAssetUnion(x):
@@ -2090,7 +2074,7 @@ def mkAssetUnion(x):
         case "ProjectedByFactor" :
             return mkTag(("PF", mkAsset(x)))
         case _:
-            raise RuntimeError(f"Failed to match AssetUnion {x}")
+            raise AbsboxParseError(f"Failed to match AssetUnion {preview(x)}")
 
 
 def mkRevolvingPool(x):
@@ -2118,7 +2102,7 @@ def mkPoolType(assetDate, x, mixedFlag) -> dict:
             return mkTag(("MultiPool" 
                         ,{f"PoolName:{k}":mkPoolComp(vDate(assetDate),v,mixedFlag) for (k,v) in x.items()}))
         case _ :
-            raise RuntimeError("Failed to match pool type ",x)
+            raise AbsboxParseError("Failed to match pool type ",x)
 
 
 def mkPoolComp(asOfDate, x, mixFlag) -> dict:
@@ -2144,7 +2128,7 @@ def mkPool(x: dict):
             _pool_asset_type = identify_deal_type({"pool": _pool})
             return mkTag((mapping[_pool_asset_type], _pool))
         case _:
-            raise RuntimeError(f"Failed to match {x}:mkPool")
+            raise AbsboxParseError(f"Failed to match {preview(x)}:mkPool")
 
 
 def mkCustom(x: dict):
@@ -2172,7 +2156,7 @@ def mkLiqProviderType(x):
         case {}:
             return mkTag(("UnLimit"))
         case _:
-            raise RuntimeError(f"Failed to match LiqProvider Type:{x}")
+            raise AbsboxParseError(f"Failed to match LiqProvider Type:{preview(x)}")
         
 
 def mkLiqProvider(n: str, x: dict):
@@ -2227,7 +2211,7 @@ def mkLedger(n: str, x: dict=None):
         case None:
             return {"ledgName":vStr(n),"ledgBalance":0,"ledgStmt":None}
         case _:
-            raise RuntimeError(f"Failed to match Ledger:{n},{x}")
+            raise AbsboxParseError(f"Failed to match Ledger:{preview(n)},{preview(x)}")
 
 
 def mkCf(x:list):
@@ -2257,7 +2241,7 @@ def mkPid(x):
             dealName, bondName = x.split(":")
             return mkTag(("UnderlyingDeal", [dealName, bondName]))
         case x if isinstance(x, str):
-            return mkTag((f"PoolName", x))
+            return mkTag(("PoolName", x))
 
 
 def mkCollection(x):
@@ -2294,14 +2278,14 @@ def mkCollection(x):
             return mkTag(("CollectByPct",[pids, mkPoolSource(s), accsWithPct]))
         
         case _:
-            raise RuntimeError(f"Failed to match collection rule {x}")
+            raise AbsboxParseError(f"Failed to match collection rule {preview(x)}")
 
 
 def mkFee(x):
     match x :
         case {"name":fn, "type": feeType, **fi}:
             if "feeStart" not in fi:
-                raise RuntimeError("feeStart not found in fee:after version 0.45.x fee must to include field feeStart")
+                raise AbsboxParseError("feeStart not found in fee:after version 0.45.x fee must to include field feeStart")
             opt_fields = subMap(fi, [("feeDueDate",None),("feeDue",0),
                                     ("feeArrears",0),("feeLastPaidDate",None),
                                     ("feeStart",None)])
@@ -2311,10 +2295,10 @@ def mkFee(x):
                                       ("拖欠","feeArrears",0),("上次缴付日期","feeLastPaidDay",None),
                                       ("起始日","feeStart",None)])
             if opt_fields["feeStart"] is None :
-                raise RuntimeError("feeStart not found in fee:after version 0.45.x fee must to include field feeStart")
+                raise AbsboxParseError("feeStart not found in fee:after version 0.45.x fee must to include field feeStart")
             return  {"feeName": vStr(fn), "feeType": mkFeeType(feeType)} | opt_fields
         case _:
-            raise RuntimeError(f"Failed to match fee: {x}")
+            raise AbsboxParseError(f"Failed to match fee: {preview(x)}")
 
 def mkBondPricingMethod(x):
     match x:
@@ -2325,7 +2309,7 @@ def mkBondPricingMethod(x):
         case ("byCurve", ts):
             return mkTag(("PvBondByCurve", ts))
         case _:
-            raise RuntimeError(f"Failed to match bondPricingMethod: {x}")
+            raise AbsboxParseError(f"Failed to match bondPricingMethod: {preview(x)}")
 
 def mkTradeType(x):
     match x:
@@ -2334,7 +2318,7 @@ def mkTradeType(x):
         case ("byBalance", balance):
             return mkTag(("ByBalance", vNum(balance)))
         case _:
-            raise RuntimeError(f"Failed to match trade Type: {x}")
+            raise AbsboxParseError(f"Failed to match trade Type: {preview(x)}")
 
 def mkIrrType(x):
     match x:
@@ -2345,7 +2329,7 @@ def mkIrrType(x):
         case ("buy", d, bondPricing, tradeType):
             return mkTag(("BuyBond", [vDate(d), mkBondPricingMethod(bondPricing), mkTradeType(tradeType), None]))
         case _:
-            raise RuntimeError(f"Failed to match irrType: {x}")
+            raise AbsboxParseError(f"Failed to match irrType: {preview(x)}")
 
 
 def mkPricingAssump(x):
@@ -2357,7 +2341,7 @@ def mkPricingAssump(x):
         case ("irr", m) | {"IRR": m} | {"Irr": m} if isinstance(m, dict):
             return mkTag(("IrrInput", mapValsBy(m, mkIrrType)))
         case _:
-            raise RuntimeError(f"Failed to match pricing assumption: {x}")
+            raise AbsboxParseError(f"Failed to match pricing assumption: {preview(x)}")
 
 
 def readPricingResult(x, locale) -> dict | None:
@@ -2379,7 +2363,7 @@ def readPricingResult(x, locale) -> dict | None:
     elif tag == "PriceResultNull":
         return None
     else:
-        raise RuntimeError(f"Failed to read princing result: {x} with tag={tag}")
+        raise AbsboxParseError(f"Failed to read princing result: {preview(x)} with tag={preview(tag)}")
 
     # 
     if (v:=list(x.values())):
@@ -2619,7 +2603,7 @@ def mkRateAssumption(x):
         case (idx, r) :
             return mkTag(("RateFlat" ,[idx, vNum(r)]))
         case _ :
-            raise RuntimeError(f"Failed to match RateAssumption:{x}")
+            raise AbsboxParseError(f"Failed to match RateAssumption:{preview(x)}")
 
 
 def mkFundingPlan(x:tuple):
@@ -2634,7 +2618,7 @@ def mkFundingPlan(x:tuple):
         case (d,bName,accName,bnd):
             return [vDate(d), mkTag(("IssueBondEvent",[None,vStr(bName),vStr(accName),mkBnd(bnd["name"],bnd|{"startDate":vDate(d)})|{"tag":"Bond"},None,None]))]
         case _:
-            raise RuntimeError(f"Failed to match mkFundingPlan:{x}")
+            raise AbsboxParseError(f"Failed to match mkFundingPlan:{preview(x)}")
 
 
 def mkRefiPlan(x:tuple):
@@ -2642,7 +2626,7 @@ def mkRefiPlan(x:tuple):
         case ("byRate",d,accName, bndName, interestInfo):
             return [vDate(d), mkTag(("RefiRate",[vStr(accName), vStr(bndName), mkBondRate(interestInfo) ]))]
         case _:
-            raise RuntimeError(f"Failed to match mkRefinancePlan:{x}")
+            raise AbsboxParseError(f"Failed to match mkRefinancePlan:{preview(x)}")
 
 
 def mkInspect(x):
@@ -2652,7 +2636,7 @@ def mkInspect(x):
         case (dp,ds) if isinstance(ds, list):
             return mkTag(("InspectRpt",[mkDatePattern(dp),lmap(mkDs,ds)]))
         case _:
-            raise RuntimeError(f"Failed to match mkInspect:{x}")
+            raise AbsboxParseError(f"Failed to match mkInspect:{preview(x)}")
 
 
 def mkCallOptions(x):
@@ -2662,7 +2646,7 @@ def mkCallOptions(x):
         case ("if", *pres) | ("condition", *pres):
             return mkTag(("CallPredicate", lmap(mkPre,pres)))
         case _:
-            raise RuntimeError(f"Failed to make call options: {x}")
+            raise AbsboxParseError(f"Failed to make call options: {preview(x)}")
 
 
 def mkNonPerfAssumps(r, xs:list) -> dict:

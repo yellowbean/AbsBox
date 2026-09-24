@@ -162,6 +162,14 @@ class API:
     debug = False
     """ internal """
 
+    @staticmethod
+    def _validatedUrl(url: str) -> str:
+        """Validate a server URL, raising AbsboxError instead of returning None."""
+        validated = isValidUrl(url)
+        if validated is None:
+            raise AbsboxError(f"❌Invalid server url: {url}")
+        return validated.rstrip("/")
+
     def __post_init__(self) -> None:
         """Init the API instance with url and perform version check
 
@@ -172,11 +180,10 @@ class API:
         if self.url == EnginePath.USE_ENV.value:
             urlInEnv = os.environ.get("ABSBOX_SERVER")
             if urlInEnv is None:
-                raise AbsboxError(f"❌No ABSBOX_SERVER found in environment variable")
-            else:
-                self.url = isValidUrl(urlInEnv).rstrip("/")
+                raise AbsboxError("❌No ABSBOX_SERVER found in environment variable")
+            self.url = self._validatedUrl(urlInEnv)
         else:
-            self.url = isValidUrl(self.url).rstrip("/")
+            self.url = self._validatedUrl(self.url)
 
         console.print(f"Connecting engine server -> {self.url}")
 
@@ -315,7 +322,7 @@ class API:
         return json.dumps(r, ensure_ascii=False)
 
     @staticmethod    
-    def _getWarningMsg(msgs, flag:bool) -> []:
+    def _getWarningMsg(msgs, flag:bool) -> list:
         """get warning message from server response
         :return: list of warning messages
         :rtype: list
@@ -638,10 +645,10 @@ class API:
         url = f"{self.url}/{Endpoints.RunByCombo.value}"
 
         if len(dealMap) == 0:
-            raise AbsboxError(f"❌ No deals found in dealMap,at least one deal is required")
+            raise AbsboxError("❌ No deals found in dealMap,at least one deal is required")
 
         if "^" in " ".join(tz.concatv([str(_) for _ in dealMap.keys()],[str(_) for _ in poolAssump.keys()],[str(_) for _ in runAssump.keys()])):
-            raise AbsboxError(f"❌ Deal name should not contain '^' ")
+            raise AbsboxError("❌ Deal name should not contain '^' ")
 
         req = self.build_run_deal_req("CS", dealMap, poolAssump, runAssump)
 

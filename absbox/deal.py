@@ -70,7 +70,7 @@ def mkDeal(x:dict, preCheck=True):
         ,currencySwap
         ,trigger
         ,status
-        ,None
+        ,custom
         ,ledgers
         ,rateCap
     )

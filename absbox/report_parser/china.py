@@ -1,7 +1,5 @@
 import re
 import dateparser
-import toolz as tz
-from lenses import lens
 
 def rmDigitsInLine(x):
     return re.sub(r"\n\d+\n","",x)

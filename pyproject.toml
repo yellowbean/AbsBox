@@ -126,13 +126,16 @@ line-length = 127
 extend-exclude = ["docs", "notebooks", "absbox.egg-info"]
 
 [tool.ruff.lint]
-# Start with the same high-signal checks the previous flake8 CI used (syntax
-# errors and undefined names). Expand gradually (e.g. add "E", "F", "B") once
-# the tree is clean.
+# High-signal checks only: syntax errors and undefined names. These are verified
+# clean (pyflakes/mypy were run locally). F401 is intentionally NOT enabled:
+# ~100 names in component.py/generic.py/china.py are deliberate re-exports that
+# downstream modules and users consume via `from .local.component import *`,
+# so removing them would be a breaking change. Widen this set gradually.
 select = ["E9", "F63", "F7", "F82"]
 
 [tool.mypy]
-python_version = "3.10"
+# No `python_version` pin: pinning to 3.10 makes mypy mis-parse type statements
+# in current third-party stubs (e.g. numpy). It follows the running interpreter.
 ignore_missing_imports = true
 warn_unused_configs = true
 warn_redundant_casts = true

@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-import functools
 import pandas as pd
 import toolz as tz
 

@@ -1,5 +1,5 @@
 import pandas as pd
-import functools,json,copy,logging,re,itertools
+import functools,json,copy,logging,re
 from functools import reduce
 from datetime import datetime
 from lenses import lens, ui, optics
@@ -442,10 +442,6 @@ def strFromLens(x) -> str:
 def enumVals(e) -> list:
     ''' return a list of enum values '''
     return [_.value for _ in [*e]]
-
-
-def readCfFromLst(lst:list)-> pd.DataFrame:
-    return None
 
 
 def tupleToDictWithKey(xs,key="name"):

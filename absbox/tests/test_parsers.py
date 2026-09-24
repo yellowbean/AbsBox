@@ -32,6 +32,8 @@ from absbox.local.util import (
 )
 from absbox.local.base import china_bondflow_fields_s, english_bondflow_fields_s
 from absbox.local.readers import readComponentStmts
+from absbox.exception import AbsboxParseError
+from absbox.local.interface import preview
 
 
 def test_mkTag_and_mkCurve():
@@ -272,3 +274,60 @@ def test_read_component_stmts():
     assert out_cn["liqProvider"] == {}
     assert out_cn["fees"]["f1"].index.name == "日期"
 
+
+
+def test_preview_truncates_large_values():
+    assert preview("abc") == "'abc'"
+    long = "x" * 5000
+    out = preview(long)
+    assert len(out) < 300
+    assert out.endswith("...(truncated)")
+
+
+def test_parse_failures_use_absbox_parse_error():
+    # AbsboxParseError must stay compatible with existing `except RuntimeError`
+    assert issubclass(AbsboxParseError, RuntimeError)
+
+    with pytest.raises(AbsboxParseError):
+        mkTradeType(("byCash-nope", 1))
+    with pytest.raises(RuntimeError):
+        mkOrder("bogus")
+
+    # a huge offending payload must not be dumped in full into the message
+    with pytest.raises(AbsboxParseError) as ei:
+        mkOrder("z" * 10000)
+    assert len(str(ei.value)) < 300
+    assert "truncated" in str(ei.value)
+
+
+def test_modules_do_not_depend_on_star_import_leakage():
+    """Guard against names silently arriving through `from .base import *`.
+
+    `readRunSummary` uses `functools.reduce`; it used to resolve only because
+    `base.py` re-exported `util.py`'s namespace via a star import.
+    """
+    import absbox.local.china as china
+    import absbox.local.component as component
+    import absbox.local.generic as generic
+
+    for mod in (component, generic, china):
+        assert hasattr(mod, "reduce"), f"{mod.__name__} cannot resolve 'reduce'"
+
+
+def test_sample_deal_serializes_to_engine_json():
+    """End-to-end offline check of the whole parse/serialize pipeline.
+
+    Exercises mkDate / mkPoolType / identify_deal_type / mkBndComp / mkWaterfall
+    / mkFee / mkAcc / mkCollection / mkCustom against a real sample deal,
+    without needing an engine server.
+    """
+    import json as _json
+
+    from absbox.tests.regression.deals import test01
+
+    j = test01.json
+    assert isinstance(j["tag"], str) and j["tag"]
+    contents = j["contents"]
+    for key in ("dates", "pool", "bonds", "waterfall", "fees", "accounts", "collects", "custom"):
+        assert key in contents, key
+    _json.dumps(j)  # must remain JSON-serialisable for the engine request

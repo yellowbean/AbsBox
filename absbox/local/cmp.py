@@ -1,5 +1,4 @@
 import pandas as pd
-from lenses import lens
 
 
 def compDf(x:pd.DataFrame, y:pd.DataFrame, names) -> pd.DataFrame:
