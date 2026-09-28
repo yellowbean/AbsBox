@@ -7,7 +7,7 @@ include = ["absbox*"]
 exclude = ["absbox.tests*", "docs*", "notebooks*"]
 
 [project]
-version = "0.52.3"
+version = "0.52.4"
 name = "absbox"
 description = "an analytical library for cashflow modeling on ABS/MBS products"
 readme = "README.md"

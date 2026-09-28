@@ -19,7 +19,7 @@ resolution-markers = [
 
 [[package]]
 name = "absbox"
-version = "0.52.3"
+version = "0.52.4"
 source = { editable = "." }
 dependencies = [
     { name = "dateparser" },

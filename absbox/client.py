@@ -104,21 +104,24 @@ class EnginePath(str, enum.Enum):
 def PickApiFrom(Apilist:list, **kwargs):
     """ Auto init API instance from a list of API urls with version check
 
-    :param Apilist: list of API urls
+    :param Apilist: list of API urls (``EnginePath`` members or plain strings)
     :type Apilist: list
     """
     verify = kwargs.get("verify", False)
 
+    def toUrl(x):
+        return x.value if isinstance(x, EnginePath) else str(x)
+
     def pingApi(x):
         try:
-            r = requests.get(f"{x.value}/{Endpoints.Version.value}", verify=verify, timeout=5 ,headers={"Origin":"http://localhost:8001"}).text 
+            r = requests.get(f"{toUrl(x)}/{Endpoints.Version.value}", verify=verify, timeout=5 ,headers={"Origin":"http://localhost:8001"}).text 
             return json.loads(r) 
         except Exception as e:
             return ("Error",e)
 
     _, libVersion, _ = VERSION_NUM.split(".")
 
-    apiResps = [{"url":api,"resp":pingApi(api)} for api in Apilist ]
+    apiResps = [{"url":toUrl(api),"resp":pingApi(api)} for api in Apilist ]
     validApis = tz.pipe(apiResps
                     ,lambda apis: list(filter(lambda x:"Error" not in x['resp'],apis))
                     ,lambda apis: lens.Each()['resp']['_version'].modify(lambda x: x.split("."))(apis)
@@ -129,7 +132,7 @@ def PickApiFrom(Apilist:list, **kwargs):
     r = list(validApis)
 
     if len(r)>0: 
-        return API(r[0],**kwargs)
+        return API(r[0]["url"],**kwargs)
     else:
         raise AbsboxError(f"❌ No valid API found in list match current lib version {libVersion}, from list:{apiResps}")
 
@@ -209,7 +212,7 @@ class API:
         self.session = requests.Session()
         console.print(f"✅Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
 
-    def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=[], rtn = []) -> str:
+    def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=None, rtn = None) -> str:
         """build run deal requests: (single run, multi-scenario run, multi-struct run)
 
         :meta private:
@@ -219,13 +222,15 @@ class API:
         :type deal: _type_
         :param perfAssump: a tuple of pool level assumption(Default/Prepayment/Recovery) for single run. a map for multi-scenario run, defaults to None
         :type perfAssump: _type_, optional
-        :param nonPerfAssump: a list of deal level assumptions, defaults to []
+        :param nonPerfAssump: a list of deal level assumptions, defaults to None
         :type nonPerfAssump: list, optional
         :raises RuntimeError: _description_
         :return: a string of request body to be sent out to engine
         :rtype: str
 
         """
+        nonPerfAssump = nonPerfAssump or []
+        rtn = rtn if rtn is not None else []
         r = None
 
         match run_type:
@@ -360,11 +365,11 @@ class API:
 
     def run(self, deal,
             poolAssump=None,
-            runAssump=[],
+            runAssump=None,
             read=True,
             showWarning=True,
-            rtn = [],
-            debug=False) -> dict:
+            rtn = None,
+            debug=False) -> dict | str:
         """ run deal with pool and deal run assumptions
 
         :param deal: a deal object
@@ -408,10 +413,10 @@ class API:
 
     def runByScenarios(self, deal,
                     poolAssump=None,
-                    runAssump=[],
+                    runAssump=None,
                     read=True,
                     showWarning=True,
-                    debug=False) -> dict :
+                    debug=False) -> dict | str :
         """ run deal with multiple scenarios, return a map
 
         :param deal: _description_
@@ -449,7 +454,7 @@ class API:
         else:
             return result
 
-    def read_single(self, breakdown, pool_resp) -> tuple:
+    def read_single(self, breakdown, pool_resp) -> dict:
         """ read pool run response from engine and convert to dataframe
 
         :param pool_resp: (pool raw cashflow, pool statistics)
@@ -472,7 +477,7 @@ class API:
                                     for _ in pool_breakdown_flow  ]
                     }
 
-    def runPoolByScenarios(self, pool, poolAssump, rateAssump=None, read=True, breakdown = False,debug=False) -> dict :
+    def runPoolByScenarios(self, pool, poolAssump, rateAssump=None, read=True, breakdown = False,debug=False) -> dict | str :
         """ run a pool with multiple scenario ,return result as map , with key same to pool assumption map
 
         :param pool: pool map
@@ -503,7 +508,7 @@ class API:
             return result & lens.Values().Values().modify(partial(self.read_single, breakdown))
         return result
 
-    def runPool(self, pool, poolAssump=None, rateAssump=None, read=True, debug=False, breakdown = False, **kwargs) -> tuple:
+    def runPool(self, pool, poolAssump=None, rateAssump=None, read=True, debug=False, breakdown = False, **kwargs) -> dict | str:
         """perform pool run with pool and rate assumptions
 
         :param pool: a pool object
@@ -539,7 +544,7 @@ class API:
         else:
             return result
 
-    def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, runAssump=None, rtn=[], read=True, debug=False) -> dict:
+    def runStructs(self, deals, poolAssump=None, nonPoolAssump=None, runAssump=None, rtn=None, read=True, debug=False) -> dict | str:
         """run multiple deals with same assumption
 
         :param deals: a dict of deals
@@ -560,6 +565,7 @@ class API:
         if not isinstance(deals, dict):
             raise AbsboxError(f"❌ Deals should be a dict but got {type(deals)}")
 
+        rtn = rtn if rtn is not None else []
         url = f"{self.url}/{Endpoints.RunMultiDeal.value}" 
         _poolAssump = mkAssumpType(poolAssump) if poolAssump else None 
         _nonPerfAssump = mkNonPerfAssumps({}, mapNone(nonPoolAssump,[]) + mapNone(runAssump,[]))
@@ -586,7 +592,7 @@ class API:
                     runAssump={},
                     read=True,
                     showWarning=True,
-                    debug=False) -> dict :
+                    debug=False) -> dict | str :
         """ run deal with multiple run assumption, return a map
 
         :param deal: _description_
@@ -625,7 +631,7 @@ class API:
                     dealMap, 
                     poolAssump={}, 
                     runAssump={}, 
-                    read=True, showWarning=True, debug=False) -> dict:
+                    read=True, showWarning=True, debug=False) -> dict | str:
         """ run mulitple deals with multiple pool assumption/ with multiple run assumption, return a map 
         
         :param dealMap: a dict of deals
@@ -676,7 +682,7 @@ class API:
         else:
             return result
 
-    def runFirstLoss(self, deal, bName, poolAssump=None, runAssump=[], read=True, debug=False) -> dict:
+    def runFirstLoss(self, deal, bName, poolAssump=None, runAssump=None, read=True, debug=False) -> dict | str:
         """run first loss with deal and pool assumptions
 
         :param deal: a deal object
@@ -694,7 +700,7 @@ class API:
         """
         return self.runRootFinder(deal, poolAssump, runAssump, ("firstLoss", bName), read, debug)
 
-    def runRootFinder(self, deal, poolAssump, runAssump, p, read=True, debug=False) -> dict:
+    def runRootFinder(self, deal, poolAssump, runAssump, p, read=True, debug=False) -> dict | str:
         """run root finder with deal and pool assumptions
         :param deal: a deal object
         :type deal: Generic | SPV
@@ -735,7 +741,7 @@ class API:
 
 
     def runAsset(self, date, _assets, poolAssump=None, rateAssump=None
-                 , pricing=None, read=True, debug=False) -> tuple:
+                 , pricing=None, read=True, debug=False) -> tuple | str:
         """run asset with assumptions
 
         :param date: date of start projection and pricing day
@@ -800,7 +806,7 @@ class API:
         result = self._send_req(req, url)
         return result
 
-    def _send_req(self, _req, _url: str, timeout=10, headers={})-> dict | None:
+    def _send_req(self, _req, _url: str, timeout=10, headers=None)-> dict | None:
         """generic function send request to server
 
         :meta private:
@@ -818,7 +824,7 @@ class API:
         if _req is None:
             raise AbsboxError("❌ request body is None, please check your request")
         try:
-            hdrs = self.hdrs | headers
+            hdrs = self.hdrs | (headers or {})
             r = None
             if self.session:
                 r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=self.verify, timeout=timeout)

@@ -53,7 +53,7 @@ def compResult(r1:dict, r2:dict, names=("Left", "Right")):
         comp_result['bonds'] = {}
         for k,v in r1['bonds'].items():
             if isinstance(v, pd.DataFrame):
-                comp_result['bonds'][k] = compDf(v, r2['bonds'][k])
+                comp_result['bonds'][k] = compDf(v, r2['bonds'][k], names)
             elif isinstance(v, dict):
                 assert isinstance(r2['bonds'][k], dict), f"expecting dict, got {type(r2['bonds'][k])}"
                 comp_result['bonds'][k] = cmpMap(v, r2['bonds'][k])

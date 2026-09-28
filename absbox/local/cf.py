@@ -37,17 +37,6 @@ def buildDaySeq(_df):
     return df.set_index([date_col, "daySeq"])
 
 
-def buildDaySeq2(_df):
-    """  https://stackoverflow.com/questions/23435270/add-a-sequential-counter-column-on-groups-to-a-pandas-dataframe """
-    df = _df.reset_index()
-    df['daySeq'] = df.groupby(["date"]).cumcount()
-    return df.set_index(["date", "daySeq"])
-
-
-def filterCols(xs, columnsToKeep):
-    return [_[columnsToKeep] for _ in xs]
-
-
 class BondCfHeader(enum.Enum):
     SIMPLE = ['rate','cash','intDue','intOverInt','factor','memo']+["利率","本息合计","应付利息","罚息","本金系数","备注"]
     STANDARD = ['intOverInt','factor','memo']+["罚息","本金系数","备注"]
@@ -107,7 +96,8 @@ def patchMissingIndex(df,idx:set)-> pd.DataFrame:
     return df.reindex(df.index.values.tolist()+list(missingIdx)).sort_index()
 
 
-def buildJointCf(m:dict, popColumns=[]) -> pd.DataFrame:
+def buildJointCf(m:dict, popColumns=None) -> pd.DataFrame:
+    popColumns = popColumns or []
     if len(m)==0:
         return pd.DataFrame()
     fullColumns = list(m.values())[0].columns.to_list()

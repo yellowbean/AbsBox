@@ -35,7 +35,6 @@ class LibraryPath(str, enum.Enum):
     """ Enum class representing shortcut to deal library and data service """
     CN = "https://absbox.com.cn/api"
 
-        # add near top of the module (above the LIBRARY class)
 
 def require_token(func):
     @functools.wraps(func)
@@ -130,7 +129,7 @@ class LIBRARY:
             raise AbsboxError(f"❌ Failed during library login {e}")
 
     @require_token
-    def query(self, k = {}, read=True):
+    def query(self, k = None, read=True):
         """query deal library with bond ids
 
         :param ks: bond Ids
@@ -142,6 +141,7 @@ class LIBRARY:
         
         """
 
+        k = k if k is not None else {}
         deal_library_url = self.url+f"/{LibraryEndpoints.Query.value}"
         result = self._send_req(json.dumps({"q":k})
                                 , deal_library_url
@@ -220,7 +220,7 @@ class LIBRARY:
             raise AbsboxError(f"❌ Failed to read result with error = {e}")
 
 
-    def _send_req(self, _req, _url: str, timeout=10, headers={})-> dict | None:
+    def _send_req(self, _req, _url: str, timeout=10, headers=None)-> dict | None:
         """generic function send request to server
 
         :meta private:
@@ -236,7 +236,7 @@ class LIBRARY:
         :rtype: dict | None
         """
         try:
-            hdrs = self.hdrs | headers
+            hdrs = self.hdrs | (headers or {})
             r = None
             if self.session and not isinstance(_req, bytes):
                 r = self.session.post(_url, data=_req.encode('utf-8'), headers=hdrs, verify=self.verify, timeout=timeout)

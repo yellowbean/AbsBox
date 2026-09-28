@@ -23,7 +23,7 @@ def readComponentStmts(deal_content: dict, read_paths: dict, date_key: str = "da
     :param handle_none: when true, a ``None`` statement becomes an empty frame
     :return: ordered map of ``component name -> OrderedDict(name -> DataFrame)``
     """
-    output = {}
+    output: dict = {}
     for comp_name, comp_v in read_paths.items():
         if (comp_name not in deal_content) or (deal_content[comp_name] is None):
             continue

@@ -239,7 +239,27 @@ def mkPoolSource(x):
             raise AbsboxParseError(f"not match found: {preview(x)} :make Pool Source")
 
 
-@functools.lru_cache(maxsize=128)
+def _cache_hashable(fn):
+    """Memoize `fn` only for hashable arguments.
+
+    Formulas may carry lists/dicts (e.g. pricing methods, rate curves); those
+    are unhashable and would make a plain ``lru_cache`` raise ``TypeError``
+    before the function body runs. Such calls bypass the cache.
+    """
+    cached = functools.lru_cache(maxsize=128)(fn)
+
+    @functools.wraps(fn)
+    def wrapper(x):
+        try:
+            hash(x)
+        except TypeError:
+            return fn(x)
+        return cached(x)
+
+    return wrapper
+
+
+@_cache_hashable
 def mkDs(x):
     "Making Deal Stats"
     try:
@@ -1191,6 +1211,8 @@ def mkAction(x:list):
         case ["计提应付本金", source, target, m] | ["calcBondPrin", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("CalcBondPrin", [l, vStr(source), vList(target, str),s]))
+        case ["计提应付本金", source, target] | ["calcBondPrin", source, target] if isinstance(target, list):
+            return mkTag(("CalcBondPrin", [None, vStr(source), vList(target, str), None]))
         case ["计提应付本金", target, limit] | ["calcBondPrin", target, limit]:
             return mkTag(("CalcBondPrin2", [mkLimit(limit), vList(target, str)]))
         case ["支付计提本金", source, target] | ["payPrinWithDue", source, target]:
@@ -1221,6 +1243,10 @@ def mkAction(x:list):
         case ["计提支付利息","组",source, target, o] | ["accrueAndPayIntByGroup", source, target,o]:
             byOrder = mkOrder(o)
             return mkTag(("AccrueAndPayIntGroup", [None, vStr(source), vStr(target),byOrder,None]))
+        case ["减记本金", target] | ["writeOff", target] if isinstance(target, str):
+            return mkTag(("WriteOff", [None, vStr(target)]))
+        case ["减记本金", targets] | ["writeOff", targets] if isinstance(targets, list):
+            return mkTag(("WriteOffBySeq", [None, vList(targets,str)]))
         case ["减记本金", target, l, "簿记", dr, ln] | ["writeOff", target, l, "book", dr, ln] if isinstance(target, str):
             limit = mkLimit(l) if l else None
             return mkTag(("WriteOffAndBook", [limit, vStr(target), (dr,ln)]))
@@ -1236,6 +1262,8 @@ def mkAction(x:list):
         case ["募集本金", source, target, l] | ["fundWith", source, target, l]:
             limit = mkLimit(l) if l else None
             return mkTag(("FundWith", [limit, vStr(source), vStr(target)]))
+        case ["募集本金", source, target] | ["fundWith", source, target]:
+            return mkTag(("FundWith", [None, vStr(source), vStr(target)]))
         case ["支付本金", source, target] | ["payPrin", source, target]:
             return mkTag(("PayPrin", [None, vStr(source), vList(target, str), None]))
         case ["支付剩余本金", source, target] | ["payPrinResidual", source, target]:
@@ -2201,7 +2229,7 @@ def mkLiqProvider(n: str, x: dict):
     }
     return r
 
-def mkLedger(n: str, x: dict=None):
+def mkLedger(n: str, x: dict | None = None):
     ''' Build ledger '''
     match x:
         case {"balance":bal} | {"余额":bal}:
@@ -2395,11 +2423,11 @@ def readPoolCf(x, lang='english'):
                                                 , columns=_pool_cf_header)
     pool_idx = cfIndexMap[lang]
     r = r.set_index(pool_idx)
-    r.index.rename(pool_idx, inplace=True)    
+    r.index = r.index.rename(pool_idx)
     return r
 
 
-def readRunSummary(x, locale) -> dict:
+def readRunSummary(x, locale) -> dict | None:
     r = {}
     if x is None:
         return None
@@ -2422,7 +2450,7 @@ def readRunSummary(x, locale) -> dict:
         bndSummary.loc[bn, _fmap[locale][amt_type]] = amt
         bndSummary.loc[bn, bndStatus[locale][2]] = begBal
     
-    bndSummary.fillna(0, inplace=True)
+    bndSummary = bndSummary.fillna(0)
     bndSummary["Total"] = bndSummary[bndStatus[locale][0]] + \
         bndSummary[bndStatus[locale][1]]
 
@@ -2436,10 +2464,9 @@ def readRunSummary(x, locale) -> dict:
     # inspection variables
     def uplift_ds(df:pd.DataFrame) -> pd.DataFrame:
         ds_name = readTagStr(df['DealStats'].iloc[0])
-        df.drop(columns=["DealStats"],inplace=True)
-        df.rename(columns={"Value":ds_name},inplace=True)
-        df.set_index("Date",inplace=True)
-        return df
+        df = df.drop(columns=["DealStats"])
+        df = df.rename(columns={"Value":ds_name})
+        return df.set_index("Date")
     inspect_vars = [  c & lens['contents'][2].set(sys.float_info.max) if c['contents'][2]==inf else c  for c in filter_by_tags(x, enumVals(InspectTags))  ]
     if inspect_vars:
         inspect_df = pd.DataFrame(data = [ (c['contents'][0],str(c['contents'][1]),c['contents'][2]) for c in inspect_vars ]
@@ -2507,7 +2534,7 @@ def readRunSummary(x, locale) -> dict:
         x = reduce(lambda d1, d2: d1 | d2, [ bsData[_] & lens.modify(buildTree) for _ in comp ]) 
         x = pd.json_normalize(x | {"date":rptDate}, sep="&")
         x.columns = pd.MultiIndex.from_tuples([tuple(col.split("&")) for col in x.columns])
-        x.set_index("date",inplace=True)
+        x = x.set_index("date")
         return x[["Asset", "Liability", "Net Asset"]]
 
 
@@ -2519,8 +2546,8 @@ def readRunSummary(x, locale) -> dict:
         # x = pd.json_normalize(x | {"startDate":begDate,"endDate":endDate})
         x = pd.json_normalize(x,sep="&")
         x.columns = pd.MultiIndex.from_tuples([tuple(col.split("&")) for col in x.columns])
-        x.set_index([pd.Index([begDate],name="startDate")
-                     ,pd.Index([endDate],name="endDate")], inplace=True)
+        x = x.set_index([pd.Index([begDate],name="startDate")
+                     ,pd.Index([endDate],name="endDate")])
         return x[["Inflow", "Outflow", "Net Cash"]]
 
 
@@ -2654,8 +2681,6 @@ def mkNonPerfAssumps(r, xs:list) -> dict:
         match y:
             case ("stop", dp, *p):
                 return {"stopRunBy": mkTag(("StopByPre", [mkDatePattern(dp), lmap(mkPre,p)]))}
-            case ("stop", d):
-                return {"stopRunBy": mkTag("StopByDate", vDate(d))}
             case ("estimateExpense", *projectExps):
                 return {"projectedExpense":[(vStr(fn),mkTs("BalanceCurve",ts)) for (fn, ts) in projectExps]}
             case ("call", *opts):

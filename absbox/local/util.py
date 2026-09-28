@@ -1,5 +1,6 @@
 import pandas as pd
 import functools,json,copy,logging,re
+from collections.abc import Callable
 from functools import reduce
 from datetime import datetime
 from lenses import lens, ui, optics
@@ -17,13 +18,13 @@ def mapNone(x, v):
         return x
 
 
-def lmap(f: callable, xs) -> list:
+def lmap(f: Callable, xs) -> list:
     ''' just make it looks more functional '''
     return list(map(f, xs))
 
 
 def flat(xss) -> list:
-    return reduce(lambda xs, ys: xs + ys, xss)
+    return [x for xs in xss for x in xs]
 
 
 def filter_by_tags(xs: list, tags: list) -> list:
@@ -183,13 +184,13 @@ def subMap2(m: dict, ks: list):
     return renameKs(_m, _mapping)
 
 
-def mapValsBy(m: dict, f: callable):
+def mapValsBy(m: dict, f: Callable):
     ''' Given a map and apply function to every vals'''
     assert isinstance(m, dict), f"M is not a map but a {type(m)}, {m}"
     return {k: f(v) for k, v in m.items()}
 
 
-def mapListValBy(m: dict, f: callable):
+def mapListValBy(m: dict, f: Callable):
     ''' Given a map, whose vals are list,  apply function to every element in each list of each val'''
     assert isinstance(m, dict), "M is not a map"
     return {k: [f(_v) for _v in v] for k,v in m.items()}
@@ -336,10 +337,9 @@ def _read_cf(x, lang):
         logging.error(f"{e}")
         logging.error(f"Failed to match header:{flow_header} with {result}")
         return False
-    result.set_index(idx, inplace=True)
-    result.index.rename(idx, inplace=True)
-    result.sort_index(inplace=True)
-    return result
+    result = result.set_index(idx)
+    result.index = result.index.rename(idx)
+    return result.sort_index()
 
 
 def _read_asset_pricing(xs, lang) -> pd.DataFrame:
@@ -389,7 +389,7 @@ def allKeysAreString(m: dict):
     return all([isinstance(_, str) for _ in m.keys()])
 
 
-def earlyReturnNone(fn: callable, v):
+def earlyReturnNone(fn: Callable, v):
     "return None if passed in a None, otherwise apply fn and return"
     if v is None:
         return None

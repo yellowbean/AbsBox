@@ -20,10 +20,14 @@ def _require(m: dict, ks: list, label: str):
 
 def mkDeal(x:dict, preCheck=True):
     name = getValWithKs(x, ['name', "名称", "comment", '备注'], defaultReturn="")
+
+    def take(ks: list, label: str, default=None):
+        """Required when `preCheck` is on, otherwise fall back to `default`."""
+        return _require(x, ks, label) if preCheck else getValWithKs(x, ks, defaultReturn=default)
+
+    dates = take(['dates', "date", "日期"], "dates")
     
-    dates = _require(x, ['dates', "date", "日期"], "dates")
-    
-    accs = list(_require(x, ['accounts', "account", "账户", "帐户"], "accounts").items())
+    accs = list((take(['accounts', "account", "账户", "帐户"], "accounts", {}) or {}).items())
     
     fees = list((fn,fv|{"name":fn,"名称":fn})
                 for (fn,fv) in getValWithKs(x
@@ -32,11 +36,11 @@ def mkDeal(x:dict, preCheck=True):
     
     pool = getValWithKs(x, ['pool', "collateral", "资产池"])
 
-    bonds = list(_require(x, ['bond', "bonds", "notes", "债券", "支持证券"], "bonds").items())
+    bonds = list((take(['bond', "bonds", "notes", "债券", "支持证券"], "bonds", {}) or {}).items())
 
-    waterfall = _require(x, ['waterfall', "现金流分配", "分配规则"], "waterfall")
+    waterfall = take(['waterfall', "现金流分配", "分配规则"], "waterfall", {})
     
-    collection = _require(x,['collect','colleciton', 'collectionRule', 'aggregation', '归集规则', '归集'], "collection")
+    collection = take(['collect','colleciton', 'collectionRule', 'aggregation', '归集规则', '归集'], "collection", [])
 
     liqFacility = getValWithKs(x, ['liqFacility', 'liqProvider', "insurance"
                                     ,"cashAdvance", "liquidity", "流动性支持"
@@ -56,6 +60,8 @@ def mkDeal(x:dict, preCheck=True):
     
     ledgers = getValWithKs(x, ['ledger', "ledgers", "科目"])
     
+    stats = getValWithKs(x, ['stats', "统计"])
+    
     deal = Generic(
         name
         ,dates 
@@ -73,6 +79,7 @@ def mkDeal(x:dict, preCheck=True):
         ,custom
         ,ledgers
         ,rateCap
+        ,stats
     )
 
     return deal

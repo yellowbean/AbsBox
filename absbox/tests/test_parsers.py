@@ -331,3 +331,57 @@ def test_sample_deal_serializes_to_engine_json():
     for key in ("dates", "pool", "bonds", "waterfall", "fees", "accounts", "collects", "custom"):
         assert key in contents, key
     _json.dumps(j)  # must remain JSON-serialisable for the engine request
+
+
+def test_comp_result_handles_bond_groups():
+    """Regression: comparing results whose bonds contain a group must not crash."""
+    import pandas as pd
+
+    from absbox.local.cmp import compResult
+
+    a = pd.DataFrame({"x": [1, 2]}, index=["d1", "d2"])
+    b = pd.DataFrame({"x": [1, 3]}, index=["d1", "d2"])
+
+    def mk(bond):
+        return {"pool": {"flow": {}}, "fees": {}, "accounts": {}, "bonds": bond}
+
+    r1 = mk({"A": a, "G": {"g1": a}})
+    r2 = mk({"A": b, "G": {"g1": b}})
+    out = compResult(r1, r2, names=("L", "R"))
+    assert "A" in out["bonds"]
+    assert "G" in out["bonds"]
+
+
+def test_build_run_deal_req_defaults_preserve_payload():
+    """Regression: switching mutable defaults to None must not change the JSON.
+
+    `rtn` must stay `[]` and deal-level assumptions must stay `{}` (not `null`).
+    """
+    import json
+
+    from absbox.client import API
+    from absbox.tests.regression.deals import test01
+
+    # self is unused by build_run_deal_req, so it can be exercised offline
+    req = API.build_run_deal_req(None, "Single", test01, None, None, None)
+    payload = json.loads(req)
+    assert payload["tag"] == "SingleRunReq"
+    rtn, _deal, _perf, nonPerf = payload["contents"]
+    assert rtn == []
+    assert nonPerf == {}
+
+    req2 = API.build_run_deal_req(None, "Single", test01, None, None, ["AssetLevelFlow"])
+    assert json.loads(req2)["contents"][0] == ["AssetLevelFlow"]
+
+
+def test_read_cf_sets_and_sorts_date_index():
+    """Regression for the inplace->assignment refactor in `_read_cf`."""
+    from absbox.local.util import _read_cf
+
+    rows = [
+        {"tag": "BondFlow", "contents": ["2021-02-01", 10, 1, 2]},
+        {"tag": "BondFlow", "contents": ["2021-01-01", 20, 3, 4]},
+    ]
+    df = _read_cf(rows, "english")
+    assert df.index.name == "Date"
+    assert list(df.index) == ["2021-01-01", "2021-02-01"]

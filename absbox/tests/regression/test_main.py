@@ -7,7 +7,6 @@ from pathlib import Path
 from collections import Counter
 from itertools import dropwhile
 import numpy_financial as npf
-from datetime import datetime
 import numpy as np
 
 
@@ -73,28 +72,6 @@ def seniorTest(x, y):
 def insert_functional(lst, index, element):
     return lst[:index] + [element] + lst[index:]
 
-def days_between_dates(date1, date2):
-    """
-    Calculate the number of days between two dates.
-    
-    Args:
-        date1 (str): First date in "YYYY-MM-DD" format
-        date2 (str): Second date in "YYYY-MM-DD" format
-    
-    Returns:
-        int: Absolute number of days between the two dates
-    """
-    try:
-        # Convert string dates to datetime objects
-        d1 = datetime.datetime.strptime(date1, "%Y-%m-%d")
-        d2 = datetime.datetime.strptime(date2, "%Y-%m-%d")
-        
-        # Calculate the difference and return absolute value in days
-        delta = abs(d2 - d1)
-        return delta.days
-        
-    except ValueError as e:
-        raise ValueError(f"Invalid date format. Please use 'YYYY-MM-DD'. Error: {e}")
 
 @pytest.fixture(scope="session")
 def setup_api():

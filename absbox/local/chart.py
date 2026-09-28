@@ -3,19 +3,11 @@ from .util import getValWithKs
 def viz(x):
     """ visualized the waterfall (experiment) """
     import graphviz
-    
+
     waterfall =  getValWithKs(x, ["分配规则","waterfall"])
     agg = getValWithKs(x, ["归集规则","collection"])
-    accounts = getValWithKs(x, ["账户","accounts"])
-    fees = getValWithKs(x, ["费用","fees"])
-    bonds = getValWithKs(x, ["债券","bonds"])
-    liqFacility = getValWithKs(x, ["流动性支持","liqFacility"])
-    rateSwap = getValWithKs(x,[ "利率对冲","rateSwap"])
-    currencySwap = getValWithKs(x, ["汇率对冲","currencySwap"])
-    trigger = getValWithKs(x, ["触发事件","trigger"])
     name = getValWithKs(x, ["名称", "name"])
-    #bonds = getattr(x,"状态","bonds")
-    
+
     def build_agg(d, y):
         """ build aggregation rules ( how proceeds from pool are distributed to accounts)"""
         for s, a in y:

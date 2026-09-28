@@ -33,20 +33,20 @@ class Generic:
     name: str
     dates: dict
     pool: dict
-    accounts: tuple
-    bonds: tuple
-    fees: tuple
+    accounts: tuple | list
+    bonds: tuple | list
+    fees: tuple | list
     waterfall: dict
-    collection: list
-    liqFacility: dict = None
-    rateSwap: dict = None
-    currencySwap: dict = None
-    trigger: dict = None
-    status: str = "Amortizing"
-    custom: dict = None
-    ledgers: dict = None
-    rateCap: dict = None
-    stats: dict = None
+    collection: list | tuple
+    liqFacility: dict | None = None
+    rateSwap: dict | None = None
+    currencySwap: dict | None = None
+    trigger: dict | None = None
+    status: str | tuple = "Amortizing"
+    custom: dict | None = None
+    ledgers: dict | None = None
+    rateCap: dict | None = None
+    stats: dict | None = None
 
     @property
     def json(self) -> dict:

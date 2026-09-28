@@ -148,7 +148,9 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
     return absPath
 
 
-def toExcel(r:dict, p:str,exlude=[],headerFormat={'bold': True, 'bg_color': '#9fdd92','align':'center'}):
+def toExcel(r:dict, p:str,exlude=None,headerFormat=None):
+    exlude = exlude or []
+    headerFormat = headerFormat or {'bold': True, 'bg_color': '#9fdd92','align':'center'}
     x = consolResp(r)
 
     def annotateLoc(m:dict, skip=3):

@@ -268,12 +268,6 @@ Pool
   
     .. versionadded:: 0.24.1
     * ``("schedulePoolValuation", <pricing method>, <pool name1>, <pool name2>..)`` -> get valuation on schedule cashflow from specific pool or all pools with :ref:`Pricing Method` 
-
-      .. warning::
-
-         In absbox 0.52.3 this formula cannot be built: ``mkDs`` is memoized with
-         ``functools.lru_cache`` and the ``<pricing method>`` is a list/dict, which
-         is unhashable. Use this formula only after the code fix is released.
   
     .. versionadded:: 0.52.3
     * ``(poolAccruedInterest, )`` -> get accrued interest of the pool
@@ -3178,7 +3172,9 @@ WriteOff
   write off the bond balance
 
   syntax
-    ``["writeOff", <Bond>, <Limit>]``   (use ``None`` for no limit)
+    ``["writeOff", <Bond>]``
+
+    ``["writeOff", <Bond>, <Limit>]``   (``None`` means no limit)
 
     The ``<Limit>`` :ref:`<limit>`
   
@@ -3206,7 +3202,9 @@ FundWith
   increase balance of the bond and deposit cash to an account
 
   syntax
-    ``["fundWith", <Account>, <Bond>, <Limit>]``   (use ``None`` for no limit)
+    ``["fundWith", <Account>, <Bond>]``
+
+    ``["fundWith", <Account>, <Bond>, <Limit>]``   (``None`` means no limit)
 
     The ``<Limit>`` :ref:`<limit>`
 
@@ -3215,6 +3213,8 @@ Calc Bond Principal Due
   calculate the principal due amount 
 
   syntax 
+    ``["calcBondPrin", <Account>, [<Bond>]]``
+
     ``["calcBondPrin", <Account>, [<Bond>], m ]``
     
     ``m``is just map same in the ``payFee`` , which has keys :
@@ -4167,6 +4167,12 @@ The data is helpful when schedule payment was presented in ``index-based``.
     ,None
     ,{"BondPaidPeriod": 2,"PoolCollectedPeriod":0}
     )
+
+With the map-based sugar ``mkDeal``, pass the same facts under the ``"stats"`` key:
+
+.. code-block:: python
+
+    mkDeal(deal_data | {"stats": {"BondPaidPeriod": 2, "PoolCollectedPeriod": 0}})
 
 
 
