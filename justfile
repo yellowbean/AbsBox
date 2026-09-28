@@ -5,15 +5,19 @@ test:
     echo "Running Tests"
     pytest absbox/tests/regression/test_main.py
 
+# Bump the single source of truth. Sphinx docs derive their version from pyproject.toml.
 update-version version:
-    echo "Update Version: {version}"
+    echo "Update Version: {{version}}"
     sed -i "s/^version = .*/version = \"{{version}}\"/g"  pyproject.toml
-    sed -i "s/^release = .*/release = \"{{version}}\"/g"   docs/source/conf.py
-    sed -i "s/^version = .*/version = \"{{version}}\"/g"   docs/source/conf.py
+    uv lock
+
+# Export marimo notebooks (docs/source/marimo/*.py) to static HTML.
+export-marimo:
+    uv run python docs/export_marimo.py
 
 tag env version:
     echo "Tagging"
-    git add pyproject.toml
+    git add pyproject.toml uv.lock
     git commit -m "bump version to-> < {{version}} >"
     git tag -a {{env}}{{version}} -m "{{env}}{{version}}"
     git push origin HEAD --tag

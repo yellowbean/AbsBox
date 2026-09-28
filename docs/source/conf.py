@@ -9,7 +9,39 @@ project = 'absbox'
 copyright = '2025, Xiaoyu Zhang'
 author = 'Xiaoyu Zhang'
 
-release = "0.52.4"
+
+def _absbox_version() -> str:
+    """Return the absbox version from the repo's ``pyproject.toml``.
+
+    The repository ``pyproject.toml`` is the single source of truth, so the
+    published docs version can never drift from the library version. If the
+    file is unavailable (e.g. building from an sdist), fall back to the
+    installed package metadata.
+    """
+    pyproject = None
+    try:
+        pyproject = pathlib.Path(__file__).resolve().parents[2] / "pyproject.toml"
+    except IndexError:  # conf.py not at the expected depth
+        pyproject = None
+    if pyproject is not None and pyproject.exists():
+        try:
+            import tomllib  # Python 3.11+
+        except ModuleNotFoundError:  # pragma: no cover - Python 3.10
+            try:
+                import tomli as tomllib
+            except ModuleNotFoundError:
+                tomllib = None
+        if tomllib is not None:
+            with pyproject.open("rb") as f:
+                return tomllib.load(f)["project"]["version"]
+    from importlib.metadata import version as _pkg_version
+
+    return _pkg_version("absbox")
+
+
+release = _absbox_version()
+# Sphinx's ``version`` is the short X.Y form; keep it in lockstep with release.
+version = ".".join(release.split(".")[:2])
 
 # -- General configuration
 
@@ -29,6 +61,9 @@ extensions = [
 ]
 
 graphviz_output_format = 'svg'
+
+# Serve files copied from ``docs/source/_static`` (e.g. marimo HTML exports).
+html_static_path = ['_static']
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
