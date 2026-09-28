@@ -164,7 +164,7 @@ Then, project the cashflow with:
 
 .. code-block:: python
 
-  r = localAPI.run(loan_level_deal ,assumptions=[] ,read=True)
+  r = localAPI.run(loan_level_deal ,poolAssump=None ,runAssump=[] ,read=True)
 
   r['pool']['flow'] # Now you shall able to view the loan level cashflow ! 
 
@@ -245,7 +245,7 @@ Two methods to construct structuring plans
     }
 
 
-Build multiple deals(mkDealBy())
+Build multiple deals(mkDealsBy())
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Build components
@@ -473,7 +473,7 @@ After the deal was run, user can view the cashflow of `pool`/ `bonds` `fees` etc
     r['pool']['flow']
 
     #expenses
-    r['fee']
+    r['fees']
 
 For the users who is not patient enough or who want to take a high level view of how the deal was changing during the future.
 `absbox` support `Financial Reports` since version `0.17.0`.
@@ -572,7 +572,7 @@ Once the deal enter a new status `Amortizing`, then in the waterfall acitons wou
 
   ["IfElse"  
     ,["status","Revolving"] # the predicate
-    ,[["transferBy",{"formula":("substract",("bondBalance",),("poolBalance",))} # list of actions if predicate is True ()
+    ,[["transfer",{"formula":("substract",("bondBalance",),("poolBalance",))} # list of actions if predicate is True ()
                    ,"distAcc",'revolBuyAcc']
      ,["buyAsset",["Current|Defaulted",1.0,0],"revolBuyAcc",None]
      ,["payIntResidual","distAcc","Sub"] ]
@@ -628,7 +628,7 @@ Pricing an revolving asset would have a huge impact on the pool cashflow .
 
   ["IfElse"  # 
    ,["status","Revolving"]
-   ,[["transferBy",{"formula":("substract",("bondBalance",),("poolBalance",))}
+   ,[["transfer",{"formula":("substract",("bondBalance",),("poolBalance",))}
                   ,"distAcc",'revolBuyAcc']
     ,["buyAsset",["Current|Defaulted",1.0,0],"revolBuyAcc",None] # <--- action of buying revolving assets
     ,["payIntResidual","distAcc","Sub"] ]
@@ -686,13 +686,12 @@ Error/Warning Log
   from absbox import API,mkDeal
   localAPI = API("http://localhost:8081",check=False)
 
-  deal = mkDeal(deal_data,preCheck=False)
+  deal = mkDeal(deal_data)
 
   r = localAPI.run(deal
                   ,poolAssump = None
                   ,runAssump = None
-                  ,read=True
-                  ,preCheck=False)
+                  ,read=True)
 
   r['result']['logs']
 
@@ -854,7 +853,7 @@ OK, let's assume ,we are a homeowner that want to install a solar panel system w
               ,{"start":"2023-11-01","originBalance":15000,"originTerm":240
                 ,"residual":1000,"period":"Monthly","amortize":"Straight"
                 ,"capacity":("Fixed",20*20*2)}
-              ,{"remainTerm":240}]] 
+              ,{"remainTerm":240,"currentBalance":15000}]] 
 
   exps = (("maintenance",{"type":{"recurFee":["YearFirst",200]}})
           ,("maintenance2",{"type":{"recurFee":["YearFirst",200],"feeStart":"2033-11-01"}})
@@ -939,12 +938,12 @@ Nowe we need assumption to project cashflow:
 .. code-block:: python
 
   myAssump = ("Pool"
-              ,("Fixed",[["2024-01-01",0.3]
-                        ,["2025-01-01",0.25]
-                        ,["2026-01-01",0.2]]
-                       ,[["2024-01-01",0.9]
+              ,("Fixed",[["2024-01-01",0.9]
                         ,["2025-01-01",0.85]
-                        ,["2026-01-01",0.8]])
+                        ,["2026-01-01",0.8]]
+                       ,[["2024-01-01",0.3]
+                        ,["2025-01-01",0.25]
+                        ,["2026-01-01",0.2]])
               ,None
               ,None)
 
@@ -958,7 +957,25 @@ and calculate the IRR of equity investment:
 
 .. code-block:: python 
 
-  from absbox.local.analytics import irr
+  # absbox does not ship an `irr` helper; compute a date-weighted IRR locally
+  from datetime import datetime
+
+  def irr(bondCf, init):
+      """XIRR of a bond cashflow DataFrame plus an initial (date, amount) flow."""
+      flows = [init] + [(d, c) for d, c in bondCf['cash'].items() if c]
+      d0 = datetime.strptime(flows[0][0], "%Y-%m-%d")
+      def npv(r):
+          return sum(c / (1 + r) ** ((datetime.strptime(d, "%Y-%m-%d") - d0).days / 365.0)
+                     for d, c in flows)
+      lo, hi = -0.9999, 10.0
+      for _ in range(200):
+          mid = (lo + hi) / 2
+          if npv(mid) > 0:
+              lo = mid
+          else:
+              hi = mid
+      return (lo + hi) / 2
+
   irr(p['bonds']['EQ'],init=('2024-01-01',-7_000))
 
 it was ``1.67%`` (YoY)...whoa...sad 
@@ -974,38 +991,38 @@ We can perform sensitivity analysis to explore how robust our investment is
 
   scenarioMap = {
     "base":("Pool"
-            ,("Fixed",[["2024-01-01",0.3]
-                      ,["2025-01-01",0.25]
-                      ,["2026-01-01",0.2]]
-                     ,[["2024-01-01",0.9]
+            ,("Fixed",[["2024-01-01",0.9]
                       ,["2025-01-01",0.85]
-                      ,["2026-01-01",0.8]])
+                      ,["2026-01-01",0.8]]
+                     ,[["2024-01-01",0.3]
+                      ,["2025-01-01",0.25]
+                      ,["2026-01-01",0.2]])
             ,None
             ,None)
     ,"lowUtil" :("Pool"
-                ,("Fixed",[["2024-01-01",0.3]
-                          ,["2025-01-01",0.25]
-                          ,["2026-01-01",0.2]]
-                         ,[["2024-01-01",0.85]
+                ,("Fixed",[["2024-01-01",0.85]
                           ,["2025-01-01",0.80]
-                          ,["2026-01-01",0.75]])
+                          ,["2026-01-01",0.75]]
+                         ,[["2024-01-01",0.3]
+                          ,["2025-01-01",0.25]
+                          ,["2026-01-01",0.2]])
                 ,None
                 ,None)
    ,"lowPrice" : ("Pool"
-                ,("Fixed",[["2024-01-01",0.3]
-                          ,["2025-01-01",0.225]
-                          ,["2026-01-01",0.19]]
-                         ,[["2024-01-01",0.9]
+                ,("Fixed",[["2024-01-01",0.9]
                           ,["2025-01-01",0.85]
-                          ,["2026-01-01",0.8]])
+                          ,["2026-01-01",0.8]]
+                         ,[["2024-01-01",0.3]
+                          ,["2025-01-01",0.225]
+                          ,["2026-01-01",0.19]])
                 ,None
                 ,None)
    }
-   p = localAPI.run(solarPanel,poolAssump=scenarioMap
+   p = localAPI.runByScenarios(solarPanel,poolAssump=scenarioMap
                        ,runAssump=[("call",{"afterDate":"2044-01-01"})
                                   ,("report",{"dates":"MonthEnd"})]
                        ,read=True)
-  from absbox.local.util import irr
+  # reuse the irr() helper defined in the Project Cashflow section above
   {k:irr(v['bonds']['EQ'],init=('2024-01-01',-7000)) 
     for k,v in p.items()}
 
@@ -1078,7 +1095,7 @@ Users have the option to build their own `Deal Library` or just deploy the servi
 How to use a deal library?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-User just need to pass the bond id and pool/deal level assumptions to the `runLibrary()` function, the deal object will be retrieved from the library and projected cashflow will be returned.
+User just needs to pass the deal id and pool/deal level assumptions to the ``run()`` method of a ``LIBRARY`` instance; the deal object will be retrieved from the library and projected cashflow will be returned.
 
 Why using a deal library ? 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1093,7 +1110,7 @@ How to pass deal files around ?
 A deal object 
 ^^^^^^^^^^^^^^^^^
 
-A deal object either initialized with `SPV` or `Generic` class, is actually a python `dataclass` which implements a ``.json()`` .
+A deal object either initialized with `SPV` or `Generic` class, is actually a python `dataclass` which implements a ``.json`` property .
 
 The ``json()`` function will convert the class to a json representation string .
 
@@ -1106,7 +1123,7 @@ Now with that string, user can just write it into a No-SQL document database . o
 How to use Deal JSON string 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The JSON string from `.json()` method can be used as part of post request send to `Hastructure` engine.
+The JSON string from `.json` property can be used as part of post request send to `Hastructure` engine.
 
 But unfortunately there is no way convert the string back to python class so far.
 

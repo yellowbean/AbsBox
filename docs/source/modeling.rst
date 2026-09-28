@@ -268,6 +268,12 @@ Pool
   
     .. versionadded:: 0.24.1
     * ``("schedulePoolValuation", <pricing method>, <pool name1>, <pool name2>..)`` -> get valuation on schedule cashflow from specific pool or all pools with :ref:`Pricing Method` 
+
+      .. warning::
+
+         In absbox 0.52.3 this formula cannot be built: ``mkDs`` is memoized with
+         ``functools.lru_cache`` and the ``<pricing method>`` is a list/dict, which
+         is unhashable. Use this formula only after the code fix is released.
   
     .. versionadded:: 0.52.3
     * ``(poolAccruedInterest, )`` -> get accrued interest of the pool
@@ -480,7 +486,7 @@ Integer Based Condition
 .. versionadded:: 0.29.14
 
 * ``["period", ">", N]`` -> if period number is greater than N
-* ``["period", "bewteen", rangeType, N1, N2]`` -> if period number is between N1 and N2 with :ref:`Range Type`
+* ``["period", "between", rangeType, N1, N2]`` -> if period number is between N1 and N2 with :ref:`Range Type`
 * ``["period", "><", rangeType, N1, N2]`` -> same but less key strike
 * ``["period", "in", N1, N2...]`` -> if period number is in the list of N1, N2...
 
@@ -1065,7 +1071,7 @@ syntax
   ``{"annualPctFee":[ <Formula>,<percentage> ] }``
 
   .. versionadded:: 0.52.3
-  ``{"annualPctFeeRate": <percentage>, "base": <Formula> }``
+  ``{"base": <Formula>, "annualisedRate": <percentage> }``
 
 
 available formula options:
@@ -1145,7 +1151,7 @@ syntax
   ``{"numFee":[ <DatePattern>, <Formula>, <Amount> ]}``
 
   .. versionadded:: 0.52.3
-  ``{ "numFeeAmt": <Amount> ,"numFeeDates": <DatePattern>, "base": <Formula>}``
+  ``{ "numFeeAmount": <Amount> ,"numFeeDates": <DatePattern>, "base": <Formula>}``
 
 .. code-block:: python
   
@@ -1159,7 +1165,7 @@ target amount fee
 The fee due amount is equal to ``max ( <Formula 1> - <Formula 2>,0)``
 
 syntax
-  ``("targetBalanceFee, <Formula 1>, <Formula 2>)``
+  ``("targetBalanceFee", <Formula 1>, <Formula 2>)``
 
   ``{"targetBalanceFee:[<Formula 1>,<Formula 2>]}``
 
@@ -1756,7 +1762,8 @@ This type of asset can be used to model `future flow of securitization` : `Hotel
 
   .. versionchanged:: 0.45.3
   
-    "Balance" becomes a required field in status of `FixedAsset` type asset.
+    The ``currentBalance`` field is required in the status map of a
+    ``FixedAsset`` type asset.
 
 
 .. code-block:: python
@@ -1764,7 +1771,7 @@ This type of asset can be used to model `future flow of securitization` : `Hotel
   assets = [["FixedAsset" ,{"start":"2023-11-01","originBalance":100_0000,"originTerm":120
                             ,"residual":10_0000,"period":"Monthly","amortize":"Straight"
                             ,"capacity":("Fixed",24*25*120*30)}
-                          ,{"remainTerm":120,"balance":30000}]]
+                          ,{"remainTerm":120,"currentBalance":30000}]]
 
 .. warning::
 
@@ -2320,9 +2327,9 @@ syntax
 
     :code:`"rateType":{"fix":0.0569,"dayCount":"DC_ACT_365"}`
 
-    :code:`"rateType":["fix":0.0569]`
+    :code:`"rateType":["fix",0.0569]`
 
-    :code:`"rateType":("fix":0.0569)`
+    :code:`"rateType":("fix",0.0569)`
 
 .. versionadded:: 0.40.10
 
@@ -2410,7 +2417,7 @@ Instead of accrue interest on bond's outstanding balance
 
 The bond interest will be calculated by a base balance described by a :ref:`Formula`
 
-It use a composite syntax: ``("byRefBalance",<formula>, <rate object>)``
+It use a composite syntax: ``("refBalance",<formula>, <rate object>)``
 
 syntax
   :code:`"rateType":("refBalance",("*",("bondBalance","A","B"), 0.3) ,{"Fixed":0.06})`
@@ -2478,7 +2485,6 @@ there are 5 types of `Principal` for bonds/tranches
   * ``Lockout``: Principal won't be paid after lockout date
   * ``Equity``:  No interest and shall serve as junior tranche
   * ``IO``:  Interest Only tranche
-  * ``Z``:  only payable if other bonds are paid off
 
 Sequential 
 """""""""""""
@@ -3048,7 +3054,7 @@ PayIntAndBook
   pay interest to bond and book the ledger
 
   syntax
-    ``["payInt", {Account}, [<Bonds>], m, "book", <Direction>, <Ledger>]``
+    ``["payIntAndBook", {Account}, [<Bonds>], m, "book", <Direction>, <Ledger>]``
 
     `m`is just a map same in the `payFee` , which has keys :
 
@@ -3159,7 +3165,7 @@ PayIntResidual
   
     The ``<Limit>`` :ref:`<limit>`
 
-PayPrintWithDue
+PayPrinWithDue
   .. versionadded:: 0.27.32
   pay principal to bond till principal due amount. Make sure to run `Calc Bond Principal Due` before this action
 
@@ -3172,9 +3178,7 @@ WriteOff
   write off the bond balance
 
   syntax
-    ``["writeOff", <Bond>]`` 
-
-    ``["writeOff", <Bond>, <Limit>]`` 
+    ``["writeOff", <Bond>, <Limit>]``   (use ``None`` for no limit)
 
     The ``<Limit>`` :ref:`<limit>`
   
@@ -3189,7 +3193,7 @@ WriteOff
 
     The ``<Limit>`` :ref:`<limit>`
 
-WirteOffAndBook
+WriteOffAndBook
   .. versionadded:: 0.40.5
   write off the bond and book the ledger
 
@@ -3202,9 +3206,7 @@ FundWith
   increase balance of the bond and deposit cash to an account
 
   syntax
-    ``["fundWith", <Account>, <Bond>]``
-
-    ``["fundWith", <Account>, <Bond>, <Limit>]``
+    ``["fundWith", <Account>, <Bond>, <Limit>]``   (use ``None`` for no limit)
 
     The ``<Limit>`` :ref:`<limit>`
 
@@ -3213,8 +3215,6 @@ Calc Bond Principal Due
   calculate the principal due amount 
 
   syntax 
-    ``["calcBondPrin", <Account>, [<Bond>]]``
-    
     ``["calcBondPrin", <Account>, [<Bond>], m ]``
     
     ``m``is just map same in the ``payFee`` , which has keys :
@@ -3230,15 +3230,15 @@ Accure Interest of Bond Group
   accrue interest of bonds in a group
 
   syntax
-    ``["calcIntByGroup", "A"]``
+    ``["calcIntByGroup", ["A"]]``
 
 Accure Interest and Pay of Bond Group
   accrue interest and pay interest of bonds in a group
 
   syntax
-    ``["accrueAndPayIntByGroup", "A", order]``
+    ``["accrueAndPayIntByGroup", <Account>, "A", order]``
 
-    ``["accrueAndPayIntByGroup", "A", order, m]``
+    ``["accrueAndPayIntByGroup", <Account>, "A", order, m]``
     
   ``m``is just map same in the ``payFee`` , which has keys :
 
@@ -3251,9 +3251,9 @@ Pay Interest to Bond Group
   pay interest to bonds in a group via a order , :ref:`<ordering>`
 
   syntax
-    ``["payIntByGroup", "A", order]``
+    ``["payIntByGroup", <Account>, "A", order]``
 
-    ``["payIntByGroup", "A", order, m]``
+    ``["payIntByGroup", <Account>, "A", order, m]``
     
   ``m``is just map same in the ``payFee`` , which has keys :
 
@@ -3264,9 +3264,9 @@ Pay Principal to Bond Group
   pay principal to bonds in a group via a order 
 
   syntax
-    ``["payPrinByGroup", "A", order]``
+    ``["payPrinByGroup", <Account>, "A", order]``
     
-    ``["payPrinByGroup", "A", order, m]``
+    ``["payPrinByGroup", <Account>, "A", order, m]``
     
   ``m``is just map same in the ``payFee`` , which has keys :
 
@@ -4251,8 +4251,8 @@ We can model these two like:
     ....
     ,["payPrin","acc01",["A1"]]
     ,["payPrin","acc01",["A2"]]
-    ,["If",["or"
-          ,["isPaidOff","A1","A2"]
+    ,["If",["any"
+          ,[("isPaidOff","A1","A2"), True]
           ,[">=","2009-06-30"]
           ,[("cumPoolNetLossRate",),"<",0.05]]
       ,["payPrin","acc01",["B"]]

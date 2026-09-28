@@ -27,10 +27,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -e ".[test]"
-        pip install ruff
+        pip install ruff mypy
     - name: Lint with ruff
       run: |
         ruff check absbox
+    - name: Type-check with mypy (advisory)
+      # Advisory only: the codebase still carries annotation debt (~30 errors).
+      # Remove `|| true` once the baseline reaches zero.
+      run: |
+        python -m mypy || true
     - name: Test with pytest
       run: |
         python -m pytest absbox/tests

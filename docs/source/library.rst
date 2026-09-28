@@ -58,7 +58,7 @@ Login
 .. code-block:: python
 
     library.login("username","password")
-    library.safeLogin("trial_1")"
+    library.safeLogin("trial_1")
 
 
 Query a deal

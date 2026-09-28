@@ -125,7 +125,7 @@ Performing
     * ``{"DefaultAtEndByRate":(0.05,0.10)}``, will apply 5% as CDR for all periods except last period. The last period will use default CDR 10% (which start from begining day).
     .. versionadded:: 0.42.2
 
-    * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
+    * ``{"byTerm":[ [vec1],[vec2]...]}``, input list of vectors, asset will use vector with same origin term length
 * <Prepayment Assumption>
   
   prepayment assumption for performing asset
@@ -135,7 +135,7 @@ Performing
     * ``{"CPRPadding":[0.01,0.02,0.04]}`` same with above but the CPR 4% will be applied to rest of periods of the asset
     .. versionadded:: 0.42.2
     * ``{"PSA": 1.0}`` 100% of PSA Speed. 
-    * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
+    * ``{"byTerm":[ [vec1],[vec2]...]}``, input list of vectors, asset will use vector with same origin term length
 
 
 * <Recovery Assumption>
@@ -165,7 +165,7 @@ Non-Performing
 
     .. code-block:: python 
     
-        ("Defaulted":[0.5,4,[0.5,0.2,0.3]])
+        ("Defaulted",0.5,4,[0.5,0.2,0.3])
 
     which says:
 
@@ -202,7 +202,7 @@ Summary
         "Prepayment Assumption" -> "{'byTerm':....}"
         "Recovery Assumption" -> "{'Rate':x,'Lag':y}"
         "Defaulted" -> "Defaulted Assumption"
-        "Defaulted Assumption" -> "{'Defaulted':[x,y,[z...]]}"
+        "Defaulted Assumption" -> "('Defaulted',x,y,[z...])"
     }
 
 
@@ -223,13 +223,13 @@ Loan
   * <default assump> : ``{"CDR":<%>}``, can be a vector or constant value
   * <default assump> : ``{"CDRPadding":<%>}``, can be a vector or constant value, with last element till end of the asset
   .. versionadded:: 0.42.2
-  * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
+  * ``{"byTerm":[ [vec1],[vec2]...]}``, input list of vectors, asset will use vector with same origin term length
 * Prepayment
 
   * <prepayment assump> : ``{"CPR":<%>}``, can be a vector or constant value
   * <prepayment assump> : ``{"CPRPadding":<%>}``, can be a vector or constant value , with last element till end of the asset
   .. versionadded:: 0.42.2
-  * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
+  * ``{"byTerm":[ [vec1],[vec2]...]}``, input list of vectors, asset will use vector with same origin term length
 
 Summary
 """"""""""""""""
@@ -277,12 +277,12 @@ Installment
 
   * <default assump> : ``{"CDR":<%>}``
   .. versionadded:: 0.42.2
-  * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
+  * ``{"byTerm":[ [vec1],[vec2]...]}``, input list of vectors, asset will use vector with same origin term length
 * Prepayment
 
   * <prepayment assump> : ``{"CPR":<%>}``
   .. versionadded:: 0.42.2
-  * ``{"ByTerm":[ [vec1],[vec2]...]``, input list of vectors, asset will use vector with same origin term length
+  * ``{"byTerm":[ [vec1],[vec2]...]}``, input list of vectors, asset will use vector with same origin term length
 
 Summary
 """"""""""""""""
@@ -1614,8 +1614,7 @@ params:
 
 returns:
    * (``<asset cashflow>``
-   *  , ``<cumulative balance before cutoff date>``
-   *  , ``<pricing result>``)  -> not implemented yet
+   *  , ``<pricing result>``)
 
 .. code-block:: python
 
@@ -1638,13 +1637,13 @@ returns:
                                           ,None)
                        ,read=True)
 
-  # asset cashflow
-  r[0] 
-  # cumulative defaults/loss/delinq before cutoff date
+  # asset cashflow (keyed by pool name; 'PoolConsol' for an unnamed pool)
+  r['PoolConsol']['flow']
+  # pricing result
   r[1]
 
   # or just pattern match on the result
-  (cf,stat,pricing) = localAPI.runAsset(....)
+  (cf,pricing) = localAPI.runAsset(....)
 
 .. note::
 
@@ -1726,8 +1725,9 @@ the `runPool()` function will return cashflow for a pool, user need to specify `
 
    mypool = {'assets':[
                      ["Lease"
-                     ,{"fixRental":1000,"originTerm":12,"freq":["DayOfMonth",12]
-                        ,"remainTerm":10,"originDate":"2021-02-01","status":"Current"}]
+                     ,{"rental":("byPeriod",1000,"Monthly"),"originTerm":12
+                        ,"originDate":"2021-02-01"}
+                     ,{"status":"Current","remainTerm":10,"currentBalance":10000}]
               ],
              'cutoffDate':"2021-04-04"}
 
@@ -2338,7 +2338,7 @@ Use ``runRootFinder()`` to run root finder, it has four parameters:
         <Deal Object>
         ,<Pool Assumption>
         ,<Run Assumption>
-        ,(<Tweak>, <Stop Condition>>)
+        ,(<Tweak>, <Stop Condition>)
     )
 
 Tweak
@@ -2370,7 +2370,7 @@ Max Spread
     ``("maxSpread", <bondName>)``
 
     .. versionadded:: 0.50.1
-    ``("maxSpread", <min factor:float>, <max factor:float>)``
+    ``("maxSpread", <bondName>, <min factor:float>, <max factor:float>)``
 
 Split Balance
   It will adjust balance distribution of two bonds. 
@@ -2404,7 +2404,7 @@ Bond Pricing Equals to Face
   The search stop when a bond pricing equals to face value.
   
   syntax
-    ``("bondPricingEqOrigin", <bondName>, <TestBondFlag>, <TestFeeFlag>)``
+    ``("bondPricingEqOriginBal", <bondName>, <TestBondFlag>, <TestFeeFlag>)``
 
 Bond with target IRR
   The search stop when a bond hit a target IRR.
@@ -2554,7 +2554,7 @@ User can inspect difference as below:
 
   diff = compResult(r1,r2,names=("highCDR","lowCDR"))
 
-  diff['bond']['senior'][['balance','cash']]
+  diff['bonds']['senior'][['balance','cash']]
 
 Exmaple output:
 

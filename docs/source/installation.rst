@@ -228,13 +228,27 @@ If ``absbox`` is version ``0.28.5``, it will find first engine with version ``0.
 
 .. versionadded:: 0.28.5
 
-.. code-block:: python 
+.. warning::
 
-  from absbox import PickApiFrom
+   ``PickApiFrom`` is **non-functional in absbox 0.52.3**: it forwards an
+   internal ``{"url": ...}`` map to ``API`` and fails during URL validation.
+   Probe the engines explicitly instead, until the code fix is released.
 
-  # auto connect to the best fit engine
-  listOfApis = [EnginePath.PROD,EnginePath.DEV,"http://your_own_server:8081"]
+.. code-block:: python
 
-  api = PickApiFrom(listOfApis,check=False,lang='english')
+  from absbox import API, EnginePath
+
+  # pick the first reachable engine explicitly
+  api = None
+  for ep in [EnginePath.PROD, EnginePath.DEV, EnginePath.LOCAL]:
+      try:
+          api = API(ep, check=False, lang='english')
+          break
+      except Exception:
+          continue
+
+  # documented but currently broken:
+  # from absbox import PickApiFrom
+  # api = PickApiFrom([EnginePath.PROD, EnginePath.DEV], check=False, lang='english')
 
 

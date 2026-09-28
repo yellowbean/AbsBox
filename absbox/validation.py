@@ -16,47 +16,47 @@ def isValidUrl(url: str) -> str | None:
 dateStr = Regex(r"^\d{4}-\d{2}-\d{2}$")
 
 
-def vList(x, t, msg:str = None) -> list:
+def vList(x, t,     msg: str | None = None) -> list:
     return Schema([t]).validate(x)
 
-def vListOfList(x, t, msg:str = None) -> list:
+def vListOfList(x, t,     msg: str | None = None) -> list:
     return Schema([[t]]).validate(x)
 
-def vTuple(x, t, msg:str = None) -> tuple:
+def vTuple(x, t,     msg: str | None = None) -> tuple:
     return Schema((t,)).validate(x)
 
-def vDict(x, msg:str = None) -> dict:
+def vDict(x,     msg: str | None = None) -> dict:
     pass
 
 
-def vStr(x, msg:str = None) -> str:
+def vStr(x,     msg: str | None = None) -> str:
     return Schema(str).validate(x)
 
 
-def vNum(x, msg:str = None) -> float:
+def vNum(x,     msg: str | None = None) -> float:
     return Schema(Or(float, int)).validate(x)
 
-def vFloat(x, msg:str = None) -> float:
+def vFloat(x,     msg: str | None = None) -> float:
     return Schema(float).validate(x)
 
 
-def vInt(x, msg:str = None) -> int:
+def vInt(x,     msg: str | None = None) -> int:
     return Schema(int).validate(x)
 
 
-def vBool(x, msg:str = None) -> bool:
+def vBool(x,     msg: str | None = None) -> bool:
     return Schema(bool).validate(x)
 
 
-def vDate(x, msg:str = None) -> str:
+def vDate(x,     msg: str | None = None) -> str:
     return Schema(dateStr).validate(x)
 
 
-def vCurve(x, msg:str = None):
+def vCurve(x,     msg: str | None = None):
     return Schema([[Schema(dateStr), Or(int, float)]]).validate(x)
 
 
-def vTable(x, msg:str = None):
+def vTable(x,     msg: str | None = None):
     return Schema([[Or(int, float) ,Or(int, float)]]).validate(x)
 
 
