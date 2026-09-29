@@ -952,33 +952,12 @@ Nowe we need assumption to project cashflow:
                                     ,("report",{"dates":"MonthEnd"})]
                         ,read=True)
 
-we can inspect the cashflow projection  :ref: 
-and calculate the IRR of equity investment:
+we can inspect the projected bond cashflow:
 
-.. code-block:: python 
+.. code-block:: python
 
-  # absbox does not ship an `irr` helper; compute a date-weighted IRR locally
-  from datetime import datetime
-
-  def irr(bondCf, init):
-      """XIRR of a bond cashflow DataFrame plus an initial (date, amount) flow."""
-      flows = [init] + [(d, c) for d, c in bondCf['cash'].items() if c]
-      d0 = datetime.strptime(flows[0][0], "%Y-%m-%d")
-      def npv(r):
-          return sum(c / (1 + r) ** ((datetime.strptime(d, "%Y-%m-%d") - d0).days / 365.0)
-                     for d, c in flows)
-      lo, hi = -0.9999, 10.0
-      for _ in range(200):
-          mid = (lo + hi) / 2
-          if npv(mid) > 0:
-              lo = mid
-          else:
-              hi = mid
-      return (lo + hi) / 2
-
-  irr(p['bonds']['EQ'],init=('2024-01-01',-7_000))
-
-it was ``1.67%`` (YoY)...whoa...sad 
+  # equity tranche cashflow
+  p['bonds']['EQ']
 
 Sensitivity Analysis 
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1022,18 +1001,14 @@ We can perform sensitivity analysis to explore how robust our investment is
                        ,runAssump=[("call",{"afterDate":"2044-01-01"})
                                   ,("report",{"dates":"MonthEnd"})]
                        ,read=True)
-  # reuse the irr() helper defined in the Project Cashflow section above
-  {k:irr(v['bonds']['EQ'],init=('2024-01-01',-7000)) 
-    for k,v in p.items()}
+  # equity cashflow for each scenario
+  {k: v['bonds']['EQ'] for k, v in p.items()}
 
-  #  {'base': 0.016930937065270275,
-  #   'lowPrice': 0.0028372850153230164,
-  #   'lowUtil': -0.0013152392627518972}
+Compare the projected equity cashflows across scenarios to see which driver
+matters most over the 20-year horizon: keeping the utilization rate high has a
+larger effect than a moderate price drop.
 
-Well, it's pretty clear that in current transaction , lower price isn't most scary factor comparing to low utilization rate.
-In the long run of 20 years, keep higher utilization rate is important, so sweep the panel weekly! 
-
-or you can buy a robot to do that ,but it will drag down the IRR :) 
+or you can buy a robot to do that, but it will drag down the return :)
 
 Conclusion
 ^^^^^^^^^^^^^

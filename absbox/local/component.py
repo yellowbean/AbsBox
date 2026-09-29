@@ -677,6 +677,8 @@ def mkBondType(x):
             return mkTag(("Equity"))
         case "IO":
             return mkTag(("IO"))
+        case {"Z": _} | "Z" | "Z-Tranche" | "ZTranche" | "Z债券":
+            return mkTag(("Z"))
         case _:
             raise AbsboxParseError(f"Failed to match bond type: {preview(x)}")
 

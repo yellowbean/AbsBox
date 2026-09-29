@@ -81,6 +81,8 @@ html_theme_options = {
 
 
 nb_execution_excludepatterns = [
+    # no stored outputs; would execute against the engine at build time
+    "**/triggerRolling.ipynb",
 ]
 
 ## Autoapi Doc

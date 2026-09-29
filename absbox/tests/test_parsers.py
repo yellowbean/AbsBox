@@ -12,6 +12,7 @@ from absbox.local.component import (
     mkDatePattern,
     mkBnd,
     mkBndComp,
+    mkBondType,
     mkPid,
     mkTradeType,
     mkOrder,
@@ -158,6 +159,29 @@ def test_mkBndComp_single_and_group():
         ),
     )
     assert group["tag"] == "BondGroup"
+
+
+def test_mkBondType_z_tranche():
+    # the engine BondType has a nullary Z constructor:
+    #   Hastructure src/Liability.hs:  data BondType = ... | Z | Equity ...
+    # and its wire shape is ``{"tag": "Z"}`` (see swagger.json BondType).
+    assert mkBondType("Z") == {"tag": "Z"}
+    assert mkBondType({"Z": None}) == {"tag": "Z"}
+    assert mkBondType("Sequential") == {"tag": "Sequential"}
+
+    bnd = mkBnd(
+        "Z1",
+        {
+            "balance": 100.0,
+            "rate": 0.05,
+            "originBalance": 100.0,
+            "originRate": 0.05,
+            "startDate": "2021-01-01",
+            "rateType": ["fix", 0.05],
+            "bondType": "Z",
+        },
+    )
+    assert bnd["bndType"] == {"tag": "Z"}
 
 
 def test_mkPid_underlying_deal():

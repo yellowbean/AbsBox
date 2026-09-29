@@ -2471,7 +2471,7 @@ syntax
 
 Principal 
 ^^^^^^^^^^^
-there are 5 types of `Principal` for bonds/tranches
+there are 7 types of `Principal` for bonds/tranches
 
   * ``Sequential``: can be paid down as much as its oustanding balance
   * ``PAC``: Balance of bond can only be paid down by a predefined balance schedule
@@ -2479,6 +2479,7 @@ there are 5 types of `Principal` for bonds/tranches
   * ``Lockout``: Principal won't be paid after lockout date
   * ``Equity``:  No interest and shall serve as junior tranche
   * ``IO``:  Interest Only tranche
+  * ``Z``:  accrual (Z) tranche; principal is only paid once the other tranches are paid off
 
 Sequential 
 """""""""""""
