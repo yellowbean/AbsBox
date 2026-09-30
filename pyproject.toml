@@ -7,7 +7,7 @@ include = ["absbox*"]
 exclude = ["absbox.tests*", "docs*", "notebooks*"]
 
 [project]
-version = "0.52.4"
+version = "0.52.7"
 name = "absbox"
 description = "an analytical library for cashflow modeling on ABS/MBS products"
 readme = "README.md"
@@ -89,6 +89,7 @@ test = [
 [tool.towncrier]
 directory = "changes"
 name = "Absbox"
+package = "absbox"
 filename = "CHANGELOG.rst"
 
 start_string = ".. towncrier release notes start\n"
