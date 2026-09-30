@@ -4,6 +4,9 @@ etc/
 share
 lib64
 pyvenv.cfg
+__pycache__/
+*.py[cod]
+__marimo__/
 .ipynb_checkpoints/
 absbox/__pycache__/
 absbox/examples/__pycache__/
@@ -14,6 +17,8 @@ absbox/tests/benchmark/us/__pycache__/
 absbox/tests/regression/__pycache__/
 absbox/tests/regression/*.ipynb
 absbox.egg-info/
+build/
+dist/
 include/
 jupyter_execute
 bin/
@@ -22,3 +27,11 @@ docs/build/
 absbox/tests/config.json
 .gitignore
 publish.sh
+notebooks/
+opencode.json
+justfile
+
+# macOS / editor junk
+.DS_Store
+*.code-workspace
+justfile

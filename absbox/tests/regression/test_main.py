@@ -19,11 +19,26 @@ from absbox.exception import AbsboxError
 
 config_file_path = Path(__file__).resolve().parent.parent / 'config.json'
 
+# Friendly engine aliases selectable via the ABSBOX_TEST_SERVER env var.
+# local -> local engine, dev/prod -> Singapore servers (see EnginePath).
+ENGINE_ALIASES = {
+    "local": EnginePath.LOCAL.value,
+    "dev": EnginePath.DEV.value,
+    "prod": EnginePath.PROD.value,
+}
+
 # Engine-dependent regression tests hit an external server and are therefore
 # non-hermetic. Skip them in CI by default; set ABSBOX_REGRESSION=1 to force.
 def _should_skip_server_tests() -> bool:
     forced = str(os.environ.get("ABSBOX_REGRESSION", "")).lower() in ("1", "true", "yes")
     return bool(os.environ.get("CI")) and not forced
+
+def _resolve_test_server(default: str) -> str:
+    """Use ``ABSBOX_TEST_SERVER`` when set (alias or full url), else the config value."""
+    override = str(os.environ.get("ABSBOX_TEST_SERVER", "")).strip()
+    if not override:
+        return default
+    return ENGINE_ALIASES.get(override.lower(), override)
 
 def closeTo(a,b,r=2):
     assert math.floor(a * 10**r)/10**r == math.floor(b * 10**r)/10**r, f"Not close to {a}/{math.floor(a * 10**r)/10**r} {b}/{math.floor(b * 10**r)/10**r}"
@@ -83,10 +98,11 @@ def setup_api():
                     "skipping engine-dependent regression test")
     with config_file_path.open('r') as config_file:
         config = json.load(config_file)
+    server_url = _resolve_test_server(config['test_server'])
     try:
-        api = API(config['test_server'], check=False, lang='english')
+        api = API(server_url, check=False, lang='english')
     except Exception as e:
-        pytest.skip(f"engine server {config.get('test_server')} not reachable: {e}")
+        pytest.skip(f"engine server {server_url} not reachable: {e}")
     return api
 
 

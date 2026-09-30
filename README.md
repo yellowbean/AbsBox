@@ -16,6 +16,11 @@ a structured finance cashflow engine wrapper for structured credit professionals
 * English -> https://absbox-doc.readthedocs.io
 * Chinese(inactive) -> https://absbox.readthedocs.io
 
+## AI Assistant Skill
+* [absbox-skill](https://github.com/absbox/absbox-skill) -> ready-made workflows, reference tables
+  and verified golden-path recipes that let AI coding assistants (opencode, Claude, etc.) model
+  and project structured finance deals with absbox and the Hastructure engine.
+
 ## Goal
 * Structuring
   * Easy way to create different pool assets/deal capital structures and waterfalls

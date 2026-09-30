@@ -15,6 +15,7 @@ pkgs.mkShell {
     pkgs.pkg-config
     pkgs.glibcLocales
     pkgs.graphviz
+    pkgs.just
   ];
   LANG = "en_US.UTF-8";
   LC_ALL = "en_US.UTF-8";
