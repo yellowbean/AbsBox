@@ -54,8 +54,11 @@ def mkDatePattern(x):
             return mkTag((_x))
         case _x if (_x in datePattern.keys()):
             return mkTag((datePattern[x]))
-        case d if isinstance(d, str) and vDate(x):
-            return mkTag(("SingletonDate", d))
+        case d if isinstance(d, str):
+            try:
+                return mkTag(("SingletonDate", vDate(d)))
+            except Exception as e:
+                raise AbsboxParseError(f"Failed to match {preview(d)} in DatePattern", e)
         case _:
             raise AbsboxParseError(f"Failed to match {preview(x)}")
 
@@ -364,7 +367,7 @@ def mkDs(x):
                 return mkTag(("PoolWaRate", mkPid(pName)))
             case ("资产池利率",) | ("poolWaRate",):
                 return mkTag(("PoolWaRate", None))
-            case ("所有账户余额",) | ("accountBalance"):
+            case ("所有账户余额",) | ("accountBalance",):
                 return mkTag("AllAccBalance")
             case ("账户余额", *ans) | ("accountBalance", *ans):
                 return mkTag(("AccBalance", vList(ans, str)))
@@ -506,6 +509,8 @@ def mkDs(x):
                         return mkTag(("DealStatBool", s))
                     case "rate" | "ratio" | "percent":
                         return mkTag(("DealStatRate", s))
+                    case _:
+                        raise AbsboxParseError(f"Failed to match dealStat type: {preview(_t)}")
             case _:
                 raise AbsboxParseError(f"Failed to match DS/Formula: {preview(x)}")
     except TypeError as e:
@@ -1181,7 +1186,7 @@ def mkAction(x:list):
             return mkTag(("PayInt", [l, vStr(source), vList(target, str), s]))
         case ["payIntAndBook", source, target, m, "book",dr, ln] | ["支付利息", source, target, m,"簿记", dr, ln]:
             (l, s) = mkMod(m)
-            return mkTag(("PayIntAndBook", [l, vStr(source), vList(target, str), s, [dr, vStr(ln)]]))
+            return mkTag(("PayIntAndBook", [l, vStr(source), vList(target, str), s, [bookDirection[dr], vStr(ln)]]))
         case ["顺序支付利息", source, target, m] | ["payIntBySeq", source, target, m]:
             (l, s) = mkMod(m)
             return mkTag(("PayIntBySeq", [l, vStr(source), vList(target, str), s]))
@@ -1326,7 +1331,7 @@ def mkAction(x:list):
             :
             return mkTag(("BuyAssetFrom", [mkLimit(_limit), mkLiqMethod(liq), vStr(source), sPool, mkPid(mPn)]))
         ## Trigger
-        case ["更新事件", trgName] | ["runTriggers", *trgName] | ["runTrigger", *trgName]:
+        case ["更新事件", *trgName] | ["runTriggers", *trgName] | ["runTrigger", *trgName]:
             return mkTag(("RunTrigger", ["InWF", vList(trgName, str)]))
         ## Inspect
         case ["查看", comment, *ds] | ["inspect", comment, *ds]:
@@ -2322,7 +2327,7 @@ def mkFee(x):
             return  {"feeName": vStr(fn), "feeType": mkFeeType(feeType)} | opt_fields
         case {"名称":fn , "类型": feeType, **fi}:
             opt_fields = subMap2(fi, [("计算日","feeDueDate",None),("应计费用","feeDue",0),
-                                      ("拖欠","feeArrears",0),("上次缴付日期","feeLastPaidDay",None),
+                                      ("拖欠","feeArrears",0),("上次缴付日期","feeLastPaidDate",None),
                                       ("起始日","feeStart",None)])
             if opt_fields["feeStart"] is None :
                 raise AbsboxParseError("feeStart not found in fee:after version 0.45.x fee must to include field feeStart")

@@ -10,6 +10,8 @@ from absbox.local.interface import mkTag, mkCurve, readAeson
 from absbox.local.component import (
     mkDate,
     mkDatePattern,
+    mkDs,
+    mkAction,
     mkBnd,
     mkBndComp,
     mkBondType,
@@ -88,8 +90,69 @@ def test_mkDate_last_collect_case():
 def test_mkDatePattern():
     assert mkDatePattern("月末") == {"tag": "MonthEnd"}
     assert mkDatePattern(["每月", 15]) == {"tag": "DayOfMonth", "contents": 15}
+    assert mkDatePattern("2021-01-01") == {
+        "tag": "SingletonDate",
+        "contents": "2021-01-01",
+    }
     with pytest.raises(Exception):
         mkDatePattern("not-a-date-pattern")
+    # an unrecognised-but-stringly value must surface as AbsboxParseError,
+    # not as a raw schema.SchemaError from vDate
+    with pytest.raises(AbsboxParseError):
+        mkDatePattern("not-a-date-pattern")
+
+
+def test_mkAction_trigger_update_chinese_alias():
+    # regression: `["更新事件", name]` used to bind a scalar and crash vList
+    assert mkAction(["更新事件", "T1"]) == {
+        "tag": "RunTrigger",
+        "contents": ["InWF", ["T1"]],
+    }
+    assert mkAction(["runTrigger", "T1"]) == {
+        "tag": "RunTrigger",
+        "contents": ["InWF", ["T1"]],
+    }
+    assert mkAction(["runTriggers", "T1", "T2"]) == {
+        "tag": "RunTrigger",
+        "contents": ["InWF", ["T1", "T2"]],
+    }
+
+
+def test_mkAction_pay_int_and_book_normalizes_direction():
+    # regression: PayIntAndBook used to emit the raw direction ("借方")
+    r = mkAction(
+        ["支付利息", "acc", ["A"], {"limit": ("balPct", 0.5)}, "簿记", "借方", "L1"]
+    )
+    assert r["tag"] == "PayIntAndBook"
+    assert r["contents"][-1] == ["Debit", "L1"]
+
+
+def test_mkDs_dealstat_unknown_type_raises():
+    # regression: an unknown dealStat type silently returned None
+    with pytest.raises(AbsboxParseError):
+        mkDs(("dealStat", "not-a-type", "x"))
+
+
+def test_mkDs_account_balance_tuple():
+    # regression: a missing comma made the bare string "accountBalance" match
+    assert mkDs(("accountBalance", "acc01")) == {
+        "tag": "AccBalance",
+        "contents": ["acc01"],
+    }
+
+
+def test_mkFee_chinese_last_paid_date_field():
+    # regression: Chinese fee mapped to `feeLastPaidDay` (Day) not `...Date`
+    fee = mkFee(
+        {
+            "名称": "f1",
+            "类型": {"固定费用": 100},
+            "起始日": "2020-01-01",
+            "上次缴付日期": "2020-02-01",
+        }
+    )
+    assert fee["feeLastPaidDate"] == "2020-02-01"
+    assert "feeLastPaidDay" not in fee
 
 
 def test_mkBond_origin_date_is_validated_as_date():
