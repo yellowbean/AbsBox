@@ -461,6 +461,28 @@ def test_build_run_deal_req_defaults_preserve_payload():
     assert json.loads(req2)["contents"][0] == ["AssetLevelFlow"]
 
 
+def test_read_bond_stmt_group_and_multi_int_bond_locale_parity():
+    """Regression: the Chinese bond reader must accept the same wire shapes
+    as the English one (BondGroup contents is ``[bndMap, pt]``; MultiIntBond
+    must be supported)."""
+    from absbox.local import china, generic
+
+    stmt = [
+        {"contents": ["2021-01-01", 100, 1, 2, 0.05, 3, 4, 5, 1.0, "m"]}
+    ]
+    grp = {"tag": "BondGroup", "contents": [{"A1": {"bndStmt": stmt}}, None]}
+    cn_grp = china.readBondStmt(grp)
+    en_grp = generic.readBondStmt(grp)
+    assert set(cn_grp) == set(en_grp) == {"A1"}
+    assert cn_grp["A1"].index.name == "date"
+
+    multi = {"tag": "MultiIntBond", "bndStmt": stmt}
+    cn_multi = china.readBondStmt(multi)
+    en_multi = generic.readBondStmt(multi)
+    assert cn_multi.shape == en_multi.shape == (1, 9)
+    assert cn_multi.index.name == "date"
+
+
 def test_read_cf_sets_and_sorts_date_index():
     """Regression for the inplace->assignment refactor in `_read_cf`."""
     from absbox.local.util import _read_cf
