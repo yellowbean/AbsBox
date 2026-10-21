@@ -95,6 +95,8 @@ def unify(xs, ns):
 
 def unifyTs(xs):
     "unify time-series alike dataframe"
+    if not xs:
+        return pd.DataFrame()
     _index_set = set([x.index.name for x in xs])
     assert len(_index_set)==1,f"Index of dataframes should have same name,got:{_index_set}"
 
@@ -277,24 +279,82 @@ def guess_pool_flow_header(x, l):
             raise RuntimeError(f"Failed to match pool header with {x['tag']},{len(x['contents'])},{l}")
 
 
+_ASSET_SPEC_ALIASES = {
+    "按揭贷款": "Mortgage",
+    "贷款": "Loan",
+    "分期": "Installment",
+    "租赁": "Lease",
+    "固定资产": "FixedAsset",
+    "应收账款": "Invoice",
+    "应收帐款": "Invoice",
+    "应收賬款": "Invoice",
+}
+
+_ASSET_FAMILY = {
+    "AdjustRateMortgage": "Mortgage",
+    "ScheduleMortgageFlow": "Mortgage",
+    "PersonalLoan": "Loan",
+    "RegularLease": "Lease",
+    "StepUpLease": "Lease",
+    "ProjectedByFactor": "ProjectedCashFlow",
+    "ProjectedCashflow": "ProjectedCashFlow",
+    "MO": "AssetUnion",
+    "LO": "AssetUnion",
+    "IL": "AssetUnion",
+    "LS": "AssetUnion",
+    "FA": "AssetUnion",
+    "RE": "AssetUnion",
+    "PF": "AssetUnion",
+}
+
+_POOL_TYPE_BY_ASSET = {
+    "Mortgage": "MPool",
+    "Loan": "LPool",
+    "Installment": "IPool",
+    "Lease": "RPool",
+    "FixedAsset": "FPool",
+    "Invoice": "VPool",
+    "ProjectedCashFlow": "PPool",
+}
+
+
+def assetFamily(tag: str) -> str:
+    """Return the engine pool family for a raw spec name or an engine asset tag."""
+    return _ASSET_FAMILY.get(tag, tag)
+
+
+def assetSpecType(a) -> str | None:
+    """Return the asset family of a raw asset spec (``[tag, ...]``)."""
+    if isinstance(a, (list, tuple)) and a and isinstance(a[0], str):
+        return assetFamily(_ASSET_SPEC_ALIASES.get(a[0], a[0]))
+    return None
+
+
+def poolAssetTypes(x: dict) -> set:
+    """Return the asset families of a raw pool spec (``assets`` / ``清单``)."""
+    if not isinstance(x, dict):
+        return set()
+    assets = getValWithKs(x, ["assets", "清单"], defaultReturn=[]) or []
+    return {t for t in (assetSpecType(a) for a in assets) if t}
+
+
+def isMixedPoolSpec(x: dict) -> bool:
+    """True when a raw single pool spec mixes more than one asset type."""
+    return isinstance(x, dict) and "deals" not in x and len(poolAssetTypes(x)) > 1
+
+
+def isTaggedPoolType(x) -> bool:
+    """True when ``x`` already is an engine ``PoolTypeWrap`` (``{"tag": ..., "contents": ...}``)."""
+    return isinstance(x, dict) and "contents" in x and isinstance(x.get("tag"), str)
+
+
 def inferPoolTypeFromAst(x:dict) -> str:
-    match x:
-        case {"assets":[["Mortgage",*fields],*ast]} | {"assets":[["AdjustRateMortgage",*fields],*ast]} | {'清单': [['按揭贷款', *fields], *ast]}:
-            return "MPool"
-        case {"assets":[["Loan",*fields],*ast]} | {'清单': [['贷款', *fields], *ast]}:
-            return "LPool"
-        case {"assets":[["Installment",*fields],*ast]} | {'清单': [['分期', *fields], *ast]}:
-            return "IPool"
-        case {"assets":[["Lease",*fields],*ast]} | {'清单': [['租赁', *fields], *ast]}:
-            return "RPool"
-        case {"assets":[["FixedAsset",*fields],*ast]}:
-            return "FPool"
-        case {"assets":[["Invoice",*fields],*ast]} | {'清单': [['应收账款', *fields], *ast]}:
-            return "VPool"
-        case {"assets":[["ProjectedCashflow",*fields],*ast]} | {"assets":[["ProjectedByFactor",*fields],*ast]} :
-            return "PPool"
-        case _:
-            raise RuntimeError(f"Failed to find pool type from assets:{x}")
+    types = poolAssetTypes(x)
+    if len(types) == 1:
+        _t = types.pop()
+        if _t in _POOL_TYPE_BY_ASSET:
+            return _POOL_TYPE_BY_ASSET[_t]
+    raise RuntimeError(f"Failed to find pool type from assets:{x}")
     
 
 
@@ -406,10 +466,12 @@ def searchByFst(xs:list, v, defaultRtn=None):
 
 
 def isMixedDeal(x: dict) -> bool:
-    ''' check if pool of deals has mixed asset types'''    
-    if 'assets' in x or 'cashflow' in x:
+    ''' check if pool of deals has mixed asset types'''
+    if isTaggedPoolType(x):
         return False
-    if '清单' in x or '归集表' in x:
+    if 'assets' in x or '清单' in x:
+        return isMixedPoolSpec(x)
+    if 'cashflow' in x or '归集表' in x:
         return False
     if 'deals' in x:
         return False

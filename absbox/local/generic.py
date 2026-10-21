@@ -7,7 +7,7 @@ from .util import mapListValBy,mapValsBy,renameKs2\
 from .util import earlyReturnNone,lmap,isMixedDeal                              
 from .component import *
 from .base import * 
-from .readers import readComponentStmts, readPoolFlows
+from .readers import readComponentStmts, readPoolFlows, ledgerEntryRows
 from ..validation import vStr,vDate,vNum,vList,vBool,vFloat,vInt
 from .interface import mkTag,readAeson
 
@@ -101,7 +101,7 @@ class Generic:
                      , 'liqProvider': ('liqStmt', english_liq_flow_fields_d, "")
                      , 'rateSwap': ('rsStmt', english_rs_flow_fields_d, "")
                      , 'rateCap': ('rcStmt', english_rs_flow_fields_d, "")
-                     , 'ledgers': ('ledgStmt', english_ledger_flow_fields_d, "")
+                     , 'ledgers': ('ledgStmt', english_ledger_flow_fields_d, "", ledgerEntryRows)
                      }
         output = {}
         output['_deal'] = readAeson(resp[0])

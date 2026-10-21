@@ -44,7 +44,7 @@ def viz(x):
             case ["支付期间收益", source, target]:
                 return f"{source} -> {target}"
             case ["支付收益", source, target, limit] | ["payResidual", source, target, limit]:
-                return f"{source} -> {_limit} -> {target}"
+                return f"{source} -> {limit} -> {target}"
             case ["支付收益", source, target] | ["payResidual", source, target]:
                 return f"{source} -> {target}"
             case ["储备账户转移", source, target, satisfy] | ["transferReserve", source, target, satisfy]:

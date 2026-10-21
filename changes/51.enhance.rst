@@ -1,0 +1,11 @@
+CI advisory static-analysis stack plus a local scan recipe (#51): ruff's gate
+now also guards the missing-comma string-concat bug class via ``ISC002``
+(baseline verified clean), ``mypy`` findings surface as inline PR annotations
+from a ``continue-on-error`` advisory job instead of log-only text, and a new
+``pyright`` (``basic`` mode) advisory column runs the same way on each
+push/PR. Adds ``pyrightconfig.json`` and drops pytype (stale, no Python 3.13).
+The ``just code-inspect`` recipe reproduces the same tool stack locally and
+writes ``<git-hash>_code_inspect.md`` with a per-tool findings summary
+(married to a NixOS-friendly ruff loader patch and an ``npx pyright`` fallback).
+The ``just publish`` recipe now runs the code check first and aborts the
+release when the ruff gate reports findings; mypy/pyright stay advisory.

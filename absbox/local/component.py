@@ -14,6 +14,7 @@ from .util import mkTs, readTagStr, subMap, subMap2, renameKs, ensure100
 from .util import mapListValBy, uplift_m_list, mapValsBy, allList, getValWithKs, applyFnToKey,flat
 from .util import earlyReturnNone, mkFloatTs, mkRateTs, mkRatioTs, mkTbl, mapNone, guess_pool_flow_header
 from .util import filter_by_tags, enumVals, lmap, readTagMap, patchDicts,updateKs, ensureKeysInMap
+from .util import inferPoolTypeFromAst, isMixedPoolSpec, assetFamily
 from .base import *
 
 from ..validation import vDict, vList, vStr, vNum, vInt, vDate, vFloat, vBool, vTuple, vListOfList
@@ -48,7 +49,7 @@ def mkDatePattern(x):
             return mkTag(("EndsAt", ["Inc", vDate(_d), mkDatePattern(dp) ]))
         case ["Exclude", _d, _dps] | ["ExcludeDatePattern", _d, _dps] | ["排除", _d, _dps] | ["-", _d, _dps] | ("Exclude", _d, _dps) | ("-", _d, _dps):
             return mkTag(("Exclude", [mkDatePattern(_d), [mkDatePattern(_) for _ in _dps]]))
-        case ["Offset", _dp, n] | ["OffsetDateDattern", _dp, n] | ["平移", _dp, n] | ("Offset", _dp, n):
+        case ["Offset", _dp, n] | ["OffsetDatePattern", _dp, n] | ["平移", _dp, n] | ("Offset", _dp, n):
             return mkTag(("OffsetBy", [mkDatePattern(_dp), vInt(n)]))
         case _x if (_x in datePattern.values()):
             return mkTag((_x))
@@ -262,6 +263,19 @@ def _cache_hashable(fn):
     return wrapper
 
 
+def mkOp(op):
+    """ lookup comparison operator in ``op_map`` and raise a DSL error for unknown tokens.
+
+    Callers previously indexed ``op_map[op]`` directly, leaking a raw ``KeyError``
+    for typos like ``==`` or ``!=``. DSL comparison operators are ASCII only:
+    ``>``, ``>=``, ``<``, ``<=``, ``=``.
+    """
+    try:
+        return op_map[op]
+    except KeyError:
+        raise AbsboxParseError(f"Unknown operator {preview(op)}, allowed ops: {list(op_map)}") from None
+
+
 @_cache_hashable
 def mkDs(x):
     "Making Deal Stats"
@@ -335,10 +349,12 @@ def mkDs(x):
                 return mkTag(("PoolCurCollection", [lmap(mkPoolSource,i), None]))
             case ("资产池当期至", pNames, idx, *i) | ("curPoolCollectionStats", pNames, idx, *i):
                 if pNames:
-                    return mkTag(("PoolCurCollectionStats", [idx, lmap(mkPoolSource,i), lmap(mkPid,pNames)]))
+                    return mkTag(("PoolCollectionStats", [idx, lmap(mkPoolSource,i), lmap(mkPid,pNames)]))
                 return mkTag(("PoolCollectionStats", [idx, lmap(mkPoolSource,i), None]))
             case ("poolIssuanceBalance", *pNames):
-                return mkTag(("PoolIssuanceBalance", lmap(mkPid,pNames)))
+                if pNames:
+                    return mkTag(("OriginalPoolBalance", lmap(mkPid,pNames)))
+                return mkTag(("OriginalPoolBalance", None))
             case ("计划资产池估值", pricingMethod, *pNames) | ("schedulePoolValuation", pricingMethod, *pNames):
                 if pNames:
                     return mkTag(("PoolScheduleCfPv", [mkLiqMethod(pricingMethod), lmap(mkPid,pNames)]))
@@ -465,7 +481,7 @@ def mkDs(x):
             case ("逾期", *bns) | ("hasPassedMaturity", *bns):
                 return mkTag(("HasPassedMaturity",bns))
             case ("比率测试", ds, op, r) | ("rateTest", ds, op, r):
-                return mkTag(("TestRate", [mkDs(ds), op_map[op], r]))
+                return mkTag(("TestRate", [mkDs(ds), mkOp(op), r]))
             case ("所有测试", b, *ds) | ("allTest", b, *ds):
                 return mkTag(("TestAll", [b, [mkDs(_) for _ in ds]]))
             case ("非", ds) | ("not", ds):
@@ -544,26 +560,26 @@ def mkPre(p):
             case ["date", "in", *vs]:
                 return mkTag(("IfDateIn", [vDate(v) for v in vs]))
             case ["date", op, v]:
-                return mkTag(("IfDate", [op_map[op], vDate(v)]))
+                return mkTag(("IfDate", [mkOp(op), vDate(v)]))
 
             case ["period", "between", rngType, d1, d2] | ["period", "><", rngType, d1, d2]:
                 return mkTag(("IfIntBetween", [mkDs(("periodNum",)), rngType, vNum(d1), vNum(d2)]))
             case ["period", "in", *vs]:
                 return mkTag(("IfIntIn", [mkDs(("periodNum",)), [vNum(v) for v in vs]]))
             case ["period", op, v]:
-                return mkTag(("IfInt", [op_map[op], mkDs(("periodNum",)), vNum(v)]))
+                return mkTag(("IfInt", [mkOp(op), mkDs(("periodNum",)), vNum(v)]))
 
             case ["periodCurve", dsVal, op, dsSelect, periodCurve]:
                 val = mkDs(dsVal)
                 select = mkDs(dsSelect)
                 curve = mkTag(("CurrentVal", periodCurve))
-                return mkTag(("IfByPeriodCurve", [op_map[op], val, select, curve]))
+                return mkTag(("IfByPeriodCurve", [mkOp(op), val, select, curve]))
 
             case ["periodRateCurve", dsVal, op, dsSelect, periodCurve]:
                 val = mkDs(dsVal)
                 select = mkDs(dsSelect)
                 curve = mkTag(("CurrentVal", periodCurve))
-                return mkTag(("IfRateByPeriodCurve", [op_map[op], val, select, curve]))
+                return mkTag(("IfRateByPeriodCurve", [mkOp(op), val, select, curve]))
             
             case [ds, "=", 0]:
                 return mkTag(("IfZero", mkDs(ds)))
@@ -571,15 +587,15 @@ def mkPre(p):
                 return mkTag(("IfBool", [mkDs(ds), b]))
             case [ds1, op, ds2] if (isinstance(ds1, tuple) and isinstance(ds2, tuple)):
                 q = queryType(ds1)
-                return mkTag((f"{q}2", [op_map[op], mkDs(ds1), mkDs(ds2)]))
+                return mkTag((f"{q}2", [mkOp(op), mkDs(ds1), mkDs(ds2)]))
             case [ds, op, curve] if isinstance(curve, list):
                 q = queryType(ds)
-                return mkTag((f"{q}Curve", [op_map[op], mkDs(ds), mkCurve("ThresholdCurve", curve)]))
+                return mkTag((f"{q}Curve", [mkOp(op), mkDs(ds), mkCurve("ThresholdCurve", curve)]))
             case [ds, op, n]:
                 q = queryType(ds)
-                return mkTag((q, [op_map[op], mkDs(ds), n]))
+                return mkTag((q, [mkOp(op), mkDs(ds), n]))
             case [op, _d]:
-                return mkTag(("IfDate", [op_map[op], _d]))
+                return mkTag(("IfDate", [mkOp(op), _d]))
             case _:
                 raise AbsboxParseError(f"Failed to match on Pre: {preview(p)}")
     except TypeError as e:
@@ -737,7 +753,7 @@ def mkBondRate(x:dict)->dict:
             return mkTag(("WithIoI", [mkBondRate(bRateInfo), mkBondIoItype(pRateInfo)]))
 
         case None :
-            return mkTag(("Fix",[0, DC.DC_ACT_365F]))
+            return mkTag(("Fix",[0, DC.DC_ACT_365F.value]))
         
         case {"rate": rate,"index": idx, "spread": spd, "reset": resetInterval, **p} :
             dc = p.get("dayCount", DC.DC_ACT_365F.value)
@@ -1147,7 +1163,7 @@ def mkAction(x:list):
         case ["计提费用", *feeNames] | ["calcFee", *feeNames]:
             return mkTag(("CalcFee", vList(feeNames, str)))
         case ["特殊计提利息", (mbal, mrate), bndName] | ["calcIntBy", (mbal, mrate), bndName]:
-            return mkTag(("CalcBondIntBy", [[vStr(bndName)]
+            return mkTag(("CalcBondIntBy", [vStr(bndName)
                                           , earlyReturnNone(mkDs, mbal)
                                           , earlyReturnNone(mkDsRate, mrate)]))
         case ["计提利息", *bndNames] | ["calcInt", *bndNames]:
@@ -1202,12 +1218,12 @@ def mkAction(x:list):
             return mkTag(("PayIntBySeq", [None, vStr(source), vList(target, str), None]))
         case ["payIntByIndex", source, target, index, m] :
             (l, s) = mkMod(m)
-            return mkTag(("PayIntByRateIndex", [l, vStr(source), vList(target, str), vNum(index),m]))
+            return mkTag(("PayIntByRateIndex", [l, vStr(source), vList(target, str), vNum(index),s]))
         case ["payIntByIndex", source, target, index] :
             return mkTag(("PayIntByRateIndex", [None, vStr(source), vList(target, str), vNum(index),None]))
         case ["payIntByIndexBySeq", source, target, index, m] :
             (l, s) = mkMod(m)
-            return mkTag(("PayIntByRateIndexBySeq", [l, vStr(source), vList(target, str), vNum(index),m]))
+            return mkTag(("PayIntByRateIndexBySeq", [l, vStr(source), vList(target, str), vNum(index),s]))
         case ["payIntByIndexBySeq", source, target, index] :
             return mkTag(("PayIntByRateIndexBySeq", [None, vStr(source), vList(target, str), vNum(index),None]))
         case ["顺序支付本金", source, target, m] | ["payPrinBySeq", source, target, m]:
@@ -1256,13 +1272,13 @@ def mkAction(x:list):
             return mkTag(("WriteOffBySeq", [None, vList(targets,str)]))
         case ["减记本金", target, l, "簿记", dr, ln] | ["writeOff", target, l, "book", dr, ln] if isinstance(target, str):
             limit = mkLimit(l) if l else None
-            return mkTag(("WriteOffAndBook", [limit, vStr(target), (dr,ln)]))
+            return mkTag(("WriteOffAndBook", [limit, vStr(target), [bookDirection[dr], vStr(ln)]]))
         case ["减记本金", target, l] | ["writeOff", target, l] if isinstance(target, str):
             limit = mkLimit(l) if l else None
             return mkTag(("WriteOff", [limit, vStr(target)]))
         case ["减记本金", targets, l, "簿记", dr, ln] | ["writeOff", targets, l, "book", dr, ln] if isinstance(targets, list):
             limit = mkLimit(l) if l else None
-            return mkTag(("WriteOffBySeqAndBook", [limit, vList(targets,str),(dr, vStr(ln))]))
+            return mkTag(("WriteOffBySeqAndBook", [limit, vList(targets,str),[bookDirection[dr], vStr(ln)]]))
         case ["减记本金", targets, l] | ["writeOff", targets, l] if isinstance(targets, list):
             limit = mkLimit(l) if l else None
             return mkTag(("WriteOffBySeq", [limit, vList(targets,str)]))
@@ -1316,8 +1332,10 @@ def mkAction(x:list):
             return mkTag(("ActionWithPre2", [mkPre(pre), lmap(mkAction,actions1), lmap(mkAction,actions2)]))
         ## Revolving buy
         ### Revolving buy with optional limit and target pool
-        case ["购买资产", liq, source, _limit, mPns] | ["buyAsset", liq, source, _limit, mPns]:
-            return mkTag(("BuyAsset", [mkLimit(_limit), mkLiqMethod(liq), vStr(source), lmap(mkPid, mPns)]))
+        case ["购买资产", liq, source, _limit, mPn] | ["buyAsset", liq, source, _limit, mPn]:
+            if isinstance(mPn, (list, tuple)):
+                raise AbsboxParseError(f"BuyAsset target pool should be a single pool name or None, got:{preview(mPn)} (use 'buyAsset2' for a source pool)")
+            return mkTag(("BuyAsset", [mkLimit(_limit), mkLiqMethod(liq), vStr(source), mkPid(mPn)]))
         ### Revolving buy with optional limit and default pool
         case ["购买资产", liq, source, _limit] | ["buyAsset", liq, source, _limit]:
             return mkTag(("BuyAsset", [mkLimit(_limit), mkLiqMethod(liq), vStr(source), None]))
@@ -1341,7 +1359,7 @@ def mkAction(x:list):
         case ["更改状态", st] | ["changeStatus", st]:
             return mkTag(("ChangeStatus",[None, mkStatus(st)]))
         case None:
-            return mkTag(("Placeholder",[]))
+            return mkTag(("Placeholder",None))
         case _:
             raise AbsboxParseError(f"Failed to match :{preview(x)}:mkAction")
 
@@ -1754,11 +1772,11 @@ def mkAsset(x):
                                             ,"period":freqMap[p],"accRule":mkAccRule(ar)
                                             ,"capacity":mkCapacity(cap)} | mkTag("FixedAssetInfo")
                                             ,vNum(bal),vInt(rt)]))
-        case ["Invoice", {"start":sd,"originBalance":ob,"originAdvance":oa,"dueDate":dd,"feeType":ft},{"status":status}] :
+        case ["Invoice" | "应收账款" | "应收帐款" | "应收賬款", {"start":sd,"originBalance":ob,"originAdvance":oa,"dueDate":dd,"feeType":ft},{"status":status}] :
             obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
             return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":mkInvoiceFeeType(ft),"obligor":obligorInfo} | mkTag("ReceivableInfo")
                                         ,mkAssetStatus(status)]))
-        case ["Invoice", {"start":sd,"originBalance":ob,"originAdvance":oa,"dueDate":dd},{"status":status}] :
+        case ["Invoice" | "应收账款" | "应收帐款" | "应收賬款", {"start":sd,"originBalance":ob,"originAdvance":oa,"dueDate":dd},{"status":status}] :
             obligorInfo = getValWithKs(x[1],["obligor","借款人"], mapping=mkObligor)
             return mkTag(("Invoice",[{"startDate":vDate(sd),"originBalance":vNum(ob),"originAdvance":vNum(oa),"dueDate":vDate(dd),"feeType":None,"obligor":obligorInfo} | mkTag("ReceivableInfo") ,mkAssetStatus(status)]))
 
@@ -1774,6 +1792,9 @@ def mkAsset(x):
 def identify_deal_type(x):
     """ identify deal type from 1st asset in asset list  """
     def id_by_pool_assets(z):
+        assetTags = set(assetFamily(a['tag']) for a in (z.get('assets') or []) if isinstance(a, dict) and 'tag' in a)
+        if len(assetTags) > 1:
+            return "UDeal"
         match z:
             case {"assets": [{'tag': 'PersonalLoan'}, *rest]}:
                 return "LDeal"
@@ -1781,7 +1802,7 @@ def identify_deal_type(x):
                 return "MDeal"
             case {"assets": [{'tag': 'AdjustRateMortgage'}, *rest]}:
                 return "MDeal"
-            case {"assets": [], "futureCf": cfs} if cfs[0]['contents'][1][0]['tag'] == 'MortgageFlow':
+            case {"assets": [], "futureCf": cfs} if cfs and cfs[0]['contents'][1][0]['tag'] == 'MortgageFlow':
                 return "MDeal"
             case {"assets": [{'tag': 'Installment'}, *rest]} :
                 return "IDeal"
@@ -1846,7 +1867,7 @@ def mkCallOptionsLegacy(x):
             return mkTag(("Pre", mkPre(p)))
         case {"任意满足": xs} | {"or": xs} | ("any", *xs) | ("or", *xs):
             return mkTag(("Or", lmap(mkCallOptionsLegacy, xs)))
-        case {"全部满足": xs} | {"and": xs} | ("all", *xs) | ("all", *xs):
+        case {"全部满足": xs} | {"and": xs} | ("and", *xs) | ("all", *xs):
             return mkTag(("And", lmap(mkCallOptionsLegacy, xs)))
         case _:
             raise AbsboxParseError(f"Failed to match {preview(x)}:mkCallOptionsLegacy")
@@ -2104,9 +2125,9 @@ def mkAssetUnion(x):
             return mkTag(("LS", mkAsset(x)))
         case "固定资产" | "FixedAsset" : 
             return mkTag(("FA", mkAsset(x)))
-        case "应收帐款" | "Invoice" : 
+        case "应收账款" | "应收帐款" | "应收賬款" | "Invoice":
             return mkTag(("RE", mkAsset(x)))
-        case "ProjectedByFactor" :
+        case "ProjectedByFactor" | "ProjectedCashflow" :
             return mkTag(("PF", mkAsset(x)))
         case _:
             raise AbsboxParseError(f"Failed to match AssetUnion {preview(x)}")
@@ -2123,12 +2144,16 @@ def mkRevolvingPool(x):
         case ["curve", astsWithDates]|["曲线", astsWithDates]:
             assetCurve = [ [d, lmap(mkAssetUnion, asts)] for (d,asts) in astsWithDates ]
             return mkTag(("AssetCurve",assetCurve))
+        case _:
+            raise AbsboxParseError(f"Failed to match {preview(x)}:mkRevolvingPool")
 
 
 def mkPoolType(assetDate, x, mixedFlag) -> dict:
     match x:
+        case {"tag": t, "contents": c} if t in ("LPool", "MPool", "IPool", "RPool", "FPool", "VPool", "PPool", "UPool"):
+            return mkTag(("MultiPool", {"PoolConsol": c}))
         case {"assets": y} | {"清单": y} | {"归集表": y}: 
-            return mkTag(("MultiPool" ,{"PoolConsol":mkPoolComp(vDate(assetDate), x, False)}))
+            return mkTag(("MultiPool" ,{"PoolConsol":mkPoolComp(vDate(assetDate), x, mixedFlag)}))
         case {"deals": y} if isinstance(y, dict):
             return mkTag(("ResecDeal",{f"{dealObj.json['contents']['name']}:{bn}:{sd}:{str(pct)}": \
                                         {"deal":dealObj.json['contents'],"futureCf":None,"futureScheduleCf":None,"issuanceStat":None}\
@@ -2137,7 +2162,7 @@ def mkPoolType(assetDate, x, mixedFlag) -> dict:
             return mkTag(("MultiPool" 
                         ,{f"PoolName:{k}":mkPoolComp(vDate(assetDate),v,mixedFlag) for (k,v) in x.items()}))
         case _ :
-            raise AbsboxParseError("Failed to match pool type ",x)
+            raise AbsboxParseError(f"Failed to match pool type {preview(x)}")
 
 
 def mkPoolComp(asOfDate, x, mixFlag) -> dict:
@@ -2154,14 +2179,13 @@ def mkPoolComp(asOfDate, x, mixFlag) -> dict:
 
 
 def mkPool(x: dict):
-    mapping = {"LDeal": "LPool", "MDeal": "MPool",
-               "IDeal": "IPool", "RDeal": "RPool", "FDeal":"FPool",
-               "VDeal": "VPool", "UDeal": "UPool"}
     match x:
         case {"清单": assets, "封包日": d} | {"assets": assets, "cutoffDate": d}:
+            if isMixedPoolSpec(x):
+                _pool = {"assets": [mkAssetUnion(a) for a in assets] , "asOfDate": d}
+                return mkTag(("UPool", _pool))
             _pool = {"assets": [mkAsset(a) for a in assets] , "asOfDate": d}
-            _pool_asset_type = identify_deal_type({"pool": _pool})
-            return mkTag((mapping[_pool_asset_type], _pool))
+            return mkTag((inferPoolTypeFromAst(x), _pool))
         case _:
             raise AbsboxParseError(f"Failed to match {preview(x)}:mkPool")
 

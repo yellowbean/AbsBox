@@ -102,7 +102,7 @@ class LIBRARY:
             console.print(f"✅ Login successfully, user -> {r['user']},group -> {r['group']}")
             self.token = r['token']
         else:
-            console.print(f"❌ Failed to login,{r['msg']}")
+            console.print(f"❌ Failed to login,{r.get('msg')}")
             self.token = None
         return r
     

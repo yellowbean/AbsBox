@@ -31,11 +31,32 @@ jobs:
     - name: Lint with ruff
       run: |
         ruff check absbox
-    - name: Type-check with mypy (advisory)
-      # Advisory only: the codebase still carries annotation debt (~30 errors).
-      # Remove `|| true` once the baseline reaches zero.
-      run: |
-        python -m mypy || true
     - name: Test with pytest
       run: |
         python -m pytest absbox/tests
+
+  # Static-analysis advisories (#51): surface mypy/pyright findings as inline PR
+  # annotations from the workflow log (GitHub parses `::error`/`::warning`,
+  # `::notice` lines). `continue-on-error` keeps them strictly informative.
+  analysis-advisory:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+      - name: mypy (advisory, inline PR annotations)
+        run: |
+          python -m mypy 2>&1 | tee /tmp/mypy.log || true
+          python tools/annotate_from_log.py /tmp/mypy.log mypy || true
+      - name: Pyright (basic mode via pyrightconfig.json, advisory)
+        run: |
+          pip install pyright
+          pyright 2>&1 | tee /tmp/pyright.log || true
+          python tools/annotate_from_log.py /tmp/pyright.log pyright || true

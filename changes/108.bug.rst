@@ -1,0 +1,4 @@
+Unknown comparison-operator tokens in ``mkPre``/``mkDs`` (e.g. ``==`` or
+``!=`` where only ``>``, ``>=``, ``<``, ``<=``, ``=`` are allowed) now raise
+``AbsboxParseError`` naming the token and the allowed set, instead of leaking a
+raw ``KeyError`` from deep inside request building.

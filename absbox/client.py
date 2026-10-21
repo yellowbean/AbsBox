@@ -15,7 +15,8 @@ from .validation import isValidUrl
 from .local.util import mapValsBy \
                               , _read_cf, _read_asset_pricing, mergeStrWithDict \
                               , earlyReturnNone, searchByFst, filter_by_tags \
-                              , enumVals, lmap, inferPoolTypeFromAst, getValWithKs, mapNone\
+                              , enumVals, lmap, inferPoolTypeFromAst, getValWithKs, mapNone \
+                              , isMixedPoolSpec, isTaggedPoolType
                               
 from .local.component import mkPool, mkAssumpType, mkNonPerfAssumps, mkLiqMethod \
                                    , mkAssetUnion, mkRateAssumption, mkDatePattern, mkPoolType
@@ -119,14 +120,13 @@ def PickApiFrom(Apilist:list, **kwargs):
         except Exception as e:
             return ("Error",e)
 
-    _, libVersion, _ = VERSION_NUM.split(".")
+    libTenth, _ = parse_version_pair(VERSION_NUM)
 
     apiResps = [{"url":toUrl(api),"resp":pingApi(api)} for api in Apilist ]
     validApis = tz.pipe(apiResps
                     ,lambda apis: list(filter(lambda x:"Error" not in x['resp'],apis))
-                    ,lambda apis: lens.Each()['resp']['_version'].modify(lambda x: x.split("."))(apis)
-                    ,lambda apis: filter(lambda x:x['resp']['_version'][1]==libVersion, apis) 
-                    ,lambda apis: sorted(apis,key=lambda x: x['resp']['_version'][2])
+                    ,lambda apis: filter(lambda x: parse_version_pair(x['resp']['_version'])[0] == libTenth, apis) 
+                    ,lambda apis: sorted(apis,key=lambda x: parse_version_pair(x['resp']['_version'])[1])
     )
 
     r = list(validApis)
@@ -134,7 +134,45 @@ def PickApiFrom(Apilist:list, **kwargs):
     if len(r)>0: 
         return API(r[0]["url"],**kwargs)
     else:
-        raise AbsboxError(f"❌ No valid API found in list match current lib version {libVersion}, from list:{apiResps}")
+        raise AbsboxError(f"❌ No valid API found in list match current lib version {VERSION_NUM} (tenth {libTenth}) , from list:{apiResps}")
+
+
+def extract_engine_error(r) -> str:
+    """Extract a readable message from a non-200 engine response.
+
+    The engine (>=0.52.9) answers rejected requests with a JSON error envelope
+    (``{"Left":"..."}`` for HTTP 400 and 500); older engines and proxies may
+    return plain text. Raise the result with ``EngineError``.
+
+    :meta private:
+    """
+    raw = getattr(r, "text", None)
+    if raw is None:
+        return str(r)
+    try:
+        body = json.loads(raw)
+    except JSONDecodeError:
+        return raw
+    if isinstance(body, dict) and "Left" in body:
+        leftVal = body["Left"]
+        return (json.dumps(leftVal, ensure_ascii=False)
+                if isinstance(leftVal, dict) else str(leftVal))
+    return raw
+
+
+def parse_version_pair(v: str) -> tuple:
+    """split a version like `0.52.11` into its tenth (`52`) and patch (`11`)
+
+    tolerate any number of trailing segments (e.g. `0.52.9.dev1`)
+    :raises AbsboxError: fewer than 3 segments or non-numeric tenth/patch
+    """
+    parts = v.split(".")
+    if len(parts) < 3:
+        raise AbsboxError(f"❌Invalid version format: {v}")
+    try:
+        return (int(parts[1]), int(parts[2]))
+    except ValueError as e:
+        raise AbsboxError(f"❌Invalid version format: {v}") from e
 
 
 @dataclass
@@ -177,6 +215,7 @@ class API:
         """Init the API instance with url and perform version check
 
         :raises ConnectionRefusedError: Failed to connect to server
+        :raises AbsboxError: Failed to connect, or an invalid version response
         :raises RuntimeError: Failed to get version info from server
         :raises VersionMismatch: Failed to match version between client and server
         """
@@ -202,15 +241,21 @@ class API:
             raise AbsboxError(f"❌Error: Can't not connect to API server {self.url}")
         if _r is None:
             raise RuntimeError(f"Failed to get version from url:{self.url}")
-        self.server_info = self.server_info | json.loads(_r)
+        try:
+            body = json.loads(_r)
+        except JSONDecodeError as e:
+            raise AbsboxError(f"❌Failed to get version info from server {self.url}, invalid JSON response:{str(_r)[:120]!r}") from e
+        if not isinstance(body, dict):
+            raise AbsboxError(f"❌Failed to get version info from server {self.url}, payload is not a JSON object:{str(_r)[:120]!r}")
+        self.server_info = self.server_info | body
         if "_version" not in self.server_info:
             raise RuntimeError(f"Failed to get version info from server:{self.server_info}")
-        engine_version = self.server_info['_version'].split(".")
-        if self.check and (self.version[1] != engine_version[1]):
+        engineTenth, _ = parse_version_pair(self.server_info['_version'])
+        if self.check and (self.version[1] != str(engineTenth)):
             console.print("pls upgrade your api package by: pip -U absbox")
-            raise VersionMismatch('.'.join(self.version), '.'.join(engine_version))
+            raise VersionMismatch('.'.join(self.version), self.server_info['_version'])
         self.session = requests.Session()
-        console.print(f"✅Connected, local lib:{'.'.join(self.version)}, server:{'.'.join(engine_version)}")
+        console.print(f"✅Connected, local lib:{'.'.join(self.version)}, server:{self.server_info['_version']}")
 
     def build_run_deal_req(self, run_type, deal, perfAssump=None, nonPerfAssump=None, rtn = None) -> str:
         """build run deal requests: (single run, multi-scenario run, multi-struct run)
@@ -269,16 +314,6 @@ class API:
                 _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
                 dealRunInput= (_deal, _perfAssump, _nonPerfAssump, [])
                 r = mkTag((RunReqType.RootFinder.value, [dealRunInput, mkTweak(tweak), mkStop(stop)]))
-            case ("FirstLoss", bn) | ("FL", bn):
-                _deal = deal.json if hasattr(deal, "json") else deal
-                _perfAssump = mkAssumpType(perfAssump)
-                _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
-                r = mkTag(("FirstLossReq", [(_deal, _perfAssump, _nonPerfAssump), bn]))
-            case ("MaxSpreadToFaceReq", bn, bondFlag, feeFlag):
-                _deal = deal.json if hasattr(deal, "json") else deal
-                _perfAssump = mkAssumpType(perfAssump)
-                _nonPerfAssump = mkNonPerfAssumps({}, nonPerfAssump)
-                r = mkTag(("MaxSpreadToFaceReq", [(_deal, _perfAssump, _nonPerfAssump), bn, bondFlag, feeFlag]))
             case _:
                 raise RuntimeError(f"Failed to match run type:{run_type}")
         
@@ -312,12 +347,12 @@ class API:
 
         def buildPoolType(p) -> dict:
             """ build type for `PoolTypeWrap` """
-            assetTag = inferPoolTypeFromAst(p) if (('assets' in p) or ('清单' in p)) else "UPool"
-            _p = tz.dissoc(p, 'cutoffDate')
-            if assetTag == "UPool":
-                return mkTag((assetTag, mkPoolType(assetDate, _p, True)))
-            else:
-                return mkTag((assetTag, mkPoolType(assetDate, _p, False)))
+            if isTaggedPoolType(p):
+                return p
+            isMixed = isMixedPoolSpec(p)
+            assetTag = "UPool" if isMixed else (inferPoolTypeFromAst(p) if (('assets' in p) or ('清单' in p)) else "UPool")
+            _p = tz.dissoc(p, 'cutoffDate', '封包日')
+            return mkTag((assetTag, mkPoolType(assetDate, _p, assetTag == "UPool")))
 
         if not isMultiScenario:
             r = mkTag((RunReqType.SinglePool.value, [breakdown, buildPoolType(pool), mkAssumpType(poolAssump), _rateAssump]))
@@ -835,7 +870,7 @@ class API:
         except ReadTimeout:
             raise AbsboxError("❌ Failed to get response from server")
         if r.status_code != 200:
-            raise EngineError(r)
+            raise EngineError(extract_engine_error(r))
         try:
             return json.loads(r.text)
         except JSONDecodeError as e:

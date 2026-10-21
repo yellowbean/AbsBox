@@ -92,10 +92,10 @@ def insert_functional(lst, index, element):
 def setup_api():
     if _should_skip_server_tests():
         pytest.skip("engine-dependent regression tests are skipped in CI "
-                    "(set ABSBOX_REGRESSION=1 to force)")
+                    + "(set ABSBOX_REGRESSION=1 to force)")
     if not config_file_path.exists():
         pytest.skip(f"engine server config not found at {config_file_path}; "
-                    "skipping engine-dependent regression test")
+                    + "skipping engine-dependent regression test")
     with config_file_path.open('r') as config_file:
         config = json.load(config_file)
     server_url = _resolve_test_server(config['test_server'])

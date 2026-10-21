@@ -7,7 +7,7 @@ include = ["absbox*"]
 exclude = ["absbox.tests*", "docs*", "notebooks*"]
 
 [project]
-version = "0.52.8"
+version = "0.52.9"
 name = "absbox"
 description = "an analytical library for cashflow modeling on ABS/MBS products"
 readme = "README.md"
@@ -39,10 +39,8 @@ dependencies = [
     "htpy",
     "markupsafe",
     "dateparser",
-    "more-itertools",
     "xlsxwriter",
     "matplotlib",
-    "numpy-financial",
 ]
 
 
@@ -79,11 +77,11 @@ testpaths = [
 [project.optional-dependencies]
 test = [
     "pytest",
-    "jsondiff",
     "deepdiff",
     "ipykernel",
     "pytest-notebook",
     "marimo",
+    "numpy-financial",
 ]
 
 [tool.towncrier]
@@ -132,7 +130,16 @@ extend-exclude = ["docs", "notebooks", "absbox.egg-info"]
 # ~100 names in component.py/generic.py/china.py are deliberate re-exports that
 # downstream modules and users consume via `from .local.component import *`,
 # so removing them would be a breaking change. Widen this set gradually.
-select = ["E9", "F63", "F7", "F82"]
+# ISC002 guards the "missing comma joins two string literals" bug class
+# (gh #99: `所有测试` + `isOutstanding` melted into one bogus token).
+# By default ISC002 fires only on backslash continuations, so
+# allow-multiline is turned off to make bracketed multi-line concats
+# errors as well. Baseline: zero multi-line implicit concats in the
+# codebase, verified clean.
+select = ["E9", "F63", "F7", "F82", "ISC002"]
+
+[tool.ruff.lint.flake8-implicit-str-concat]
+allow-multiline = false
 
 [tool.mypy]
 # No `python_version` pin: pinning to 3.10 makes mypy mis-parse type statements

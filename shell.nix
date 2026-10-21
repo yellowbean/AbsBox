@@ -1,4 +1,10 @@
 { pkgs ? import <nixpkgs> {} }:
+let
+  # Haskell toolchain + LSP for working across AbsBox and ../Hastructure.
+  # HLS must match the engine's GHC (ghc912 = 9.12.3); pkgs.haskell-language-server
+  # targets the nixpkgs default GHC (9.10.x) and won't load the Hastructure project.
+  hls = pkgs.haskell.packages.ghc912.haskell-language-server;
+in
 pkgs.mkShell {
   buildInputs = [
     pkgs.rustc
@@ -16,6 +22,11 @@ pkgs.mkShell {
     pkgs.glibcLocales
     pkgs.graphviz
     pkgs.just
+    # Haskell engine (../Hastructure) + language server
+    pkgs.haskell.compiler.ghc912
+    pkgs.cabal-install
+    hls
+    pkgs.zlib
   ];
   LANG = "en_US.UTF-8";
   LC_ALL = "en_US.UTF-8";

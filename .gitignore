@@ -34,4 +34,6 @@ justfile
 # macOS / editor junk
 .DS_Store
 *.code-workspace
+# local static-analysis reports (just code-inspect)
+*_code_inspect.md
 justfile

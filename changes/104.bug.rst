@@ -1,0 +1,4 @@
+``viz()`` waterfall rendering no longer crashes on the limited form of
+``payResidual``/``支付收益``: the branch matched ``limit`` but referenced the
+unbound ``_limit``, raising ``UnboundLocalError`` when run first and picking up
+a stale limit value from an earlier branch rendered before it.

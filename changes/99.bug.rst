@@ -1,0 +1,3 @@
+A missing comma in the ``boolLikeFormula`` set literal concatenated
+``所有测试`` with ``isOutstanding`` into a bogus token, dropping both real
+entries (the set is exported; no internal consumer yet).

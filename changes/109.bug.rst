@@ -1,0 +1,15 @@
+Follow-ups to the engine contract audit (#109): ``poolIssuanceBalance`` stats
+now emit the engine's ``OriginalPoolBalance`` tag (``PoolIssuanceBalance`` does
+not exist engine-side) with an empty pool list decoded as ``null`` per
+``Maybe [PoolId]``; ``calcIntBy`` sends the bond name as a scalar per
+``CalcBondIntBy BondName ...``; ``buyAsset`` takes a single optional target
+pool per ``Maybe PoolId`` (lists are rejected with a clear error, and a bare
+string is no longer split per character into bogus pool ids);
+``writeOff``/``writeOffBySeq`` with booking map the direction through
+``bookDirection`` (``借方``→``Debit``, ``贷方``→``Credit``) into a proper
+``(BookDirection, LedgerName)`` pair like the other booked actions;
+``payIntByIndex``/``payIntByIndexBySeq`` send the built ``ExtraSupport`` value
+instead of the raw modifier map; a ``None`` waterfall action emits
+``Placeholder: null`` per ``Maybe String``. Ledger statements returned by the
+engine carry ``(BookDirection, Balance)/(BookDirection, Amount)`` pairs; the
+readers now flatten them so ledger ``balance``/``amount`` columns hold scalars.

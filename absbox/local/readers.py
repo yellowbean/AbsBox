@@ -28,14 +28,23 @@ def readComponentStmts(deal_content: dict, read_paths: dict, date_key: str = "da
         if (comp_name not in deal_content) or (deal_content[comp_name] is None):
             continue
         output[comp_name] = {}
+        row_map = comp_v[3] if (len(comp_v) > 3) else None
         for k, x in deal_content[comp_name].items():
             if x[comp_v[0]]:
                 ir = list(tz.pluck('contents', x[comp_v[0]]))
+                if row_map is not None:
+                    ir = [row_map(r) for r in ir]
                 output[comp_name][k] = pd.DataFrame(ir, columns=comp_v[1]).set_index(date_key)
             elif handle_none and x[comp_v[0]] is None:
                 output[comp_name][k] = pd.DataFrame([], columns=comp_v[1]).set_index(date_key)
         output[comp_name] = collections.OrderedDict(sorted(output[comp_name].items()))
     return output
+
+
+def ledgerEntryRows(row: list) -> list:
+    """Flatten an engine ``EntryTxn`` row ``[date, (dir, balance), (dir, amount), comment]``
+    to ``[date, balance, amount, comment]`` (``BookLedgerBy`` direction is dropped)."""
+    return [row[0], row[1][1], row[2][1], row[3]]
 
 
 def readPoolFlows(resp, deal_content: dict) -> tuple:
@@ -56,7 +65,12 @@ def readPoolFlows(resp, deal_content: dict) -> tuple:
         pool['flow'] = tz.valmap(lambda v: readPoolCf(v['futureCf'][0]['contents']) if (not v['futureCf'] is None) else pd.DataFrame(), poolMap)
         pool['breakdown'] = tz.valmap(lambda v: list(tz.map(readPoolCf, v['futureCf'][1] & lens.Each()['contents'].collect())) if (v['futureCf'] and (not v['futureCf'][1] is None)) else [], poolMap)
     elif deal_content['pool']['tag'] == 'ResecDeal':
-        pool['flow'] = {tz.get([1, 2, 4], k.split(":")): readPoolCf(v['futureCf']['contents']) for (k, v) in poolMap.items()}
+        # resec keys are built as "<deal name>:<bond>:<settle date>:<pct>" (see mkPoolType).
+        # rsplit keeps deal names that themselves contain ':' intact.
+        def resecKey(k: str):
+            parts = k.rsplit(":", 3)
+            return tuple(parts[1:]) if len(parts) == 4 else k
+        pool['flow'] = {resecKey(k): readPoolCf(v['futureCf']['contents']) for (k, v) in poolMap.items()}
     else:
         raise RuntimeError(f"Failed to match deal pool type:{deal_content['pool']['tag']}")
 

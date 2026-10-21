@@ -9,7 +9,7 @@ import toolz as tz
 from .base import *
 from .util import *
 from .component import *
-from .readers import readComponentStmts, readPoolFlows
+from .readers import readComponentStmts, readPoolFlows, ledgerEntryRows
 from .interface import mkTag
 
 def readBondStmt(respBond):
@@ -96,7 +96,7 @@ class SPV:
                     , 'accounts': ('accStmt', china_acc_flow_fields_d , "账户")
                     , 'liqProvider': ('liqStmt', china_liq_flow_fields_d, "流动性支持")
                     , 'rateSwap': ('rsStmt', china_rs_flow_fields_d, "")
-                    , 'ledgers': ('ledgStmt', china_ledger_flow_fields_d, "")
+                    , 'ledgers': ('ledgStmt', china_ledger_flow_fields_d, "", ledgerEntryRows)
                     }
         assert isinstance(resp,list),f"<read>:resp should be list,but it is {type(resp)} => {resp}"
         deal_content = resp[0]['contents']

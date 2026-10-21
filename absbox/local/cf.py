@@ -162,9 +162,8 @@ def readTriggers(tMap) -> pd.DataFrame:
 
 def readInspect(r:dict) -> pd.DataFrame:
     """ read inspect result from waterfall and run assumption input , return a joined dataframe ordered by date"""
-    if 'inspect' in r:
-        i = r['inspect']
-        u = unifyTs(i.values())
+    if 'inspect' in r and r['inspect']:
+        u = unifyTs(r['inspect'].values())
     else:
         u = pd.DataFrame()
 

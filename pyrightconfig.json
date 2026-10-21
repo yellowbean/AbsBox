@@ -1,0 +1,19 @@
+{
+  "include": [
+    "absbox"
+  ],
+  "exclude": [
+    "docs",
+    "notebooks",
+    "absbox/tests/benchmark",
+    "absbox/tests/regression",
+    "absbox/examples",
+    "absbox.egg-info"
+  ],
+  "pythonVersion": "3.10",
+  "typeCheckingMode": "basic",
+  "reportMissingTypeStubs": "none",
+  "reportMissingImports": "warning",
+  "reportUnusedImport": "none",
+  "reportPrivateUsage": "none"
+}

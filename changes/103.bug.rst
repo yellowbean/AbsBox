@@ -1,0 +1,5 @@
+Chinese invoice assets normalize consistently: 应收账款 (账) is the canonical
+tag, and the 帐 / 賬 variants are accepted everywhere the Chinese tag appears
+(``mkAsset``, ``mkAssetUnion``, pool-type inference aliases) and all spellings
+map to the same engine ``Invoice`` asset (``RE`` in a union pool) — previously
+``应收賬款`` failed outright and the two spellings drifted across call sites.

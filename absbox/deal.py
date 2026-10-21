@@ -34,7 +34,7 @@ def mkDeal(x:dict, preCheck=True):
                                             , ['expense', 'expenses', 'fee', "fees", "费用"]
                                             , defaultReturn={}).items())
     
-    pool = getValWithKs(x, ['pool', "collateral", "资产池"])
+    pool = take(['pool', "collateral", "资产池"], "pool")
 
     bonds = list((take(['bond', "bonds", "notes", "债券", "支持证券"], "bonds", {}) or {}).items())
 

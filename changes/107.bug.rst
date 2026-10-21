@@ -1,0 +1,4 @@
+``API.__post_init__`` no longer leaks a raw ``JSONDecodeError`` (or ``TypeError``
+on a scalar JSON payload) when the version endpoint answers with a non-JSON or
+non-object body: it now raises a descriptive ``AbsboxError`` naming the server
+URL and a body excerpt, consistent with the other version-check errors.

@@ -1,0 +1,5 @@
+``unifyTs([])`` now returns an empty DataFrame instead of asserting on the
+index-name set of an empty input, and ``readInspect`` treats a present-but-empty
+``inspect`` map the same as an absent one. A report for a run that collected no
+inspect variables (or a direct ``unifyTs([])``/``readInspect`` call) no longer
+crashes the HTML rendering path.

@@ -4,6 +4,8 @@ These tests do not require an engine server and are meant to run in CI:
 they cover the DSL builders in ``absbox.local.component`` and the
 response decoder in ``absbox.local.interface``.
 """
+import json
+
 import pytest
 
 from absbox.local.interface import mkTag, mkCurve, readAeson
@@ -24,6 +26,13 @@ from absbox.local.component import (
     mkCollection,
     mkNonPerfAssumps,
     getStartDate,
+    mkBondRate,
+    mkCallOptionsLegacy,
+    mkAsset,
+    mkAssetUnion,
+    mkPool,
+    mkPoolType,
+    identify_deal_type,
 )
 from absbox.local.util import (
     ensure100,
@@ -32,6 +41,10 @@ from absbox.local.util import (
     subMap2,
     updateKs,
     getValWithKs,
+    isMixedDeal,
+    isMixedPoolSpec,
+    inferPoolTypeFromAst,
+    unifyTs,
 )
 from absbox.local.base import china_bondflow_fields_s, english_bondflow_fields_s
 from absbox.local.readers import readComponentStmts
@@ -494,3 +507,360 @@ def test_read_cf_sets_and_sorts_date_index():
     df = _read_cf(rows, "english")
     assert df.index.name == "Date"
     assert list(df.index) == ["2021-01-01", "2021-02-01"]
+
+
+ASSET_LOAN = ["Loan", {"originBalance": 100, "originRate": {"fix": 0.05}, "originTerm": 24,
+                       "freq": "Monthly", "type": "Level", "originDate": "2021-01-01"},
+              {"currentBalance": 100, "currentRate": 0.05, "remainTerm": 24, "status": "Current"}]
+
+ASSET_MORTGAGE = ["Mortgage", {"originBalance": 2000, "originRate": {"fix": 0.045},
+                               "originTerm": 240, "freq": "Monthly", "type": "Level",
+                               "originDate": "2021-01-01"},
+                  {"currentBalance": 2000, "currentRate": 0.045, "remainTerm": 240,
+                   "status": "Current"}]
+
+
+def _generic(pool):
+    from absbox.local.generic import Generic
+
+    dates = {"cutoff": "2021-03-01", "closing": "2021-04-01", "firstPay": "2021-06-20",
+             "payFreq": ["DayOfMonth", 20], "poolFreq": "MonthFirst", "stated": "2030-01-01"}
+    bonds = (("A1", {"balance": 1000, "rate": 0.07, "originBalance": 1000, "originRate": 0.07,
+                     "startDate": "2020-01-03", "rateType": {"Fixed": 0.08},
+                     "bondType": {"Sequential": None}}),)
+    return Generic("T", dates, pool, (("acc01", {"balance": 0}),), bonds, tuple(), {}, [], {})
+
+
+def test_mkBondRate_none_is_serializable():
+    # InterestInfo = Fix IRate DayCount: [rate, dayCount], same order as the explicit fix arms
+    r = mkBondRate(None)
+    assert r == {"tag": "Fix", "contents": [0, "DC_ACT_365F"]}
+    assert mkBondRate({"fix": 0.06}) == {"tag": "Fix", "contents": [0.06, "DC_ACT_365F"]}
+    json.dumps(r)
+
+
+def test_mkDs_pool_collection_stats_matches_engine_tag():
+    r = mkDs(("curPoolCollectionStats", ["P1"], 0, "Interest"))
+    assert r["tag"] == "PoolCollectionStats"
+    assert r["contents"] == [0, ["CollectedInterest"], [{"tag": "PoolName", "contents": "P1"}]]
+
+
+def test_mkCallOptions_legacy_and_alias():
+    r = mkCallOptionsLegacy(("and", ("poolBalance", 10), ("bondBalance", 5)))
+    assert r["tag"] == "And"
+    assert [x["tag"] for x in r["contents"]] == ["PoolBalance", "BondBalance"]
+    assert mkCallOptionsLegacy(("all", ("poolBalance", 10)))["tag"] == "And"
+
+
+def test_mkAssetUnion_projected_cashflow_and_invoice_alias():
+    assert mkAssetUnion(["ProjectedByFactor", [], "MonthEnd", 0.05, []])["tag"] == "PF"
+    assert mkAssetUnion(["应收账款", {"start": "2021-01-01", "originBalance": 100,
+                                    "originAdvance": 0, "dueDate": "2021-06-01",
+                                    "feeType": ("Fixed", 0)},
+                         {"status": "Current"}])["tag"] == "RE"
+
+
+def test_mkAsset_invoice_chinese_aliases():
+    for alias in ("应收账款", "应收帐款"):
+        r = mkAsset([alias, {"start": "2021-01-01", "originBalance": 100, "originAdvance": 0,
+                             "dueDate": "2021-06-01", "feeType": ("Fixed", 0)},
+                     {"status": "Current"}])
+        assert r["tag"] == "Invoice"
+
+
+def test_mkAsset_invoice_spellings_normalize_to_Invoice():
+    # 应收账款 (账) is the canonical Chinese tag; 帐 and 賬 variants normalize to
+    # the same "/"Invoice" engine asset.
+    spec = {"start": "2021-01-01", "originBalance": 100.0, "originAdvance": 0.0
+             , "dueDate": "2021-06-01"}
+    status = {"status": "Current"}
+    for tag in ["Invoice", "应收账款", "应收帐款", "应收賬款"]:
+        r = mkAsset([tag, spec, status])
+        assert r["tag"] == "Invoice"
+        info, st = r["contents"][0], r["contents"][1]
+        assert info["originBalance"] == 100.0
+        assert info["obligor"] is None
+        assert info["feeType"] is None
+    r = mkAsset(["应收賬款", dict(spec, feeType=("Fixed", 200.0)), status])
+    assert r["contents"][0]["feeType"] == {"tag": "FixedFee", "contents": 200.0}
+
+
+def test_mkAssetUnion_invoice_all_spellings():
+    spec = {"start": "2021-01-01", "originBalance": 100.0, "originAdvance": 0.0
+             , "dueDate": "2021-06-01"}
+    for tag in ["Invoice", "应收账款", "应收帐款", "应收賬款"]:
+        r = mkAssetUnion([tag, spec, {"status": "Current"}])
+        assert r["tag"] == "RE"
+        assert r["contents"]["tag"] == "Invoice"
+
+
+def test_invoice_pool_type_all_spellings_and_mixed():
+    from absbox.local.util import inferPoolTypeFromAst, isMixedPoolSpec
+
+    spec = {"start": "2021-01-01", "originBalance": 100.0, "originAdvance": 0.0
+             , "dueDate": "2021-06-01"}
+    for tag in ["Invoice", "应收账款", "应收帐款", "应收賬款"]:
+        assert inferPoolTypeFromAst({"assets": [[tag, spec, {"status": "Current"}]]}) == "VPool"
+        assert isMixedPoolSpec({"assets": [[tag, spec, {"status": "Current"}]]}) is False
+    mixed = {"assets": [["应收賬款", spec, {"status": "Current"}], ASSET_MORTGAGE]}
+    assert isMixedPoolSpec(mixed) is True
+    with pytest.raises((RuntimeError, AbsboxParseError)):
+        inferPoolTypeFromAst(mixed)
+
+
+def test_mkPool_locales_and_mixed():
+    assert mkPool({"assets": [ASSET_LOAN], "cutoffDate": "2021-01-01"})["tag"] == "LPool"
+    assert mkPool({"清单": [ASSET_LOAN], "封包日": "2021-01-01"})["tag"] == "LPool"
+
+    mixed = mkPool({"assets": [ASSET_MORTGAGE, ASSET_LOAN], "cutoffDate": "2021-01-01"})
+    assert mixed["tag"] == "UPool"
+    assert [a["tag"] for a in mixed["contents"]["assets"]] == ["MO", "LO"]
+
+    with pytest.raises(AbsboxParseError):
+        mkPool({"other": 1})
+
+
+def test_mixed_single_pool_detection_and_tagging():
+    mixed = {"assets": [ASSET_MORTGAGE, ASSET_LOAN], "cutoffDate": "2021-01-01"}
+    assert isMixedPoolSpec(mixed)
+    assert isMixedDeal(mixed)
+    with pytest.raises(RuntimeError):
+        inferPoolTypeFromAst(mixed)
+    # Mortgage and AdjustRateMortgage are constructors of the same engine pool.
+    same_family = {"assets": [ASSET_MORTGAGE, ["AdjustRateMortgage", {}, {}]]}
+    assert not isMixedPoolSpec(same_family)
+
+    from absbox.client import API
+
+    r = json.loads(API.__new__(API).build_pool_req(mixed, None, None))
+    assert r["contents"][1]["tag"] == "UPool"
+    inner = r["contents"][1]["contents"]["contents"]["PoolConsol"]["assets"]
+    assert [a["tag"] for a in inner] == ["MO", "LO"]
+
+
+def test_tagged_pool_passthrough():
+    from absbox.client import API
+
+    p = mkPool({"assets": [ASSET_LOAN], "cutoffDate": "2021-01-01"})
+    assert not isMixedDeal(p)
+    r = json.loads(API.__new__(API).build_pool_req(p, None, None))
+    assert r["contents"][1] == p
+    assert identify_deal_type({"pool": mkPoolType("2021-01-01", p, False)}) == "LDeal"
+
+
+def test_generic_accepts_mixed_and_tagged_pools():
+    assert _generic({"assets": [ASSET_MORTGAGE, ASSET_LOAN]}).json["tag"] == "UDeal"
+    tagged = mkPool({"assets": [ASSET_LOAN], "cutoffDate": "2021-01-01"})
+    assert _generic(tagged).json["tag"] == "LDeal"
+
+
+def test_mkDeal_requires_pool():
+    from absbox.deal import mkDeal
+    from absbox.exception import AbsboxError
+
+    with pytest.raises(AbsboxError):
+        mkDeal({"dates": {}, "accounts": {}})
+
+
+def test_readPoolFlows_resec_keys_with_colons(monkeypatch):
+    import absbox.local.readers as readers
+
+    monkeypatch.setattr(readers, "readPoolCf", lambda contents: contents)
+    deal_content = {"pool": {"tag": "ResecDeal", "contents": {
+        "A1:BN1:2021-03-01:0.5": {"futureCf": {"contents": "flow1"}},
+        "Deal:A:BN2:2021-03-01:1.0": {"futureCf": {"contents": "flow2"}},
+    }}}
+    pool, outstanding = readers.readPoolFlows([None, None, None, None, {}], deal_content)
+    assert pool["flow"] == {("BN1", "2021-03-01", "0.5"): "flow1",
+                            ("BN2", "2021-03-01", "1.0"): "flow2"}
+    assert outstanding == {"flow": {}, "breakdown": {}}
+
+
+def test_pool_issuance_balance_maps_to_original_pool_balance():
+    assert mkDs(("poolIssuanceBalance", ["P1"])) == mkDs(("originalPoolBalance", ["P1"]))
+    assert mkDs(("poolIssuanceBalance",)) == {"tag": "OriginalPoolBalance", "contents": None}
+
+
+def test_calcIntBy_passes_scalar_bond_name():
+    assert mkAction(["calcIntBy", (None, None), "A1"]) == \
+        {"tag": "CalcBondIntBy", "contents": ["A1", None, None]}
+
+
+def test_buyAsset_wants_single_pool_target():
+    liq = ["Current|Defaulted", 1.0, 0]
+    r = mkAction(["buyAsset", liq, "acc01", None, "P1"])
+    assert r["tag"] == "BuyAsset"
+    assert r["contents"][3] == {"tag": "PoolName", "contents": "P1"}
+    with pytest.raises(AbsboxParseError):
+        mkAction(["buyAsset", liq, "acc01", None, ["P1", "P2"]])
+
+
+def test_writeOff_books_direction():
+    assert mkAction(["writeOff", "A1", None, "book", "借方", "L1"]) == \
+        {"tag": "WriteOffAndBook", "contents": [None, "A1", ["Debit", "L1"]]}
+    r = mkAction(["writeOff", ["A1", "A2"], None, "book", "贷方", "L2"])
+    assert r["tag"] == "WriteOffBySeqAndBook"
+    assert r["contents"][1] == ["A1", "A2"]
+    assert r["contents"][2] == ["Credit", "L2"]
+
+
+def test_placeholder_has_null_payload():
+    assert mkAction(None) == {"tag": "Placeholder", "contents": None}
+
+
+def test_payIntByIndex_sends_built_support():
+    r = mkAction(["payIntByIndex", "acc01", ["A1"], 3, {"support": ["account", "acc02"]}])
+    assert r["tag"] == "PayIntByRateIndex"
+    assert r["contents"][0] is None
+    assert r["contents"][3] == 3
+    assert r["contents"][4] == {"tag": "SupportAccount", "contents": ["acc02", None]}
+    assert mkAction(["payIntByIndex", "acc01", ["A1"], 3])["contents"][4] is None
+
+
+def test_ledger_rows_flatten_book_pairs():
+    from absbox.local.readers import ledgerEntryRows, readComponentStmts
+
+    deal_content = {"ledgers": {"L1": {"ledgStmt": [
+        {"tag": "EntryTxn", "contents": ["2021-01-01", ["Debit", 100], ["Credit", 200], "c1"]},
+        {"tag": "EntryTxn", "contents": ["2021-01-02", ["Credit", 300], ["Debit", 400], "c2"]},
+    ]}}}
+    paths = {"ledgers": ("ledgStmt", ["date", "balance", "amount", "comment"], "", ledgerEntryRows)}
+    df = readComponentStmts(deal_content, paths)["ledgers"]["L1"]
+    assert df.loc["2021-01-01", "balance"] == 100
+    assert df.loc["2021-01-02", "amount"] == 400
+
+
+def test_unifyTs_empty_returns_empty_dataframe():
+    assert unifyTs([]).empty
+
+
+def test_readInspect_handles_empty_inspect_map():
+    from absbox.local.cf import readInspect
+
+    assert readInspect({"inspect": {}}).empty
+    assert readInspect({}).empty
+
+
+def test_readInspect_single_series_still_joins():
+    from absbox.local.cf import readInspect
+    import pandas as pd
+
+    df = pd.DataFrame([1], columns=["Bal"], index=["2021-01-01"])
+    df.index.name = "Date"
+    out = readInspect({"inspect": {"Bal": df}})
+    assert list(out.columns) == ["Bal"]
+
+
+def test_readInspect_empty_inspect_with_empty_waterfall_inspect():
+    from absbox.local.cf import readInspect
+    import pandas as pd
+
+    ws = pd.DataFrame(columns=["Date", "Comment", "DealStats", "Value"]).set_index("Date")
+    out = readInspect({"inspect": {}, "waterfallInspect": ws})
+    assert out.empty
+
+
+def test_API_version_endpoint_rejects_non_json(monkeypatch):
+    from absbox import client as client_mod
+    from absbox.exception import AbsboxError
+
+    class FakeResp:
+        def __init__(self, text):
+            self.text = text
+
+    for payload in ["<html><body>502 Bad Gateway</body></html>", "", "42", '[1,2]']:
+        monkeypatch.setattr(client_mod.requests, "get", lambda *a, **kw: FakeResp(payload))
+        with pytest.raises(AbsboxError) as exc:
+            client_mod.API("http://localhost:1", check=False)
+        assert "invalid JSON response" in str(exc.value) or "not a JSON object" in str(exc.value)
+
+
+def test_API_version_endpoint_object_payload_still_checked(monkeypatch):
+    from absbox import client as client_mod
+    from absbox.exception import AbsboxError
+
+    class FakeResp:
+        def __init__(self):
+            self.text = json.dumps({"_version": "not a version"})
+
+    monkeypatch.setattr(client_mod.requests, "get", lambda *a, **kw: FakeResp())
+    with pytest.raises(AbsboxError):
+        client_mod.API("http://localhost:1", check=False)
+
+
+def test_boolLikeFormula_set_has_all_tokens():
+    from absbox.local.base import boolLikeFormula
+
+    for token in ["trigger", "事件", "isMostSenior", "最优先", "isPaidOff", "清偿完毕"
+                  , "rateTest", "allTest", "anyTest", "比率测试", "任一测试", "所有测试"
+                  , "isOutstanding", "isAnyOutstanding", "always"]:
+        assert token in boolLikeFormula, token
+    assert "所有测试isOutstanding" not in boolLikeFormula
+
+
+def test_viz_payResidual_with_limit_as_first_action():
+    """viz() must not raise UnboundLocalError when the limited payResidual branch
+    runs before any branch that binds `_limit` (issue #104)."""
+    from absbox.local.chart import viz
+
+    deal_like = {"waterfall": {"Close": [["payResidual", "acc01", "B", 10]]}
+                 ,"collection": [("pool", "acc01")]
+                 ,"name": "issue104"}
+    src = viz(deal_like).source
+    assert "payResidual:acc01 -> 10 -> B" in src
+
+
+def test_viz_payResidual_limit_not_stolen_from_earlier_branch():
+    """After another `_limit`-binding branch rendered first, the payResidual edge
+    label must use its own limit, not the earlier branch's value."""
+    from absbox.local.chart import viz
+
+    actions = [["payFeeResidual", "acc01", "B", 7]
+               ,["payResidual", "acc01", "C", 9]]
+    deal_like = {"waterfall": {"Close": actions}
+                 ,"collection": [("pool", "acc01")]
+                 ,"name": "issue104b"}
+    src = viz(deal_like).source
+    assert "payFeeResidual:acc01 -> 7 -> B" in src
+    assert "payResidual:acc01 -> 9 -> C" in src
+    assert "payResidual:acc01 -> 7 -> C" not in src
+
+
+def test_viz_payResidual_chinese_alias_with_limit():
+    from absbox.local.chart import viz
+
+    actions = [["支付收益", "账户01", "B", 3]]
+    deal_like = {"waterfall": {"正常": actions}
+                 ,"collection": [("资金池", "账户01")]
+                 ,"name": "issue104c"}
+    src = viz(deal_like).source
+    assert "支付收益:账户01 -> 3 -> B" in src
+
+
+def test_mkPre_unknown_operator_raises_parse_error():
+    """Unknown operator tokens raise AbsboxParseError (message includes the token),
+    not a raw KeyError — covers the op_map[op] sites in mkPre and the rateTest arm
+    of mkDs (issue #108)."""
+    from absbox.local.component import mkPre, mkDs
+
+    probes = [["date", "==", "2025-01-01"]
+              ,["period", "!=", 5]
+              ,[("cumPoolDefaultedRate",), "==", ("bondBalance",)]
+              ,[("cumPoolDefaultedRate",), "<<", 10000]
+              ,[">!", "2025-01-01"]]
+    for p in probes:
+        with pytest.raises(AbsboxParseError, match=r"Unknown operator"):
+            mkPre(p)
+
+    with pytest.raises(AbsboxParseError, match=r"Unknown operator '<>'"):
+        mkDs(("rateTest", ("cumPoolDefaultedRate",), "<>", 0.05))
+
+
+def test_pre_operator_map_valid_tokens_passthrough():
+    """Valid operators still map to the same engine enum values (E/G/GE/L/LE)."""
+    from absbox.local.component import mkPre, mkDs
+
+    assert mkPre(["date", ">=", "2025-01-01"])["contents"][0] == "GE"
+    assert mkPre(["date", "=", "2025-01-01"])["contents"][0] == "E"
+    assert mkPre([("cumPoolDefaultedRate",), "<", 10000])["contents"][0] == "L"
+    assert mkDs(("rateTest", ("cumPoolDefaultedRate",), ">=", 0.05))["contents"][1] == "GE"
