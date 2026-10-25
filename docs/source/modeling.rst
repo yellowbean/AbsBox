@@ -180,7 +180,7 @@ DatePattern
 
 ``<DatePattern>`` is used to describe a series of dates .
 
-* ``"MonthFirst"``  -> Every Jun 1, May 1 during the projection
+* ``"MonthFirst"``  -> Every 1st of month during the projection
 * ``"MonthEnd"``  ->Every  Month End ,like Jan 31, Feb 28/29  during the projection
 * ``"QuarterFirst"`` -> Every March 1 , Jun 1 , Sep 1 , Dec 1 during the projection
 * ``"QuarterEnd"``  -> Every March 31, Jun 30, Sep 30, Dec 31 during the projection
@@ -200,7 +200,7 @@ DatePatterns can be composed together:
 * ``["After","YYYY-MM-DD",<datepattern>]`` -> a ``<datapattern>`` after "YYYY-MM-DD"(exclusive)
 * ``["AllDatePattern",<datepattern1>,<datepattern2>.....]`` -> a union set of date pattern during the projection, like sum of dates
 * ``["ExcludeDatePattern",<datepattern1>,<datepattern2>.....]`` -> build dates from 1st ``<datepattern1>`` and exclude dates from ``<datepattern2>,<datepattern3>``... 
-* ``["OffsetDateDattern",<datepattern>,N]`` ->  build dates from ``<datepattern>`` and offset days by N ( positive N move dates to future) , negative N will move dates to past ) 
+* ``["OffsetDatePattern",<datepattern>,N]`` ->  build dates from ``<datepattern>`` and offset days by N ( positive N move dates to future) , negative N will move dates to past ) 
 
 .. versionadded:: 0.30.8
 
@@ -390,7 +390,7 @@ Combination Type
     * ``("min", <Formula>, <Formula>, ...)`` -> get the lower value in the list
     * ``("sum", <Formula>, <Formula>, ...)`` -> sum of formula values
     * ``("avg", <Formula>, <Formula>, ...)`` -> average of formula values
-    * ``("/", <Formula>, <Formula>, ...)`` -> divide two formulas (2 digtis)
+    * ``("/", <Formula>, <Formula>)`` -> divide two formulas (2 digtis)
     * ``("abs", <Formula>)`` -> absolute value of formula value
     * ``("subtract", <Formula>, <Formula>, ...)`` -> using 1st of element to substract rest in the list
 
@@ -473,7 +473,7 @@ Date Based Condition
 * ``["date", "between", rangeType, date1, date2]`` -> between date1 and date2 with :ref:`Range Type`
 * ``["date", "><", rangeType, date1, date2]`` -> same but less key strike
 * ``["date", "in", date1 ,date 2...]`` -> if in the list of dates
-* ``["date", ">", <date> ]`` -> if not in the list of dates
+* ``["date", ">", <date> ]`` -> if the current date is after ``<date>``
 
 Integer Based Condition
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1172,11 +1172,11 @@ syntax
      ,{"type":{"targetBalanceFee":[("poolBalance",),("bondBalance",)]}
      ,"feeStart":"2022-01-01"})
 
-    # the fee is total funded amount * 1%
-    ("upfrontFee"
-      ,{"type":{"targetBalanceFee":[ ("*", ("totalFunded","A1","E"),0.01)
-                                      , ("feeTxnAmt",None,"upfrontFee") ]}
-        ,"feeStart":"2022-01-01"})
+   # the fee is total funded amount * 1%
+   ("upfrontFee"
+     ,{"type":{"targetBalanceFee":[ ("*", ("totalFunded","A1","E"),0.01)
+                                     , ("feeTxnAmt",None,"upfrontFee") ]}
+       ,"feeStart":"2022-01-01"})
 
 fee by collection periods
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1192,7 +1192,7 @@ syntax
 .. code-block:: python
 
    #period , serviceFee charge 15 in each period
-   ("serviceFee", {"type":{"byPeriod":15}})
+   ("serviceFee", {"type":{"byPeriod":15},"feeStart":"2022-01-01"})
 
 fee by table
 ^^^^^^^^^^^^^^^
@@ -1214,7 +1214,8 @@ syntax
    ("serviceFee", {"type":{"byTable":["MonthEnd"
                                       ,("*",("poolBalance",),0.01)
                                       ,[(0,5),(2,10),(10,15)]]
-                                   }})
+                                   }
+                   ,"feeStart":"2022-01-01"})
 
 
 Pool
@@ -1229,13 +1230,14 @@ syntax
   ``Pool`` is modeled as map with following fields:
 
   * ``assets`` -> a list of assets, see :ref:`Asset Types`
-  * ``cashflow`` -> a list of projected cashflow
   * ``issuanceStat`` -> a map describe extra information of pool
   * ``extendBy`` -> :ref:`DatePattern`, used to provide extra dates of pool collection
 
-.. warning::
+.. note::
 
-  ``assets`` and ``cashflow`` are mutually exclusive, only one of them can be used in a pool
+  The wrapper builds pools from ``assets`` only. For projected cashflow, model
+  it as an asset (``ProjectedCashflow`` / ``ProjectedByFactor``, see
+  :ref:`Asset Types`) instead of a pool-level ``cashflow`` key.
 
 When to model ``asset`` or ``cashflow`` in the pool ?
 
@@ -1746,7 +1748,12 @@ Fixed Asset
 This type of asset can be used to model `future flow of securitization` : `Hotel room` / `Solar Panel` / `EV Charger Station` or anything which has a cap on capacity and it would generate something to sell.
 
 ``capacity``
-  can be a fixed value or a curve which depends on ``remainTerm``, which suggests the production would decrease with time, for example, the `Solar Panel` . or a fixed value, like a `Hotel Room`
+  can be a fixed value or a per-term schedule, which suggests the production would decrease with time, for example, the `Solar Panel` . or a fixed value, like a `Hotel Room`
+
+  * ``("Fixed", <units>)`` -> constant capacity each period
+  * ``("ByTerm", [[<term>, <units>], ...])`` -> capacity per term index, where
+    ``<term>`` is an integer period count from the asset start
+    (the last value applies to the remaining periods)
 
 ``amortize``
   either ``Straight`` or ``DecliningBalance`` .
@@ -2116,6 +2123,17 @@ syntax:
      - Yes
      - Optional
 
+Interest-bearing accounts are configured with an ``interest`` map::
+
+  {"balance": 1000
+   ,"interest": {"period": "MonthEnd", "rate": 0.02
+                 ,"lastSettleDate": "2021-06-01"}}
+
+  {"balance": 1000
+   ,"interest": {"period": "MonthEnd", "reset": "MonthEnd"
+                 ,"index": "SOFR3M", "spread": 0.005
+                 ,"lastSettleDate": "2021-06-01", "rate": 0.02}}
+
 
 Bank Account
 ^^^^^^^^^^^^^^^^^^
@@ -2373,10 +2391,11 @@ The bond will use a step up rate with:
 * add a spread to rate on a date.
 * add spreads to rate on dates ,described via a :ref:`DatePattern`
 
-syntax
-    :code:`{"stepUp":("once","2024-01-01",0.01)}`
+syntax (``stepUp`` is a field of the bond map, next to ``rateType``)
+
+    :code:`"stepUp":("once","2024-01-01",0.01)`
     
-    :code:`{"stepUp":("ladder","2024-01-01",0.01,"QuarterEnd")}`
+    :code:`"stepUp":("ladder","2024-01-01",0.01,"QuarterEnd")`
     
     .. versionadded:: 0.52.3
     :code:`{"date": "2024-01-01", "spread": 0.01}`
@@ -3941,10 +3960,10 @@ If there is a shortage on fee or interest or principal, user can setup rules to 
 The optional attributes of ``fee`` and ``rate`` can be used to model service fee or interest to be charged.
 
 common properites
-  * ``start`` -> when the liquidity provider start to be effective
+  * ``start`` -> when the liquidity provider start to be effective (required)
+  * ``type`` -> type of liquidity provider (required), :ref:`Different types of line of credit`
   * ``credit`` -> current available credit to draw, served as base to calculate premium fee
   * ``balance`` -> current balance to be paid back to provider, served as base to calculate interest
-  * ``type`` -> type of liquidity provider, :ref:`Different types of line of credit`
   * ``creditCalc`` -> whether include due interest/due premium in credit calculation
   * ``rate`` -> interest rate to be used on ``balance``
   * ``fee`` ->  premium fee to be used on ``credit``
@@ -4078,7 +4097,8 @@ Fields:
   * ``balance`` -> (optional), current reference balance
   * ``lastSettleDate`` -> (optional), last settle date which calculate `netcash`
   * ``netcash`` -> (optional), current cash to pay/to collect 
-  * ``stmt`` -> (optional),transaction history
+  * ``stmt`` -> (optional), transaction history; pass a list of transaction rows
+    (the wrapper tags them as ``IrsTxn``; pre-tagged rows pass through)
 
 example: 
 
@@ -4110,7 +4130,7 @@ Fields:
   * ``rate`` ->  current reference rate
   * ``lastSettleDate`` -> (optional), last settle date which calculate `netcash`
   * ``netcash`` -> (optional), current cash to collect 
-  * ``stmt`` -> (optional), transaction history
+  * ``stmt`` -> (optional), transaction history; same ``IrsTxn`` row handling as swaps
 
 example: 
 

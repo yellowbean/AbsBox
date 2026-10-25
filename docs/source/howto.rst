@@ -147,7 +147,7 @@ Once we have built the loan level data `loans` , we can just plug it into the _d
                ,"startDate":"2020-01-03"
                ,"rateType":{"Fixed":0.08}
                ,"bondType":{"Sequential":None}}),)
-      ,(("trusteeFee",{"type":{"fixFee":30}}),)
+      ,(("trusteeFee",{"type":{"fixFee":30},"feeStart":"2023-02-15"}),)
       ,{"amortizing":[
            ["payFee","acc01",['trusteeFee']]
            ,["payInt","acc01",["A1"]]
@@ -158,7 +158,10 @@ Once we have built the loan level data `loans` , we can just plug it into the _d
         ,["CollectedPrepayment","acc01"]
         ,["CollectedRecoveries","acc01"]]
       ,None
-      ,None)
+      ,None
+      ,None
+      ,None
+      ,("PreClosing","Amortizing"))
 
 Then, project the cashflow with:
 
@@ -483,6 +486,12 @@ Syntax
 
 To build the `financial reports` , user need to add a tuple in the list of `runAssump`.
 
+.. warning::
+
+   Engines ``0.52.x`` accept the assumption but do not return ``FinancialReport``
+   logs, so ``r['result']['report']`` is absent in practice. Verify against your
+   engine before relying on this output.
+
 .. code:: python 
    
     ("report",{"dates":<DatePattern>})
@@ -572,13 +581,13 @@ Once the deal enter a new status `Amortizing`, then in the waterfall acitons wou
 
   ["IfElse"  
     ,["status","Revolving"] # the predicate
-    ,[["transfer",{"formula":("substract",("bondBalance",),("poolBalance",))} # list of actions if predicate is True ()
-                   ,"distAcc",'revolBuyAcc']
+    ,[["transfer","distAcc",'revolBuyAcc' # list of actions if predicate is True
+                   ,{"formula":("substract",("bondBalance",),("poolBalance",))}]
      ,["buyAsset",["Current|Defaulted",1.0,0],"revolBuyAcc",None]
      ,["payIntResidual","distAcc","Sub"] ]
     ,[["payPrin","distAcc",["A"]] # >>>> list of actions if deal is NOT  Revolving Status
      ,["payPrin","distAcc",["Sub"]]
-     ,["payFeeResidual", "distAcc", "bmwFee"]]]]
+     ,["payFeeResidual", "distAcc", "bmwFee"]]]
 
 
 Revolving Asset 
@@ -628,13 +637,13 @@ Pricing an revolving asset would have a huge impact on the pool cashflow .
 
   ["IfElse"  # 
    ,["status","Revolving"]
-   ,[["transfer",{"formula":("substract",("bondBalance",),("poolBalance",))}
-                  ,"distAcc",'revolBuyAcc']
+   ,[["transfer","distAcc",'revolBuyAcc'
+                  ,{"formula":("substract",("bondBalance",),("poolBalance",))}]
     ,["buyAsset",["Current|Defaulted",1.0,0],"revolBuyAcc",None] # <--- action of buying revolving assets
     ,["payIntResidual","distAcc","Sub"] ]
    ,[["payPrin","distAcc",["A"]]
     ,["payPrin","distAcc",["Sub"]]
-    ,["payFeeResidual", "distAcc", "bmwFee"]]]]
+    ,["payFeeResidual", "distAcc", "bmwFee"]]]
 
 
 
@@ -855,9 +864,9 @@ OK, let's assume ,we are a homeowner that want to install a solar panel system w
                 ,"capacity":("Fixed",20*20*2)}
               ,{"remainTerm":240,"currentBalance":15000}]] 
 
-  exps = (("maintenance",{"type":{"recurFee":["YearFirst",200]}})
-          ,("maintenance2",{"type":{"recurFee":["YearFirst",200],"feeStart":"2033-11-01"}})
-          ,("insurance",{"type":{"recurFee":["MonthFirst",20]}}))
+  exps = (("maintenance",{"type":{"recurFee":["YearFirst",200]},"feeStart":"2024-01-01"})
+          ,("maintenance2",{"type":{"recurFee":["YearFirst",200]},"feeStart":"2033-11-01"})
+          ,("insurance",{"type":{"recurFee":["MonthFirst",20]},"feeStart":"2024-01-01"}))
 
 * Waterfall 
   
@@ -949,6 +958,7 @@ Nowe we need assumption to project cashflow:
 
   p = localAPI.run(solarPanel,poolAssump=myAssump
                         ,runAssump=[("call",{"afterDate":"2044-01-01"})
+                                    # accepted, but 0.52.x engines do not return report output
                                     ,("report",{"dates":"MonthEnd"})]
                         ,read=True)
 
@@ -997,10 +1007,10 @@ We can perform sensitivity analysis to explore how robust our investment is
                 ,None
                 ,None)
    }
-   p = localAPI.runByScenarios(solarPanel,poolAssump=scenarioMap
-                       ,runAssump=[("call",{"afterDate":"2044-01-01"})
-                                  ,("report",{"dates":"MonthEnd"})]
-                       ,read=True)
+  p = localAPI.runByScenarios(solarPanel,poolAssump=scenarioMap
+                      ,runAssump=[("call",{"afterDate":"2044-01-01"})
+                                 ,("report",{"dates":"MonthEnd"})]
+                      ,read=True)
   # equity cashflow for each scenario
   {k: v['bonds']['EQ'] for k, v in p.items()}
 

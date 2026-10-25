@@ -1,0 +1,6 @@
+Align the wrapper with the documented syntax found in the docs audit:
+
+* ``freq`` accepts ``"Daily"`` (the docs' Period list includes it).
+* ``("ByTerm", [[<term>, <units>], ...])`` capacity requires integer term keys
+  (engine ``CapacityByTerm [(Int,Balance)]``) and raises a clear error for
+  dates.

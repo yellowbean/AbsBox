@@ -712,8 +712,8 @@ i.e
                      ,poolAssump=AssetLevelAssumption
                      ,read=True)
   
-  # asset cashflow
-  r[0]
+  # asset cashflow, keyed by pool name
+  r['PoolConsol']['flow']
 
 
 By Obligor
@@ -800,7 +800,7 @@ It will apply *Any Level* assumption to pools with same name
    ("ByPoolId",<assumption map>)
 
 Assumption map
-  Key -> Pool Name/Id
+  Key -> Pool name (string)
   Value -> <Any Pool Assumption>
 
 
@@ -828,7 +828,7 @@ Deal Assumption
   r = localAPI.run(deal
                    ,poolAssump = None 
                    ,runAssump = [("stop","2021-01-01")
-                                ,("call",("CleanUp",("poolBalance",200)))
+                                ,("call",("poolBalance",200))   # clean up when pool balance < 200
                                 ,.....]
                    ,read=True)
 
@@ -1253,7 +1253,7 @@ syntax
 
 .. code-block:: python
 
-  ("fireTrigger",[("2021-10-01","AfterCollect","poolDef")
+  ("fireTrigger",[("2021-10-01","AfterCollect","poolDef")])
 
 .. seealso::
   
@@ -1560,8 +1560,8 @@ Single Scenario
                                        ,None
                                        ,None)
                      ,read=True)
-   r[0] # pool cashflow
-   r[1] # pool history stats before cutoff date
+   r['PoolConsol']['flow']   # pool cashflow, keyed by pool name
+   # (runPool returns {poolName: {"flow": DataFrame}}; it is not a tuple)
 
 Multi Scenarios
 """"""""""""""""""
@@ -1597,8 +1597,8 @@ If user pass scenario with a map , the response will be a map as well.
   r = localAPI.runPoolByScenarios(myPool
                                 ,poolAssump = multiScenario
                                 ,read=True)
-  r["Stress01"][0]
-  r["Stress02"][0]
+  r["Stress01"]["PoolConsol"]["flow"]
+  r["Stress02"]["PoolConsol"]["flow"]
 
 .. note::
 
@@ -1642,12 +1642,10 @@ returns:
                                           ,None)
                        ,read=True)
 
-  # asset cashflow (keyed by pool name; 'PoolConsol' for an unnamed pool)
-  r['PoolConsol']['flow']
-  # pricing result
-  r[1]
+  # runAsset returns a (cashflow, pricing) tuple
+  (cf, pricing) = r
 
-  # or just pattern match on the result
+  # or just pattern match on the call
   (cf,pricing) = localAPI.runAsset(....)
 
 .. note::
@@ -1877,7 +1875,7 @@ Non-Cashflow Results
      - /
      - r['result']['waterfall']
    * - ``Financial Reports``
-     - if `reports` in deal assumption
+     - if `reports` in deal assumption **and the engine returns them** (0.52.x does not)
      - r['result']['report']
 
 Bond Pricing 
@@ -1914,7 +1912,7 @@ Non-Cashflow Results
      - /
      - r['result']['waterfall']
    * - ``Financial Reports``
-     - if `reports` in deal assumption
+     - if `reports` in deal assumption **and the engine returns them** (0.52.x does not)
      - r['result']['report']
 
 Bond Pricing 
@@ -2460,7 +2458,6 @@ Then engine return a tuple
                   ,[]
                   ,("firstLoss", "A1")
                   )
-        )
   # stress factor 
   r0[0]
   # stressed result

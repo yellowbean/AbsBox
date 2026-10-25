@@ -226,7 +226,7 @@ User can save this json object (e.g. after ``json.dumps``) to database or file s
 
    test.json  
 
-   #{'tag': 'FDeal',
+   #{'tag': 'MDeal',
    # 'contents': {'dates': {'tag': 'GenericDates',
    #   'contents': {'CutoffDate': {'tag': 'SingletonDate', 'contents': '2021-03-01'},
    #    'ClosingDate': {'tag': 'SingletonDate', 'contents': '2021-06-15'},

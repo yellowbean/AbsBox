@@ -46,7 +46,6 @@ Content
    support
    reference
    nbsample/index
-   marimo
    faq
    api
    changelog
