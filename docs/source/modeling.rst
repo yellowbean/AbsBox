@@ -2046,10 +2046,10 @@ exmaple:
 
 .. code-block:: python 
 
-  [["CollectedInterest",[[0.8,"acc01"],[0.2,"acc02"]]] 
+  [["CollectedInterest",[0.8,"acc01"],[0.2,"acc02"]]
     # 80% of interest will be allocated to acc01
     # 20% of interest will be allocated to acc02
-    ,["CollectedPrincipal",[[0.8,"acc01"],[0.2,"acc02"]]]
+    ,["CollectedPrincipal",[0.8,"acc01"],[0.2,"acc02"]]
     ,["CollectedPrepayment","acc01"] 
     # 100% of prepayment will be allocated to acc01
     ,["CollectedRecoveries","acc01"]]

@@ -1150,6 +1150,11 @@ User just need to specify the ``dates`` of financial statement by :ref:`DatePatt
 .. note::
    There is a major refactor on financial reports on version 0.31.4
 
+.. warning::
+   Engines ``0.52.x`` accept the ``("report", ...)`` assumption but currently do
+   not return ``FinancialReport`` logs, so ``r['result']['report']`` is absent in
+   practice. Verify against your engine before relying on this output.
+
 BalanceSheet
   The engine will query all the deal component (Accounts,Asset Pools,Bonds,Fees,misc).
   Then engine will calculate possbile `accrue` value ( accrue interest for bonds or accounts ,accure expenses)  

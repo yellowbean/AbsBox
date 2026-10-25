@@ -29,7 +29,7 @@ API Integration
 - deploy engine locally via Docker 
     - ``docker pull yellowbean/hastructure:latest`` for stable version 
     - ``docker pull yellowbean/hastructure:dev`` for development version 
-    - ``docker run -p 5000:8081 yellowbean/hastructure``
+    - ``docker run -p 8081:8081 yellowbean/hastructure``
     - the server runs at port ``8081``
 
 .. image:: img/Intergration.png
