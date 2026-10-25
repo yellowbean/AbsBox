@@ -355,7 +355,7 @@ def inferPoolTypeFromAst(x:dict) -> str:
         _t = types.pop()
         if _t in _POOL_TYPE_BY_ASSET:
             return _POOL_TYPE_BY_ASSET[_t]
-    raise RuntimeError(f"Failed to find pool type from assets:{x}")
+    raise AbsboxParseError(f"Failed to find pool type from assets:{preview(x)}")
     
 
 

@@ -1,0 +1,7 @@
+``mkPool`` now returns a complete engine ``PoolTypeWrap``: the outer
+``LPool``/``MPool``/``IPool``/``RPool``/``FPool``/``VPool``/``PPool``/``UPool``
+tag wraps a tagged ``MultiPool`` built by ``mkPoolType``. Previously it always
+raised ``AbsboxParseError``; once that was fixed it still built a bare pool that
+the engine rejected with ``key "tag" not found``. Mixed single pools return
+``UPool`` with ``mkAssetUnion`` assets, English/Chinese asset and date keys can
+be mixed, and ``mkPoolType`` is idempotent for an already wrapped pool.

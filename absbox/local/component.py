@@ -2178,6 +2178,11 @@ def mkRevolvingPool(x):
 
 def mkPoolType(assetDate, x, mixedFlag) -> dict:
     match x:
+        # already a complete PoolTypeWrap from mkPool: keep the inner PoolType as is
+        case {"tag": t, "contents": c} \
+                if t in ("LPool", "MPool", "IPool", "RPool", "FPool", "VPool", "PPool", "UPool") \
+                and isinstance(c, dict) and c.get("tag") in ("MultiPool", "ResecDeal"):
+            return c
         case {"tag": t, "contents": c} if t in ("LPool", "MPool", "IPool", "RPool", "FPool", "VPool", "PPool", "UPool"):
             return mkTag(("MultiPool", {"PoolConsol": c}))
         case {"assets": y} | {"清单": y} | {"归集表": y}: 
@@ -2207,15 +2212,14 @@ def mkPoolComp(asOfDate, x, mixFlag) -> dict:
 
 
 def mkPool(x: dict):
-    match x:
-        case {"清单": assets, "封包日": d} | {"assets": assets, "cutoffDate": d}:
-            if isMixedPoolSpec(x):
-                _pool = {"assets": [mkAssetUnion(a) for a in assets] , "asOfDate": d}
-                return mkTag(("UPool", _pool))
-            _pool = {"assets": [mkAsset(a) for a in assets] , "asOfDate": d}
-            return mkTag((inferPoolTypeFromAst(x), _pool))
-        case _:
-            raise AbsboxParseError(f"Failed to match {preview(x)}:mkPool")
+    ''' Build a runnable ``PoolTypeWrap`` (``LPool``/``MPool``/... around a tagged ``MultiPool``) '''
+    if not isinstance(x, dict):
+        raise AbsboxParseError(f"Failed to match {preview(x)}:mkPool")
+    assetDate = getValWithKs(x, ["cutoffDate", "封包日"])
+    if assetDate is None:
+        raise AbsboxParseError(f"Failed to match {preview(x)}:mkPool")
+    poolTag = "UPool" if isMixedPoolSpec(x) else inferPoolTypeFromAst(x)
+    return mkTag((poolTag, mkPoolType(assetDate, x, poolTag == "UPool")))
 
 
 def mkCustom(x: dict):

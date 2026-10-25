@@ -622,27 +622,89 @@ def test_invoice_pool_type_all_spellings_and_mixed():
         assert isMixedPoolSpec({"assets": [[tag, spec, {"status": "Current"}]]}) is False
     mixed = {"assets": [["应收賬款", spec, {"status": "Current"}], ASSET_MORTGAGE]}
     assert isMixedPoolSpec(mixed) is True
-    with pytest.raises((RuntimeError, AbsboxParseError)):
+    with pytest.raises(AbsboxParseError):
         inferPoolTypeFromAst(mixed)
 
 
+@pytest.mark.parametrize("tag,poolTag", [
+    ("Mortgage", "MPool"),
+    ("AdjustRateMortgage", "MPool"),
+    ("Loan", "LPool"),
+    ("Installment", "IPool"),
+    ("Lease", "RPool"),
+    ("RegularLease", "RPool"),
+    ("StepUpLease", "RPool"),
+    ("FixedAsset", "FPool"),
+    ("Invoice", "VPool"),
+    ("应收账款", "VPool"),
+    ("应收帐款", "VPool"),
+    ("应收賬款", "VPool"),
+    ("ProjectedByFactor", "PPool"),
+    ("ProjectedCashflow", "PPool"),
+])
+def test_inferPoolTypeFromAst_aliases(tag, poolTag):
+    assert inferPoolTypeFromAst({"assets": [[tag, {}, {}]]}) == poolTag
+    assert isMixedPoolSpec({"assets": [[tag, {}, {}]]}) is False
+
+
+def test_inferPoolTypeFromAst_errors_are_parse_errors():
+    for spec in ({"assets": []}, {"assets": [["Bogus", {}, {}]]}):
+        with pytest.raises(AbsboxParseError):
+            inferPoolTypeFromAst(spec)
+
+
 def test_mkPool_locales_and_mixed():
-    assert mkPool({"assets": [ASSET_LOAN], "cutoffDate": "2021-01-01"})["tag"] == "LPool"
-    assert mkPool({"清单": [ASSET_LOAN], "封包日": "2021-01-01"})["tag"] == "LPool"
+    for spec in (
+        {"assets": [ASSET_LOAN], "cutoffDate": "2021-01-01"},
+        {"清单": [ASSET_LOAN], "封包日": "2021-01-01"},
+        # English/Chinese keys may be mixed freely
+        {"assets": [ASSET_LOAN], "封包日": "2021-01-01"},
+        {"清单": [ASSET_LOAN], "cutoffDate": "2021-01-01"},
+    ):
+        p = mkPool(spec)
+        assert p["tag"] == "LPool"
+        assert p["contents"]["tag"] == "MultiPool"
+        consol = p["contents"]["contents"]["PoolConsol"]
+        assert [a["tag"] for a in consol["assets"]] == ["PersonalLoan"]
+        assert consol["asOfDate"] == "2021-01-01"
 
     mixed = mkPool({"assets": [ASSET_MORTGAGE, ASSET_LOAN], "cutoffDate": "2021-01-01"})
     assert mixed["tag"] == "UPool"
-    assert [a["tag"] for a in mixed["contents"]["assets"]] == ["MO", "LO"]
+    assert mixed["contents"]["tag"] == "MultiPool"
+    assert [a["tag"] for a in mixed["contents"]["contents"]["PoolConsol"]["assets"]] == ["MO", "LO"]
 
     with pytest.raises(AbsboxParseError):
         mkPool({"other": 1})
+    with pytest.raises(AbsboxParseError):
+        mkPool({"assets": [ASSET_LOAN]})              # missing cutoff date
+    with pytest.raises(AbsboxParseError):
+        mkPool({"assets": [], "cutoffDate": "2021-01-01"})
+
+
+def test_mkPool_returns_wire_ready_pooltypewrap():
+    from absbox.client import API
+
+    p = mkPool({"assets": [ASSET_LOAN], "cutoffDate": "2021-01-01"})
+    # PoolTypeWrap LPool contents must be a tagged PoolType, not a bare Pool.
+    assert p["tag"] == "LPool"
+    assert p["contents"]["tag"] == "MultiPool"
+    assert set(p["contents"]) == {"tag", "contents"}
+    # mkPoolType accepts the completed wrapper without nesting it again.
+    assert mkPoolType("2021-01-01", p, False) == p["contents"]
+    # build_pool_req passes the completed wrapper through untouched.
+    req = json.loads(API.__new__(API).build_pool_req(p, None, None))
+    assert req["contents"][1] == p
+    # ...and that request is identical to the one built from the raw spec.
+    raw_req = json.loads(API.__new__(API).build_pool_req(
+        {"assets": [ASSET_LOAN], "cutoffDate": "2021-01-01"}, None, None))
+    assert req == raw_req
 
 
 def test_mixed_single_pool_detection_and_tagging():
     mixed = {"assets": [ASSET_MORTGAGE, ASSET_LOAN], "cutoffDate": "2021-01-01"}
     assert isMixedPoolSpec(mixed)
     assert isMixedDeal(mixed)
-    with pytest.raises(RuntimeError):
+    with pytest.raises(AbsboxParseError):
         inferPoolTypeFromAst(mixed)
     # Mortgage and AdjustRateMortgage are constructors of the same engine pool.
     same_family = {"assets": [ASSET_MORTGAGE, ["AdjustRateMortgage", {}, {}]]}

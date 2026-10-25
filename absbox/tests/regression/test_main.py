@@ -16,6 +16,7 @@ from .pool import *
 
 from absbox import API,EnginePath,readInspect,PickApiFrom,readBondsCf
 from absbox.exception import AbsboxError
+from absbox.local.component import mkPool
 
 config_file_path = Path(__file__).resolve().parent.parent / 'config.json'
 
@@ -371,6 +372,27 @@ def test_pool_01(setup_api):
                         ,breakdown = True)
     assert 'breakdown' in r['PoolConsol'], "breakdown should be in PoolConsol"  
     assert 2 == len(r['PoolConsol']['breakdown']), "breakdown should have 2 items"
+
+
+@pytest.mark.pool
+def test_pool_mkPool(setup_api):
+    """mkPool must produce the same runnable PoolTypeWrap as a raw pool spec."""
+    pool = mkPool(myPool)
+    assert pool["tag"] == "MPool"
+    assert pool["contents"]["tag"] == "MultiPool", "mkPool must return a complete PoolTypeWrap"
+    assump = ("Pool",("Mortgage",None,None,None,None)
+                    ,None
+                    ,None)
+    r = setup_api.runPool(pool
+                        ,poolAssump=assump
+                        ,read = True
+                        ,breakdown = False)
+    raw = setup_api.runPool(myPool
+                        ,poolAssump=assump
+                        ,read = True
+                        ,breakdown = False)
+    assert set(r) == {"PoolConsol"}
+    assert r['PoolConsol']['flow'].equals(raw['PoolConsol']['flow'])
 
 @pytest.mark.analytics
 def test_first_loss(setup_api):
