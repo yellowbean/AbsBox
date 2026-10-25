@@ -1,0 +1,26 @@
+Fix wrapper/engine contract bugs found in the Dec26 full review:
+
+* ``("borrowerNumber",)`` now carries ``contents: null`` (engine
+  ``CurrentPoolBorrowerNum (Maybe [PoolId])``), fixing a 400 from both 0.52.13
+  and 0.52.14.
+* ``("ledgerTxnAmount", …)`` sends a list of ledger names and a raw
+  ``TxnComment`` string, matching ``LedgerTxnAmt [String] (Maybe TxnComment)``.
+* ``("floorCap", floor, cap, value)`` wraps the bounds as ``Constant``
+  ``DealStats`` (engine ``FloorAndCap DealStats DealStats DealStats``).
+* ``("cumPoolDefaultedRate", N)`` now builds ``CumulativePoolDefaultedRateTill``
+  for integer ``N``; ``mkPid`` rejects non-string pool ids instead of silently
+  emitting ``null``.
+* ``("lastFeePaid", …)`` maps to the engine's ``LastFeePaid`` (date-bound);
+  cumulative ``feePaidAmt`` remains mapped to ``FeePaidAmt``.
+* ``ProjectedByFactor`` rejects a missing fixed portion, normalises
+  ``floatPcts=None`` to ``[]`` and validates the 4-tuple float portions
+  ``(share, current rate, spread, index)``.
+* ``rateSwap``/``rateCap`` ``stmt`` rows are auto-tagged as ``IrsTxn`` (already
+  tagged transactions pass through), consistent with bonds/liq/ledger.
+* Pool-name formula arguments accept either variadic names or a single list
+  (e.g. ``("poolBalance", ["P1"])``).
+* Empty pool/asset cashflows return an empty ``DataFrame`` instead of ``[]``
+  so the result shape no longer changes for matured pools.
+* ``runAsset`` refuses ``pricing`` without a pool-level assumption (engine
+  rejects it) and ``runByDealScenarios``/``runByCombo`` raise clear errors for
+  wrong argument shapes instead of ``Failed to match run type``.

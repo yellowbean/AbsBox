@@ -299,12 +299,18 @@ class API:
                 mDeal = {k: v.json if hasattr(v, "json") else v for k, v in deal.items()}
                 _perfAssump = mkAssumpType(perfAssump)
                 r = mkTag((RunReqType.MultiStructs.value, [rtn, mDeal, _perfAssump, _nonPerfAssump]))
-            case "MultiRunScenarios" | "MRS" if isinstance(nonPerfAssump,dict):
+            case "MultiRunScenarios" | "MRS":
+                if not isinstance(nonPerfAssump, dict):
+                    raise AbsboxError("❌ runByDealScenarios requires runAssump as a dict of {scenario: [assumptions]}")
+                if not isinstance(deal, dict) and not hasattr(deal, "json"):
+                    raise AbsboxError("❌ runByDealScenarios expects a single deal object")
                 _deal = deal.json if hasattr(deal, "json") else deal
                 _perfAssump = earlyReturnNone(mkAssumpType, perfAssump)
                 mRunAssump = mapValsBy(nonPerfAssump, lambda x: mkNonPerfAssumps({}, x))
                 r = mkTag((RunReqType.MultiRunScenarios.value, [rtn, _deal, _perfAssump, mRunAssump]))
-            case "ComboSensitivity" | "CS" if isinstance(nonPerfAssump,dict) and isinstance(perfAssump,dict) and isinstance(deal,dict):
+            case "ComboSensitivity" | "CS":
+                if not (isinstance(nonPerfAssump, dict) and isinstance(perfAssump, dict) and isinstance(deal, dict)):
+                    raise AbsboxError("❌ runByCombo requires dealMap, poolAssump and runAssump to be dicts")
                 mDeal = {k: v.json if hasattr(v, "json") else v for k, v in deal.items()}
                 mAssump = mapValsBy(perfAssump, mkAssumpType)
                 if mAssump == {}:
@@ -821,6 +827,8 @@ class API:
         _assumptions = mkAssumpType(poolAssump) if poolAssump else None
         _rate = lmap(mkRateAssumption, rateAssump) if rateAssump else None
         _pricing = mkLiqMethod(pricing) if pricing else None
+        if _pricing is not None and (not isinstance(_assumptions, dict) or _assumptions.get("tag") != "PoolLevel"):
+            raise AbsboxError("❌ runAsset pricing requires a pool-level assumption, e.g. (\"Pool\", (\"Mortgage\", ...), None, None)")
         assets = lmap(mkAssetUnion, _assets) 
         req = json.dumps([date, assets, _assumptions, _rate, _pricing], ensure_ascii=False)
         if debug:

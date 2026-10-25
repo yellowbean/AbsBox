@@ -19,6 +19,7 @@ from absbox.local.component import (
     mkBondType,
     mkPid,
     mkRateSwap,
+    mkRateCap,
     mkTradeType,
     mkOrder,
     mkCustom,
@@ -957,3 +958,65 @@ def test_report_deal_name_reads_both_shapes():
     assert report_mod.dealContents({"_deal": {"tag": "MDeal", "contents": {"name": "cn-deal"}}}).get("name") \
         == "cn-deal"
     assert report_mod.dealContents({"_deal": {"MDeal": {"name": "en-deal"}}}).get("name") == "en-deal"
+
+
+def test_mkDs_single_contents_formulas():
+    # engine constructors with a Maybe argument still need a "contents" key
+    assert mkDs(("borrowerNumber",)) == {
+        "tag": "CurrentPoolBorrowerNum", "contents": None}
+    assert mkDs(("cumPoolDefaultedRate", 3)) == {
+        "tag": "CumulativePoolDefaultedRateTill", "contents": [3, None]}
+    assert mkDs(("cumPoolDefaultedRate", "P"))["tag"] == "CumulativePoolDefaultedRate"
+    with pytest.raises(AbsboxParseError):
+        mkPid(3)
+
+
+def test_mkDs_ledgerTxnAmount_and_floorCap():
+    # LedgerTxnAmt takes [String] (Maybe TxnComment)
+    assert mkDs(("ledgerTxnAmount", "g")) == {
+        "tag": "LedgerTxnAmt", "contents": [["g"], None]}
+    assert mkDs(("ledgerTxnAmount", ["g1", "g2"]))["contents"][0] == ["g1", "g2"]
+    # FloorAndCap takes three DealStats
+    w = mkDs(("floorCap", 0.5, 0.1, ("poolBalance",)))
+    assert w["tag"] == "FloorAndCap"
+    assert w["contents"][0] == {"tag": "Constant", "contents": 0.5}
+    assert w["contents"][1] == {"tag": "Constant", "contents": 0.1}
+    assert w["contents"][2]["tag"] == "CurrentPoolBalance"
+
+
+def test_mkDs_lastFeePaid_maps_to_engine_ctor():
+    assert mkDs(("lastFeePaid", "f"))["tag"] == "LastFeePaid"
+    assert mkDs(("feePaidAmt", "f"))["tag"] == "FeePaidAmt"
+
+
+def test_mkAsset_projectedByFactor_validates_portions():
+    base = ["ProjectedByFactor", [["2024-09-01", 100]], "MonthEnd"]
+    w = mkAsset(base + [(0.5, 0.08), None])
+    assert w["contents"][3] == []
+    w = mkAsset(base + [(0.5, 0.08), [(0.5, 0.02, 0.01, "LIBOR1M")]])
+    assert list(w["contents"][3][0]) == [0.5, 0.02, 0.01, "LIBOR1M"]
+    with pytest.raises(AbsboxParseError):
+        mkAsset(base + [(0.5, 0.08), [(0.5, 0.02, "LIBOR1M")]])
+    with pytest.raises(AbsboxParseError):
+        mkAsset(base + [None, []])
+
+
+def test_mkRateSwap_rateCap_statements_are_auto_tagged():
+    swap = {"updateDates": "MonthEnd", "pair": [0.04, ("SOFR1M", 0.0)],
+            "base": {"fix": 100}, "start": "2021-06-15", "balance": 100,
+            "stmt": [["2021-07-01", 0, 0, 0, 0, 0, ""]]}
+    w = mkRateSwap(swap)
+    assert w["rsStmt"] == [{"tag": "IrsTxn",
+                            "contents": ["2021-07-01", 0, 0, 0, 0, 0, ""]}]
+    tagged = [{"tag": "IrsTxn", "contents": ["2021-07-01", 0, 0, 0, 0, 0, ""]}]
+    assert mkRateSwap(swap | {"stmt": tagged})["rsStmt"] == tagged
+    cap = {"index": "LIBOR6M", "strike": [["2023-01-01", 0.03]], "base": {"fix": 1},
+           "start": "2022-01-01", "end": "2025-01-01", "settleDates": "QuarterEnd",
+           "rate": 0.03, "stmt": [["2021-07-01", 0, 0, 0, 0, 0, ""]]}
+    assert mkRateCap(cap)["rcStmt"][0]["tag"] == "IrsTxn"
+
+
+def test_read_cf_empty_returns_dataframe():
+    from absbox.local.util import _read_cf
+    import pandas as pd
+    assert isinstance(_read_cf([], "english"), pd.DataFrame)

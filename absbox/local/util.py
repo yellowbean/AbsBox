@@ -385,7 +385,7 @@ def getValWithKs(m: dict, ks: list, defaultReturn=None, mapping=None):
 def _read_cf(x, lang):
     ''' read cashflow from a list , and set index to date'''
     if x == []:
-        return []
+        return pd.DataFrame()
     assert isinstance(x, list), f"Input is not a list but {type(x)}"
     flow_header, idx, expandFlag = guess_pool_flow_header(x[0], lang)
     result = None
