@@ -287,7 +287,7 @@ Accounts
 Expense
 """"""""""
     * ``("feeDue","F1","F2")`` -> sum of fee due for fee "F1","F2"
-    * ``("lastFeePaid","F1","F2")`` -> sum of fee last paid for fee "F1","F2"
+    * ``("lastFeePaid","F1","F2")`` -> fee amount paid on the current calculation date for fee "F1","F2" (engine ``LastFeePaid``, date-bound)
     * ``("feeTxnAmt",None,"A")`` -> total transaction amount of fee "A"
 
 LiquidationProvider 
@@ -1866,20 +1866,22 @@ syntax
         ,["2024-12-01",0]
         ]
       ,"MonthEnd" 
-      ,(0.5, 0.08) 
-      ,[(0.5, 0.02, "LIBOR1M")]
+      ,(0.5, 0.08)
+      ,[(0.5, 0.02, 0.01, "LIBOR1M")]
       ]
+
 * ``[[<Date>, <Balance>]...]``
 
   Expected balance and dates
 
-
-* ``(0.5,0.08)``
+* ``(<share>, <fix rate>)``
 
   Means, 50% of projected cashflow are attributed to fix rate assets with fix rate of 8%
-* ``[(0.5,0.02,"LIBOR1M")]``
+* ``[(<share>, <current rate>, <spread>, <index>)]``
 
-  Means 50% of rest cashflow are generated from floater asset with spread of 2% and index of `LIBOR1M`
+  Means 50% of the cashflow is generated from a floater asset (current rate 2%, spread 1% over `LIBOR1M`).
+  Each floating portion is a 4-element tuple; the shares must sum to ``1.0`` together with the
+  fixed share, otherwise the engine rejects the run.
 
 .. warning::
 
