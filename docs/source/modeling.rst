@@ -209,7 +209,7 @@ DatePatterns can be composed together:
 * ``["<","YYYY-MM-DD",<datepattern>]`` -> a ``<datapattern>`` before "YYYY-MM-DD"(exclusive)
 * ``["<=","YYYY-MM-DD",<datepattern>]`` -> a ``<datapattern>`` before "YYYY-MM-DD"(inclusive)
 * ``["+",<datepattern1>,<datepattern2>.....]`` -> a union set of date pattern during the projection, like sum of dates
-* ``["-",<datepattern1>,<datepattern2>.....]`` -> build dates from 1st ``<datepattern1>`` and exclude dates from ``<datepattern2>,<datepattern3>``... 
+* ``["-",<datepattern>, [<datepattern2>,<datepattern3>...]]`` -> build dates from ``<datepattern>`` and exclude the dates of the listed patterns
 
 
 Formula 
@@ -915,6 +915,8 @@ Deal Status Enums
   Deal is in accelerated stage, which means the deal is picking ``Accelerated`` waterfall on distribution dates .
 ``Defaulted``
   Deal is in default stage, which means the deal is picking ``Defaulted`` waterfall on distribution dates .
+``Called``
+  Deal was called (clean-up call exercised).
 ``Ended`` 
   Means deal stop projection cashflow.
 
@@ -3493,6 +3495,10 @@ Collect
 
 Rate Hedge
 ^^^^^^^^^^^^
+
+Settle a rate cap and deposit the received amount into an account:
+
+``["settleCap", <Account>, <CapName>]``
 
 
 

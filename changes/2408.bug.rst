@@ -1,0 +1,2 @@
+Accept the engine's ``Called`` deal status (``mkStatus("Called")``); the manual
+and the published result samples already use it.

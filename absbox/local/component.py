@@ -1401,6 +1401,8 @@ def mkStatus(x: tuple|str):
             return mkTag(("DealDefaulted", None))
         case "结束" | "Ended":
             return mkTag(("Ended", None))
+        case "Called" | "已回购" | "已召回":
+            return mkTag(("Called"))
         case {"current": "PreClosing", "next":st}:
             return mkTag(("PreClosing", mkStatus(st)))
         case ("设计", st) | ("PreClosing", st) | ("preclosing", st):
