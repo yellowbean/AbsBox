@@ -27,6 +27,8 @@ console = Console()
 def mkDatePattern(x):
     ''' make date pattern, to describe a series of dates'''
     match x:
+        case {"tag": _}:
+            return x
         case ["DayOfMonth", _d] | ["每月", _d] | ("每月", _d):
             return mkTag(("DayOfMonth", vInt(_d)))
         case ["MonthDayOfYear", _m, _d] | ["每年", _m, _d] | ("每年", _m, _d):
@@ -37,6 +39,8 @@ def mkDatePattern(x):
             return mkTag(("EveryNMonth", [vDate(d), vInt(n)]))
         case ["Weekday", n] if n >= 0 and n <= 6:
             return mkTag(("Weekday", vInt(n)))
+        case ["StartsExclusive", d, dp]:
+            return mkTag(("StartsExclusive", [vDate(d), mkDatePattern(dp)]))
         case ["all", *_dps] | ["All", *_dps] | ["AllDatePattern", *_dps] | ["+", *_dps] | ("+", *_dps) | ("all", *_dps) | ("AllDatePattern", *_dps):
             return mkTag(("AllDatePattern", lmap(mkDatePattern, _dps)))
         case [">", _d, dp] | ["After", _d, dp] | ["之后", _d, dp] | (">", _d, dp) | ("After", _d, dp):
@@ -158,6 +162,8 @@ def mkDsRate(x):
 
 def mkFeeType(x):
     match x:
+        case {"tag": _}:
+            return x
         case {"年化费率": [base, rate]} | {"annualPctFee": [base, rate]} | ("annualPctFee", base, rate) | {"base":base,"annualisedRate": rate}:
             return mkTag(("AnnualRateFee", [mkDs(base), mkDsRate(rate)]))
         case {"百分比费率": [base, _rate]} | {"pctFee": [base, _rate]} | ("pctFee", base, _rate) | {"base":base,"pctFeeRate": _rate}:
@@ -229,6 +235,8 @@ def mkPoolSource(x):
             return "CollectedCash"
         case "费用" | "Fee" | "现金回款" | "CollectedFeePaid":
             return "CollectedFeePaid"
+        case "罚息" | "提前还款罚息" | "PrepaymentPenalty" | "CollectedPrepaymentPenalty":
+            return "CollectedPrepaymentPenalty"
         case "新增违约" | "Defaults":
             return "NewDefaults"
         case "新增拖欠" | "Delinquencies":
@@ -281,6 +289,8 @@ def mkDs(x):
     "Making Deal Stats"
     try:
         match x:
+            case {"tag": _}:
+                return x
             case ("债券余额",) | ("bondBalance",):
                 return mkTag("CurrentBondBalance")
             case ("债券余额", *bnds) | ("bondBalance", *bnds):
@@ -310,7 +320,7 @@ def mkDs(x):
             case ("资产池违约余额", *pNames) | ("currentPoolDefaultedBalance", *pNames): #DEPRECATE
                 if pNames:
                     return mkTag(("CurrentPoolDefaultedBalance", mkPidList(pNames)))
-                return mkTag(("CurrentPoolDefaultedBalance", None))
+                return mkTag(("CurrentPoolDefaultedBalance"))
             case ("资产池累计违约余额", *pNames) | ("cumPoolDefaultedBalance", *pNames): #DEPRECATE
                 if pNames:
                     return mkTag(("CumulativePoolDefaultedBalance",mkPidList(pNames)))
@@ -556,6 +566,8 @@ def mkPre(p):
                 return "If"
     try:
         match p:
+            case {"tag": _}:
+                return p
             case ["状态", _st] | ["status", _st]:
                 return mkTag(("IfDealStatus", mkStatus(_st)))
             case ["同时满足", *_p] | ["同时", *_p] | ["all", *_p]:
@@ -629,6 +641,8 @@ def mkAccInt(x):
 
 def mkAccType(x):
     match x:
+        case {"tag": _}:
+            return x
         # fixed amount
         case ("固定", amt) | ("fix", amt) | ("fixReserve", amt) | {"固定储备金额": amt} | {"fixReserve": amt}:
             return mkTag(("FixReserve", vNum(amt)))
@@ -693,6 +707,8 @@ def mkAcc(an, x=None):
 
 def mkBondType(x):
     match x:
+        case {"tag": _}:
+            return x
         case {"PAC":schedule,"anchorBonds":bns}:
             return mkTag(("PacAnchor", [mkTag(("BalanceCurve", schedule)), vList(bns, str)]))
         case {"固定摊还": schedule} | {"PAC": schedule}:
@@ -724,6 +740,8 @@ def mkBondIoItype(x):
 
 def mkBondRate(x:dict)->dict:
     match x:
+        case {"tag": _}:
+            return x
         # floater rate with daycount
         case {"浮动": [r, _index, Spread, resetInterval], "日历": dc} | \
                 {"floater": [r, _index, Spread, resetInterval], "dayCount": dc} | \
@@ -775,8 +793,8 @@ def mkBondRate(x:dict)->dict:
                     return mkBondRate(("floor", floor, tz.dissoc(x,'floor')))
                 case (cap, None):
                     return mkBondRate(("cap", cap, tz.dissoc(x,'cap')))
-                case _ :
-                    raise AbsboxParseError(f"Failed to match bond rate with both cap and floor: {preview(x)}")
+                case (cap, floor):
+                    return mkTag(("Floater", [vNum(rate), idx, vNum(spd), mkDatePattern(resetInterval), dc, vNum(floor), vNum(cap)]))
         
         
         case _:
@@ -849,6 +867,7 @@ def mkBnd(bn, x:dict):
     md = getValWithKs(x, ["到期日", "maturityDate"])
     lastAccrueDate = getValWithKs(x, ["计提日", "lastAccrueDate"])
     lastIntPayDate = getValWithKs(x, ["付息日", "lastIntPayDate"])
+    lastPrinPayDate = getValWithKs(x, ["还本日", "lastPrinPayDate"])
     dueInt = getValWithKs(x, ["应付利息", "dueInt"], defaultReturn=0)
     duePrin = getValWithKs(x, ["应付本金", "duePrin"], defaultReturn=0)
     dueIntOverInt = getValWithKs(x, ["拖欠利息", "dueIntOverInt"], defaultReturn=0)
@@ -879,6 +898,7 @@ def mkBnd(bn, x:dict):
                     ,"bndDueInts": dueInts
                     ,"bndDueIntOverInts": dueIntOverInts
                     ,"bndLastIntPays": lmap(vDate, mLastIntPays) if mLastIntPays else None
+                    ,"bndLastPrinPay": lastPrinPayDate
                     ,"bndStmt": mStmt
                     ,"tag": "MultiIntBond"}
         case {"当前余额": bndBalance, "当前利率": bndRate, "初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
@@ -888,6 +908,7 @@ def mkBnd(bn, x:dict):
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
                     , "bndDuePrin": vNum(duePrin), "bndDueInt": vNum(dueInt), "bndDueIntOverInt":vNum(dueIntOverInt), "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
                     , "bndLastIntPay": lastIntPayDate
+                    , "bndLastPrinPay": lastPrinPayDate
                     , "bndStmt": mStmt
                     , "tag": "Bond"}
             return y
@@ -906,6 +927,8 @@ def mkBnd(bn, x:dict):
 
 def mkLiqMethod(x):
     match x:
+        case {"tag": _}:
+            return x
         case ["正常|违约", a, b] | ["Current|Defaulted", a, b] | {"currentFactor": a, "defaultFactor": b}:
             return mkTag(("BalanceFactor", [vNum(a), vNum(b)]))
         case ["正常|拖欠|违约", a, b, c] | ["Current|Delinquent|Defaulted", a, b, c]:
@@ -1066,6 +1089,8 @@ def mkRateCap(x):
 
 def mkRateType(x):
     match x :
+        case {"tag": _}:
+            return x
         case {"fix":r, "dayCount":dc} | {"固定":r, "日历":dc} |\
             ["fix", r, dc] | ["固定", r, dc] | ("fix", r, dc) | ("固定", r, dc):
             return mkTag(("Fix", [dc, vNum(r)]))
@@ -1160,6 +1185,8 @@ def mkAction(x:list):
         return (limit, support)
         
     match x:
+        case {"tag": _}:
+            return x
         case ["账户转移", source, target, m,"簿记",dr, ln] | ["transfer", source, target, m, "book", dr, ln]:
             return mkTag(("TransferAndBook", [ mkLimit(m), vStr(source), vStr(target)
                                               ,[bookDirection[dr], ln]
@@ -1387,6 +1414,8 @@ def mkAction(x:list):
 
 def mkStatus(x: tuple|str):
     match x:
+        case {"tag": _}:
+            return x
         case "摊销" | "Amortizing" | "摊还" | "amortizing":
             return mkTag(("Amortizing"))
         case "Warehousing" | "储备":
@@ -1466,6 +1495,8 @@ def mkTrigger(x: dict):
 
 def mkTriggerEffect(x):
     match x:
+        case {"tag": _}:
+            return x
         case ("新状态", s) | ("newStatus", s):
             return mkTag(("DealStatusTo", mkStatus(s)))
         case ("动作", *actions) | ("actions", *actions):
@@ -2122,6 +2153,8 @@ def mkObligorStrategy(x):
 def mkAssumpType(x):
     ''' make assumps either on pool level or asset level '''
     match x:
+        case {"tag": _}:
+            return x
         case ("Pool", p, d, f) | ("pool", p, d, f):
             return mkTag(("PoolLevel",mkPDF(p, d, f)))
         case ("ByIndex", *ps) | ("byIndex", *ps):
@@ -2224,6 +2257,8 @@ def mkPool(x: dict):
 
 def mkCustom(x: dict):
     match x:
+        case {"tag": _}:
+            return x
         case {"常量": n} | {"Constant": n} | {"const": n}:
             return mkTag(("CustomConstant", n))
         case {"余额曲线": ts} | {"BalanceCurve": ts} | {"curve": ts}:
@@ -2363,6 +2398,8 @@ def mkPidList(xs) -> list:
 def mkCollection(x):
     """ Build collection rules """
     match x :
+        case {"tag": _}:
+            return x
         case [s, acc] if isinstance(acc, str) and isinstance(s, str):
             return mkTag(("Collect",[None, mkPoolSource(s), acc]))
         case [s, *pcts] if isinstance(pcts, list) and isinstance(s, str):
@@ -2406,14 +2443,18 @@ def mkFee(x):
                                     ("feeArrears",0),("feeLastPaidDate",None),
                                     ("feeStart",None)])
             opt_fields["feeLastPaidDay"] = opt_fields.pop("feeLastPaidDate")
-            return  {"feeName": vStr(fn), "feeType": mkFeeType(feeType)} | opt_fields
+            mStmt = getValWithKs(fi, ["stmt", "记录"], defaultReturn=None)
+            feeStmtVal = mkTxn("expense", mStmt) if mStmt else None
+            return  {"feeName": vStr(fn), "feeType": mkFeeType(feeType), "feeStmt": feeStmtVal} | opt_fields
         case {"名称":fn , "类型": feeType, **fi}:
             opt_fields = subMap2(fi, [("计算日","feeDueDate",None),("应计费用","feeDue",0),
                                       ("拖欠","feeArrears",0),("上次缴付日期","feeLastPaidDay",None),
                                       ("起始日","feeStart",None)])
             if opt_fields["feeStart"] is None :
                 raise AbsboxParseError("feeStart not found in fee:after version 0.45.x fee must to include field feeStart")
-            return  {"feeName": vStr(fn), "feeType": mkFeeType(feeType)} | opt_fields
+            mStmt = getValWithKs(fi, ["stmt", "记录"], defaultReturn=None)
+            feeStmtVal = mkTxn("expense", mStmt) if mStmt else None
+            return  {"feeName": vStr(fn), "feeType": mkFeeType(feeType), "feeStmt": feeStmtVal} | opt_fields
         case _:
             raise AbsboxParseError(f"Failed to match fee: {preview(x)}")
 
@@ -2451,6 +2492,8 @@ def mkIrrType(x):
 
 def mkPricingAssump(x):
     match x:
+        case {"tag": _}:
+            return x
         case ("pv",pricingDay,xs) | {"贴现日": pricingDay, "贴现曲线": xs} | {"date": pricingDay, "curve": xs}| {"PVDate": pricingDay, "PVCurve": xs}:
             return mkTag(("DiscountCurve", [vDate(pricingDay), mkTs("IRateCurve", xs)]))
         case ("zspread",bnd_with_price, rdps) | {"债券": bnd_with_price, "利率曲线": rdps} | {"bonds": bnd_with_price, "curve": rdps}:

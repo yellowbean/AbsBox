@@ -1082,3 +1082,68 @@ def test_read_cf_empty_returns_dataframe():
     from absbox.local.util import _read_cf
     import pandas as pd
     assert isinstance(_read_cf([], "english"), pd.DataFrame)
+
+
+def test_engine_tagged_objects_pass_through():
+    from absbox.local.component import (mkAction, mkDatePattern, mkPre, mkFeeType,
+        mkAccType, mkLiqMethod, mkPricingAssump, mkTriggerEffect, mkAssumpType,
+        mkStatus, mkCollection, mkRateType, mkBondRate, mkBondType, mkCustom)
+    pairs = [
+        (mkDs, {"tag": "FutureCurrentPoolBalance", "contents": None}),
+        (mkAction, {"tag": "PayIntPrinBySeq", "contents": [None, "acc", ["A"], None]}),
+        (mkDatePattern, {"tag": "MonthEnd"}),
+        (mkPre, {"tag": "IfDealStatus", "contents": {"tag": "Amortizing"}}),
+        (mkFeeType, {"tag": "FixFee", "contents": 10}),
+        (mkAccType, {"tag": "FixReserve", "contents": 1}),
+        (mkLiqMethod, {"tag": "PvRate", "contents": 0.05}),
+        (mkPricingAssump, {"tag": "DiscountCurve"}),
+        (mkTriggerEffect, {"tag": "DoNothing"}),
+        (mkAssumpType, {"tag": "PoolLevel"}),
+        (mkStatus, {"tag": "Called"}),
+        (mkCollection, {"tag": "Collect"}),
+        (mkRateType, {"tag": "Fix"}),
+        (mkBondRate, {"tag": "Fix"}),
+        (mkBondType, {"tag": "Sequential"}),
+        (mkCustom, {"tag": "CustomDS"}),
+    ]
+    for fn, obj in pairs:
+        assert fn(obj) is obj
+
+
+def test_bond_last_prin_pay_and_fee_stmt():
+    from absbox.local.component import mkBnd
+    bond = {"balance": 100, "rate": 0.05, "originBalance": 100, "originRate": 0.05,
+            "startDate": "2021-01-01", "rateType": {"fix": 0.05},
+            "bondType": {"Sequential": None},
+            "lastIntPayDate": "2021-06-01", "lastPrinPayDate": "2021-06-02"}
+    b = mkBnd("A", bond)
+    assert b["bndLastIntPay"] == "2021-06-01"
+    assert b["bndLastPrinPay"] == "2021-06-02"
+
+    f = mkFee({"name": "f", "type": {"fixFee": 1}, "feeStart": "2021-01-01",
+               "stmt": [["2021-06-01", 0, 10, 0, ""]]})
+    assert f["feeStmt"] == [{"tag": "ExpTxn",
+                             "contents": ["2021-06-01", 0, 10, 0, ""]}]
+
+
+def test_floater_accepts_cap_and_floor_together():
+    from absbox.local.component import mkBnd
+    bond = {"balance": 100, "rate": 0.05, "originBalance": 100, "originRate": 0.05,
+            "startDate": "2021-01-01",
+            "rateType": {"rate": 0.05, "index": "SOFR3M", "spread": 0.0,
+                         "reset": "MonthEnd", "cap": 0.1, "floor": 0.01},
+            "bondType": {"Sequential": None}}
+    w = mkBnd("A", bond)
+    assert w["bndInterestInfo"]["tag"] == "Floater"
+    assert w["bndInterestInfo"]["contents"][5] == 0.01
+    assert w["bndInterestInfo"]["contents"][6] == 0.1
+
+
+def test_prepayment_penalty_source_and_starts_exclusive():
+    from absbox.local.component import mkDatePattern, mkPoolSource
+    assert mkPoolSource("CollectedPrepaymentPenalty") == "CollectedPrepaymentPenalty"
+    assert mkDatePattern(["StartsExclusive", "2021-01-01", "MonthEnd"]) == {
+        "tag": "StartsExclusive",
+        "contents": ["2021-01-01", {"tag": "MonthEnd"}]}
+    assert mkDs(("currentPoolDefaultedBalance",)) == {
+        "tag": "CurrentPoolDefaultedBalance"}

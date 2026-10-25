@@ -200,7 +200,8 @@ DatePatterns can be composed together:
 * ``["After","YYYY-MM-DD",<datepattern>]`` -> a ``<datapattern>`` after "YYYY-MM-DD"(exclusive)
 * ``["AllDatePattern",<datepattern1>,<datepattern2>.....]`` -> a union set of date pattern during the projection, like sum of dates
 * ``["ExcludeDatePattern",<datepattern1>,<datepattern2>.....]`` -> build dates from 1st ``<datepattern1>`` and exclude dates from ``<datepattern2>,<datepattern3>``... 
-* ``["OffsetDatePattern",<datepattern>,N]`` ->  build dates from ``<datepattern>`` and offset days by N ( positive N move dates to future) , negative N will move dates to past ) 
+* ``["OffsetDatePattern",<datepattern>,N]`` ->  build dates from ``<datepattern>`` and offset days by N ( positive N move dates to future) , negative N will move dates to past )
+* ``["StartsExclusive",<date>,<datepattern>]`` -> deprecated exclusive start form, same as ``["After",<date>,<datepattern>]`` 
 
 .. versionadded:: 0.30.8
 
@@ -703,6 +704,7 @@ Pool Sources
 * ``Prepayment``, ``CollectedPrepayment``
 * ``Rental``, ``CollectedRental``
 * ``Cash``, ``CollectedCash``
+* ``PrepaymentPenalty``, ``CollectedPrepaymentPenalty``
 * ``Defaults`` 
 * ``Delinquencies``
 * ``Losses``
@@ -720,6 +722,14 @@ Range Type
 
 Components
 ============
+
+.. note::
+
+   Advanced: a ready-made engine object ``{"tag": ..., "contents": ...}`` is
+   accepted and passed through unchanged for formulas, conditions, actions,
+   trigger effects, fee types, reserve types, bond rates/types, date patterns,
+   pricing methods, assumptions, collection rules and custom data. This covers
+   engine constructors that have no wrapper shorthand.
 
 Deal Dates
 ------------
@@ -959,6 +969,7 @@ syntax
   * ``"feeDueDate"`` -> the date when due amount was calculated 
   * ``"feeDue"`` ->    total oustanding due amount 
   * ``"feeLastPaidDate"`` -> the date when last paid
+  * ``"stmt"`` -> transaction history rows (the wrapper tags them as ``ExpTxn``)
 
 .. warning::
 
@@ -2326,6 +2337,8 @@ syntax
 optional fields:
   * ``maturityDate`` : maturity date of bond
   * ``lastAccrueDate`` : last date of interest accrued
+  * ``lastIntPayDate`` : last interest payment date
+  * ``lastPrinPayDate`` : last principal payment date
   * ``dueInt`` : due interest amount already accrued
 
 Interest

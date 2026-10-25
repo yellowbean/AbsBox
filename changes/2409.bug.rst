@@ -1,0 +1,15 @@
+Close the remaining wrapper/engine contract gaps found on the Dec26 line:
+
+* engine-shaped tagged objects (``{"tag": ..., "contents": ...}``) are accepted
+  wherever a component is expected and passed through unchanged (formulas,
+  conditions, actions, trigger effects, fee types, reserve types, bond rates,
+  bond types, date patterns, pricing methods, assumptions, collections, custom
+  data) — this covers engine constructors without a shorthand;
+* bonds accept ``lastPrinPayDate`` and emit ``bndLastPrinPay`` (Bond and
+  MultiIntBond);
+* fees accept ``stmt`` rows and emit ``feeStmt``;
+* a floater rate dict may carry both ``cap`` and ``floor`` (engine supports both
+  on the same rate);
+* pool sources accept ``CollectedPrepaymentPenalty``;
+* ``DatePattern`` accepts the deprecated ``StartsExclusive`` form;
+* ``CurrentPoolDefaultedBalance`` is emitted in canonical nullary form.
