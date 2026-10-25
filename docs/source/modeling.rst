@@ -228,6 +228,7 @@ Bond
     * ``("bondBalance","A","B"...)`` -> sum of balance of bond A and bond B
     * ``("originalBondBalance",)`` -> bond balance at issuance
     * ``("originalBondBalance","A","B")`` -> bond balance at issuance of "A" and "B" 
+    * ``("bondDuePrin","A","B")`` -> bond due principal for bond A and bond B
     * ``("bondDueInt","A","B")``  -> bond due interest for bond A and bond B
     * ``("bondDueIntOverInt","A","B")``  -> bond due interest over interest for bond A and bond B
     * ``("bondDueIntTotal","A","B")`` -> sum of interest due and interest over interest for bond A and bond B
@@ -705,6 +706,8 @@ Pool Sources
 * ``Defaults`` 
 * ``Delinquencies``
 * ``Losses``
+* ``Balance`` (engine ``CurBalance``)
+* ``BegBalance`` (engine ``CurBegBalance``)
 
 Range Type
 ^^^^^^^^^^^^^
@@ -2848,6 +2851,12 @@ This workflow chart demostrate how engine pick the waterfall to execute during d
    * - ``closingDay``
      - deal status is `PreClosing`
      - once deal exits `PreClosing` status
+   * - ``Warehousing``
+     - deal status is `Warehousing`
+     - every distribution day
+   * - ``default``
+     - any deal status
+     - fallback waterfall when no other key matches
    * - ``(custom,<waterfall name>)``
      - any deal status
      - once deal hits the custom date 
@@ -3173,6 +3182,17 @@ PayPrinResidual
   syntax
     ``["payPrinResidual", {Account}, [<Bond>] ]``
   
+PayIntOverInt
+  pay penalty interest (interest over interest) to a bond.
+
+  syntax
+    ``["payIntOverInt", {Account}, [<Bonds>], m]``
+
+    `m`is just a map same in the `payFee` , which has keys :
+
+      * ``limit`` -> :ref:`<limit>`
+      * ``support`` -> :ref:`<support>`
+
 PayIntResidual 
   pay interest to a bond regardless its interest due.
 

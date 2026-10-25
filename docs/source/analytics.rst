@@ -1460,7 +1460,7 @@ params:
    * ``read`` : if `True` , will try it best to parse the result into `DataFrame`
 
    .. versionadded:: 0.50.0
-   * ``rtn`` : defaults to [], to get asset level cashflow pass ``["AssetLevelFlow"]``
+   * ``rtn`` : defaults to ``None`` (no extra outputs); pass ``["AssetLevelFlow"]`` for asset-level cashflow
 
 returns:
    * a map with keys of components like:
@@ -1530,6 +1530,7 @@ params:
     * ``cutoffDate`` : a date which suggests all cashflow after that date will be shown
     * ``poolAssump`` : pool performance assumption, passing a map if run with multi scenaro mode
     * ``rateAssump`` : interest rate assumption
+    * ``pricing`` : optional :ref:`Pricing Method`; requires a pool-level ``poolAssump``
     * ``read`` : if `True` , will try it best to parse the result into `DataFrame`
 
 returns:
