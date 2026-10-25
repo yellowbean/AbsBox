@@ -1,0 +1,4 @@
+``PickApiFrom`` and ``API`` version checks now use a shared numeric version
+parser and no longer raise ``ValueError: too many values to unpack`` when the
+installed absbox version carries extra segments (e.g. ``0.52.9.dev1``); ties in
+the same tenth are sorted by numeric patch instead of string order.

@@ -1,0 +1,4 @@
+Non-200 responses (engine 0.52.10+ rejections: misrouted request shapes, run
+limits, engine errors) are raised as ``EngineError`` with the human-readable
+message extracted from the JSON error envelope (``{"Left":"..."}``) instead of
+the raw JSON body.

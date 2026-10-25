@@ -851,6 +851,7 @@ def mkBnd(bn, x:dict):
             l = len(bndInterestInfos)
             dueInts = getValWithKs(x, ["应付利息", "dueInt"], defaultReturn=[0]*l)
             dueIntOverInts = getValWithKs(x, ["拖欠利息", "dueIntOverInt"], defaultReturn=[0]*l)
+            mLastIntPays = getValWithKs(x, ["付息日", "lastIntPays"], defaultReturn=None)
             mSts = getValWithKs(x, ["调息", "stepUps"], defaultReturn=None)
             return {"bndName": vStr(bn), "bndType": mkBondType(bndType)
                     ,"bndOriginInfo":{"originBalance": vNum(originBalance), "originDate": vDate(originDate), "originRate": vNum(originRate)}
@@ -861,6 +862,7 @@ def mkBnd(bn, x:dict):
                     ,"bndDuePrin": vNum(duePrin)
                     ,"bndDueInts": dueInts
                     ,"bndDueIntOverInts": dueIntOverInts
+                    ,"bndLastIntPays": lmap(vDate, mLastIntPays) if mLastIntPays else None
                     ,"bndStmt": mStmt
                     ,"tag": "MultiIntBond"}
         case {"当前余额": bndBalance, "当前利率": bndRate, "初始余额": originBalance, "初始利率": originRate, "起息日": originDate, "利率": bndInterestInfo, "债券类型": bndType} | \
@@ -869,7 +871,7 @@ def mkBnd(bn, x:dict):
                     , "bndOriginInfo": {"originBalance": vNum(originBalance), "originDate": vDate(originDate), "originRate": vNum(originRate)} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
                     , "bndDuePrin": vNum(duePrin), "bndDueInt": vNum(dueInt), "bndDueIntOverInt":vNum(dueIntOverInt), "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
-                    , "bndLastIntPayDate": lastIntPayDate
+                    , "bndLastIntPay": lastIntPayDate
                     , "bndStmt": mStmt
                     , "tag": "Bond"}
             return y
@@ -879,7 +881,7 @@ def mkBnd(bn, x:dict):
                     , "bndOriginInfo": {"originBalance": vNum(originBalance), "originDate": vDate(originDate), "originRate": vNum(originRate)} | {"maturityDate": md}
                     , "bndInterestInfo": mkBondRate(bndInterestInfo), "bndType": mkBondType(bndType)
                     , "bndDuePrin": vNum(duePrin), "bndDueInt": vNum(dueInt), "bndDueIntOverInt": vNum(dueIntOverInt), "bndDueIntDate": lastAccrueDate, "bndStepUp": mSt
-                    , "bndLastIntPayDate": lastIntPayDate
+                    , "bndLastIntPay": lastIntPayDate
                     , "bndStmt": mStmt
                     , "tag": "Bond"}
         case _:
@@ -995,7 +997,7 @@ def mkRsBase(x):
         case {"formula": ds} | {"公式": ds}:
             return mkTag(("Base", mkDs(ds)))
         case {"schedule": tbl} | {"计划": tbl}:
-            return mkTs("Balance", tbl)
+            return mkTag(("Schedule", mkTs("BalanceCurve", tbl)))
         case _:
             raise AbsboxParseError(f"Failed to match :{preview(x)}:Interest Swap Base")
 
@@ -1374,8 +1376,6 @@ def mkStatus(x: tuple|str):
             return mkTag(("Warehousing", mkStatus(st)))
         case "循环" | "Revolving" | "revolving":
             return mkTag(("Revolving"))
-        case "RampUp":
-            return mkTag(("RampUp"))
         case "加速清偿" | "Accelerated":
             return mkTag(("DealAccelerated", None))
         case "违约" | "Defaulted":
@@ -2238,9 +2238,13 @@ def mkLiqProvider(n: str, x: dict):
     def mkCredit(y): 
         match y:
             case None:
-                return "Unlimit"
-            case amt:
+                return mkTag(("Unlimit"))
+            case amt if isinstance(amt, (int, float)):
                 return mkTag(("ByAvailAmount", vNum(amt)))
+            case (direction, amt) if direction in ("Debit", "Credit"):
+                return mkTag(("ByAvailAmount", vNum(amt)))
+            case _:
+                raise AbsboxParseError(f"Failed to match liqCredit: {preview(y)}; use a number (available amount) or None for unlimit")
     r = {
         "liqName": vStr(n),
         "liqType": mkLiqProviderType(x_transformed["liqType"]),
@@ -2262,13 +2266,20 @@ def mkLiqProvider(n: str, x: dict):
 
 def mkLedger(n: str, x: dict | None = None):
     ''' Build ledger '''
+    def mkBalance(v):
+        " Ledger balance is a (BookDirection, Amount) pair ; a bare number defaults to 'Debit' "
+        if isinstance(v, (int, float)):
+            return ["Debit", vNum(v)]
+        if isinstance(v, list) and len(v) == 2 and v[0] in ("Debit", "Credit"):
+            return [v[0], vNum(v[1])]
+        raise AbsboxParseError(f"Failed to match ledger balance: {preview(v)}; use a number or ['Debit'|'Credit', amount]")
     match x:
-        case {"balance":bal} | {"余额":bal}:
-            return {"ledgName":vStr(n),"ledgBalance":vNum(bal),"ledgStmt":None}
+        case {"balance": bal} | {"余额": bal}:
+            return {"ledgName":vStr(n),"ledgBalance":mkBalance(bal),"ledgStmt":None}
         case {"balance":bal,"txn":tx} | {"余额":bal, "记录":tx}:
-            return {"ledgName":vStr(n),"ledgBalance":vNum(bal),"ledgStmt":mkAccTxn(tx)}
+            return {"ledgName":vStr(n),"ledgBalance":mkBalance(bal),"ledgStmt":mkAccTxn(tx)}
         case None:
-            return {"ledgName":vStr(n),"ledgBalance":0,"ledgStmt":None}
+            return {"ledgName":vStr(n),"ledgBalance":["Debit",0],"ledgStmt":None}
         case _:
             raise AbsboxParseError(f"Failed to match Ledger:{preview(n)},{preview(x)}")
 
@@ -2296,9 +2307,12 @@ def mkPid(x):
     match x:
         case None:
             return None
+        case (dp0, dealName, bondName, startDate, rate) if dp0 == "DealBondFlow":
+            return mkTag(("DealBondFlow", [vStr(dealName), vStr(bondName), vDate(startDate), vNum(rate)]))
+        case ["DealBondFlow", dealName, bondName, startDate, rate]:
+            return mkTag(("DealBondFlow", [vStr(dealName), vStr(bondName), vDate(startDate), vNum(rate)]))
         case x if isinstance(x, str) and x.startswith("Deal-"):
-            dealName, bondName = x.split(":")
-            return mkTag(("UnderlyingDeal", [dealName, bondName]))
+            raise AbsboxParseError(f"Failed to match pid {preview(x)}: 'Deal-<deal>:<bond>' is not a valid PoolId on the engine ; use (\"DealBondFlow\", <dealName>, <bondName>, <startDate>, <rate>)")
         case x if isinstance(x, str):
             return mkTag(("PoolName", x))
 
@@ -2348,10 +2362,11 @@ def mkFee(x):
             opt_fields = subMap(fi, [("feeDueDate",None),("feeDue",0),
                                     ("feeArrears",0),("feeLastPaidDate",None),
                                     ("feeStart",None)])
+            opt_fields["feeLastPaidDay"] = opt_fields.pop("feeLastPaidDate")
             return  {"feeName": vStr(fn), "feeType": mkFeeType(feeType)} | opt_fields
         case {"名称":fn , "类型": feeType, **fi}:
             opt_fields = subMap2(fi, [("计算日","feeDueDate",None),("应计费用","feeDue",0),
-                                      ("拖欠","feeArrears",0),("上次缴付日期","feeLastPaidDate",None),
+                                      ("拖欠","feeArrears",0),("上次缴付日期","feeLastPaidDay",None),
                                       ("起始日","feeStart",None)])
             if opt_fields["feeStart"] is None :
                 raise AbsboxParseError("feeStart not found in fee:after version 0.45.x fee must to include field feeStart")
@@ -2366,7 +2381,7 @@ def mkBondPricingMethod(x):
         case ("byRate", r):
             return mkTag(("PvBondByRate", r))
         case ("byCurve", ts):
-            return mkTag(("PvBondByCurve", ts))
+            return mkTag(("PvBondByCurve", mkTs("IRateCurve", ts)))
         case _:
             raise AbsboxParseError(f"Failed to match bondPricingMethod: {preview(x)}")
 

@@ -1,0 +1,6 @@
+``Generic.read`` and ``SPV.read`` store ``_deal`` in the same raw engine
+shape (``{"tag": ..., "contents": {...}}``) again — ``Generic.read`` had
+switched to the aeson-decoded shape, which made ``positionFlow`` and any
+raw-shape consumer raise ``KeyError: 'contents'`` on English results.
+``positionFlow`` (and the new ``dealContents`` helper, also used by the
+HTML report) now accept both shapes.

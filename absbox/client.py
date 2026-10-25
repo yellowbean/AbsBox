@@ -29,6 +29,8 @@ from .rootFinder import mkTweak, mkStop
 VERSION_NUM = version("absbox")
 console = Console()
 
+DealExpectReturns = ("DealLogs", "AssetLevelFlow")
+
 __all__ = ["API", "Endpoints", "RunReqType", "RunResp" , "EnginePath"]
 
 
@@ -276,6 +278,9 @@ class API:
         """
         nonPerfAssump = nonPerfAssump or []
         rtn = rtn if rtn is not None else []
+        bad_rtn = [s for s in rtn if s not in DealExpectReturns]
+        if bad_rtn:
+            raise AbsboxError(f"❌ invalid rtn items {bad_rtn}; engine accepts only {list(DealExpectReturns)}")
         r = None
 
         match run_type:
@@ -601,6 +606,9 @@ class API:
             raise AbsboxError(f"❌ Deals should be a dict but got {type(deals)}")
 
         rtn = rtn if rtn is not None else []
+        bad_rtn = [s for s in rtn if s not in DealExpectReturns]
+        if bad_rtn:
+            raise AbsboxError(f"❌ invalid rtn items {bad_rtn}; engine accepts only {list(DealExpectReturns)}")
         url = f"{self.url}/{Endpoints.RunMultiDeal.value}" 
         _poolAssump = mkAssumpType(poolAssump) if poolAssump else None 
         _nonPerfAssump = mkNonPerfAssumps({}, mapNone(nonPoolAssump,[]) + mapNone(runAssump,[]))

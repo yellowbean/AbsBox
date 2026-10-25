@@ -6,6 +6,8 @@ def mkTag(x: tuple | str) -> dict:
         case (tagName, tagValue):
             return {"tag": tagName, "contents": tagValue}
         case (tagName):
+            if not isinstance(tagName, str):
+                raise AbsboxParseError(f"mkTag expects a string or a 2-tuple (tag, contents); got 1-tuple/singleton {preview(x)}")
             return {"tag": tagName}
 
 def mkCurve(tag, xs):

@@ -1,0 +1,4 @@
+Stop building the legacy ``FirstLossReq`` / ``MaxSpreadToFaceReq`` request
+shapes that the engine 0.52.10+ rejects as unsupported; ``runFirstLoss``,
+``runRootFinder("maxSpreadToFace", ...)`` and the generic ``("RootFinder", tweak,
+stop)`` path are unaffected — they compose ``RootFinderReq``.

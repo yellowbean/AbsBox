@@ -1,0 +1,6 @@
+Dependency cleanup: drop unused ``more-itertools`` and ``jsondiff``, and move
+``numpy-financial`` to the ``test`` extra (it is only used by regression
+tests). Default installs get smaller; ``pip install -e ".[test]"`` is
+required for the test suite (as CI already does). Offline parser tests now
+cover the DSL/tag/alias fixes and pool typing paths, so CI catches these
+contract regressions without an engine.

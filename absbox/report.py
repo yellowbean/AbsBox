@@ -6,6 +6,7 @@ from htpy import body, head, html, li, title, ul, div, h2, a, h3
 from markupsafe import Markup
 from .local.cf import readInspect,readPoolsCfBreakdown
 from .local.cf import readBondsCf,readFeesCf,readAccsCf,readPoolsCf,readLedgers,readTriggers
+from .local.util import dealContents
 
 class OutputType(int, enum.Enum):
     """Internal
@@ -120,7 +121,7 @@ def toHtml(r:dict, p:str, style=OutputType.Plain, debug=False):
         section5 = [] 
     # section5 
 
-    dealName = r['_deal'] & lens.Values()['name'].get() 
+    dealName = dealContents(r).get("name", "")
     
     c = html[
         head[title[dealName]],

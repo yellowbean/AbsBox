@@ -164,8 +164,8 @@ def test_mkFee_chinese_last_paid_date_field():
             "上次缴付日期": "2020-02-01",
         }
     )
-    assert fee["feeLastPaidDate"] == "2020-02-01"
-    assert "feeLastPaidDay" not in fee
+    assert fee["feeLastPaidDay"] == "2020-02-01"
+    assert "feeLastPaidDate" not in fee
 
 
 def test_mkBond_origin_date_is_validated_as_date():
@@ -263,10 +263,12 @@ def test_mkBondType_z_tranche():
 def test_mkPid_underlying_deal():
     assert mkPid(None) is None
     assert mkPid("PoolA") == {"tag": "PoolName", "contents": "PoolA"}
-    # `Deal-` prefix must take precedence over the generic pool-name branch
-    assert mkPid("Deal-ABC:BN1") == {
-        "tag": "UnderlyingDeal",
-        "contents": ["Deal-ABC", "BN1"],
+    # engine PoolId only supports PoolName | PoolConsol | DealBondFlow
+    with pytest.raises(AbsboxParseError):
+        mkPid("Deal-ABC:BN1")
+    assert mkPid(("DealBondFlow", "ABC", "BN1", "2021-06-15", 0.05)) == {
+        "tag": "DealBondFlow",
+        "contents": ["ABC", "BN1", "2021-06-15", 0.05],
     }
 
 
@@ -864,3 +866,79 @@ def test_pre_operator_map_valid_tokens_passthrough():
     assert mkPre(["date", "=", "2025-01-01"])["contents"][0] == "E"
     assert mkPre([("cumPoolDefaultedRate",), "<", 10000])["contents"][0] == "L"
     assert mkDs(("rateTest", ("cumPoolDefaultedRate",), ">=", 0.05))["contents"][1] == "GE"
+
+
+MINI_RUN_RESP = [{"tag": "MDeal", "contents": {
+                      "name": "parity",
+                      "fees": {"f1": {"feeStmt": None}},
+                      "accounts": {"a1": {"accStmt": None}},
+                      "bonds": {"B": {"tag": "Bond", "bndStmt": None}},
+                      "pool": {"tag": "MultiPool", "contents": {"PoolConsol": {"futureCf": None}}}}}
+                 , None, None, None, {}]
+
+
+def test_read_stores_deal_shape_parity():
+    """Generic.read and SPV.read must store `_deal` as the same raw engine
+    payload, so shape-sensitive consumers (positionFlow, reports) work for
+    both locales (issue #95)."""
+    from absbox.local.generic import Generic
+    from absbox.local.china import SPV
+
+    g = Generic.read(list(MINI_RUN_RESP))
+    s = SPV.read(list(MINI_RUN_RESP))
+    assert g["_deal"] is MINI_RUN_RESP[0]
+    assert s["_deal"] is MINI_RUN_RESP[0]
+    assert "contents" in g["_deal"] and "contents" in s["_deal"]
+
+
+def test_dealContents_normalizes_shapes():
+    from absbox.local.util import dealContents
+
+    raw = {"tag": "MDeal", "contents": {"name": "d"}}
+    decoded = {"MDeal": {"name": "d"}}
+    assert dealContents({"_deal": raw}) == {"name": "d"}
+    assert dealContents({"_deal": decoded}) == {"name": "d"}
+    assert dealContents(raw) == {"name": "d"}
+    with pytest.raises(AbsboxParseError):
+        dealContents({"_deal": {"junk": 1}})
+
+
+def test_positionFlow_works_for_both_deal_shapes():
+    """positionFlow reads origin balances through both _deal storage shapes,
+    scaling balance/interest/principal/cash by position/face-per-paper and
+    leaving the rate column alone (issue #95)."""
+    import pandas as pd
+    from absbox.local.util import positionFlow
+    from absbox.local.base import english_bondflow_fields
+
+    cols = english_bondflow_fields[1:]
+    df = pd.DataFrame([[1000.0, 10.0, 200.0, 0.05, 210.0, 0, 0, 1.0, ""]]
+                      , index=["2021-06-01"], columns=cols)
+
+    raw = {"_deal": {"tag": "MDeal", "contents": {"bonds": {"B": {"bndOriginInfo": {"originBalance": 1000.0}}}}}
+           ,"bonds": {"B": df}}
+    decoded = {"_deal": {"MDeal": {"bonds": {"B": {"bndOriginInfo": {"originBalance": 1000.0}}}}}
+               ,"bonds": {"B": df}}
+
+    r = positionFlow(raw, {"B": 5}, facePerPaper=100)
+    d = positionFlow(decoded, {"B": 5}, facePerPaper=100)
+    for out in (r["B"], d["B"]):
+        assert list(out["balance"]) == [500.0]
+        assert list(out["interest"]) == [5.0]
+        assert list(out["principal"]) == [100.0]
+        assert list(out["cash"]) == [105.0]
+        assert list(out["rate"]) == [0.05]
+
+
+def test_report_deal_name_reads_both_shapes():
+    from absbox import report as report_mod
+
+    class _Cell:
+        children = ()
+        attrs = {}
+
+    # dealContents path (the lens extraction used by report only ever worked
+    # on the decoded shape; raw shape raised TypeError)
+    assert report_mod.dealContents({"_deal": {"tag": "MDeal", "contents": {"name": "cn-deal"}}}).get("name") \
+        == "cn-deal"
+    assert report_mod.dealContents({"_deal": {"MDeal": {"name": "en-deal"}}}).get("name") == "en-deal"

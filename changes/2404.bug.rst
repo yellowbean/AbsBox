@@ -1,0 +1,28 @@
+Align the offline DSL with the engine's real wire shapes, verified against
+both a local 0.52.13 server and absbox.org/api/latest (0.52.14):
+
+* ``mkRsBase``/``mkRateCap`` schedule notional is wrapped as
+  ``Schedule(BalanceCurve ts)`` (engine ``RateSwapBase``); bare ``Ts`` was
+  rejected by the engine.
+* ``liqProvider`` credit: ``None`` builds ``Unlimit`` and a bare amount
+  builds ``ByAvailAmount`` — the engine's ``SupportAvailType`` expects
+  tagged objects, not strings like ``"Unlimit"``.
+* ``mkLedger`` balances build ``[Debit|Credit, amount]`` pairs — the engine
+  ``Ledger.ledgBalance`` is ``Maybe (BookDirection, Double)``, not a number.
+* ``mkBondPricingMethod("byCurve", ts)`` wraps ``ts`` in ``IRateCurve``.
+* ``mkPid``: legacy ``Deal-<deal>:<bond>`` strings now raise (the engine
+  ``PoolId`` has no such constructor); ``("DealBondFlow", deal, bond, start,
+  rate)`` builds ``DealBondFlow [deal, bond, start, rate]``.
+* Bond/fee fields renamed to the engine record names: bond emits
+  ``bndLastIntPay`` (and ``bndLastIntPays`` for multi-rate bonds instead of
+  dropping it); fee emits ``feeLastPaidDay`` (user-facing key
+  ``feeLastPaidDate`` still accepted).
+* ``DatePattern``: removed the bogus ``每周 -> DayOfWeek`` mapping the
+  engine does not implement; ``("Weekday", n)`` remains available.
+* ``Deal.stats`` keys are validated against the four stat-key sets instead
+  of being silently dropped on unknown keys.
+* ``ExpectReturn`` values are validated client-side (``DealLogs`` /
+  ``AssetLevelFlow``) in ``runDeal``/``runStructs`` with a clear error
+  before the engine rejects them.
+* ``mkTag`` rejects 1-tuple/singleton inputs with a parse error instead of
+  emitting ``{"tag": null}``-shaped wire.

@@ -1,0 +1,23 @@
+Fix client/engine contract bugs in the offline DSL and response readers:
+``mkPool`` now builds a usable pool object (single-type pools are tagged
+``LPool``/``MPool``/…, mixed pools become ``UPool`` with ``AssetUnion``
+assets) and already-tagged pools are passed through by ``runPool`` and
+accepted by ``Generic``/``SPV``; single mixed-asset pools are detected and
+tagged ``UPool`` instead of being mis-tagged from their first asset
+(``Mortgage`` + ``Loan`` previously decoded as an ``MPool`` engine-side).
+Pool collection statistics now emit the ``PoolCollectionStats`` tag the
+engine actually defines (``PoolCurCollectionStats`` never existed engine-side
+and made any ``curPoolCollectionStats``/``资产池当期至`` formula fail
+server-side); the tuple variant of the ``and`` call-alias no longer collides
+with its ``all`` twin, and the ``OffsetDatePattern`` alias typo is fixed.
+A bond with ``rateType: None`` now serializes as ``Fix IRate DayCount``
+(previously a day-count enum object was embedded in the rate slot). Chinese invoice
+aliases accept both ``应收账款`` and ``应收帐款`` in single and mixed pools,
+``ProjectedCashflow`` is supported by ``mkAssetUnion``, and the ``封包日``
+cutoff key no longer leaks into pool requests. The resec pool-flow reader
+parses ``<deal>:<bond>:<settle date>:<pct>`` keys correctly (previously every
+call raised ``IndexError``) and survives ``:`` in deal names. ``mkRevolvingPool``
+and ``mkPoolType`` raise ``AbsboxParseError`` on unknown input instead of
+returning ``None``, ``mkDeal`` fails fast when the pool is missing, and
+cashflow-only pools with no assets report a clear ``AbsboxParseError`` instead
+of a ``TypeError``.

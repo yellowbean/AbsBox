@@ -9,7 +9,8 @@ from .component import *
 from .base import * 
 from .readers import readComponentStmts, readPoolFlows, ledgerEntryRows
 from ..validation import vStr,vDate,vNum,vList,vBool,vFloat,vInt
-from .interface import mkTag,readAeson
+from ..exception import AbsboxParseError
+from .interface import mkTag
 
 def readBondStmt(respBond):
     match respBond:
@@ -83,6 +84,10 @@ class Generic:
     def buildStats(self,):
         if self.stats is None:
             return [{},{},{},{}]
+        all_stat_keys = dealStatBalance | dealStatRate | dealStatBool | dealStatInt
+        unknown_keys = set(self.stats.keys()) - all_stat_keys
+        if unknown_keys:
+            raise AbsboxParseError(f"Failed to match stats keys: {sorted(unknown_keys)}; valid keys are {sorted(all_stat_keys)}")
         a = {k:v for k,v in self.stats.items() if k in dealStatBalance }
         b = {k:v for k,v in self.stats.items() if k in dealStatRate }
         c = {k:v for k,v in self.stats.items() if k in dealStatBool }
@@ -104,7 +109,7 @@ class Generic:
                      , 'ledgers': ('ledgStmt', english_ledger_flow_fields_d, "", ledgerEntryRows)
                      }
         output = {}
-        output['_deal'] = readAeson(resp[0])
+        output['_deal'] = resp[0]
         deal_content = resp[0]['contents']
 
         output.update(readComponentStmts(deal_content, read_paths, date_key="date", handle_none=True))

@@ -7,7 +7,8 @@ from lenses import lens, ui, optics
 import toolz as tz
 
 from .base import *
-from .interface import mkTag
+from .interface import mkTag, preview
+from ..exception import AbsboxParseError
 
 
 def mapNone(x, v):
@@ -413,6 +414,21 @@ def mergeStrWithDict(s: str, m: dict) -> str:
     return json.dumps(t | m)
 
 
+def dealContents(x):
+    ''' Return the deal fields map from a run result's ``_deal`` entry.
+
+    Accepts both stored shapes: the raw engine payload
+    (``{"tag": ..., "contents": {...}}``) and the legacy aeson-decoded
+    single-key shape (``{"MDeal": {...}}``).
+    '''
+    deal = x["_deal"] if isinstance(x, dict) and "_deal" in x else x
+    if isinstance(deal, dict) and isinstance(deal.get("contents"), dict):
+        return deal["contents"]
+    if isinstance(deal, dict) and len(deal) == 1 and isinstance(next(iter(deal.values())), dict):
+        return next(iter(deal.values()))
+    raise AbsboxParseError(f"Failed to get deal contents from {preview(x)}: unsupported _deal shape")
+
+
 def positionFlow(x, m: dict, facePerPaper=100):
     ''' Get a position bond cashflow from a run result '''
     _, _bflow = list(x['bonds'].items())[0]
@@ -429,7 +445,7 @@ def positionFlow(x, m: dict, facePerPaper=100):
         
     assert isinstance(m, dict), "Position info must be a map/dict"
     
-    bOrignBal = {bondName: x['_deal']['contents']['bonds'][bondName]['bndOriginInfo']['originBalance'] for bondName, bondPos in m.items()}
+    bOrignBal = {bondName: dealContents(x)['bonds'][bondName]['bndOriginInfo']['originBalance'] for bondName, bondPos in m.items()}
     bPapersPerBond = {bondName: bondOrigBal/facePerPaper for (bondName, bondOrigBal) in bOrignBal.items()}
     bflowFactor = {bondName: (bondPos/bPapersPerBond[bondName]) for (bondName, bondPos) in m.items()}
     return {bn: calcBondFlow(bf, bflowFactor[bn]) for bn, bf in x['bonds'].items() if bn in m}
