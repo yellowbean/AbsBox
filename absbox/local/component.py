@@ -1641,9 +1641,6 @@ def mkCapacity(x):
         case ("固定", c) | ("Fixed", c):
             return mkTag(("FixedCapacity", vNum(c)))
         case ("按年限", cs) | ("ByTerm", cs):
-            for p in cs:
-                if not (isinstance(p, (list, tuple)) and len(p) == 2 and isinstance(p[0], int)):
-                    raise AbsboxParseError(f"Failed to match {preview(cs)}: ByTerm capacity must be [[<term:int>, <units>], ...]")
             return mkTag(("CapacityByTerm", cs))
         case _ :
             raise AbsboxParseError(f"Failed to match {preview(x)}:mkCapacity")

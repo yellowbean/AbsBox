@@ -677,7 +677,6 @@ Indexes
 Period
 ^^^^^^^^^^^
 
-* ``Daily``
 * ``Weekly``
 * ``BiWeekly``
 * ``Monthly``
