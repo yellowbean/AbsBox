@@ -621,7 +621,7 @@ def mkAccInt(x):
 def mkAccType(x):
     match x:
         # fixed amount
-        case ("固定", amt) | ("fix", amt) | {"固定储备金额": amt} | {"fixReserve": amt}:
+        case ("固定", amt) | ("fix", amt) | ("fixReserve", amt) | {"固定储备金额": amt} | {"fixReserve": amt}:
             return mkTag(("FixReserve", vNum(amt)))
         case ("目标", base, rate) | ("target", base, rate) | {"目标储备金额": [base, rate]} | {"targetReserve": [base, rate]}:
             match base:
@@ -789,7 +789,7 @@ def mkBndComp(bn,bo):
     def itlookslikeaBond(bm:dict):
         try:
             mkBnd("whatever",bm)
-        except Exception as e:
+        except Exception:
             return False
         return True
 
@@ -802,8 +802,10 @@ def mkBndComp(bn,bo):
             return mkTag(("BondGroup", [{k:mkBnd(k,v) for k,v in bndMap.items()}, mkBondType(pt)] ))
         case (bn, bnd) if itlookslikeaBond(bnd): # single bond
             return mkBnd(bn, bnd)
-        case (bondGroupName, bndMap) if isinstance(bndMap ,dict) : # bond group
+        case (bondGroupName, bndMap) if isinstance(bndMap ,dict) and all(isinstance(v, dict) for v in bndMap.values()): # bond group
             return mkTag(("BondGroup", [{k:mkBnd(k,v) for k,v in bndMap.items() }, None]))
+        case (bn, bnd) if isinstance(bnd, dict):
+            return mkBnd(bn, bnd) # surface the real parse error instead of "bond component"
         case _ :
             raise AbsboxParseError("Failed to match bond component")
 
@@ -1007,7 +1009,10 @@ def mkRateSwap(x):
         case {"updateDates": updateDates, "pair": pair, "base": base
               ,"start": sd, "balance": bal, **p}:
             stl_dates = p.get("settleDates", None)
-            extSettleDate = lambda y: (mkDatePattern(y[0]), vStr(y[1]))
+            def extSettleDate(y) -> tuple:
+                if not (isinstance(y, (list, tuple)) and len(y) == 2):
+                    raise AbsboxParseError(f"Failed to match settleDates: {preview(y)}; use (DatePattern, DayCount) e.g. (\"MonthEnd\", \"DC_ACT_365F\")")
+                return (mkDatePattern(y[0]), vStr(y[1]))
             dc = p.get("dayCount", DC.DC_ACT_365F.value)
             return {"rsType": mkRateSwapType(*pair),
                     "rsDayCount": dc,

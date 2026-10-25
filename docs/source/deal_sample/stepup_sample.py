@@ -17,8 +17,8 @@ test06 = Generic(
              ,"originBalance":1000
              ,"originRate":0.07
              ,"startDate":"2020-01-03"
-             ,"rateType":{"StepUp":0.08,"Spread":0.01
-                          ,"When":["After","2022-04-01","MonthEnd"]}
+             ,"rateType":{"fix":0.08}
+             ,"stepUp":("ladder","2022-04-01",0.01,"MonthEnd")
              ,"bondType":{"Sequential":None}})
       ,("B",{"balance":1000
              ,"rate":0.0
@@ -28,7 +28,7 @@ test06 = Generic(
              ,"rateType":{"Fixed":0.00}
              ,"bondType":{"Equity":None}
              }))
-    ,(("trusteeFee",{"type":{"fixFee":30}}),)
+    ,(("trusteeFee",{"type":{"fixFee":30},"feeStart":"2021-06-15"}),)
     ,{"amortizing":[
          ["payFee","acc01",['trusteeFee']]
          ,["payInt","acc01",["A1"]]
@@ -41,4 +41,7 @@ test06 = Generic(
       ,["CollectedPrepayment","acc01"]
       ,["CollectedRecoveries","acc01"]]
     ,None
-    ,None)
+    ,None
+    ,None
+    ,None
+    ,("PreClosing","Amortizing"))

@@ -6,4 +6,5 @@ Run Deals
 
    run_deal
    Irr_001
+   firstLoss
    structuring-lease-doc

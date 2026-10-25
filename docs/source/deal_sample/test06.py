@@ -30,7 +30,7 @@ test01 = Generic(
     ,tuple()
     ,{"amortizing":[
          ["calcInt","A1"]
-         ,["liqSupport", "insuranceProvider","account","acc01"
+         ,["liqSupport", "insuranceProvider","account",["acc01"]
            ,{"formula":
              ("Max"
              ,("substract",("bondDueInt","A1","B"),("accountBalance","acc01"))
@@ -49,8 +49,8 @@ test01 = Generic(
       ,["CollectedPrepayment","acc02"]
       ,["CollectedRecoveries","acc02"]]
     ,{"insuranceProvider":
-         {"lineOfCredit":100,"start":"2021-06-15"
-          ,"type":{"Reset":"MonthEnd","Formula":("bondBalance",),"Pct":0.0015}}}
+         {"start":"2021-06-15"
+          ,"type":{"formula":("bondBalance",),"pct":0.0015}}}
     ,None
     ,None
     ,None

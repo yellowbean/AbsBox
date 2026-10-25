@@ -29,12 +29,12 @@ deal_data = {
                      ,"startDate":"2020-01-03"
                      ,"rateType":{"Fixed":0.00}
                      ,"bondType":{"Equity":None}}}
-    ,"fees":{"trusteeFee":{"type":{"fixFee":30}}
-            ,"serviceFee":{"type":{"byPeriod":15}}
+    ,"fees":{"trusteeFee":{"type":{"fixFee":30},"feeStart":"2021-07-15"}
+            ,"serviceFee":{"type":{"byPeriod":15},"feeStart":"2021-07-15"}
             ,"serviceFee2":{"type":{"byTable":["MonthEnd"
                                                ,("*",("poolBalance",),0.01)
                                                ,[(0,5),(2,10),(10,15)]]
-                                   }}}
+                                   },"feeStart":"2021-07-15"}}
     ,"collect":[["CollectedCash","acc01"]]
     ,"waterfall":{"Amortizing":[
          ["payFee","acc01",['trusteeFee']]

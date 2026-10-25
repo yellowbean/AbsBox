@@ -7,7 +7,7 @@ Slides & Videos
 Slides 
 """"""""""
 
-* Goolge Slide :
+* Google Slide :
 
   *  `absbox 101 <https://docs.google.com/presentation/d/1mKJsClatZhm7UY-wzNGNgdYpy9D1niUgSJBYAw_7HOg/>`_
   *  `absbox 201 <https://docs.google.com/presentation/d/1k4gQ_9SQblPtlkR-vDDijbj2VFU64anTlViOyD5w4v0/>`_
@@ -216,9 +216,9 @@ JSON Format
 
 Deal 
 """""""""
-A deal object can be converted into json format via a property field `.json`
+A deal object can be converted into JSON format via the property field ``.json`` , which returns a ``dict``
 
-User can save this string/json object to database or file system, building a ``Deal Library``
+User can save this json object (e.g. after ``json.dumps``) to database or file system, building a ``Deal Library``
 
 .. code-block:: python
    
@@ -226,14 +226,15 @@ User can save this string/json object to database or file system, building a ``D
 
    test.json  
 
-   #{'tag': 'MDeal',
-   # 'contents': {'dates': {'tag': 'PreClosingDates',
-   #   'contents': ['2021-03-01',
-   #    '2021-06-15',
-   #    None,
-   #    '2030-01-01',
-   #    ['2021-06-15', {'tag': 'MonthEnd'}],
-   #    ['2021-07-26', {'tag': 'DayOfMonth', 'contents': 20}]]},
+   #{'tag': 'FDeal',
+   # 'contents': {'dates': {'tag': 'GenericDates',
+   #   'contents': {'CutoffDate': {'tag': 'SingletonDate', 'contents': '2021-03-01'},
+   #    'ClosingDate': {'tag': 'SingletonDate', 'contents': '2021-06-15'},
+   #    'FirstPayDate': {'tag': 'SingletonDate', 'contents': '2021-07-26'},
+   #    'FirstCollectDate': {'tag': 'SingletonDate', 'contents': '2021-06-15'},
+   #    'StatedMaturityDate': {'tag': 'SingletonDate', 'contents': '2030-01-01'},
+   #    'DistributionDates': {'tag': 'DayOfMonth', 'contents': 20},
+   #    'CollectionDates': {'tag': 'MonthEnd'}}},
    #  'name': 'Multiple Waterfall',
    #  'status': {'tag': 'Amortizing'},
    #  'pool': {'assets': [{'tag': 'Mortgage',

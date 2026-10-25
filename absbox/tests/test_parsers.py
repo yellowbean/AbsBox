@@ -18,6 +18,7 @@ from absbox.local.component import (
     mkBndComp,
     mkBondType,
     mkPid,
+    mkRateSwap,
     mkTradeType,
     mkOrder,
     mkCustom,
@@ -303,8 +304,22 @@ def test_mkFee_mkAcc_mkCollection():
     acc = mkAcc("acc01", {"balance": 0})
     assert acc["accName"] == "acc01"
 
+    # all documented fix-reserve forms build the same wire
+    for rt in [("fix", 1000), ("fixReserve", 1000), {"fixReserve": 1000}]:
+        assert mkAcc("R", {"balance": 0, "type": rt})["accType"] == {
+            "tag": "FixReserve", "contents": 1000}
+
     coll = mkCollection(["CollectedInterest", "acc01"])
     assert coll["tag"] == "Collect"
+
+
+def test_mkRateSwap_settleDates_must_be_tuple():
+    swap = {"updateDates": "MonthEnd", "pair": [0.04, ("SOFR1M", 0.0)],
+            "base": {"fix": 100}, "start": "2021-06-15", "balance": 100}
+    with pytest.raises(AbsboxParseError):
+        mkRateSwap(swap | {"settleDates": "MonthEnd"})
+    w = mkRateSwap(swap | {"settleDates": ("MonthEnd", "DC_ACT_365F")})
+    assert w["rsSettleDates"] == ({"tag": "MonthEnd"}, "DC_ACT_365F")
 
 
 def test_util_helpers():

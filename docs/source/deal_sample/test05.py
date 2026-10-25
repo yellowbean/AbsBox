@@ -32,8 +32,8 @@ test05 = Generic(
     ,{"amortizing":[
          ["calcInt","A1"]
          ,["liqAccrue","insuranceProvider"]
-         ,["liqSupport", "insuranceProvider","interest","A1"]
-         ,["liqSupport", "insuranceProvider","interest","B"]
+         ,["liqSupport", "insuranceProvider","interest",["A1"]]
+         ,["liqSupport", "insuranceProvider","interest",["B"]]
          ,["accrueAndPayInt","acc01",["A1","B"]]
          ,["payPrin","acc02",["A1"]]
          ,["payPrin","acc02",["B"]]
@@ -48,8 +48,8 @@ test05 = Generic(
       ,["CollectedPrepayment","acc02"]
       ,["CollectedRecoveries","acc02"]]
     ,{"insuranceProvider":
-         {"lineOfCredit":100,"start":"2021-06-15","fixRate":0.01
-          ,"rateAccDates":"MonthEnd","lastAccDate":"2021-06-15"}}
+         {"type":{"total":100},"credit":100,"start":"2021-06-15"
+          ,"rateType":("fix",0.01),"rate":0.01,"dueIntDate":"2021-06-15"}}
     ,None
     ,None
     ,None

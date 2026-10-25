@@ -34,20 +34,20 @@ GNMA_36208ALG4 = Generic(
       ,)
     ,(("Ginnie_Mae_guaranty",
        {"type":{"annualPctFee":[("poolBalance",),0.0006]}
-       ,"feeDueDate":"2023-04-26"}),
+       ,"feeDueDate":"2023-04-26","feeStart":"2023-04-26"}),
       ("service_fee",
        {"type":{"annualPctFee":[("poolBalance",)
                                 ,("Max"
                                   ,("substract",("poolWaRate",),("bondRate","A1"))
                                   ,("constant",0))]}
-       ,"feeDueDate":"2023-04-26"}))
+       ,"feeDueDate":"2023-04-26","feeStart":"2023-04-26"}))
     ,{"amortizing":[
          ["calcFee","Ginnie_Mae_guaranty","service_fee"]
          ,["payFee","acc01",['Ginnie_Mae_guaranty',"service_fee"]]
          ,["payInt","acc01",["A1"]]
          ,["payPrin","acc01",["A1"]]]
       ,"endOfCollection":[
-          ["liqSupport","Ginnie_Mae","account","acc01"
+          ["liqSupport","Ginnie_Mae","account",["acc01"]
               ,{"formula": 
                 ("floorWithZero"
                 ,("substract",("cumPoolDefaultedBalance",)
@@ -58,7 +58,7 @@ GNMA_36208ALG4 = Generic(
       ,["CollectedPrincipal","acc01"]
       ,["CollectedPrepayment","acc01"]
       ,["CollectedRecoveries","acc01"]]
-    ,{"Ginnie_Mae":{"type":"Unlimited","start":"2023-05-26"}}
+    ,{"Ginnie_Mae":{"type":"Unlimit","start":"2023-05-26"}}
     ,None
     ,None
     ,None

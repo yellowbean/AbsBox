@@ -33,8 +33,8 @@ test01 = Generic(
              ,"rateType":{"Fixed":0.00}
              ,"bondType":{"Equity":None}
              }))
-    ,(("trusteeFee",{"type":{"fixFee":30}})
-      ,("borrowerFee",{"type":{"numFee":[["DayOfMonth",20],("borrowerNumber",),1]}}))
+    ,(("trusteeFee",{"type":{"fixFee":30},"feeStart":"2021-06-15"})
+      ,("borrowerFee",{"type":{"numFee":[["DayOfMonth",20],("borrowerNumber",),1]},"feeStart":"2021-06-15"}))
     ,{"amortizing":[
           ["calcFee",'borrowerFee']
          ,["payFee","acc01",['borrowerFee']]

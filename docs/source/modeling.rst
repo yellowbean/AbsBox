@@ -780,9 +780,9 @@ if deal is ``ongoing`` ( which has been issued ), the difference is that in ``Pr
     :code:`[<last pool collection date>, <next pool collection date>]`
 ``pay``
     :code:`[<last distribution payment date>, <next distribution payment date>]`
-``poolFeq``
+``poolFreq``
     a :ref:`DatePattern`, describe the dates that collect cashflow from pool
-``payFeq``
+``payFreq``
     a :ref:`DatePattern`, describe the dates that distribution funds to fees and bonds.
 
 .. code-block:: python
@@ -1161,7 +1161,7 @@ The fee due amount is equal to ``max ( <Formula 1> - <Formula 2>,0)``
 syntax
   ``("targetBalanceFee", <Formula 1>, <Formula 2>)``
 
-  ``{"targetBalanceFee:[<Formula 1>,<Formula 2>]}``
+  ``{"targetBalanceFee": [<Formula 1>,<Formula 2>]}``
 
   .. versionadded:: 0.52.3
   ``{ "targetBalDue": <Formula> ,"targetBalOffset": <Formula>}``
@@ -1172,10 +1172,11 @@ syntax
      ,{"type":{"targetBalanceFee":[("poolBalance",),("bondBalance",)]}
      ,"feeStart":"2022-01-01"})
 
-   # the fee is total funded amount * 1%
-   ("upfrontFee"
-     ,{"type":{"targetBalanceFee":[ ("*", ("totalFunded","A1","E"),0.01)
-                                     , ("feeTxnAmt",None,"upfrontFee") ]}})
+    # the fee is total funded amount * 1%
+    ("upfrontFee"
+      ,{"type":{"targetBalanceFee":[ ("*", ("totalFunded","A1","E"),0.01)
+                                      , ("feeTxnAmt",None,"upfrontFee") ]}
+        ,"feeStart":"2022-01-01"})
 
 fee by collection periods
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2082,7 +2083,7 @@ for example:
 
 .. code-block:: python 
 
-  ["pool_A","pool_B","pool_C"],"CollectedCash","acc01"]
+  [["pool_A","pool_B","pool_C"],"CollectedCash","acc01"]
 
 
 
@@ -2308,7 +2309,7 @@ Interest
 
 there are 3 types of `Interest` settings for bonds. 
 
-.. seealso:: User has the option to accrue with custom rate / custom balance in waterfall action ``calIntBy``
+.. seealso:: User has the option to accrue with custom rate / custom balance in waterfall action ``calcIntBy``
 
 
 Fix Rate 
@@ -3787,11 +3788,11 @@ Add a trigger
 
 .. code-block:: python
   
-  "effects":[("newTrigger"
+  "effects":["newTrigger"
               ,{"condition":...
                ,"effects":...
                ,"status":...
-               ,"curable":...})]
+               ,"curable":...}]
 
 Perform Actions
   .. versionadded:: 0.28.5
@@ -3970,8 +3971,7 @@ It provides liquidity up to a fix amount of cash with a cap
 
 .. code-block:: python 
 
-  {"lineOfCredit" : 1000
-  ,"type": {"total": <Balance> }
+  {"type": {"total": <Balance> }
   ,"start": <Date>}
 
 
@@ -3982,8 +3982,7 @@ The line of credit will be reset periodically.
 
 .. code-block:: python 
 
-  {"lineOfCredit" : 1000
-  ,"type": {"reset":<DatePattern>
+  {"type": {"reset":<DatePattern>
            ,"quota":<CapToReset>}
   ,"start": <Date>}
 
@@ -3994,8 +3993,7 @@ The line of credit is determined by a ``<Formula>``.
 
 .. code-block:: python 
 
-  {"lineOfCredit" : 1000
-  ,"type":{"formula":<Formula>
+  {"type":{"formula":<Formula>
            ,"pct":<Percentage>}
   ,"start": <Date>}
 
@@ -4068,7 +4066,8 @@ Interest Rate Swap
 it was modeled as a map ,with key as name to swap ,value serve as properties to swap. The very reason using a map becasue a deal can have multiple Swap contract.
 
 Fields:
-  * ``settleDates`` -> :ref:`DatePattern`,describe the settlement dates .
+  * ``updateDates`` -> :ref:`DatePattern` (required), describe the reset dates of the swap balance
+  * ``settleDates`` -> (optional), settlement dates of the swap , described by a tuple ``(DatePattern, DayCount)``
   * ``pair`` -> describe rates to swap (paying rate in left, receiving rate on right)
     
     it can be float to float , fix to float , or float to fix 
@@ -4084,7 +4083,8 @@ example:
 .. code-block:: python
 
   swap = {
-      "swap1":{"settleDates":"MonthEnd"
+      "swap1":{"updateDates":"MonthEnd"
+               ,"settleDates":("MonthEnd","DC_ACT_365")
                ,"pair":[("LPR5Y",0.01),0.05] # paying a float rate with spread ,and receiving a fix annualized rate
                ,"base":{"formula":("poolBalance",)}
                ,"start":"2021-06-25"
@@ -4124,7 +4124,7 @@ example:
               ,"settleDates":"QuarterEnd"
               ,"rate":0.035
               ,"lastSettleDate":"2023-06-01"
-              ,"netCash":100
+              ,"netcash":100
               }
   }
 
@@ -4159,14 +4159,20 @@ The data is helpful when schedule payment was presented in ``index-based``.
 
 .. code-block:: python
 
+    # Generic positional args: name, dates, pool, accounts, bonds, fees,
+    # waterfall, collection, liquidityProvider, rateSwap, currencySwap,
+    # trigger, status, custom, ledgers, rateCap, stats
     (
     ....
-    ,None
-    ,("PreClosing","Amortizing")
-    ,None
-    ,None
-    ,None
-    ,{"BondPaidPeriod": 2,"PoolCollectedPeriod":0}
+    ,None                       # 9. liquidity provider
+    ,None                       # 10. rate swap
+    ,None                       # 11. reserve for currency swap
+    ,None                       # 12. trigger
+    ,("PreClosing","Amortizing")# 13. deal status
+    ,None                       # 14. custom data
+    ,None                       # 15. ledgers
+    ,None                       # 16. rate caps
+    ,{"BondPaidPeriod": 2,"PoolCollectedPeriod":0}  # 17. stats
     )
 
 With the map-based sugar ``mkDeal``, pass the same facts under the ``"stats"`` key:

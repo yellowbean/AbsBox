@@ -29,7 +29,7 @@ deal_data = {
                      ,"startDate":"2020-01-03"
                      ,"rateType":{"Fixed":0.00}
                      ,"bondType":{"Equity":None}}}
-    ,"fees":{"trusteeFee":{"type":{"fixFee":30}}}
+    ,"fees":{"trusteeFee":{"type":{"fixFee":30},"feeStart":"2021-07-15"}}
     ,"collect":[["CollectedCash","acc01"]]
     ,"waterfall":{"Amortizing":[
          ['settleCap',"acc01","cap1"]

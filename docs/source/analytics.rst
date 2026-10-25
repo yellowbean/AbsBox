@@ -1409,7 +1409,7 @@ Running
    * - Source
      - Response Type
      - Function
-   * - ``Run Sinlge Asset``
+   * - ``Run Single Asset``
      - Single Result
      - ``api.runAsset()``
    * - ``Run a Pool of Assets``

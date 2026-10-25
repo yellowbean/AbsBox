@@ -1087,7 +1087,7 @@ A deal object
 
 A deal object either initialized with `SPV` or `Generic` class, is actually a python `dataclass` which implements a ``.json`` property .
 
-The ``json()`` function will convert the class to a json representation string .
+The ``.json`` property returns the deal as a ``dict`` (aeson-compatible shape); serialize it with ``json.dumps`` when a string is needed.
 
 A string 
 ^^^^^^^^^^^^^^^
@@ -1095,12 +1095,12 @@ A string
 Now with that string, user can just write it into a No-SQL document database . or sent via Email , or Fax it .
 
 
-How to use Deal JSON string 
+How to use Deal JSON 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The JSON string from `.json` property can be used as part of post request send to `Hastructure` engine.
+The JSON (``dict``) from the ``.json`` property can be used as part of post request send to `Hastructure` engine.
 
-But unfortunately there is no way convert the string back to python class so far.
+But unfortunately there is no way convert the json back to python class so far.
 
 
 Primary Pricing with `Absbox`

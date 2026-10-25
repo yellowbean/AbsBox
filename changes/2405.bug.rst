@@ -1,0 +1,25 @@
+Bring the docs back in line with the wrapper DSL (audited docs vs code):
+
+* ``DatePattern`` constants: add the missing ``DC_ACT_365`` member to the
+  public ``DC`` enum (engine and docs both list it).
+* ``mkAccType`` accepts the documented ``("fixReserve", <amount>)`` tuple,
+  so all three documented fix-reserve forms build.
+* ``mkRateSwap`` raises a clear ``AbsboxParseError`` when ``settleDates``
+  is not a ``(DatePattern, DayCount)`` pair (previously a raw schema error).
+* ``mkBndComp`` no longer mis-classifies a malformed single bond as a bond
+  group; the underlying bond parse error is surfaced.
+* Docs: swap section documents the required ``updateDates`` and the
+  ``settleDates`` tuple, rate-cap example uses ``netcash``, liquidity
+  provider examples drop the unused ``lineOfCredit`` key, fee
+  ``upfrontFee`` example gains the required ``feeStart``, deal-stats tuple
+  example shows the real ``Generic`` argument slots, trigger
+  ``newTrigger`` effect uses the accepted list form, plus small rst
+  typos (``poolFreq``/``payFreq``, ``targetBalanceFee`` syntax,
+  multi-pool collect brackets, ``calcIntBy`` spelling).
+* Docs: ``.json`` is documented as returning a ``dict`` (not a string) and
+  the JSON sample reflects the current ``FDeal``/``GenericDates`` wire.
+* Docs: all ``deal_sample`` files and the SRT notebook are updated to the
+  current DSL (``feeStart``, list-valued bond targets, current liquidity
+  provider keys, 4-element floater rate, step-up bond by ``stepUp``,
+  ``price``-action names, ``runPool(rateAssump=...)``, ``PreClosing``
+  status for pre-closing dates); every sample now builds again.

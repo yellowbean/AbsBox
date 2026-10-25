@@ -173,6 +173,7 @@ class DC(enum.Enum):  # TODO need to check with HS code
     DC_30E_360 = "DC_30E_360"
     DC_30Ep_360 = "DC_30Ep_360"
     DC_ACT_360 = "DC_ACT_360"
+    DC_ACT_365 = "DC_ACT_365"
     DC_ACT_365A = "DC_ACT_365A"
     DC_ACT_365L = "DC_ACT_365L"
     DC_NL_365 = "DC_NL_365"
